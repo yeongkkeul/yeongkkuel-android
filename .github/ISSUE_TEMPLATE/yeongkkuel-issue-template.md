@@ -13,3 +13,4 @@ assignees: ''
 - [ ] task3
 
 <!-- TO DO task를 상세하게 나눠주세요! -->
+<!-- ISSUE 제목 형식: [FEATURE] 작업 주제 -->
