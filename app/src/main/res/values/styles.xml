@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+        <style name="CustomTabLayoutStyle" parent="Widget.Design.TabLayout">
+            <item name="tabRippleColor">@null</item>
+        </style>
+</resources>
