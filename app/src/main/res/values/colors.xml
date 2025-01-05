@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="black">#FF000000</color>
+    <color name="black1">#EEEEEE</color>
     <color name="black2">#999999</color>
     <color name="black3">#1E1E1E</color>
 
     <color name="white">#FFFFFFFF</color>
+
+    <color name="main1">#5B3FE7</color>
 
     <color name="tab_indicator">#00C9B2</color>
 
