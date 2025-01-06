@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="title_semib">
+        <item name="android:fontStyle">normal</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontWeight">600</item>
+        <item name="android:textSize">22sp</item>
+    </style>
+
+    <style name="humm_semibo">
+        <item name="android:fontStyle">normal</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontWeight">600</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="humm_medium">
+        <item name="android:fontStyle">normal</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontWeight">500</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="body_semibo">
+        <item name="android:fontStyle">normal</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontWeight">600</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="body_medium">
+        <item name="android:fontStyle">normal</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontWeight">500</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="body_regula">
+        <item name="android:fontStyle">normal</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontWeight">400</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="small_semib">
+        <item name="android:fontStyle">normal</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontWeight">600</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="small_regul">
+        <item name="android:fontStyle">normal</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontWeight">400</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="tiny_medium">
+        <item name="android:fontStyle">normal</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontWeight">500</item>
+        <item name="android:textSize">8sp</item>
+    </style>
+</resources>
