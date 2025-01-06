@@ -1,8 +1,11 @@
 <resources>
     <string name="app_name">yeongkkuel</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-
+    <string name="splash_logo_description">splash_logo</string>
+    <string name="login_kakao">카카오로 시작하기</string>
+    <string name="login_gmail">G-Mail로 시작하기</string>
+    <string name="login_title">함께라면 할 수 있다!</string>
+    <string name="login_subtitle">재미있는 무지출 챌린지</string>
 
     <!-- Stat -->
     <string name="stat_daily">일간</string>
