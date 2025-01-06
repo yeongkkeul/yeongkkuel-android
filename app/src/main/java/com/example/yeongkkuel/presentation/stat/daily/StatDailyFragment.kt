@@ -17,6 +17,7 @@ import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.collectLatest
@@ -45,7 +46,31 @@ class StatDailyFragment : Fragment() {
     }
 
     private fun initView() = with(binding) {
+        fun initBottomSheet(){
+            val bottomSheet = binding.clHomeItemBotSheet
+            bottomSheet.visibility = View.VISIBLE
+            val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
 
+            val displayHeight = resources.displayMetrics.heightPixels
+            val peekHeight = (displayHeight - resources.getDimensionPixelSize(R.dimen.space_440dp)) // 244dp 빼기
+
+            // BottomSheet의 초기 상태 설정
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            bottomSheetBehavior.peekHeight = peekHeight // 계산된 값 설정
+
+            // BottomSheet 이벤트 핸들링
+            bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    // 상태 변화에 따른 처리
+                }
+
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                    // 슬라이딩 중에 필요한 처리
+                }
+            })
+        }
+
+        initBottomSheet()
     }
 
     private fun initViewModel() = with(viewModel) {
@@ -58,13 +83,16 @@ class StatDailyFragment : Fragment() {
     }
 
     private fun onBind(uiState: StatDailyUiState) = with(binding) {
+
+        // pie chart 적용
         uiState.chartList.let{ dataList ->
             val dataSet = PieDataSet(dataList, "")
 
             dataSet.colors = listOf(
                 ContextCompat.getColor(requireContext(), R.color.black1),
+                ContextCompat.getColor(requireContext(), R.color.pink),
                 ContextCompat.getColor(requireContext(), R.color.main1),
-            )
+                )
 
             dataSet.valueTextSize = 16F
             dataSet.setDrawValues(false) // value 비활성화

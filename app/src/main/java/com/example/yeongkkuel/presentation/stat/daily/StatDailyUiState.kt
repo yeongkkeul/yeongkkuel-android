@@ -9,7 +9,8 @@ data class StatDailyUiState(
         fun init() = StatDailyUiState(
             chartList = listOf(
                 PieEntry(0.5f, "나머지"),
-                PieEntry(0.5f, "사용량"),
+                PieEntry(0.5f, "사용량1"),
+                PieEntry(0.5f, "사용2"),
             )
         )
     }

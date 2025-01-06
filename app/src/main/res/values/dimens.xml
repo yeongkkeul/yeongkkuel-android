@@ -6,4 +6,11 @@
     <dimen name="space_s_large">18dp</dimen>
     <dimen name="space_large">20dp</dimen>
     <dimen name="space_x_large">24dp</dimen>
+
+
+    <!--Stat-->
+    <dimen name="bottom_sheet_min_height">100dp</dimen>
+    <dimen name="box_radius">16dp</dimen>
+    <dimen name="space_440dp">440dp</dimen>
+    <dimen name="sp_standard">15sp</dimen>
 </resources>
