@@ -24,7 +24,17 @@ data class StatDailyUiState(
                     SpendingList.Spending("과자", 15000),
                     SpendingList.Spending("과자", 15000),
                     SpendingList.Spending("과자", 15000),
-                    )
+                    ),
+                selfImprovementList = listOf(
+                    SpendingList.Spending("과자", 15000),
+                    SpendingList.Spending("과자", 15000),
+                    SpendingList.Spending("과자", 15000),
+                ),
+                beautyList = listOf(
+                    SpendingList.Spending("과자", 15000),
+                    SpendingList.Spending("과자", 15000),
+                    SpendingList.Spending("과자", 15000),
+                )
             )
         )
     }
