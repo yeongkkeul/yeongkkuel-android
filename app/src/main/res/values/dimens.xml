@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="space_xx_small">8dp</dimen>
     <dimen name="space_x_small">8dp</dimen>
     <dimen name="space_small">12dp</dimen>
     <dimen name="space_median">16dp</dimen>
@@ -12,5 +13,7 @@
     <dimen name="bottom_sheet_min_height">100dp</dimen>
     <dimen name="box_radius">16dp</dimen>
     <dimen name="space_440dp">440dp</dimen>
+    <dimen name="sp_large">22sp</dimen>
     <dimen name="sp_standard">15sp</dimen>
+    <dimen name="sp_small">12sp</dimen>
 </resources>

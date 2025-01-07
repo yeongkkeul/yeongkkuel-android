@@ -3,14 +3,28 @@ package com.example.yeongkkuel.presentation.stat.daily
 import com.github.mikephil.charting.data.PieEntry
 
 data class StatDailyUiState(
-    val chartList: List<PieEntry>
-){
-    companion object{
+    val spendingList: SpendingList
+) {
+    data class SpendingList(
+        val total: Int = 300000,
+        val snackList: List<Spending> = emptyList(),
+        val selfImprovementList: List<Spending> = emptyList(),
+        val beautyList: List<Spending> = emptyList()
+    ) {
+        data class Spending(
+            val kind: String,
+            val price: Int
+        )
+    }
+
+    companion object {
         fun init() = StatDailyUiState(
-            chartList = listOf(
-                PieEntry(0.5f, "나머지"),
-                PieEntry(0.5f, "사용량1"),
-                PieEntry(0.5f, "사용2"),
+            spendingList = SpendingList(
+                snackList = listOf(
+                    SpendingList.Spending("과자", 15000),
+                    SpendingList.Spending("과자", 15000),
+                    SpendingList.Spending("과자", 15000),
+                    )
             )
         )
     }
