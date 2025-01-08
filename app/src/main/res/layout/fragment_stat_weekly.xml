@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/space_median"
+    tools:context=".presentation.stat.monthly.StatMonthlyFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_topCl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_box_blue"
+        android:clipToOutline="true"
+        android:paddingHorizontal="@dimen/space_median"
+        android:paddingVertical="@dimen/space_x_small"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tv_targetSpending"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="56,700원"
+            android:textColor="@color/white"
+            android:textSize="@dimen/sp_large"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_currentWeek"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_x_small"
+            android:text="11월 2주"
+            android:textColor="@color/white"
+            android:textSize="@dimen/sp_standard"
+            app:layout_constraintBottom_toBottomOf="@id/tv_targetSpending"
+            app:layout_constraintStart_toEndOf="@id/tv_targetSpending" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_week"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/cl_topCl"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="@dimen/space_small"
+        android:paddingVertical="@dimen/space_x_small"
+        android:paddingHorizontal="@dimen/space_median">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_weekSending"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="7"
+            android:orientation="vertical"
+            tools:listitem="@layout/item_stat_weekly_week"
+            tools:itemCount="7"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/lineChart"
+        android:layout_height="120dp"
+        android:layout_width="match_parent"
+        app:layout_constraintTop_toBottomOf="@id/cl_week"
+        android:layout_marginTop="@dimen/space_x_small"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

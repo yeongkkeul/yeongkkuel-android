@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="black">#FF000000</color>
+
     <color name="white">#FFFFFFFF</color>
+
     <color name="main1">#5B3FE7</color>
     <color name="main2">#F8F7FF</color>
     <color name="main3">#3C19B0</color>
@@ -15,4 +17,12 @@
     <color name="black0Clicked">#DEDEDE</color>
     <color name="black1">#EEEEEE</color>
     <color name="black2">#999999</color>
+    <color name="black3">#1E1E1E</color>
+
+    <color name="pink">#FF5CA3</color>
+    <color name="blue">#4385F7</color>
+    <color name="green">#77BF48</color>
+
+    <color name="tab_indicator">#00C9B2</color>
+
 </resources>

@@ -54,4 +54,10 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.timber)
+
+    // Pie chart(원형 차트)
+    implementation(libs.mpandroidchart)
+
+    // Gson
+    implementation(libs.gson)
 }
