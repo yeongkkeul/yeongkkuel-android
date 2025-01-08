@@ -60,4 +60,7 @@ dependencies {
 
     // Gson
     implementation(libs.gson)
+
+    // ActivityViewModels
+    implementation(libs.androidx.activity.ktx)
 }

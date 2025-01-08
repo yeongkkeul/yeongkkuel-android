@@ -16,6 +16,8 @@ timber = "5.0.1"
 mpandroidchart = "3.1.0"
 gson = "2.8.9"
 
+activity-ktx = "1.9.3"
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -34,6 +36,9 @@ mpandroidchart = { group = "com.github.PhilJay", name = "MPAndroidChart", versio
 
 # Gson
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+
+# Activity
+androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activity-ktx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
