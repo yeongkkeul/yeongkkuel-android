@@ -114,24 +114,24 @@ class StatDailyFragment : Fragment() {
                 }
             })
 
-            viewPagerTouchListener?.let { listener ->
-                bottomSheet.run {
-                    setOnTouchListener { _, event ->
-                        when (event.action) {
-                            MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
-                                // BottomSheet가 터치될 때 ViewPager의 터치 이벤트를 막음
-                                listener.disableViewPagerTouch() // ViewPager 터치 비활성화
-                            }
-
-                            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                                // BottomSheet의 터치가 끝나면 ViewPager 터치 이벤트 활성화
-                                listener.enableViewPagerTouch() // ViewPager 터치 활성화
-                            }
-                        }
-                        false // 터치 이벤트를 BottomSheet가 처리하도록 함
-                    }
-                }
-            }
+//            viewPagerTouchListener?.let { listener ->
+//                bottomSheet.run {
+//                    setOnTouchListener { _, event ->
+//                        when (event.action) {
+//                            MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
+//                                // BottomSheet가 터치될 때 ViewPager의 터치 이벤트를 막음
+//                                listener.disableViewPagerTouch() // ViewPager 터치 비활성화
+//                            }
+//
+//                            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+//                                // BottomSheet의 터치가 끝나면 ViewPager 터치 이벤트 활성화
+//                                listener.enableViewPagerTouch() // ViewPager 터치 활성화
+//                            }
+//                        }
+//                        false // 터치 이벤트를 BottomSheet가 처리하도록 함
+//                    }
+//                }
+//            }
 
             rvBotSheetCategory.run {
                 // RecyclerView 터치 중에는 BottomSheet가 터치 이벤트를 받지 않도록 설정
