@@ -75,10 +75,10 @@ class StatWeeklyFragment : Fragment() {
                     it.entry
                 }
                 entries.forEachIndexed { index, entry ->
-                    val iconRes = if (entry.y > uiState.targetSpending) {
-                        R.drawable.ic_hamberger  // 적절한 리소스 이름으로 변경
+                    val iconRes = if (entry.y >= uiState.targetSpending) {
+                        R.drawable.ic_point_up  // 적절한 리소스 이름으로 변경
                     } else {
-                        R.drawable.ic_bell  // 적절한 리소스 이름으로 변경
+                        R.drawable.ic_point_down  // 적절한 리소스 이름으로 변경
                     }
                     val drawable = ContextCompat.getDrawable(requireContext(), iconRes)
 

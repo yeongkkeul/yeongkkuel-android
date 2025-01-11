@@ -63,7 +63,7 @@ class StatWeeklyWeekListAdapter(
 
             targetSpending?.let { target ->
                 item.entry?.let { entry ->
-                    if (target.toFloat() < entry.y) {
+                    if (target.toFloat() <= entry.y) {
                         val tvList = listOf(
                             tvDayOfWeek,
                             tvDay,
