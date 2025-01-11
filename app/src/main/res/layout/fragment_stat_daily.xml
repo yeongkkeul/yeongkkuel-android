@@ -34,10 +34,11 @@
 
         <TextView
             android:id="@+id/tv_chartDate"
+            style="@style/body_regula"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="12월 31일 (화)"
-            android:textSize="@dimen/sp_standard"
+
             app:layout_constraintBottom_toTopOf="@id/tv_chartTarget"
             app:layout_constraintEnd_toEndOf="@id/iv_chartCenter"
             app:layout_constraintStart_toStartOf="@id/iv_chartCenter"
@@ -47,11 +48,12 @@
 
         <TextView
             android:id="@+id/tv_chartTarget"
+            style="@style/title_semib"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="25,000원"
             android:textColor="@color/main1"
-            android:textSize="@dimen/sp_large"
+
             app:layout_constraintBottom_toTopOf="@id/tv_chartDescription"
             app:layout_constraintEnd_toEndOf="@id/iv_chartCenter"
             app:layout_constraintStart_toStartOf="@id/iv_chartCenter"
@@ -60,11 +62,11 @@
 
         <TextView
             android:id="@+id/tv_chartDescription"
+            style="@style/small_regul"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="하루 목표 지출액보다\n2,500원 덜 썻어요!"
-            android:textSize="12sp"
             android:gravity="center"
+            android:text="하루 목표 지출액보다\n2,500원 덜 썻어요!"
             app:layout_constraintBottom_toBottomOf="@id/iv_chartCenter"
             app:layout_constraintEnd_toEndOf="@id/iv_chartCenter"
             app:layout_constraintStart_toStartOf="@id/iv_chartCenter"
@@ -87,10 +89,10 @@
 
         <TextView
             android:id="@+id/tv_bottomSheetDate"
+            style="@style/humm_semibo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
-            android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="12월 31일 화요일" />
@@ -105,132 +107,12 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/tv_bottomSheetDate" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_snack"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_botSheet_category"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_small"
-            android:background="@drawable/bg_box_white"
-            android:clipToOutline="true"
-            android:paddingHorizontal="@dimen/space_median"
-            android:paddingTop="@dimen/space_median"
-            android:paddingBottom="@dimen/space_small"
-            app:layout_constraintTop_toBottomOf="@id/tv_bottomSheetDate">
-
-            <TextView
-                android:id="@+id/tv_snack"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="간식/음료"
-                android:textColor="@color/blue"
-                android:textSize="@dimen/sp_standard"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageView
-                android:id="@+id/iv_btnSnackPlus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_plus_blue"
-                app:layout_constraintBottom_toBottomOf="@id/tv_snack"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/tv_snack" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_snack"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_x_small"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_snack"
-                tools:itemCount="3"
-                tools:listitem="@layout/item_stat_daily_spending" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_selfImprovement"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_small"
-            android:background="@drawable/bg_box_white"
-            android:clipToOutline="true"
-            android:paddingHorizontal="@dimen/space_median"
-            android:paddingTop="@dimen/space_median"
-            android:paddingBottom="@dimen/space_small"
-            app:layout_constraintTop_toBottomOf="@id/cl_snack">
-
-            <TextView
-                android:id="@+id/tv_selfImprovement"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="자기계발"
-                android:textColor="@color/pink"
-                android:textSize="@dimen/sp_standard"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageView
-                android:id="@+id/iv_selfImprovement"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_plus_pink"
-                app:layout_constraintBottom_toBottomOf="@id/tv_selfImprovement"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/tv_selfImprovement" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_selfImprovement"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_x_small"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_selfImprovement"
-                tools:itemCount="3"
-                tools:listitem="@layout/item_stat_daily_spending" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_beauty"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_small"
-            android:background="@drawable/bg_box_white"
-            android:clipToOutline="true"
-            android:paddingHorizontal="@dimen/space_median"
-            android:paddingTop="@dimen/space_median"
-            android:paddingBottom="@dimen/space_small"
-            app:layout_constraintTop_toBottomOf="@id/cl_selfImprovement">
-
-            <TextView
-                android:id="@+id/tv_beauty"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="미용"
-                android:textColor="@color/green"
-                android:textSize="@dimen/sp_standard"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageView
-                android:id="@+id/iv_beauty"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_plus_green"
-                app:layout_constraintBottom_toBottomOf="@id/tv_beauty"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/tv_beauty" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_beauty"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_x_small"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_beauty"
-                tools:itemCount="3"
-                tools:listitem="@layout/item_stat_daily_spending" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
+            android:layout_height="0dp"
+            android:layout_marginVertical="@dimen/sp_small"
+            app:layout_constraintTop_toBottomOf="@id/tv_bottomSheetDate"
+            tools:listitem="@layout/item_botsheet_category"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -3,19 +3,31 @@ package com.example.yeongkkuel.presentation.stat.weekly
 import com.github.mikephil.charting.data.Entry
 
 data class StatWeeklyUiState(
-    val charEntryList: List<Entry>
+    val targetSpending: Int,
+    val weekList: List<DayData>
 ) {
+    data class DayData(
+        val dayOfWeek: Week,
+        val entry: Entry?,
+        val totalSpending: Int?
+    )
+
     companion object {
         fun init() = StatWeeklyUiState(
-            charEntryList = listOf(
-                Entry(0f, 10f),
-                Entry(1f, 20f),
-                Entry(2f, 15f),
-                Entry(3f, 30f),
-//                Entry(4f, 10f),
-//                Entry(5f, 20f),
-//                Entry(6f, 15f),
+            targetSpending = 10000,
+            weekList = listOf(
+                DayData(Week.MON, Entry(0f, 2000f), 200),
+                DayData(Week.TUE, Entry(1f, 1500f), 150),
+                DayData(Week.WED, Entry(2f, 30000f), 300),
+                DayData(Week.THU, Entry(3f, 500f), 50),
+                DayData(Week.FRI, Entry(4f, 25000f), 250),
+                DayData(Week.SAT, null, null),
+                DayData(Week.SUN, null, null),
             )
         )
     }
+}
+
+enum class Week(val kor: String) {
+    SUN("일"), MON("월"), TUE("화"), WED("수"), THU("목"), FRI("금"), SAT("토")
 }

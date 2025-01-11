@@ -1,19 +1,26 @@
 package com.example.yeongkkuel.presentation.stat.daily
 
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
-import com.example.yeongkkuel.databinding.FragmentStatBinding
 import com.example.yeongkkuel.databinding.FragmentStatDailyBinding
+import com.example.yeongkkuel.presentation.dpToPx
+import com.example.yeongkkuel.presentation.statbotsheet.StatBotSheetCategoryListAdapter
+import com.example.yeongkkuel.presentation.statbotsheet.StatBotSheetUiState
+import com.example.yeongkkuel.presentation.statbotsheet.StatBotSheetViewModel
+import com.example.yeongkkuel.presentation.statbotsheet.ViewPagerTouchListener
 import com.example.yeongkkuel.presentation.toMoneyString
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.data.PieData
@@ -33,20 +40,18 @@ class StatDailyFragment : Fragment() {
     private val binding: FragmentStatDailyBinding
         get() = requireNotNull(_binding) { "FragmentStatBinding -> null" }
 
-    private val viewModel: StatDailyViewModel by viewModels()
-
-    private val spendingSnackListAdapter by lazy {
-        StatDailySpendingListAdapter()
+    private val viewModel: StatBotSheetViewModel by activityViewModels()
+    private val statBotSheetCategoryListAdapter by lazy {
+        StatBotSheetCategoryListAdapter()
     }
 
+    private var viewPagerTouchListener: ViewPagerTouchListener? = null
 
-    private val spendingSelfImprovementListAdapter by lazy {
-        StatDailySpendingListAdapter()
-    }
-
-
-    private val spendingBeutyListAdapter by lazy {
-        StatDailySpendingListAdapter()
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (parentFragment is ViewPagerTouchListener) {
+            viewPagerTouchListener = parentFragment as ViewPagerTouchListener
+        }
     }
 
     override fun onCreateView(
@@ -72,52 +77,109 @@ class StatDailyFragment : Fragment() {
 
             val displayHeight = resources.displayMetrics.heightPixels
             val peekHeight =
-                (displayHeight - resources.getDimensionPixelSize(R.dimen.space_440dp)) // 244dp 빼기
+                (displayHeight - 440.dpToPx(requireContext()))
 
             // BottomSheet의 초기 상태 설정
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             bottomSheetBehavior.peekHeight = peekHeight // 계산된 값 설정
 
+            val height = displayHeight - (440 + 60).dpToPx(requireContext())
+            rvBotSheetCategory.layoutParams.height = height
+            rvBotSheetCategory.requestLayout() // 레이아웃 강제 갱신
+
             // BottomSheet 이벤트 핸들링
             bottomSheetBehavior.addBottomSheetCallback(object :
                 BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
-                    // 상태 변화에 따른 처리
+                    when (newState) {
+                        BottomSheetBehavior.STATE_COLLAPSED -> {
+                            val height = displayHeight - (440 + 60).dpToPx(requireContext())
+                            rvBotSheetCategory.layoutParams.height = height
+                            rvBotSheetCategory.requestLayout() // 레이아웃 강제 갱신
+                        }
+
+                        BottomSheetBehavior.STATE_EXPANDED -> {
+                            val height = displayHeight - 128.dpToPx(requireContext())
+                            rvBotSheetCategory.layoutParams.height = height
+                            rvBotSheetCategory.requestLayout() // 레이아웃 강제 갱신
+                        }
+
+                        else -> {
+                            // 기타 상태 처리 (예: 드래그 상태 등)
+                        }
+                    }
                 }
 
                 override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                    // 슬라이딩 중에 필요한 처리
                 }
             })
+
+//            viewPagerTouchListener?.let { listener ->
+//                bottomSheet.run {
+//                    setOnTouchListener { _, event ->
+//                        when (event.action) {
+//                            MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
+//                                // BottomSheet가 터치될 때 ViewPager의 터치 이벤트를 막음
+//                                listener.disableViewPagerTouch() // ViewPager 터치 비활성화
+//                            }
+//
+//                            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+//                                // BottomSheet의 터치가 끝나면 ViewPager 터치 이벤트 활성화
+//                                listener.enableViewPagerTouch() // ViewPager 터치 활성화
+//                            }
+//                        }
+//                        false // 터치 이벤트를 BottomSheet가 처리하도록 함
+//                    }
+//                }
+//            }
+
+            rvBotSheetCategory.run {
+                // RecyclerView 터치 중에는 BottomSheet가 터치 이벤트를 받지 않도록 설정
+                setOnTouchListener { _, _ ->
+                    // RecyclerView가 터치될 때 BottomSheet가 드래그되지 않도록 설정
+                    bottomSheetBehavior.isDraggable = false // BottomSheet 드래그 비활성화
+                    bottomSheet.requestDisallowInterceptTouchEvent(true) // BottomSheet가 터치 이벤트를 받지 않도록 설정
+                    false // RecyclerView의 터치 이벤트를 처리하도록 함
+                }
+
+                // RecyclerView 터치가 끝나면 BottomSheet가 다시 터치 가능한 상태로 복원
+                addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                    override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                        super.onScrollStateChanged(recyclerView, newState)
+                        if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                            // RecyclerView가 스크롤이 멈추면 BottomSheet가 터치 가능하도록 복원
+                            bottomSheet.requestDisallowInterceptTouchEvent(false) // 터치 이벤트 복원
+                            bottomSheetBehavior.isDraggable = true // BottomSheet 드래그 활성화
+                        }
+                    }
+                })
+            }
+
+
         }
 
-        fun initRvAdapter() {
-            rvSnack.run {
-                adapter = spendingSnackListAdapter
-                layoutManager = LinearLayoutManager(requireContext())
-            }
 
-            rvSelfImprovement.run {
-                adapter = spendingSelfImprovementListAdapter
-                layoutManager = LinearLayoutManager(requireContext())
-            }
-            rvBeauty.run {
-                adapter = spendingBeutyListAdapter
-                layoutManager = LinearLayoutManager(requireContext())
-            }
-        }
-
-        fun initDate(){
+        fun initDate() {
             val currentDate = Date()
-            val dateFormat = SimpleDateFormat("MM월 dd일 (E)", Locale.KOREAN)
-            val formattedDate = dateFormat.format(currentDate)
+            val dateFormatChart = SimpleDateFormat("MM월 dd일 (E)", Locale.KOREAN)
+            val formattedDateChart = dateFormatChart.format(currentDate)
 
-            tvChartDate.text = formattedDate
+            val dateFormatSheet = SimpleDateFormat("MM월 dd일 E요일", Locale.KOREAN)
+            val formattedDateSheet = dateFormatSheet.format(currentDate)
+            tvChartDate.text = formattedDateChart
+            tvBottomSheetDate.text = formattedDateSheet
+        }
+
+        fun initRv() {
+            rvBotSheetCategory.run {
+                adapter = statBotSheetCategoryListAdapter
+                layoutManager = LinearLayoutManager(requireContext())
+            }
         }
 
         initBottomSheet()
-        initRvAdapter()
         initDate()
+        initRv()
     }
 
     private fun initViewModel() = with(viewModel) {
@@ -129,49 +191,47 @@ class StatDailyFragment : Fragment() {
         }
     }
 
-    private fun onBind(uiState: StatDailyUiState) = with(binding) {
-        fun initRvData(){
-            uiState.spendingList.let {
-                spendingSnackListAdapter.submitList(it.snackList)
-                spendingSelfImprovementListAdapter.submitList(it.selfImprovementList)
-                spendingBeutyListAdapter.submitList(it.beautyList)
-            }
+    private fun onBind(uiState: StatBotSheetUiState) = with(binding) {
+        fun initRvData() {
+            statBotSheetCategoryListAdapter.submitList(uiState.spendingList)
         }
 
         fun initPieChart() {
             uiState.spendingList.let {
-                val snackTotal = it.snackList.sumOf { spending -> spending.price }
-                val selfImprovementTotal =
-                    it.selfImprovementList.sumOf { spending -> spending.price }
-                val beautyTotal = it.beautyList.sumOf { spending -> spending.price }
+                val totalList = uiState.spendingList.map { spending ->
+                    spending.history.sumOf { history -> history.price }
+                }
 
-                val othersTotal =  it.total -  (snackTotal + selfImprovementTotal + beautyTotal)
+                val othersTotal = uiState.total - totalList.sum()
 
-                val otherTotalString =othersTotal.toMoneyString() + "원"
+                val otherTotalString = Math.abs(othersTotal).toMoneyString() + "원"
                 tvChartTarget.text = otherTotalString
-                if(othersTotal > 0) {
+                if (othersTotal > 0) {
                     tvChartDescription.text = "하루 목표 지출액보다\n" +
                             "${otherTotalString}원 덜 썻어요!"
                 } else {
-                    tvChartDescription.text = "목표 금액을 초과했어요!"
+                    tvChartDescription.text = "하루 목표 지출액보다\n" +
+                            "${otherTotalString}원 더 썻어요!"
                 }
-                // PieEntry 리스트 생성
-                val pieChartDataList = listOf(
-                    PieEntry(beautyTotal.toFloat(), "미용"),
-                    PieEntry(selfImprovementTotal.toFloat(), "자기계발"),
-                    PieEntry(snackTotal.toFloat(), "간식/음료"),
-                    PieEntry(othersTotal.toFloat(), "나머지")
-                )
 
-                // pie chart 적용
-                val dataSet = PieDataSet(pieChartDataList, "")
+                val pieChartDataList = ArrayList<PieEntry>().apply {
+                    uiState.spendingList.forEach { spending ->
+                        val totalPrice = spending.history.sumOf { it.price }
+                        add(PieEntry(totalPrice.toFloat(), spending.kind))
+                    }
+                    add(PieEntry(othersTotal.toFloat(), "나머지"))
+                }
 
-                dataSet.colors = listOf(
-                    ContextCompat.getColor(requireContext(), R.color.green),
-                    ContextCompat.getColor(requireContext(), R.color.pink),
-                    ContextCompat.getColor(requireContext(), R.color.main1),
-                    ContextCompat.getColor(requireContext(), R.color.black1),
-                )
+                val colorList = uiState.spendingList.map {
+                    ContextCompat.getColor(requireContext(), it.color)
+                }.toMutableList()
+
+                colorList.add(ContextCompat.getColor(requireContext(), R.color.black1)) // 색상 추가
+
+                val dataSet = PieDataSet(pieChartDataList, "").apply {
+                    colors = colorList // 색상 리스트 적용
+                }
+
 
                 dataSet.valueTextSize = 16F
                 dataSet.setDrawValues(false) // value 비활성화
@@ -186,6 +246,8 @@ class StatDailyFragment : Fragment() {
                     setDrawEntryLabels(false) // 엔트리 라벨 비활성화
                     setEntryLabelColor(Color.BLACK) // label 색상
                     animateY(1400, Easing.EaseInOutQuad) // 1.4초 동안 애니메이션 설정
+                    setTouchEnabled(false)  // 차트 터치 비활성화
+                    setOnChartValueSelectedListener(null)  // 클릭 이벤트 리스너 제거
                     animate()
                 }
 

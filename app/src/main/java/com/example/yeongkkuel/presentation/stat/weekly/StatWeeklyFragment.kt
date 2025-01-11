@@ -1,16 +1,18 @@
 package com.example.yeongkkuel.presentation.stat.weekly
 
 import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.res.ResourcesCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
+import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentStatWeeklyBinding
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
@@ -24,6 +26,10 @@ class StatWeeklyFragment : Fragment() {
 
     private val viewModel: StatWeeklyViewModel by viewModels()
 
+    private val weekListAdapter by lazy {
+        StatWeeklyWeekListAdapter()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -35,7 +41,19 @@ class StatWeeklyFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initView()
         initViewModel()
+    }
+
+    private fun initView() = with(binding) {
+        fun initRv() {
+            rvWeekSending.run {
+                adapter = weekListAdapter
+                layoutManager = GridLayoutManager(requireContext(), 7)
+            }
+        }
+
+        initRv()
     }
 
     private fun initViewModel() = with(viewModel) {
@@ -48,14 +66,30 @@ class StatWeeklyFragment : Fragment() {
     }
 
     private fun onBind(uiState: StatWeeklyUiState) = with(binding) {
-        uiState.charEntryList.let { entries ->
-            val icons = mutableListOf<Drawable>()
+        uiState.weekList.let { list ->
+            weekListAdapter.submitList(list)
+
+            val entries = list.mapNotNull {
+                it.entry
+            }
+            entries.forEachIndexed { index, entry ->
+                val iconRes = if (entry.y > uiState.targetSpending) {
+                    R.drawable.ic_hamberger  // 적절한 리소스 이름으로 변경
+                } else {
+                    R.drawable.ic_bell  // 적절한 리소스 이름으로 변경
+                }
+                val drawable = ContextCompat.getDrawable(requireContext(), iconRes)
+
+                if (drawable != null) {
+                    entry.icon = drawable
+                }
+            }
 
             // LineDataSet 생성
             val dataSet = LineDataSet(entries, "Label").apply {
                 // 선의 색, 두께 설정
-                color = Color.GRAY
-                lineWidth = 2f
+                color = ContextCompat.getColor(requireContext(), R.color.black1)
+                lineWidth = 1f
 
                 setDrawValues(false)
                 setDrawIcons(true)
@@ -71,6 +105,11 @@ class StatWeeklyFragment : Fragment() {
                 description.isEnabled = false
                 legend.isEnabled = false
 
+                setTouchEnabled(false)
+                isDragEnabled = false  // 드래그 비활성화
+                isScaleXEnabled = false // X축 스케일링 비활성화
+                isScaleYEnabled = false // Y축 스케일링 비활성화
+
                 xAxis.run {
                     setDrawGridLines(false)
                     setDrawAxisLine(false)
@@ -81,13 +120,31 @@ class StatWeeklyFragment : Fragment() {
                     axisMinimum = 0f
                     axisMaximum = 6f
                 }
+                val maxValue = entries.maxOf { it.y }
+                val minValue = entries.minOf { it.y }
+
+                val maxDiff = maxValue - uiState.targetSpending
+                val minDiff = uiState.targetSpending - minValue
+
+                axisLeft.run {
+                    val diff = if (minDiff > maxDiff) minDiff else maxDiff
+
+                    // y축의 최소값과 최대값을 targetSpending을 기준으로 설정
+                    axisMinimum = uiState.targetSpending - diff
+                    axisMaximum = uiState.targetSpending + diff
+
+                    setDrawGridLines(true)  // 그리드선 표시
+                    setDrawAxisLine(true)   // 축선 그리기
+                    axisLineColor = Color.BLACK
+                    textColor = Color.BLACK
+                }
                 axisLeft.apply {
                     setDrawGridLines(false)
                     setDrawAxisLine(false)
                     axisLineColor = Color.TRANSPARENT
                     textColor = Color.TRANSPARENT
                 }
-                axisRight.apply{
+                axisRight.apply {
                     setDrawGridLines(false)
                     setDrawAxisLine(false)
                     axisLineColor = Color.TRANSPARENT
