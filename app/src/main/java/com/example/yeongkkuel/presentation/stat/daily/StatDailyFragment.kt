@@ -12,12 +12,14 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentStatDailyBinding
 import com.example.yeongkkuel.presentation.dpToPx
 import com.example.yeongkkuel.presentation.statbotsheet.StatBotSheetCategoryListAdapter
+import com.example.yeongkkuel.presentation.statbotsheet.StatBotSheetItemTouchHelper
 import com.example.yeongkkuel.presentation.statbotsheet.StatBotSheetUiState
 import com.example.yeongkkuel.presentation.statbotsheet.StatBotSheetViewModel
 import com.example.yeongkkuel.presentation.statbotsheet.ViewPagerTouchListener
@@ -153,6 +155,10 @@ class StatDailyFragment : Fragment() {
                         }
                     }
                 })
+
+                // 드래그로 아이템 이동
+                val itemTouchHelper = ItemTouchHelper(StatBotSheetItemTouchHelper(statBotSheetCategoryListAdapter))
+                itemTouchHelper.attachToRecyclerView(this@run)
             }
 
 

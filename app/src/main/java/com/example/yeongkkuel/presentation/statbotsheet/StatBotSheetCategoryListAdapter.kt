@@ -31,6 +31,14 @@ class StatBotSheetCategoryListAdapter(
         }
     }
 
+    fun moveItem(fromPosition: Int, toPosition: Int) {
+        val currentList = currentList.toMutableList()
+        val item = currentList.removeAt(fromPosition)
+        currentList.add(toPosition, item)
+
+        submitList(currentList)
+    }
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -60,6 +68,6 @@ class SpendingCategoryListDiffUtil : DiffUtil.ItemCallback<StatBotSheetUiState.S
         oldItem: StatBotSheetUiState.Spending,
         newItem: StatBotSheetUiState.Spending
     ): Boolean {
-        return oldItem.kind == newItem.kind
+        return  oldItem.kind == newItem.kind && oldItem.color == newItem.color
     }
 }
