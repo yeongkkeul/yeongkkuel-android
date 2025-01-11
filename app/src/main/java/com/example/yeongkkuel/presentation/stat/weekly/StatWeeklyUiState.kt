@@ -8,21 +8,20 @@ data class StatWeeklyUiState(
 ) {
     data class DayData(
         val dayOfWeek: Week,
-        val entry: Entry?,
-        val totalSpending: Int?
+        val entry: Entry?
     )
 
     companion object {
         fun init() = StatWeeklyUiState(
             targetSpending = 10000,
             weekList = listOf(
-                DayData(Week.MON, Entry(0f, 2000f), 200),
-                DayData(Week.TUE, Entry(1f, 1500f), 150),
-                DayData(Week.WED, Entry(2f, 30000f), 300),
-                DayData(Week.THU, Entry(3f, 500f), 50),
-                DayData(Week.FRI, Entry(4f, 25000f), 250),
-                DayData(Week.SAT, null, null),
-                DayData(Week.SUN, null, null),
+                DayData(Week.MON, Entry(0f, 2000f)),
+                DayData(Week.TUE, Entry(1f, 1500f)),
+                DayData(Week.WED, Entry(2f, 30000f)),
+                DayData(Week.THU, Entry(3f, 500f)),
+                DayData(Week.FRI, Entry(4f, 25000f)),
+                DayData(Week.SAT, null),
+                DayData(Week.SUN, null),
             )
         )
     }

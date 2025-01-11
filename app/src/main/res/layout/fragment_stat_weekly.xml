@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/space_median"
+    android:paddingVertical="@dimen/space_median"
     tools:context=".presentation.stat.monthly.StatMonthlyFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -15,6 +15,7 @@
         android:clipToOutline="true"
         android:paddingHorizontal="@dimen/space_median"
         android:paddingVertical="@dimen/space_x_small"
+        android:layout_marginHorizontal="@dimen/space_median"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -24,7 +25,7 @@
             android:layout_height="wrap_content"
             android:text="56,700원"
             android:textColor="@color/white"
-            android:textSize="@dimen/sp_large"
+            style="@style/title_semib"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -35,8 +36,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_x_small"
             android:text="11월 2주"
+            style="@style/body_medium"
             android:textColor="@color/white"
-            android:textSize="@dimen/sp_standard"
             app:layout_constraintBottom_toBottomOf="@id/tv_targetSpending"
             app:layout_constraintStart_toEndOf="@id/tv_targetSpending" />
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -47,39 +48,58 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/cl_topCl"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="@dimen/space_small"
+        android:layout_marginTop="@dimen/space_x_small"
         android:paddingVertical="@dimen/space_x_small"
-        android:paddingHorizontal="@dimen/space_median">
+        android:paddingHorizontal="32dp">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_weekSending"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:spanCount="7"
             android:orientation="vertical"
             tools:listitem="@layout/item_stat_weekly_week"
             tools:itemCount="7"/>
+
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/lineChart"
+            android:layout_height="120dp"
+            android:layout_width="match_parent"
+            app:layout_constraintTop_toBottomOf="@id/rv_weekSending"
+            android:paddingHorizontal="@dimen/space_median"
+            android:layout_marginTop="@dimen/space_x_small"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            app:layout_constraintTop_toTopOf="@id/lineChart"
+            app:layout_constraintBottom_toBottomOf="@id/lineChart"
+            app:layout_constraintStart_toStartOf="@id/lineChart"
+            app:layout_constraintEnd_toEndOf="@id/lineChart"
+            android:background="@color/sub1"/>
+
+        <TextView
+            android:id="@+id/tv_lineTargetSpending"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/lineChart"
+            app:layout_constraintStart_toStartOf="@id/lineChart"
+            app:layout_constraintEnd_toEndOf="@id/lineChart"
+            android:text="하루 목표 지출액 10,000원"
+            android:textColor="@color/sub1"
+            android:layout_marginTop="@dimen/space_x_small"
+            style="@style/small_semib"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/lineChart"
-        android:layout_height="120dp"
-        android:layout_width="match_parent"
-        app:layout_constraintTop_toBottomOf="@id/cl_week"
-        android:paddingHorizontal="@dimen/space_median"
-        android:layout_marginTop="@dimen/space_x_small"/>
 
     <View
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        app:layout_constraintTop_toTopOf="@id/lineChart"
-        app:layout_constraintBottom_toBottomOf="@id/lineChart"
-        app:layout_constraintStart_toStartOf="@id/lineChart"
-        app:layout_constraintEnd_toEndOf="@id/lineChart"
-        android:background="@color/sub1"/>
-
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/space_x_small"
+        android:background="@color/black0"
+        app:layout_constraintTop_toBottomOf="@id/cl_week"
+        android:layout_marginTop="@dimen/space_x_small"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
