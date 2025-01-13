@@ -188,14 +188,9 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             navController.addOnDestinationChangedListener { _, destination, _ ->
                 when (destination.id) {
                     R.id.navigation_home,
-                    R.id.navigation_stat -> {
-                        binding.clItemBotSheet.visibility = View.VISIBLE
+                    R.id.navigation_stat -> setBotSheetVisible()
 
-                        val bottomSheetBehavior = BottomSheetBehavior.from(binding.clItemBotSheet)
-                        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                    }
-
-                    else -> binding.clItemBotSheet.visibility = View.GONE
+                    else -> setBotSheetGone()
                 }
             }
         }
@@ -226,4 +221,19 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.clItemBotSheet)
         bottomSheetBehavior.peekHeight = peekHeight
     }
+
+    override fun setBotSheetGone() {
+        binding.clItemBotSheet.visibility = View.GONE
+
+        val bottomSheetBehavior = BottomSheetBehavior.from(binding.clItemBotSheet)
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+
+    override fun setBotSheetVisible() {
+        binding.clItemBotSheet.visibility = View.VISIBLE
+
+        val bottomSheetBehavior = BottomSheetBehavior.from(binding.clItemBotSheet)
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+
 }

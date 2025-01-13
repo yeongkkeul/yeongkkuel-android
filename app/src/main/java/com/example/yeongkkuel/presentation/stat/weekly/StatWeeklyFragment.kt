@@ -1,5 +1,6 @@
 package com.example.yeongkkuel.presentation.stat.weekly
 
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -14,6 +15,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentStatWeeklyBinding
+import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
+import com.example.yeongkkuel.presentation.stat.ViewPagerTouchListener
 import com.example.yeongkkuel.presentation.toMoneyString
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
@@ -30,6 +33,7 @@ class StatWeeklyFragment : Fragment() {
     private val weekListAdapter by lazy {
         StatWeeklyWeekListAdapter()
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -158,7 +162,7 @@ class StatWeeklyFragment : Fragment() {
 
         }
 
-        fun setTargetSpending(){
+        fun setTargetSpending() {
             weekListAdapter.setTargetSpending(uiState.targetSpending)
 
             val targetSpendingString = uiState.targetSpending.toMoneyString()

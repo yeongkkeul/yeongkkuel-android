@@ -39,19 +39,6 @@ class StatDailyFragment : Fragment() {
 
     private val viewModel: BotSheetViewModel by activityViewModels()
 
-    private var viewPagerTouchListener: ViewPagerTouchListener? = null
-    private var botSheetListener: BotSheetListener? = null
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (parentFragment is ViewPagerTouchListener) {
-            viewPagerTouchListener = parentFragment as ViewPagerTouchListener
-        }
-
-        if (requireActivity() is BotSheetListener) {
-            botSheetListener = requireActivity() as BotSheetListener
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -76,18 +63,7 @@ class StatDailyFragment : Fragment() {
             tvChartDate.text = formattedDateChart
         }
 
-        fun initBotSheet() {
-            botSheetListener?.run {
-                val displayHeight = resources.displayMetrics.heightPixels
-                val peekHeight =
-                    (displayHeight - 440.dpToPx(requireContext()))
-
-                setPeekHeight(peekHeight)
-            }
-        }
-
         initDate()
-        initBotSheet()
     }
 
     private fun initViewModel() = with(viewModel) {
