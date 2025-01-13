@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.presentation.statbotsheet
+package com.example.yeongkkuel.presentation.botsheet
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -9,17 +9,17 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.databinding.ItemBotsheetCategoryBinding
 
-class StatBotSheetCategoryListAdapter(
-) : ListAdapter<StatBotSheetUiState.Spending, StatBotSheetCategoryListAdapter.ViewHolder>(
+class BotSheetCategoryListAdapter(
+) : ListAdapter<BotSheetUiState.Spending, BotSheetCategoryListAdapter.ViewHolder>(
     SpendingCategoryListDiffUtil()
 ) {
     inner class ViewHolder(
         private val binding: ItemBotsheetCategoryBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        private val historyListAdapter = StatBotSheetHistoryListAdapter()
+        private val historyListAdapter = BotSheetHistoryListAdapter()
 
-        fun onBind(item: StatBotSheetUiState.Spending) = with(binding) {
+        fun onBind(item: BotSheetUiState.Spending) = with(binding) {
             tvCategory.text = item.kind
             tvCategory.setTextColor(ContextCompat.getColor(binding.root.context, item.color))
 
@@ -55,18 +55,18 @@ class StatBotSheetCategoryListAdapter(
     }
 }
 
-class SpendingCategoryListDiffUtil : DiffUtil.ItemCallback<StatBotSheetUiState.Spending>() {
+class SpendingCategoryListDiffUtil : DiffUtil.ItemCallback<BotSheetUiState.Spending>() {
 
     override fun areItemsTheSame(
-        oldItem: StatBotSheetUiState.Spending,
-        newItem: StatBotSheetUiState.Spending
+        oldItem: BotSheetUiState.Spending,
+        newItem: BotSheetUiState.Spending
     ): Boolean {
         return oldItem == newItem
     }
 
     override fun areContentsTheSame(
-        oldItem: StatBotSheetUiState.Spending,
-        newItem: StatBotSheetUiState.Spending
+        oldItem: BotSheetUiState.Spending,
+        newItem: BotSheetUiState.Spending
     ): Boolean {
         return  oldItem.kind == newItem.kind && oldItem.color == newItem.color
     }

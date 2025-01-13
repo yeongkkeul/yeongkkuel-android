@@ -1,9 +1,9 @@
-package com.example.yeongkkuel.presentation.statbotsheet
+package com.example.yeongkkuel.presentation.botsheet
 
 import androidx.annotation.ColorRes
 import com.example.yeongkkuel.R
 
-data class StatBotSheetUiState(
+data class BotSheetUiState(
     val total: Int = 300000,
     val spendingList: List<Spending>
 ) {
@@ -19,18 +19,18 @@ data class StatBotSheetUiState(
     }
 
     companion object {
-        fun init() = StatBotSheetUiState(
+        fun init() = BotSheetUiState(
             spendingList = listOf(
                 Spending(
                     kind = "간식/음료1",
-                    color = R.color.green,
+                    color = R.color.pink,
                     history = listOf(
                         Spending.History("아아", 15000)
                     )
                 ),
                 Spending(
                     kind = "간식/음료2",
-                    color = R.color.green,
+                    color = R.color.blue,
                     history = listOf(
                         Spending.History("아아", 15000)
                     )
@@ -91,12 +91,6 @@ data class StatBotSheetUiState(
                         Spending.History("아아", 15000)
                     )
                 ),
-
-
-
-
-
-
 
             )
         )

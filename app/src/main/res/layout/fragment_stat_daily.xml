@@ -1,118 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".presentation.stat.daily.StatDailyFragment">
 
-    <!-- ConstraintLayout을 CoordinatorLayout의 자식으로 이동 -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
 
-        <com.github.mikephil.charting.charts.PieChart
-            android:id="@+id/pieChart"
-            android:layout_width="0dp"
-            android:layout_height="212dp"
-            android:layout_marginTop="@dimen/space_median"
-            app:layout_constraintDimensionRatio="1"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/pieChart"
+        android:layout_width="0dp"
+        android:layout_height="212dp"
+        android:layout_marginTop="@dimen/space_median"
+        app:layout_constraintDimensionRatio="1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/iv_chartCenter"
-            android:layout_width="160dp"
-            android:layout_height="0dp"
-            android:background="@drawable/bg_whitecircle"
-            app:layout_constraintBottom_toBottomOf="@id/pieChart"
-            app:layout_constraintDimensionRatio="1"
-            app:layout_constraintEnd_toEndOf="@id/pieChart"
-            app:layout_constraintStart_toStartOf="@id/pieChart"
-            app:layout_constraintTop_toTopOf="@id/pieChart" />
+    <ImageView
+        android:id="@+id/iv_chartCenter"
+        android:layout_width="160dp"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_whitecircle"
+        app:layout_constraintBottom_toBottomOf="@id/pieChart"
+        app:layout_constraintDimensionRatio="1"
+        app:layout_constraintEnd_toEndOf="@id/pieChart"
+        app:layout_constraintStart_toStartOf="@id/pieChart"
+        app:layout_constraintTop_toTopOf="@id/pieChart" />
 
-        <TextView
-            android:id="@+id/tv_chartDate"
-            style="@style/body_regula"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="12월 31일 (화)"
+    <TextView
+        android:id="@+id/tv_chartDate"
+        style="@style/body_regula"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="12월 31일 (화)"
 
-            app:layout_constraintBottom_toTopOf="@id/tv_chartTarget"
-            app:layout_constraintEnd_toEndOf="@id/iv_chartCenter"
-            app:layout_constraintStart_toStartOf="@id/iv_chartCenter"
-            app:layout_constraintTop_toTopOf="@id/iv_chartCenter"
-            app:layout_constraintVertical_chainStyle="packed"
-            tools:text="12월 31일 (화)" />
+        app:layout_constraintBottom_toTopOf="@id/tv_chartTarget"
+        app:layout_constraintEnd_toEndOf="@id/iv_chartCenter"
+        app:layout_constraintStart_toStartOf="@id/iv_chartCenter"
+        app:layout_constraintTop_toTopOf="@id/iv_chartCenter"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="12월 31일 (화)" />
 
-        <TextView
-            android:id="@+id/tv_chartTarget"
-            style="@style/title_semib"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="25,000원"
-            android:textColor="@color/main1"
+    <TextView
+        android:id="@+id/tv_chartTarget"
+        style="@style/title_semib"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="25,000원"
+        android:textColor="@color/main1"
 
-            app:layout_constraintBottom_toTopOf="@id/tv_chartDescription"
-            app:layout_constraintEnd_toEndOf="@id/iv_chartCenter"
-            app:layout_constraintStart_toStartOf="@id/iv_chartCenter"
-            app:layout_constraintTop_toBottomOf="@id/tv_chartDate"
-            tools:text="25,000원" />
+        app:layout_constraintBottom_toTopOf="@id/tv_chartDescription"
+        app:layout_constraintEnd_toEndOf="@id/iv_chartCenter"
+        app:layout_constraintStart_toStartOf="@id/iv_chartCenter"
+        app:layout_constraintTop_toBottomOf="@id/tv_chartDate"
+        tools:text="25,000원" />
 
-        <TextView
-            android:id="@+id/tv_chartDescription"
-            style="@style/small_regul"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="하루 목표 지출액보다\n2,500원 덜 썻어요!"
-            app:layout_constraintBottom_toBottomOf="@id/iv_chartCenter"
-            app:layout_constraintEnd_toEndOf="@id/iv_chartCenter"
-            app:layout_constraintStart_toStartOf="@id/iv_chartCenter"
-            app:layout_constraintTop_toBottomOf="@id/tv_chartTarget"
-            tools:text="하루 목표 지출액보다\n2,500원 덜 썻어요!" />
+    <TextView
+        android:id="@+id/tv_chartDescription"
+        style="@style/small_regul"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="하루 목표 지출액보다\n2,500원 덜 썻어요!"
+        app:layout_constraintBottom_toBottomOf="@id/iv_chartCenter"
+        app:layout_constraintEnd_toEndOf="@id/iv_chartCenter"
+        app:layout_constraintStart_toStartOf="@id/iv_chartCenter"
+        app:layout_constraintTop_toBottomOf="@id/tv_chartTarget"
+        tools:text="하루 목표 지출액보다\n2,500원 덜 썻어요!" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cl_home_itemBotSheet"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/bg_state_bottomsheet"
-        android:clipToOutline="true"
-        android:paddingHorizontal="@dimen/space_median"
-        android:paddingTop="@dimen/space_median"
-        android:visibility="visible"
-        app:behavior_hideable="false"
-        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
-
-        <TextView
-            android:id="@+id/tv_bottomSheetDate"
-            style="@style/humm_semibo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=""
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="12월 31일 화요일" />
-
-        <ImageView
-            android:id="@+id/iv_hamberger"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="4dp"
-            android:src="@drawable/ic_hamberger"
-            app:layout_constraintBottom_toBottomOf="@id/tv_bottomSheetDate"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tv_bottomSheetDate" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_botSheet_category"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginVertical="@dimen/sp_small"
-            app:layout_constraintTop_toBottomOf="@id/tv_bottomSheetDate"
-            tools:listitem="@layout/item_botsheet_category"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

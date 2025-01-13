@@ -1,11 +1,10 @@
-package com.example.yeongkkuel.presentation.statbotsheet
+package com.example.yeongkkuel.presentation.botsheet
 
-import android.view.ViewGroup
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 
-class StatBotSheetItemTouchHelper(
-  private val adapter: StatBotSheetCategoryListAdapter
+class BotSheetItemTouchHelper(
+    private val onMove: (fromPosition:Int, toPosition:Int) -> Unit
 ) : ItemTouchHelper.SimpleCallback(
     ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.LEFT
 ) {
@@ -17,7 +16,7 @@ class StatBotSheetItemTouchHelper(
         val fromPosition = viewHolder.adapterPosition
         val toPosition = target.adapterPosition
 
-        adapter.moveItem(fromPosition, toPosition)
+        onMove(fromPosition, toPosition)
 
         return true
     }

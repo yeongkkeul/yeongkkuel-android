@@ -12,7 +12,6 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentStatBinding
-import com.example.yeongkkuel.presentation.statbotsheet.ViewPagerTouchListener
 import com.google.android.material.tabs.TabLayoutMediator
 
 class StatFragment : Fragment(), ViewPagerTouchListener {
