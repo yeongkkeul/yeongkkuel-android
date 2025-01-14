@@ -1,11 +1,14 @@
 package com.example.yeongkkuel.presentation.stat.weekly
 
+import com.example.yeongkkuel.presentation.util.Colors
+import com.example.yeongkkuel.presentation.util.SpendingCategory
 import com.github.mikephil.charting.data.Entry
 
 data class StatWeeklyUiState(
     val targetSpending: Int,
     val weekList: List<DayData>,
-    val compareList: List<CompareData>
+    val compareList: List<CompareData>,
+    val pieChartList: List<PieChartData>
 ) {
     data class DayData(
         val dayOfWeek: Week,
@@ -16,16 +19,23 @@ data class StatWeeklyUiState(
         data class OthersCompare(
             val target: String,
             val targetSpending: Int,
-            val mySpending: Int,
+            val mySpending: Int, // 주간 지출에서 평균 구해서 넣기
             val spendingUnit: SpendingUnit,
             val percentile: Int,
         ) : CompareData
+
         data class PastCompare(
             val pastSpending: Int,
             val currentSpending: Int,
             val spendingUnit: SpendingUnit
         ) : CompareData
     }
+
+    data class PieChartData(
+        val category: SpendingCategory,
+        val expenditure: Int,
+        val color: Colors
+    )
 
     companion object {
         fun init() = StatWeeklyUiState(
@@ -52,6 +62,23 @@ data class StatWeeklyUiState(
                     currentSpending = 100383,
                     spendingUnit = SpendingUnit.DAY
                 )
+            ),
+            pieChartList = listOf(
+                PieChartData(
+                    category = SpendingCategory.SNACK,
+                    expenditure = 15800,
+                    Colors.GREEN
+                ),
+                PieChartData(
+                    category = SpendingCategory.SHOP,
+                    expenditure = 158000,
+                    Colors.PINK
+                ),
+                PieChartData(
+                    category = SpendingCategory.ETC,
+                    expenditure = 158000,
+                    Colors.BLUE
+                ),
             )
         )
     }
