@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.databinding.ItemBotsheetHistoryBinding
-import com.example.yeongkkuel.presentation.toMoneyString
+import com.example.yeongkkuel.presentation.util.toMoneyString
 
 class BotSheetHistoryListAdapter(
 ) : ListAdapter<BotSheetUiState.Spending.History, BotSheetHistoryListAdapter.ViewHolder>(

@@ -15,7 +15,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentStatBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
-import com.example.yeongkkuel.presentation.dpToPx
+import com.example.yeongkkuel.presentation.util.dpToPx
 import com.google.android.material.tabs.TabLayoutMediator
 
 class StatFragment : Fragment(), ViewPagerTouchListener {

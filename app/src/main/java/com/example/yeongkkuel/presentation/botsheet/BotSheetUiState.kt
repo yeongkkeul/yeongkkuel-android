@@ -2,6 +2,7 @@ package com.example.yeongkkuel.presentation.botsheet
 
 import androidx.annotation.ColorRes
 import com.example.yeongkkuel.R
+import com.example.yeongkkuel.presentation.util.Colors
 
 data class BotSheetUiState(
     val total: Int = 300000,
@@ -9,7 +10,7 @@ data class BotSheetUiState(
 ) {
     data class Spending(
         val kind: String,
-        @ColorRes val color: Int,
+        val color: Colors,
         val history: List<History>
     ) {
         data class History(
@@ -23,70 +24,70 @@ data class BotSheetUiState(
             spendingList = listOf(
                 Spending(
                     kind = "간식/음료1",
-                    color = R.color.pink,
+                    color = Colors.PINK,
                     history = listOf(
                         Spending.History("아아", 15000)
                     )
                 ),
                 Spending(
                     kind = "간식/음료2",
-                    color = R.color.blue,
+                    color = Colors.BLUE,
                     history = listOf(
                         Spending.History("아아", 15000)
                     )
                 ),Spending(
                     kind = "간식/음료3",
-                    color = R.color.green,
+                    color = Colors.GREEN,
                     history = listOf(
                         Spending.History("아아", 15000)
                     )
                 ),Spending(
                     kind = "간식/음료4",
-                    color = R.color.green,
+                    color = Colors.GREEN,
                     history = listOf(
                         Spending.History("아아", 15000)
                     )
                 ),
                 Spending(
                     kind = "간식/음료5",
-                    color = R.color.green,
+                    color = Colors.GREEN,
                     history = listOf(
                         Spending.History("아아", 15000)
                     )
                 ),
                 Spending(
                     kind = "간식/음료",
-                    color = R.color.green,
+                    color = Colors.GREEN,
                     history = listOf(
                         Spending.History("아아", 15000)
                     )
                 ),Spending(
                     kind = "간식/음료",
-                    color = R.color.green,
+                    color = Colors.GREEN,
                     history = listOf(
                         Spending.History("아아", 15000)
                     )
                 ),Spending(
                     kind = "간식/음료",
-                    color = R.color.green,
+                    color = Colors.GREEN,
                     history = listOf(
                         Spending.History("아아", 15000)
                     )
                 ),Spending(
                     kind = "간식/음료",
-                    color = R.color.green,
+                    color = Colors.GREEN,
                     history = listOf(
                         Spending.History("아아", 15000)
                     )
                 ),Spending(
                     kind = "간식/음료",
-                    color = R.color.green,
+                    color = Colors.GREEN,
                     history = listOf(
                         Spending.History("아아", 15000)
                     )
                 ),Spending(
                     kind = "간식/음료",
-                    color = R.color.green,
+                    color = Colors.GREEN,
                     history = listOf(
                         Spending.History("아아", 15000)
                     )

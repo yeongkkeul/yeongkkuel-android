@@ -21,7 +21,7 @@ class BotSheetCategoryListAdapter(
 
         fun onBind(item: BotSheetUiState.Spending) = with(binding) {
             tvCategory.text = item.kind
-            tvCategory.setTextColor(ContextCompat.getColor(binding.root.context, item.color))
+            tvCategory.setTextColor(ContextCompat.getColor(binding.root.context, item.color.id))
 
             rvHistory.run {
                 adapter = historyListAdapter

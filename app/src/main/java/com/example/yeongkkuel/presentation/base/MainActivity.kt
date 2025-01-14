@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.ActivityMainBinding
-import com.example.yeongkkuel.presentation.dpToPx
+import com.example.yeongkkuel.presentation.util.dpToPx
 import com.example.yeongkkuel.presentation.botsheet.BotSheetCategoryListAdapter
 import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
 import com.example.yeongkkuel.presentation.botsheet.BotSheetItemTouchHelper

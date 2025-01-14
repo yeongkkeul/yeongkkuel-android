@@ -1,6 +1,5 @@
 package com.example.yeongkkuel.presentation.stat.daily
 
-import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -13,17 +12,13 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentStatDailyBinding
-import com.example.yeongkkuel.presentation.dpToPx
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
-import com.example.yeongkkuel.presentation.stat.ViewPagerTouchListener
-import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
-import com.example.yeongkkuel.presentation.toMoneyString
+import com.example.yeongkkuel.presentation.util.toMoneyString
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.collectLatest
@@ -104,7 +99,7 @@ class StatDailyFragment : Fragment() {
                 }
 
                 val colorList = uiState.spendingList.map {
-                    ContextCompat.getColor(requireContext(), it.color)
+                    ContextCompat.getColor(requireContext(), it.color.id)
                 }.toMutableList()
 
                 colorList.add(ContextCompat.getColor(requireContext(), R.color.black1)) // 색상 추가

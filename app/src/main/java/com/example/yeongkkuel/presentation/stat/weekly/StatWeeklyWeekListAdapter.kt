@@ -11,12 +11,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.ItemStatWeeklyWeekBinding
-import com.example.yeongkkuel.presentation.toMoneyString
+import com.example.yeongkkuel.presentation.util.toMoneyString
 import java.math.RoundingMode
-import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.util.Calendar
-import java.util.Locale
 
 class StatWeeklyWeekListAdapter(
 ) : ListAdapter<StatWeeklyUiState.DayData, StatWeeklyWeekListAdapter.ViewHolder>(

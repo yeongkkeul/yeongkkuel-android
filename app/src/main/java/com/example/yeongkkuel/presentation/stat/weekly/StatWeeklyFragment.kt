@@ -1,9 +1,7 @@
 package com.example.yeongkkuel.presentation.stat.weekly
 
-import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,13 +13,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentStatWeeklyBinding
-import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
-import com.example.yeongkkuel.presentation.stat.ViewPagerTouchListener
-import com.example.yeongkkuel.presentation.toMoneyString
+import com.example.yeongkkuel.presentation.util.toMoneyString
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 class StatWeeklyFragment : Fragment() {
     private var _binding: FragmentStatWeeklyBinding? = null
@@ -56,9 +53,31 @@ class StatWeeklyFragment : Fragment() {
                 adapter = weekListAdapter
                 layoutManager = GridLayoutManager(requireContext(), 7)
             }
+
+            rvCompare.run{
+
+            }
+
+            rvSpendingCategory.run{
+
+            }
+        }
+
+        fun initCurrentWeek() {
+            val calendar = Calendar.getInstance()
+
+            // 오늘 날짜를 기준으로 계산
+            val currentWeekOfMonth = calendar.get(Calendar.WEEK_OF_MONTH)
+
+            // 해당 주가 몇 번째 주인지 표시
+            val weekText = "${calendar.get(Calendar.MONTH) + 1}월 ${currentWeekOfMonth}주"
+
+            // 결과를 TextView에 설정
+            tvCurrentWeek.text = weekText
         }
 
         initRv()
+        initCurrentWeek()
     }
 
     private fun initViewModel() = with(viewModel) {
