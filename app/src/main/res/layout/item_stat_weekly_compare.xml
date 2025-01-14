@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/tv_compareDescription"
+        style="@style/humm_medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/space_median"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="20대 직장인 중 상위 10%" />
+
+    <TextView
+        android:id="@+id/tv_comparedTarget"
+        style="@style/small_regul"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/sp_small"
+        android:background="@drawable/bg_box_strok_lightpurple"
+        android:paddingVertical="@dimen/space_x_small"
+        android:paddingStart="@dimen/sp_small"
+        android:paddingEnd="114dp"
+        app:layout_constraintStart_toStartOf="@id/tv_compareDescription"
+        app:layout_constraintTop_toBottomOf="@id/tv_compareDescription"
+        tools:text="20대 직장인 평균" />
+
+
+    <TextView
+        android:id="@+id/tv_comparedMoney"
+        style="@style/body_regula"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_x_small"
+        app:layout_constraintBottom_toBottomOf="@id/tv_comparedTarget"
+        app:layout_constraintStart_toEndOf="@id/tv_comparedTarget"
+        app:layout_constraintTop_toTopOf="@id/tv_comparedTarget"
+        tools:text="15,700원" />
+
+    <TextView
+        android:id="@+id/tv_comparedUnit"
+        style="@style/small_regul"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black2"
+        app:layout_constraintBottom_toBottomOf="@id/tv_comparedMoney"
+        app:layout_constraintStart_toEndOf="@id/tv_comparedMoney"
+        tools:text=" /일" />
+
+    <TextView
+        android:id="@+id/tv_myTarget"
+        style="@style/small_regul"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_x_small"
+        android:background="@drawable/bg_box_lightpurple"
+        android:paddingVertical="@dimen/space_x_small"
+        android:paddingStart="@dimen/space_small"
+        android:paddingEnd="28dp"
+        android:text="나"
+        app:layout_constraintStart_toStartOf="@id/tv_comparedTarget"
+        app:layout_constraintTop_toBottomOf="@id/tv_comparedTarget" />
+
+
+    <TextView
+        android:id="@+id/tv_myMoney"
+        style="@style/body_regula"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_x_small"
+        android:textColor="@color/main1"
+        app:layout_constraintBottom_toBottomOf="@id/tv_myTarget"
+        app:layout_constraintStart_toEndOf="@id/tv_myTarget"
+        app:layout_constraintTop_toTopOf="@id/tv_myTarget"
+        tools:text="15,700원" />
+
+    <TextView
+        android:id="@+id/tv_myUnit"
+        style="@style/small_regul"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black2"
+        app:layout_constraintBottom_toBottomOf="@id/tv_myMoney"
+        app:layout_constraintStart_toEndOf="@id/tv_myMoney"
+        tools:text=" /일" />
+
+    <View
+        android:id="@+id/view_div"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/space_median"
+        android:layout_marginTop="@dimen/space_large"
+        android:background="@color/black0"
+        app:layout_constraintTop_toBottomOf="@id/tv_myTarget" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
