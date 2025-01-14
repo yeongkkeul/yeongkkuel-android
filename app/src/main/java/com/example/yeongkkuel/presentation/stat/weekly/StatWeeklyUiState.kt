@@ -39,7 +39,20 @@ data class StatWeeklyUiState(
                 DayData(Week.SAT, null),
                 DayData(Week.SUN, null),
             ),
-            compareList = emptyList()
+            compareList = listOf(
+                CompareData.OthersCompare(
+                    target = "20대 직장인",
+                    targetSpending = 15700,
+                    mySpending = 8100,
+                    spendingUnit = SpendingUnit.DAY,
+                    percentile = 10
+                ),
+                CompareData.PastCompare(
+                    pastSpending = 122038,
+                    currentSpending = 100383,
+                    spendingUnit = SpendingUnit.DAY
+                )
+            )
         )
     }
 }
@@ -48,6 +61,6 @@ enum class Week(val kor: String) {
     SUN("일"), MON("월"), TUE("화"), WED("수"), THU("목"), FRI("금"), SAT("토")
 }
 
-enum class SpendingUnit(kor: String) {
+enum class SpendingUnit(val kor: String) {
     DAY("/일"), WEEK("/주"), MONTH("/월")
 }

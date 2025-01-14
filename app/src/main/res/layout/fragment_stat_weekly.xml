@@ -142,7 +142,7 @@
 
             <ImageView
                 android:id="@+id/iv_chartCenter"
-                android:layout_width="88dp"
+                android:layout_width="80dp"
                 android:layout_height="0dp"
                 android:background="@drawable/bg_whitecircle"
                 app:layout_constraintBottom_toBottomOf="@id/pieChart"

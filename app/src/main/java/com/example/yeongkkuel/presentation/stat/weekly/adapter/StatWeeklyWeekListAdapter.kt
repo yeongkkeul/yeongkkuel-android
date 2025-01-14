@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.presentation.stat.weekly
+package com.example.yeongkkuel.presentation.stat.weekly.adapter
 
 import android.content.res.ColorStateList
 import android.view.LayoutInflater
@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.ItemStatWeeklyWeekBinding
+import com.example.yeongkkuel.presentation.stat.weekly.StatWeeklyUiState
 import com.example.yeongkkuel.presentation.util.toMoneyString
 import java.math.RoundingMode
 import java.util.Calendar

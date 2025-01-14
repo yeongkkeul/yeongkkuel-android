@@ -37,7 +37,7 @@ class BotSheetHistoryListAdapter(
     }
 }
 
-class SpendingHistoryListDiffUtil : DiffUtil.ItemCallback<BotSheetUiState.Spending.History>() {
+private class SpendingHistoryListDiffUtil : DiffUtil.ItemCallback<BotSheetUiState.Spending.History>() {
 
     override fun areItemsTheSame(
         oldItem: BotSheetUiState.Spending.History,

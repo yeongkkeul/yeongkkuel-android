@@ -20,7 +20,7 @@ class BotSheetCategoryListAdapter(
         private val historyListAdapter = BotSheetHistoryListAdapter()
 
         fun onBind(item: BotSheetUiState.Spending) = with(binding) {
-            tvCategory.text = item.kind
+            tvCategory.text = item.kind.kor
             tvCategory.setTextColor(ContextCompat.getColor(binding.root.context, item.color.id))
 
             rvHistory.run {
