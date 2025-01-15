@@ -11,7 +11,18 @@
         android:name="com.example.yeongkkuel.presentation.home.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_homeFragment_to_storeFragment"
+            app:destination="@id/navigation_store" />
     </fragment>
+
+    <fragment
+        android:id="@+id/navigation_store"
+        android:name="com.example.yeongkkuel.presentation.home.StoreFragment"
+        android:label="fragment_store"
+        tools:layout="@layout/fragment_store" >
+    </fragment>
+
 
     <fragment
         android:id="@+id/navigation_chat"

@@ -6,49 +6,40 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- AppBar -->
+    <!-- BackBar -->
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cl_appBar"
+        android:id="@+id/cl_backBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/space_median"
         android:layout_marginVertical="@dimen/space_x_small"
-        android:layout_marginTop="156dp"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_marginTop="28dp"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="16dp">
 
         <ImageView
+            android:id="@+id/img_go_home"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_title"
+            android:src="@drawable/ic_arrow_left"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/iv_noti"
+        <TextView
+            android:id="@+id/tv_go_home"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/space_median"
-            android:layout_marginEnd="@dimen/space_x_small"
-            android:padding="4dp"
-            android:src="@drawable/ic_bell"
+            android:layout_marginStart="8dp"
+            android:text="상점"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/iv_more"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:id="@+id/iv_more"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/space_median"
-            android:padding="4dp"
-            android:src="@drawable/ic_more"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/img_go_home"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Background -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/img_bird_background"
         android:layout_width="match_parent"
@@ -57,7 +48,7 @@
         android:background="@drawable/bg_home"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <!-- Left Top Image -->
+        <!-- 왼쪽 상단 이미지 -->
         <ImageView
             android:id="@+id/img_store_swing"
             android:layout_width="150dp"
@@ -67,7 +58,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Right Top Image -->
+        <!-- 오른쪽 상단 이미지 -->
         <ImageView
             android:id="@+id/img_home_home"
             android:layout_width="150dp"
@@ -77,7 +68,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Left Bottom Image -->
+        <!-- 왼쪽 하단 이미지 -->
         <ImageView
             android:id="@+id/img_home_toy"
             android:layout_width="150dp"
@@ -88,7 +79,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <!-- Right Bottom Image -->
+        <!-- 오른쪽 하단 이미지 -->
         <ImageView
             android:id="@+id/img_home_bowl"
             android:layout_width="150dp"
@@ -99,22 +90,23 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Coin -->
+        <!-- 새 이미지 -->
         <ImageView
             android:id="@+id/img_home_bird"
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:src="@drawable/img_home_bird"
+            android:layout_marginBottom="15dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginBottom="15dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- 코인 -->
         <LinearLayout
             android:id="@+id/ly_coin_bar"
             android:layout_width="wrap_content"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="8dp"
             android:background="@drawable/bg_box_white"
@@ -140,30 +132,29 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
         </LinearLayout>
-
-        <!-- Store  -->
-
-        <ImageView
-            android:id="@+id/bg_home_store"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginEnd="32dp"
-            android:src="@drawable/bg_whitecircle"
-            app:layout_constraintBottom_toBottomOf="@id/ly_coin_bar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/ly_coin_bar"
-            app:layout_constraintVertical_bias="1.0" />
-
-        <ImageView
-            android:id="@+id/img_home_store"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_marginEnd="40dp"
-            android:src="@drawable/ic_go_store"
-            app:layout_constraintBottom_toBottomOf="@id/ly_coin_bar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/ly_coin_bar" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- 탭 레이아웃 -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_box_white"
+        app:tabIndicatorColor="@color/main3"
+        app:layout_constraintTop_toBottomOf="@id/img_bird_background"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 가로 스크롤  -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_store_items"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:padding="16dp"
+        android:scrollbars="horizontal"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintTop_toBottomOf="@id/tab_layout"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

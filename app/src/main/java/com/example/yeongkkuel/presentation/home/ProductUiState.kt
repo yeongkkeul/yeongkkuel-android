@@ -1,0 +1,74 @@
+package com.example.yeongkkuel.presentation.home
+
+import com.example.yeongkkuel.R
+import com.example.yeongkkuel.presentation.home.ProductCategory
+
+data class ProductUiState(
+    val totalProducts: Int = 8, // 총 상품 개수
+    val productList: List<Product>
+) {
+    data class Product(
+        val name: String,
+        val price: Int,
+        val category: ProductCategory,
+        val iconResId: Int,
+    )
+
+    companion object {
+        fun init() = ProductUiState(
+            productList = listOf(
+                Product(
+                    name = "탱탱볼",
+                    price = 128,
+                    category = ProductCategory.TOY,
+                    iconResId = R.drawable.img_store_toy2,
+                ),
+                Product(
+                    name = "스케이트 보드",
+                    price = 128,
+                    category = ProductCategory.TOY,
+                    iconResId = R.drawable.img_store_toy1,
+                ),
+                Product(
+                    name = "밥그릇 1",
+                    price = 64,
+                    category = ProductCategory.BOWL,
+                    iconResId = R.drawable.img_store_bowl1,
+                ),
+                Product(
+                    name = "밥그릇 2",
+                    price = 64,
+                    category = ProductCategory.BOWL,
+                    iconResId = R.drawable.img_store_bowl2,
+                ),
+                Product(
+                    name = "둥지 1",
+                    price = 256,
+                    category = ProductCategory.NEST,
+                    iconResId = R.drawable.img_store_nest1
+                ),
+                Product(
+                    name = "둥지 2",
+                    price = 768,
+                    category = ProductCategory.NEST,
+                    iconResId = R.drawable.img_store_nest2,
+
+                ),
+                Product(
+                    name = "그네 1",
+                    price = 256,
+                    category = ProductCategory.SWING,
+                    iconResId = R.drawable.img_store_swing1
+                ),
+                Product(
+                    name = "그네 2",
+                    price = 768,
+                    category = ProductCategory.SWING,
+                    iconResId = R.drawable.img_store_swing2,
+
+                    )
+
+            )
+        )
+    }
+}

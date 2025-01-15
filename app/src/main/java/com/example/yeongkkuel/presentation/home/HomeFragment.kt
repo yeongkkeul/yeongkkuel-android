@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
@@ -30,7 +31,12 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         navController = Navigation.findNavController(view)
+
+        binding.imgHomeStore.setOnClickListener {
+            navController.navigate(R.id.action_homeFragment_to_storeFragment)
+        }
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
