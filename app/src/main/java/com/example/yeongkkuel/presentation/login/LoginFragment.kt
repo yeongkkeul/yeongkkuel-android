@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentLoginBinding
+import com.kakao.sdk.auth.AuthApiClient
 import com.kakao.sdk.common.model.AuthError
 import com.kakao.sdk.common.model.AuthErrorCause
 import com.kakao.sdk.common.model.ClientError
@@ -42,14 +43,36 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
+
         // 카카오 버튼 클릭 시
         binding.btnKakaoLogin.setOnClickListener {
-            handleKakaoLogin()
+            //이미 인가 코드를 받았다면 로그아웃하는 로직 추가
+            if (AuthApiClient.instance.hasToken()) {
+                // 이미 세션이 살아있는 경우
+                Timber.d("이미 카카오 로그인이 되어 있습니다. 재로그인을 위해 로그아웃 시도.")
+                logoutAndReLogin()
+            } else {
+                // 세션이 없으므로 기존대로 로그인 진행
+                handleKakaoLogin()
+            }
         }
 
         // TODO: 구글 로그인 구현
         binding.btnGoogleLogin.setOnClickListener {
             findNavController().navigate(R.id.action_loginFragment_to_navigation_home)
+        }
+    }
+
+    private fun logoutAndReLogin() {
+        UserApiClient.instance.logout { error ->
+            if (error != null) {
+                Timber.e("카카오 로그아웃 실패: $error")
+                // 그래도 로그인은 시도해볼 수 있음
+                handleKakaoLogin()
+            } else {
+                Timber.d("카카오 로그아웃 성공. 이제 다시 로그인 시도.")
+                handleKakaoLogin()
+            }
         }
     }
 
@@ -64,6 +87,7 @@ class LoginFragment : Fragment() {
         if (UserApiClient.instance.isKakaoTalkLoginAvailable(requireContext())) {
             // 카카오톡으로 로그인
             loginWithKakaoTalk()
+
         } else {
             // 카카오 계정으로 로그인
             loginWithKakaoAccount()
@@ -81,6 +105,7 @@ class LoginFragment : Fragment() {
             }
         }
     }
+
 
     private fun loginWithKakaoAccount() {
         UserApiClient.instance.loginWithKakaoAccount(requireContext()) { token, error ->
@@ -142,7 +167,7 @@ class LoginFragment : Fragment() {
                     AuthErrorCause.Misconfigured -> Timber.tag("KakaoLogin").e("설정 오류")
                     AuthErrorCause.ServerError -> Timber.tag("KakaoLogin").e("서버 오류 발생")
                     AuthErrorCause.Unauthorized -> Timber.tag("KakaoLogin").e("권한이 없습니다")
-                    else -> Timber.tag("KakaoLogin").e("알 수 없는 인증 오류")
+                    else -> Timber.tag("KakaoLogin").e("알 수 없는 인증 오류 ${error.reason}")
                 }
             }
             else -> {
