@@ -23,7 +23,7 @@
         android:layout_marginRight="@dimen/space_x_small"
         android:textColor="@color/black"
         android:textStyle="bold"
-        android:layout_marginBottom="12dp" />
+        android:layout_marginBottom="@dimen/space_small" />
 
         <TextView
             android:id="@+id/tv_recommend_code_error"
@@ -63,7 +63,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:padding="10dp"
-            android:layout_marginRight="8dp"
+            android:layout_marginRight="@dimen/space_x_small"
             android:background="@drawable/bg_button_gray"
             android:textColor="@color/black"
             android:clickable="true"

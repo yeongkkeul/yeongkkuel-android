@@ -28,7 +28,7 @@
             android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="@dimen/space_large"
             android:text="친구와 30 리워드를 받았어요"
             android:textColor="@color/black"
             />
@@ -59,7 +59,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:padding="10dp"
-            android:layout_marginRight="8dp"
+            android:layout_marginRight="@dimen/space_x_small"
             android:background="@drawable/bg_button_gray"
             android:textColor="@color/black"
             android:clickable="true"

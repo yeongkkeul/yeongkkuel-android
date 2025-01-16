@@ -104,7 +104,7 @@
         android:id="@+id/gl_gender_group"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="@dimen/space_large"
         android:columnCount="2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -135,8 +135,8 @@
         style="@style/body_semibo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginStart="@dimen/space_median"
+        android:layout_marginTop="@dimen/signup_margin_top"
         android:text="@string/signup_age_title"
         android:textColor="@color/main1"
         android:textStyle="bold"
@@ -149,7 +149,7 @@
         android:id="@+id/gl_age_group"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="@dimen/space_large"
         android:columnCount="2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.487"
@@ -179,7 +179,7 @@
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
             android:layout_gravity="center"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="@dimen/space_large"
             android:text="@string/signup_age_30s"
             android:textColor="@color/black" />
 
@@ -188,7 +188,7 @@
             style="@style/body_regula"
             android:layout_columnWeight="1"
             android:layout_gravity="center"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="@dimen/space_large"
             android:text="@string/signup_age_40s"
             android:textColor="@color/black" />
 
@@ -197,7 +197,7 @@
             style="@style/body_regula"
             android:layout_columnWeight="1"
             android:layout_gravity="center"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="@dimen/space_large"
             android:text="@string/signup_age_50s"
             android:textColor="@color/black" />
 
@@ -206,7 +206,7 @@
             style="@style/body_regula"
             android:layout_columnWeight="1"
             android:layout_gravity="center"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="@dimen/space_large"
             android:text="@string/signup_age_over_60"
             android:textColor="@color/black" />
     </GridLayout>
@@ -216,8 +216,8 @@
         style="@style/body_semibo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginStart="@dimen/space_median"
+        android:layout_marginTop="@dimen/signup_margin_top"
         android:text="@string/signup_job_title"
         android:textColor="@color/main1"
         android:textStyle="bold"
@@ -230,7 +230,7 @@
         android:id="@+id/gl_job_group"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="@dimen/space_large"
         android:columnCount="2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.609"
@@ -259,7 +259,7 @@
             style="@style/body_regula"
             android:layout_columnWeight="1"
             android:layout_gravity="center"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="@dimen/space_large"
             android:text="@string/signup_job_housewife"
             android:textColor="@color/black" />
 
@@ -268,7 +268,7 @@
             style="@style/body_regula"
             android:layout_columnWeight="1"
             android:layout_gravity="center"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="@dimen/space_large"
             android:text="@string/signup_job_business_owner"
             android:textColor="@color/black" />
     </GridLayout>

@@ -10,7 +10,7 @@
 
 <!--Sign up-->
     <dimen name="signup_gender_margin">56dp</dimen>
-
+    <dimen name="signup_margin_top">64dp</dimen>
 
     <!--Stat-->
     <dimen name="bottom_sheet_min_height">100dp</dimen>
