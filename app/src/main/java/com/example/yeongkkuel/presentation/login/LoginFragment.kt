@@ -41,12 +41,13 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        Log.d("LoginFragment", "onViewCreated")
 
+        // 카카오 버튼 클릭 시
         binding.btnKakaoLogin.setOnClickListener {
             handleKakaoLogin()
         }
 
+        // TODO: 구글 로그인 구현
         binding.btnGoogleLogin.setOnClickListener {
             findNavController().navigate(R.id.action_loginFragment_to_navigation_home)
         }
@@ -87,11 +88,13 @@ class LoginFragment : Fragment() {
                 handleLoginError(error)
             } else if (token != null) {
                 Timber.tag("KakaoLogin").i("카카오 계정 로그인 성공. 토큰 정보: ${token.accessToken}")
+
                 fetchUserInfo(token.accessToken)
             }
         }
     }
 
+    // 사용자 정보 요청 - 사용자 요청 정보 전달.
     private fun fetchUserInfo(accessToken: String) {
         UserApiClient.instance.me { user, error ->
             if (error != null) {
@@ -99,28 +102,31 @@ class LoginFragment : Fragment() {
                 Toast.makeText(requireContext(), "사용자 정보를 가져오지 못했습니다.", Toast.LENGTH_SHORT).show()
             } else if (user != null) {
                 Timber.tag("KakaoLogin").i("사용자 정보 요청 성공: ${user}")
-                val id = user.id
                 val nickname = user.kakaoAccount?.profile?.nickname
-                val email = user.kakaoAccount?.email
-                val profileImage = user.kakaoAccount?.profile?.profileImageUrl
-
-                // 사용자 정보를 활용한 로직
                 Toast.makeText(
                     requireContext(),
                     "환영합니다, ${nickname}님!",
                     Toast.LENGTH_SHORT
                 ).show()
 
-                // 다음 화면으로 이동 예시
+                // 백엔드에 인가 코드 전달하기 -TODO: 백엔드에 인가 코드 전달하는 방법 고민
+
+                // 응답으로 성공 or 실패를 받음.
+                //실패로직과 성공로직으로 나눔. -TODO: 실패로직과 성공로직 구현
+
+                // 성공 시 - 다음 화면으로 이동
                 navigateToSignUp()
+                // 실패 시 - 실패 메시지 출력
             }
         }
     }
 
+    // 로그인 실패 시 에러 처리 - 로그인 실패 시 로그만 띄우기? - TODO: 실패 시 처리 방법 고민
     private fun handleLoginError(error: Throwable) {
         when (error) {
             is ClientError -> {
                 if (error.reason == ClientErrorCause.Cancelled) {
+                    // 사용자가 로그인 취소 시
                     Timber.tag("KakaoLogin").e("사용자가 로그인 취소")
                 } else {
                     Timber.tag("KakaoLogin").e("클라이언트 에러 발생: ${error.reason}")
@@ -146,9 +152,8 @@ class LoginFragment : Fragment() {
         }
     }
 
+
     private fun navigateToSignUp() {
-        // 회원가입 화면으로 이동
-        // 예: Navigation Component를 사용한 화면 전환
-        // findNavController().navigate(R.id.action_loginFragment_to_signupFragment)
+        findNavController().navigate(R.id.action_loginFragment_to_signupFragment)
     }
 }
