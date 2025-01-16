@@ -85,10 +85,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         initViewModel()
     }
 
-    fun hideBottomNavigation(state: Boolean) {
-        if (state) binding.bottomNavi.visibility = View.GONE else binding.bottomNavi.visibility =
-            View.VISIBLE
-    }
+
 
     private fun initView() = with(binding) {
         fun initBottomSheet() {
@@ -228,6 +225,11 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     }
 
     private fun initViewModel() = with(botSheetViewModel){
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+
+        val navController = navHostFragment.navController
+
         lifecycleScope.launch {
             uiState.flowWithLifecycle(lifecycle)
                 .collectLatest { uiState ->
