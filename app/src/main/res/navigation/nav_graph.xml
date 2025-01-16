@@ -14,7 +14,8 @@
         <action
             android:id="@+id/action_splashFragment_to_loginFragment"
             app:destination="@id/navigation_login"
-            app:enterAnim="@anim/slide_in_up"
+            app:popUpTo="@id/navigation_splash"
+            app:popUpToInclusive="true"
             />
     </fragment>
 
@@ -27,6 +28,10 @@
             android:id="@+id/action_loginFragment_to_navigation_home"
             app:destination="@id/navigation_home"
             />
+        <action
+            android:id="@+id/action_loginFragment_to_signupFragment"
+            app:destination="@id/navigation_signup"
+            />
     </fragment>
 
     <fragment
@@ -34,6 +39,18 @@
         android:name="com.example.yeongkkuel.presentation.home.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home">
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_signup"
+        android:name="com.example.yeongkkuel.presentation.signup.SignupFragment"
+        android:label="fragment_signup"
+        tools:layout="@layout/fragment_signup">
+        <action
+            android:id="@+id/action_signupFragment_to_navigation_home"
+            app:destination="@id/navigation_home"
+            app:popUpTo="@id/navigation_login"
+            app:popUpToInclusive="true"/>
     </fragment>
 
     <fragment

@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity() {
         // 바텀네비게이션 뷰 숨김 처리 - 스플래시, 로그인
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.navigation_splash, R.id.navigation_login -> hideBottomNavigation(true)
+                R.id.navigation_splash, R.id.navigation_login, R.id.navigation_signup -> hideBottomNavigation(true)
                 else -> hideBottomNavigation(false)
             }
         }
