@@ -3,6 +3,9 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <!-- Home -->
+    <string name="expense_title">지출 기입</string>
+
 
     <!-- Stat -->
     <string name="stat_daily">일간</string>
