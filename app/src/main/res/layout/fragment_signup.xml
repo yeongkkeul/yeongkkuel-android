@@ -1,173 +1,290 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
     android:background="@color/white">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <!-- 뒤로 가기 버튼 -->
+    <ImageView
+        android:id="@+id/iv_back"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_marginStart="@dimen/space_median"
+        android:layout_marginTop="@dimen/space_median"
+        android:contentDescription="뒤로가기"
+        android:src="@drawable/ic_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- 닉네임 입력 -->
+    <!-- 닉네임 입력 -->
+    <TextView
+        android:id="@+id/tv_nickname_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_median"
+        android:layout_marginTop="@dimen/space_median"
+        android:text="@string/signup_nickname_title"
+        style="@style/body_semibo"
+        android:textColor="@color/main1"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/iv_back" />
+
+    <TextView
+        android:id="@+id/tv_nickname_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/errorClicked"
+        style="@style/small_semib"
+        android:text="닉네임을 입력해주세요"
+        android:visibility="invisible"
+        android:layout_marginStart="9dp"
+        android:layout_marginBottom="@dimen/space_x_small"
+        app:layout_constraintStart_toEndOf="@+id/tv_nickname_label"
+        app:layout_constraintBottom_toTopOf="@+id/cl_nickname" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_nickname"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_x_small"
+        android:background="@drawable/rounded_nickname_background"
+        android:padding="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_nickname_label"
+        app:layout_constraintWidth_percent="0.9">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_nickname"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:hint="@string/signup_nickname_hint"
+            android:inputType="text"
+            android:maxLength="10"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tv_char_count"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
-            android:id="@+id/tv_nickname_label"
+            android:id="@+id/tv_char_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="1. 닉네임"
-            android:textSize="16sp"
-            android:textColor="@color/black"
-            android:layout_marginBottom="8dp" />
+            android:text="0/10"
+            android:textColor="@color/black2"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_nickname"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="닉네임을 입력해주세요">
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/et_nickname"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:maxLength="10"
-                android:inputType="text" />
-        </com.google.android.material.textfield.TextInputLayout>
+    <!-- 성별 선택 -->
+    <TextView
+        android:id="@+id/tv_gender_label"
+        style="@style/body_semibo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_median"
+        android:layout_marginTop="@dimen/signup_gender_margin"
+        android:text="@string/signup_gender_title"
+        android:textColor="@color/main1"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cl_nickname" />
 
-        <!-- 성별 선택 -->
+    <GridLayout
+        android:id="@+id/gl_gender_group"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:columnCount="2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_gender_label"
+        app:layout_constraintWidth_percent="0.9">
+
         <TextView
-            android:id="@+id/tv_gender_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="2. 성별을 알려주세요."
-            android:textSize="16sp"
-            android:textColor="@color/black"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp" />
+            android:id="@+id/tv_gender_male"
+            style="@style/body_regula"
+            android:layout_height="match_parent"
+            android:layout_columnWeight="1"
+            android:layout_gravity="center"
+            android:text="@string/signup_gender_female"
+            android:textColor="@color/black" />
 
-        <RadioGroup
-            android:id="@+id/rg_gender"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/rb_gender_male"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="남자"
-                android:textSize="14sp" />
-
-            <RadioButton
-                android:id="@+id/rb_gender_female"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="여자"
-                android:textSize="14sp"
-                android:layout_marginStart="16dp" />
-        </RadioGroup>
-
-        <!-- 연령대 선택 -->
         <TextView
-            android:id="@+id/tv_age_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="3. 연령대를 알려주세요."
-            android:textSize="16sp"
-            android:textColor="@color/black"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp" />
+            android:id="@+id/tv_gender_female"
+            style="@style/body_regula"
+            android:layout_columnWeight="1"
+            android:layout_gravity="center"
+            android:text="@string/signup_gender_male"
+            android:textColor="@color/black" />
+    </GridLayout>
 
-        <!--<GridLayout
-            android:id="@+id/gl_age_group"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:columnCount="3"
-            android:rowCount="2"
-            android:gap="8dp">
+    <!-- 연령대 선택 -->
+    <TextView
+        android:id="@+id/tv_age_label"
+        style="@style/body_semibo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="64dp"
+        android:text="@string/signup_age_title"
+        android:textColor="@color/main1"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/gl_gender_group" />
 
-            <TextView
-                android:id="@+id/tv_age_14_19"
-                style="@style/SelectableText"
-                android:text="14~19세" />
+    <!-- 현재 하시는 일 -->
 
-            <TextView
-                android:id="@+id/tv_age_20"
-                style="@style/SelectableText"
-                android:text="20대" />
+    <GridLayout
+        android:id="@+id/gl_age_group"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:columnCount="2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.487"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_age_label"
+        app:layout_constraintWidth_percent="0.9">
 
-            <TextView
-                android:id="@+id/tv_age_30"
-                style="@style/SelectableText"
-                android:text="30대" />
-
-            <TextView
-                android:id="@+id/tv_age_40"
-                style="@style/SelectableText"
-                android:text="40대" />
-
-            <TextView
-                android:id="@+id/tv_age_50"
-                style="@style/SelectableText"
-                android:text="50대" />
-
-            <TextView
-                android:id="@+id/tv_age_60_plus"
-                style="@style/SelectableText"
-                android:text="60대 이상" />
-        </GridLayout>-->
-
-        <!-- 현재 하시는 일 -->
         <TextView
-            android:id="@+id/tv_job_label"
-            android:layout_width="wrap_content"
+            android:id="@+id/tv_age_14_19"
+            style="@style/body_regula"
+            android:layout_columnWeight="1"
+            android:layout_gravity="center"
+            android:text="@string/signup_age_10s"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/tv_age_20"
+            style="@style/body_regula"
+            android:layout_columnWeight="1"
+            android:layout_gravity="center"
+            android:text="@string/signup_age_20s"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/tv_age_30"
+            style="@style/body_regula"
             android:layout_height="wrap_content"
-            android:text="4. 현재 하시는 일을 알려주세요."
-            android:textSize="16sp"
-            android:textColor="@color/black"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp" />
-<!--
-        <GridLayout
-            android:id="@+id/gl_job_group"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:columnCount="2"
-            android:rowCount="2"
-            android:gap="8dp">
+            android:layout_columnWeight="1"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:text="@string/signup_age_30s"
+            android:textColor="@color/black" />
 
-            <TextView
-                android:id="@+id/tv_job_student"
-                style="@style/SelectableText"
-                android:text="학생" />
+        <TextView
+            android:id="@+id/tv_age_40"
+            style="@style/body_regula"
+            android:layout_columnWeight="1"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:text="@string/signup_age_40s"
+            android:textColor="@color/black" />
 
-            <TextView
-                android:id="@+id/tv_job_worker"
-                style="@style/SelectableText"
-                android:text="직장인" />
+        <TextView
+            android:id="@+id/tv_age_50"
+            style="@style/body_regula"
+            android:layout_columnWeight="1"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:text="@string/signup_age_50s"
+            android:textColor="@color/black" />
 
-            <TextView
-                android:id="@+id/tv_job_housewife"
-                style="@style/SelectableText"
-                android:text="주부" />
+        <TextView
+            android:id="@+id/tv_age_60_plus"
+            style="@style/body_regula"
+            android:layout_columnWeight="1"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:text="@string/signup_age_over_60"
+            android:textColor="@color/black" />
+    </GridLayout>
 
-            <TextView
-                android:id="@+id/tv_job_self_employed"
-                style="@style/SelectableText"
-                android:text="자영업자" />
-        </GridLayout>
+    <TextView
+        android:id="@+id/tv_job_label"
+        style="@style/body_semibo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="64dp"
+        android:text="@string/signup_job_title"
+        android:textColor="@color/main1"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/gl_age_group" />
 
-        &lt;!&ndash; 완료 버튼 &ndash;&gt;
-        <Button
-            android:id="@+id/btn_signup_complete"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="완료"
-            android:backgroundTint="@color/main_color"
-            android:textColor="@color/white"
-            android:textSize="16sp" />-->
+    <!-- 완료 버튼 -->
 
-    </LinearLayout>
-</ScrollView>
+    <GridLayout
+        android:id="@+id/gl_job_group"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:columnCount="2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.609"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_job_label"
+        app:layout_constraintWidth_percent="0.9">
+
+        <TextView
+            android:id="@+id/tv_job_student"
+            style="@style/body_regula"
+            android:layout_columnWeight="1"
+            android:layout_gravity="center"
+            android:text="@string/signup_job_student"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/tv_job_worker"
+            style="@style/body_regula"
+            android:layout_columnWeight="1"
+            android:layout_gravity="center"
+            android:text="@string/signup_job_worker"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/tv_job_housewife"
+            style="@style/body_regula"
+            android:layout_columnWeight="1"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:text="@string/signup_job_housewife"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/tv_job_self_employed"
+            style="@style/body_regula"
+            android:layout_columnWeight="1"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:text="@string/signup_job_business_owner"
+            android:textColor="@color/black" />
+    </GridLayout>
+
+    <ImageView
+        android:id="@+id/btn_signup_complete"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="58dp"
+        android:src="@drawable/btn_sucess"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.609"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/gl_job_group"
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintWidth_percent="0.9" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
