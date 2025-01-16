@@ -1,14 +1,25 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
 }
 
+
+val localProperties = Properties()
+localProperties.load(project.rootProject.file("local.properties").inputStream())
+val kakaoApiKey = localProperties.getProperty("kakao_NATIVE_APP_KEY")?:""
+val nativeAppKey = localProperties.getProperty("kakao_NATIVE_APP_KEY_MANIFEST")?:""
+
 android {
     namespace = "com.example.yeongkkuel"
     compileSdk = 35
 
     defaultConfig {
+        buildConfigField("String", "kakao_NATIVE_APP_KEY", "\"$kakaoApiKey\"")
+        manifestPlaceholders["NATIVE_APP_KEY"] = nativeAppKey
+
         applicationId = "com.example.yeongkkuel"
         minSdk = 30
         targetSdk = 34
@@ -17,7 +28,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -43,6 +53,10 @@ android {
 
 dependencies {
 
+    implementation ("androidx.core:core-splashscreen:1.0.1") //splash Theme 적용
+    implementation ("com.kakao.sdk:v2-all:2.20.6") // 전체 모듈 설치, 2.11.0 버전부터 지원
+    implementation ("com.kakao.sdk:v2-user:2.20.6") // 카카오 로그인 API 모듈
+    implementation ("com.kakao.sdk:v2-cert:2.20.6") // 카카오톡 인증 서비스 API 모듈
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
