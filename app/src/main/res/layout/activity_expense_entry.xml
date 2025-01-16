@@ -28,8 +28,8 @@
             android:id="@+id/tv_expense_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/expense_title"
-            style="@style/expense_pageTitle"
+            android:text="@string/expense_entry"
+            style="@style/pageTitle"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toEndOf="@id/btn_back"
             android:layout_marginStart="12dp"/>

@@ -64,7 +64,7 @@
     </style>
 
     <!-- Home -->
-    <style name="expense_pageTitle">
+    <style name="pageTitle">
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">@color/black</item>
         <item name="android:fontFamily">sans-serif</item>
@@ -73,6 +73,12 @@
     <style name="expense_sectionTitle">
         <item name="android:textSize">16sp</item>
         <item name="android:textColor">@color/black</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="add_or_done">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/main1</item>
         <item name="android:textStyle">bold</item>
     </style>
 
