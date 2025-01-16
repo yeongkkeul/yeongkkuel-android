@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.presentation.statbotsheet
+package com.example.yeongkkuel.presentation.stat
 
 interface ViewPagerTouchListener {
     fun disableViewPagerTouch()
