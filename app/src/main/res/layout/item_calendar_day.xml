@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/pieChart"
+        android:layout_width="0dp"
+        android:layout_height="34dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/iv_chartCenter"
+        android:layout_width="16dp"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_whitecircle"
+        app:layout_constraintBottom_toBottomOf="@id/pieChart"
+        app:layout_constraintDimensionRatio="1"
+        app:layout_constraintEnd_toEndOf="@id/pieChart"
+        app:layout_constraintStart_toStartOf="@id/pieChart"
+        app:layout_constraintTop_toTopOf="@id/pieChart" />
+
+
+    <TextView
+        android:id="@+id/tv_day"
+        style="@style/small_regul"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/iv_chartCenter"
+        app:layout_constraintEnd_toEndOf="@id/iv_chartCenter"
+        app:layout_constraintStart_toStartOf="@id/iv_chartCenter"
+        app:layout_constraintTop_toTopOf="@id/iv_chartCenter"
+        tools:text="11" />
+</androidx.constraintlayout.widget.ConstraintLayout>

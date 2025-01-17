@@ -108,7 +108,6 @@ class StatDailyFragment : Fragment() {
                     colors = colorList // 색상 리스트 적용
                 }
 
-
                 dataSet.valueTextSize = 16F
                 dataSet.setDrawValues(false) // value 비활성화
 

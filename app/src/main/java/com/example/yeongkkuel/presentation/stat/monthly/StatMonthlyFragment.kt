@@ -6,7 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.example.yeongkkuel.databinding.FragmentStatMonthlyBinding
+import com.example.yeongkkuel.presentation.stat.monthly.adapter.viewpager.StatMonthlyCalenderViewPagerAdapter
+import com.example.yeongkkuel.presentation.util.toMoneyString
+import com.kakao.sdk.friend.view.NestedScrollableHost
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class StatMonthlyFragment : Fragment() {
     private var _binding: FragmentStatMonthlyBinding? = null
@@ -14,6 +21,10 @@ class StatMonthlyFragment : Fragment() {
         get() = requireNotNull(_binding) { "FragmentStatMonthlyBinding -> null" }
 
     private val viewModel: StatMonthlyViewModel by viewModels()
+
+    private val calendarViewPagerAdapter by lazy {
+        StatMonthlyCalenderViewPagerAdapter(requireActivity(), viewModel)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,13 +38,55 @@ class StatMonthlyFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initView()
+        initViewModel()
     }
 
-    private fun initView() = with(binding){
+    private fun initView() = with(binding) {
+        fun initVp() {
+            val nestedScrollableHost = NestedScrollableHost(requireContext())
+
+            // ViewPager2를 NestedScrollableHost에 추가
+            nestedScrollableHost.layoutParams = vpCalendar.layoutParams
+            vpCalendar.layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+
+            // 부모 뷰에서 vpCalendar를 제거하고 NestedScrollableHost에 추가
+            val parent = vpCalendar.parent as ViewGroup
+            val index = parent.indexOfChild(vpCalendar)
+            parent.removeView(vpCalendar)
+            nestedScrollableHost.addView(vpCalendar)
+            parent.addView(nestedScrollableHost, index)
+
+            // ViewPager2 설정
+            vpCalendar.run {
+                offscreenPageLimit = 3
+                adapter = calendarViewPagerAdapter
+                setCurrentItem(adapter?.itemCount?.minus(1) ?: 0, false)
+            }
+        }
+
+        initVp()
     }
 
 
-    private fun initViewModel() = with(viewModel) {}
+
+    private fun initViewModel() = with(viewModel) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            uiState.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+                .collectLatest { uiState ->
+                    onBind(uiState)
+                }
+        }
+    }
+
+    private fun onBind(uiState: StatMonthlyUiState)= with(binding){
+        tvCurrentMonth.text = uiState.targetMonth.first.toString() + "년 " + uiState.targetMonth.second.toString() + "월"
+
+        tvTotalSpending.text = uiState.totalSpending.toMoneyString() + "원"
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

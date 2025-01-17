@@ -2,6 +2,7 @@ package com.example.yeongkkuel.presentation.stat.weekly
 
 import com.example.yeongkkuel.presentation.util.Colors
 import com.example.yeongkkuel.presentation.util.SpendingCategory
+import com.example.yeongkkuel.presentation.util.Week
 import com.github.mikephil.charting.data.Entry
 
 data class StatWeeklyUiState(
@@ -20,14 +21,14 @@ data class StatWeeklyUiState(
             val target: String,
             val targetSpending: Int,
             val mySpending: Int, // 주간 지출에서 평균 구해서 넣기
-            val spendingUnit: SpendingUnit,
+            val spendingUnit: SpendingUnit = SpendingUnit.WEEK,
             val percentile: Int,
         ) : CompareData
 
         data class PastCompare(
             val pastSpending: Int,
             val currentSpending: Int,
-            val spendingUnit: SpendingUnit
+            val spendingUnit: SpendingUnit = SpendingUnit.WEEK
         ) : CompareData
     }
 
@@ -84,9 +85,6 @@ data class StatWeeklyUiState(
     }
 }
 
-enum class Week(val kor: String) {
-    SUN("일"), MON("월"), TUE("화"), WED("수"), THU("목"), FRI("금"), SAT("토")
-}
 
 enum class SpendingUnit(val kor: String) {
     DAY("/일"), WEEK("/주"), MONTH("/월")
