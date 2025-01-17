@@ -1,5 +1,6 @@
 package com.example.yeongkkuel.presentation.stat.monthly
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.example.yeongkkuel.databinding.FragmentStatMonthlyBinding
+import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
 import com.example.yeongkkuel.presentation.stat.monthly.adapter.viewpager.StatMonthlyCalenderViewPagerAdapter
 import com.example.yeongkkuel.presentation.util.toMoneyString
 import com.kakao.sdk.friend.view.NestedScrollableHost
@@ -43,22 +45,6 @@ class StatMonthlyFragment : Fragment() {
 
     private fun initView() = with(binding) {
         fun initVp() {
-            val nestedScrollableHost = NestedScrollableHost(requireContext())
-
-            // ViewPager2를 NestedScrollableHost에 추가
-            nestedScrollableHost.layoutParams = vpCalendar.layoutParams
-            vpCalendar.layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-
-            // 부모 뷰에서 vpCalendar를 제거하고 NestedScrollableHost에 추가
-            val parent = vpCalendar.parent as ViewGroup
-            val index = parent.indexOfChild(vpCalendar)
-            parent.removeView(vpCalendar)
-            nestedScrollableHost.addView(vpCalendar)
-            parent.addView(nestedScrollableHost, index)
-
             // ViewPager2 설정
             vpCalendar.run {
                 offscreenPageLimit = 3
@@ -85,6 +71,13 @@ class StatMonthlyFragment : Fragment() {
         tvCurrentMonth.text = uiState.targetMonth.first.toString() + "년 " + uiState.targetMonth.second.toString() + "월"
 
         tvTotalSpending.text = uiState.totalSpending.toMoneyString() + "원"
+
+        tvAchievementDay.text = uiState.achieveDay.toString() + "일"
+        tvRewardAmount.text = "+" + uiState.rewardsAmount.toString()
+    }
+
+    override fun onResume() {
+        super.onResume()
     }
 
     override fun onDestroyView() {

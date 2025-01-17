@@ -1,5 +1,6 @@
 package com.example.yeongkkuel.presentation.stat.daily
 
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -12,6 +13,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentStatDailyBinding
+import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import com.example.yeongkkuel.presentation.util.toMoneyString
@@ -33,7 +35,6 @@ class StatDailyFragment : Fragment() {
         get() = requireNotNull(_binding) { "FragmentStatBinding -> null" }
 
     private val viewModel: BotSheetViewModel by activityViewModels()
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -143,6 +144,7 @@ class StatDailyFragment : Fragment() {
 
         initPieChart()
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

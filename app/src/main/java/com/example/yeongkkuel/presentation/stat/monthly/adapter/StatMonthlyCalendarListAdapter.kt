@@ -80,6 +80,7 @@ class StatMonthlyCalendarListAdapter(
                 if(dayItem.day == 0){
                     binding.root.visibility = View.INVISIBLE
                 } else {
+                    binding.root.visibility = View.VISIBLE
                     initData()
                 }
 
