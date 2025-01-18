@@ -1,5 +1,6 @@
 package com.example.yeongkkuel.presentation.stat
 
+import android.content.Context
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -10,9 +11,11 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.viewpager2.widget.ViewPager2
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentStatBinding
-import com.example.yeongkkuel.presentation.statbotsheet.ViewPagerTouchListener
+import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
+import com.example.yeongkkuel.presentation.util.dpToPx
 import com.google.android.material.tabs.TabLayoutMediator
 
 class StatFragment : Fragment(), ViewPagerTouchListener {
@@ -25,6 +28,15 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
         StatViewPagerAdapter(this@StatFragment)
     }
 
+    private var botSheetListener: BotSheetListener? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        if(context is BotSheetListener){
+            botSheetListener = context
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,18 +58,55 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
     }
 
     private fun initView() = with(binding) {
-        vpStat.adapter = viewPagerAdapter
-        vpStat.offscreenPageLimit = viewPagerAdapter.itemCount
+        fun initVp() = with(vpStat) {
+            vpStat.adapter = viewPagerAdapter
+            vpStat.offscreenPageLimit = viewPagerAdapter.itemCount
 
-        TabLayoutMediator(tlStat, vpStat) { tab, position ->
-            val tabView = TextView(context).apply {
-                setText(viewPagerAdapter.getTitle(position))
-                setTextAppearance(R.style.body_semibo) // 스타일 적용
-                setTextColor(ContextCompat.getColor(context, R.color.main1))
-                gravity = Gravity.CENTER
+            TabLayoutMediator(tlStat, vpStat) { tab, position ->
+                val tabView = TextView(context).apply {
+                    setText(viewPagerAdapter.getTitle(position))
+                    setTextAppearance(R.style.body_semibo) // 스타일 적용
+                    setTextColor(ContextCompat.getColor(context, R.color.main1))
+                    gravity = Gravity.CENTER
+                }
+                tab.customView = tabView
+            }.attach()
+
+
+            // ViewPager2의 페이지가 변경될 때마다 호출되는 콜백
+            botSheetListener?.let{ listner ->
+                registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                    override fun onPageSelected(position: Int) {
+                        super.onPageSelected(position)
+
+                        when (position) {
+                            0 -> { // 첫 번째 페이지 (StatDailyFragment)
+                                listner.setBotSheetVisible()
+
+                                val displayHeight = resources.displayMetrics.heightPixels
+                                val peekHeight =
+                                    (displayHeight - 440.dpToPx(requireContext()))
+                                listner.setPeekHeight(peekHeight)
+                            }
+                            1 -> { // 두 번째 페이지 (StatWeeklyFragment)
+                                listner.setBotSheetGone()
+                            }
+                            2 -> { // 세 번째 페이지 (StatMonthlyFragment)
+                                listner.setBotSheetVisible()
+
+                                val displayHeight = resources.displayMetrics.heightPixels
+                                val peekHeight =
+                                    (displayHeight - 520.dpToPx(requireContext()))
+                                listner.setPeekHeight(peekHeight)
+                            }
+                        }
+                    }
+                })
             }
-            tab.customView = tabView
-        }.attach()
+
+        }
+
+        initVp()
     }
 
     // ViewPager의 터치 이벤트를 비활성화하는 함수
