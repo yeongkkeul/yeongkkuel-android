@@ -43,7 +43,6 @@ class StatWeeklyFragment : Fragment() {
         get() = requireNotNull(_binding) { "FragmentStatWeeklyBinding -> null" }
 
     private val viewModel: StatWeeklyViewModel by viewModels()
-    private val botSheetViewModel: BotSheetViewModel by activityViewModels()
 
     private val weekListAdapter by lazy {
         StatWeeklyWeekListAdapter()
@@ -114,19 +113,13 @@ class StatWeeklyFragment : Fragment() {
                     onBind(uiState)
                 }
         }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            botSheetViewModel.uiState.flowWithLifecycle(viewLifecycleOwner.lifecycle)
-                .collectLatest { uiState->
-                    onBindPieChart(uiState)
-                }
-        }
     }
 
     private fun onBind(uiState: StatWeeklyUiState) = with(binding) {
         fun initRvData(){
             weekListAdapter.submitList(uiState.weekList)
             compareListAdapter.submitList(uiState.compareList)
+            pieChartCategoryListAdapter.submitList(uiState.pieChartList)
         }
 
         fun initLineChart() {
@@ -226,23 +219,16 @@ class StatWeeklyFragment : Fragment() {
             tvLineTargetSpending.text = "하루 목표 지출액 ${targetSpendingString}원"
         }
 
-
-        initRvData()
-        initLineChart()
-        setTargetSpending()
-    }
-
-    private fun onBindPieChart(uiState: BotSheetUiState) = with(binding){
-        fun initPieChart() {
-            uiState.spendingList.let {
+        fun initPieChart(){
+            uiState.pieChartList.let { pieChartList ->
+                val list = pieChartList.sortedByDescending { it.expenditure }
                 val pieChartDataList = ArrayList<PieEntry>().apply {
-                    uiState.spendingList.forEach { spending ->
-                        val totalPrice = spending.history.sumOf { it.price }
-                        add(PieEntry(totalPrice.toFloat(), spending.kind))
+                    list.forEach { spending ->
+                        add(PieEntry(spending.expenditure.toFloat(), spending.category))
                     }
                 }
 
-                val colorList = uiState.spendingList.map {
+                val colorList = list.map {
                     ContextCompat.getColor(requireContext(), it.color.id)
                 }.toMutableList()
 
@@ -283,15 +269,14 @@ class StatWeeklyFragment : Fragment() {
 
                 // 내림차순으로 정렬
                 val sortedList = copiedList.sortedByDescending { it.value }
-
             }
         }
 
         fun initPieChartDescription(){
-            val mostSpendingKind = uiState.spendingList
+            val mostSpendingKind = uiState.pieChartList
                 .maxByOrNull { spending ->
-                    spending.history.sumOf { it.price }
-                }?.kind
+                    spending.expenditure
+                }?.category
 
             if(mostSpendingKind != null) {
                 val mostSpendingKindKor = mostSpendingKind.kor
@@ -315,14 +300,14 @@ class StatWeeklyFragment : Fragment() {
             }
         }
 
-        fun initRvData() {
-            pieChartCategoryListAdapter.submitList(uiState.spendingList)
-        }
-
-        initPieChartDescription()
-        initPieChart()
         initRvData()
+        initLineChart()
+        setTargetSpending()
+
+        initPieChart()
+        initPieChartDescription()
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

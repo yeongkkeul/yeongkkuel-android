@@ -96,7 +96,7 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
 
                                 val displayHeight = resources.displayMetrics.heightPixels
                                 val peekHeight =
-                                    (displayHeight - 560.dpToPx(requireContext()))
+                                    (displayHeight - 520.dpToPx(requireContext()))
                                 listner.setPeekHeight(peekHeight)
                             }
                         }
