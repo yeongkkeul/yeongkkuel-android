@@ -21,6 +21,9 @@
         android:name="com.example.yeongkkuel.presentation.home.StoreFragment"
         android:label="fragment_store"
         tools:layout="@layout/fragment_store" >
+        <action
+            android:id="@+id/action_storeFragment_to_homeFragment"
+            app:destination="@id/navigation_home" />
     </fragment>
 
 

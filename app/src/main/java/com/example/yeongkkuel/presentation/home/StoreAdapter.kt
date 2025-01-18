@@ -1,14 +1,22 @@
 package com.example.yeongkkuel.presentation.home
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.databinding.ItemStoreProductBinding
 
-data class Product(val name: String, val price: Int, val imageResId: Int)
+data class Product(
+    val name: String,
+    val price: Int,
+    val imageResId: Int,
+    val category: ProductCategory
+)
 
-class StoreAdapter(private val products: List<Product>) :
-    RecyclerView.Adapter<StoreAdapter.StoreViewHolder>() {
+class StoreAdapter(
+    private val products: List<Product>,
+    private val onItemClick: (Product) -> Unit
+) : RecyclerView.Adapter<StoreAdapter.StoreViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StoreViewHolder {
         val binding = ItemStoreProductBinding.inflate(
@@ -20,7 +28,12 @@ class StoreAdapter(private val products: List<Product>) :
     }
 
     override fun onBindViewHolder(holder: StoreViewHolder, position: Int) {
-        holder.bind(products[position])
+        val product = products[position]
+        holder.bind(product)
+        holder.itemView.setOnClickListener {
+            Log.d("StoreAdapter", "Selected Product: ${product.name}, ResId: ${product.imageResId}")
+            onItemClick(product)
+        }
     }
 
     override fun getItemCount(): Int = products.size
@@ -31,7 +44,6 @@ class StoreAdapter(private val products: List<Product>) :
         fun bind(product: Product) {
             binding.imgStoreProduct.setImageResource(product.imageResId)
             binding.tvStoreProductName.text = product.name
-            binding.tvProductPrice.text = "${product.price} 코인"
         }
     }
 }

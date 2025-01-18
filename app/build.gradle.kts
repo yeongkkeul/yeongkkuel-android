@@ -63,4 +63,8 @@ dependencies {
 
     // ActivityViewModels
     implementation(libs.androidx.activity.ktx)
+
+    // GridLayout 추가
+    implementation(libs.androidx.gridlayout)
+
 }

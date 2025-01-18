@@ -10,61 +10,61 @@ data class ProductUiState(
     data class Product(
         val name: String,
         val price: Int,
-        val category: ProductCategory,
-        val iconResId: Int,
+        val category: ProductCategory, // ProductCategory 타입
+        val iconResId: Int
     )
 
     companion object {
         fun init() = ProductUiState(
             productList = listOf(
                 Product(
-                    name = "탱탱볼",
-                    price = 128,
-                    category = ProductCategory.TOY,
-                    iconResId = R.drawable.img_store_toy2,
-                ),
-                Product(
                     name = "스케이트 보드",
                     price = 128,
                     category = ProductCategory.TOY,
-                    iconResId = R.drawable.img_store_toy1,
+                    iconResId = R.drawable.img_home_toy2,
+                ),
+                Product(
+                    name = "탱탱볼",
+                    price = 128,
+                    category = ProductCategory.TOY,
+                    iconResId = R.drawable.img_home_toy1,
                 ),
                 Product(
                     name = "밥그릇 1",
                     price = 64,
                     category = ProductCategory.BOWL,
-                    iconResId = R.drawable.img_store_bowl1,
+                    iconResId = R.drawable.img_home_bowl1,
                 ),
                 Product(
                     name = "밥그릇 2",
                     price = 64,
                     category = ProductCategory.BOWL,
-                    iconResId = R.drawable.img_store_bowl2,
+                    iconResId = R.drawable.img_home_bowl2,
                 ),
                 Product(
                     name = "둥지 1",
                     price = 256,
                     category = ProductCategory.NEST,
-                    iconResId = R.drawable.img_store_nest1
+                    iconResId = R.drawable.img_home_nest1
                 ),
                 Product(
                     name = "둥지 2",
                     price = 768,
                     category = ProductCategory.NEST,
-                    iconResId = R.drawable.img_store_nest2,
+                    iconResId = R.drawable.img_home_nest2,
 
                 ),
                 Product(
                     name = "그네 1",
                     price = 256,
                     category = ProductCategory.SWING,
-                    iconResId = R.drawable.img_store_swing1
+                    iconResId = R.drawable.img_home_swing1
                 ),
                 Product(
                     name = "그네 2",
                     price = 768,
                     category = ProductCategory.SWING,
-                    iconResId = R.drawable.img_store_swing2,
+                    iconResId = R.drawable.img_home_swing2,
 
                     )
 
