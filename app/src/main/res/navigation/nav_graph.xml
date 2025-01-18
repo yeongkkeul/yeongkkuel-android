@@ -14,6 +14,23 @@
     </fragment>
 
     <fragment
+        android:id="@+id/categoryManageFragment"
+        android:name="com.example.yeongkkuel.presentation.home.category.CategoryManageFragment"
+        android:label="카테고리 관리"
+        tools:layout="@layout/fragment_category_manage">
+        <action
+            android:id="@+id/action_categoryManageFragment_to_categoryAddFragment"
+            app:destination="@id/categoryAddFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/categoryAddFragment"
+        android:name="com.example.yeongkkuel.presentation.home.category.CategoryAddFragment"
+        android:label="카테고리 추가"
+        tools:layout="@layout/fragment_category_add" />
+
+
+    <fragment
         android:id="@+id/navigation_chat"
         android:name="com.example.yeongkkuel.presentation.chat.ChatFragment"
         android:label="fragment_chat"

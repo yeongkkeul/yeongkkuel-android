@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
@@ -30,6 +31,11 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         navController = Navigation.findNavController(view)
+
+        // 더보기 버튼 클릭 시 카테고리 관리 페이지로 이동
+        binding.ivHamberger.setOnClickListener {
+            navController.navigate(R.id.categoryManageFragment)
+        }
     }
 
     override fun onDestroyView() {

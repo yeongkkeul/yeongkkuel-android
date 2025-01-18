@@ -8,11 +8,14 @@
     android:background="@drawable/bg_edit_text">
 
     <TextView
+        android:id="@+id/tvCategoryName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="간식/음료"
         android:textSize="15sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent">
+
+    </TextView>
 </androidx.constraintlayout.widget.ConstraintLayout>
