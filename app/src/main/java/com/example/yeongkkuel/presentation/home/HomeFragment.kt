@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
+import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -44,7 +45,8 @@ class HomeFragment : Fragment() {
         navController = Navigation.findNavController(view)
 
         // 더보기 버튼 클릭 시 카테고리 관리 페이지로 이동
-        binding.ivHamberger.setOnClickListener {
+        val ivHamberger = requireActivity().findViewById<ImageView>(R.id.iv_hamberger)
+        ivHamberger.setOnClickListener {
             navController.navigate(R.id.categoryManageFragment)
         }
     }

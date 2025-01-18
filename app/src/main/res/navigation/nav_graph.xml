@@ -39,6 +39,9 @@
         android:name="com.example.yeongkkuel.presentation.home.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_navigation_home_to_categoryManageFragment"
+            app:destination="@id/categoryManageFragment" />
     </fragment>
 
     <fragment
