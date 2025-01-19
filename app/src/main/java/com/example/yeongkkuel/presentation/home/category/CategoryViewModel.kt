@@ -21,16 +21,14 @@ class CategoryViewModel : ViewModel() {
 
     fun addCategory(category: Category) {
         if (_categories.value?.size ?: 0 >= 6) {
-            Log.d("CategoryViewModel", "카테고리 추가 전: ${_categories.value}")
-            return // 최대 6개 제한
+            Log.d("CategoryViewModel", "카테고리 추가 제한 도달")
+            return
         }
-        // 기존 리스트에 새 카테고리 추가
-        val updatedList = _categories.value.orEmpty().toMutableList().apply {
-            add(category)
-        }
-        _categories.value = updatedList // 변경된 리스트 설정
+        val updatedList = _categories.value.orEmpty().toMutableList().apply { add(category) }
+        _categories.value = updatedList
         Log.d("CategoryViewModel", "카테고리 추가 후: ${_categories.value}")
     }
+
 
 
 

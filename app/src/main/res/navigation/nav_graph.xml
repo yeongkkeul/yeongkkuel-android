@@ -70,7 +70,12 @@
         android:id="@+id/categoryAddFragment"
         android:name="com.example.yeongkkuel.presentation.home.category.CategoryAddFragment"
         android:label="카테고리 추가"
-        tools:layout="@layout/fragment_category_add" />
+        tools:layout="@layout/fragment_category_add">
+        <action
+            android:id="@+id/action_categoryAddFragment_to_categoryManageFragment"
+            app:destination="@id/categoryManageFragment" />
+    </fragment>
+
 
 
     <fragment

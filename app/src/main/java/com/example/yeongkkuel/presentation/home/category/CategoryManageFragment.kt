@@ -75,10 +75,11 @@ class CategoryManageFragment : Fragment() {
 
     private fun observeViewModel() {
         viewModel.categories.observe(viewLifecycleOwner) { categories ->
-            categoryListAdapter.submitList(categories)
-            Log.d("CategoryManageFragment", "받은 데이터: $categories")
+            Log.d("CategoryManageFragment", "ViewModel 데이터 변경됨: $categories")
+            categoryListAdapter.submitList(categories) // RecyclerView에 새로운 데이터 반영
         }
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

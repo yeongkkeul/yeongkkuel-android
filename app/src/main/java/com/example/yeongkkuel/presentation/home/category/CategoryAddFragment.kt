@@ -1,5 +1,6 @@
 package com.example.yeongkkuel.presentation.home.category
 
+import android.content.Context
 import android.graphics.PorterDuff
 import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
@@ -10,9 +11,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
@@ -105,19 +109,30 @@ class CategoryAddFragment : Fragment() {
         binding.ivDropdownIcon.setImageResource(R.drawable.ic_dropdown_arrow)
     }
 
+    // 저장 버튼 클릭
     private fun saveCategory() {
         val title = binding.etCategoryAddInput.text.toString()
         val color = (binding.ivSelectedColor.background as? ColorDrawable)?.color ?: return
 
+        Log.d("CategoryAddFragment", "저장 버튼 클릭됨: 제목 = $title, 색상 = $color")
+
         if (title.isBlank()) {
-            // 제목이 비어 있으면 에러 처리
-            Log.d("CategoryAddFragment", "제목이 비어있음!")
+            Log.d("CategoryAddFragment", "저장 실패: 제목이 비어 있음")
+            // 제목이 비어 있으면 저장하지 않음
             return
         }
 
-        Log.d("CategoryAddFragment", "저장 시도: 제목 = $title, 색상 = $color")
+        // ViewModel에 새 카테고리 추가
         viewModel.addCategory(Category(name = title, color = color))
-        requireActivity().onBackPressedDispatcher.onBackPressed() // 뒤로가기
+        Toast.makeText(requireContext(), "제목: $title, 색상: $color", Toast.LENGTH_SHORT).show()
+
+        Log.d("CategoryAddFragment", "카테고리 추가 완료")
+
+        // 카테고리 관리 화면으로 이동
+        binding.tvCategoryAdd.setOnClickListener {
+            findNavController().navigate(R.id.action_categoryAddFragment_to_categoryManageFragment)
+        }
+        Log.d("CategoryAddFragment", "카테고리 관리 화면으로 이동")
     }
 
     private fun setupTextWatcher() {
