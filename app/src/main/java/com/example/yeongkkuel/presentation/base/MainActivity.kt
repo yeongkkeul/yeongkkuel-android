@@ -85,10 +85,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         initViewModel()
     }
 
-    fun hideBottomNavigation(state: Boolean) {
-        if (state) binding.bottomNavi.visibility = View.GONE else binding.bottomNavi.visibility =
-            View.VISIBLE
-    }
+
 
     private fun initView() = with(binding) {
         fun initBottomSheet() {
@@ -228,6 +225,11 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     }
 
     private fun initViewModel() = with(botSheetViewModel){
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+
+        val navController = navHostFragment.navController
+
         lifecycleScope.launch {
             uiState.flowWithLifecycle(lifecycle)
                 .collectLatest { uiState ->
@@ -235,10 +237,10 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                 }
         }
 
-        // 바텀네비게이션 뷰 숨김 처리 - 스플래시, 로그인
+        // 바텀네비게이션 뷰 숨김 처리 - 스플래시, 로그인 , 회원가입 , 약관동의
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.navigation_splash, R.id.navigation_login, R.id.navigation_signup -> hideBottomNavigation(true)
+                R.id.navigation_splash, R.id.navigation_login, R.id.navigation_signup, R.id.navigation_terms_agree -> hideBottomNavigation(true)
                 else -> hideBottomNavigation(false)
             }
         }
