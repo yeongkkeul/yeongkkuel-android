@@ -32,7 +32,8 @@ androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 
 # GridLayout 추가
-androidx-gridlayout = "androidx.gridlayout:gridlayout:1.0.0"
+androidx-gridlayout = { group = "androidx.gridlayout", name = "gridlayout", version = "1.0.0" }
+
 # Pie chart(원형 차트)
 mpandroidchart = { group = "com.github.PhilJay", name = "MPAndroidChart", version.ref = "mpandroidchart" }
 
