@@ -3,10 +3,12 @@ package com.example.yeongkkuel.presentation.botsheet
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.presentation.util.Colors
 import com.example.yeongkkuel.presentation.util.SpendingCategory
+import java.util.Date
 
 data class BotSheetUiState(
     val total: Int = 300000,
-    val spendingList: List<Spending>
+    val spendingList: List<Spending>,
+    val date: Date
 ) {
     data class Spending(
         val kind: SpendingCategory,
@@ -61,7 +63,8 @@ data class BotSheetUiState(
                         Spending.History("아아", 15000)
                     )
                 )
-            )
+            ),
+            date = Date()
         )
     }
 }

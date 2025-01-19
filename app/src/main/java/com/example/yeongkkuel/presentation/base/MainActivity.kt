@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.splashscreen.SplashScreen
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.flowWithLifecycle
@@ -40,12 +42,39 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        // 스플래시 화면 설정
+        val splashScreen = this.installSplashScreen()
+
+        splashScreen.setOnExitAnimationListener { splashScreenView ->
+            splashScreenView.iconView.animate()
+                .translationY(-splashScreenView.iconView.height.toFloat())
+                .setDuration(10)
+                .withEndAction {
+                    splashScreenView.remove()
+                }
+                .start()
+        }
+
         super.onCreate(savedInstanceState)
 
         Timber.plant(Timber.DebugTree())
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+
+        // 스플래시 화면 종료 조건 설정 (예: 데이터 초기화 완료)
+        splashScreen.setKeepOnScreenCondition {
+            // 앱 초기화 작업이 완료될 때까지 유지
+            checkInitialization()
+        }
+
+        setupHamburgerClickListener() // 카테고리 더보기 기능 추가
+
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+
 
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -58,10 +87,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         initViewModel()
     }
 
-    fun hideBottomNavigation(state: Boolean) {
-        if (state) binding.bottomNavi.visibility = View.GONE else binding.bottomNavi.visibility =
-            View.VISIBLE
-    }
+
 
     private fun initView() = with(binding) {
         fun initBottomSheet() {
@@ -201,13 +227,49 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     }
 
     private fun initViewModel() = with(botSheetViewModel){
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+
+        val navController = navHostFragment.navController
+
         lifecycleScope.launch {
             uiState.flowWithLifecycle(lifecycle)
                 .collectLatest { uiState ->
                     onBind(uiState)
                 }
         }
+
+        // 바텀네비게이션 뷰 숨김 처리 - 스플래시, 로그인
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.navigation_splash, R.id.navigation_login, R.id.navigation_signup -> hideBottomNavigation(true)
+                else -> hideBottomNavigation(false)
+            }
+        }
     }
+
+
+    private fun hideBottomNavigation(state: Boolean) {
+        if (state) binding.bottomNavi.visibility = View.GONE else binding.bottomNavi.visibility =
+            View.VISIBLE
+    }
+    private fun checkInitialization(): Boolean {
+        return false // false를 반환하면 스플래시 화면 종료
+    }
+
+    private fun setupHamburgerClickListener() {
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        // iv_hamberger 클릭 리스너 추가
+        binding.ivHamberger.setOnClickListener {
+            navController.navigate(R.id.categoryManageFragment)
+            val bottomSheetBehavior = BottomSheetBehavior.from(binding.clItemBotSheet)
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED // BottomSheet 닫기
+        }
+    }
+
 
     private fun onBind(uiState: BotSheetUiState) = with(binding){
         fun initRvData() {
@@ -235,5 +297,6 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.clItemBotSheet)
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
+
 
 }

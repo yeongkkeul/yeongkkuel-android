@@ -1,11 +1,143 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".presentation.stat.monthly.StatMonthlyFragment"
-    android:padding="@dimen/space_median">
+    android:paddingVertical="@dimen/space_median"
+    tools:context=".presentation.stat.monthly.StatMonthlyFragment">
 
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_topCl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/space_median"
+        android:background="@drawable/bg_box_blue"
+        android:clipToOutline="true"
+        android:paddingHorizontal="@dimen/space_median"
+        android:paddingVertical="@dimen/space_x_small"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tv_totalSpending"
+            style="@style/title_semib"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="56,700원"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_currentMonth"
+            style="@style/body_medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_x_small"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="@id/tv_totalSpending"
+            app:layout_constraintStart_toEndOf="@id/tv_totalSpending"
+            tools:text="2024년 11월" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <com.kakao.sdk.friend.view.NestedScrollableHost
+        android:id="@+id/vphost_calendar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/space_median"
+        android:layout_marginTop="@dimen/space_median"
+        app:layout_constraintTop_toBottomOf="@id/cl_topCl" >
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/vp_calendar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    </com.kakao.sdk.friend.view.NestedScrollableHost>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_achievementDay"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_median"
+        android:layout_marginEnd="@dimen/space_xx_small"
+        android:layout_marginTop="@dimen/space_large"
+        android:background="@drawable/bg_box_statmonthlytextbox"
+        android:paddingVertical="@dimen/space_xx_small"
+        app:layout_constraintEnd_toStartOf="@id/cl_rewardsAmount"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/vphost_calendar">
+
+        <TextView
+            android:id="@+id/textView2"
+            style="@style/small_regul"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="목표 달성 일수  "
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/tv_achievementDay"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_achievementDay"
+            style="@style/small_semib"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/main1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/textView2"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="13일" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_rewardsAmount"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_xx_small"
+        android:layout_marginEnd="@dimen/space_median"
+        android:background="@drawable/bg_box_statmonthlytextbox"
+        android:paddingVertical="@dimen/space_xx_small"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/cl_achievementDay"
+        app:layout_constraintTop_toTopOf="@id/cl_achievementDay"
+        app:layout_constraintBottom_toBottomOf="@id/cl_achievementDay">
+
+        <TextView
+            android:id="@+id/textView"
+            style="@style/small_regul"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="이번 달 받은 리워드  "
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/tv_rewardAmount"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_rewardAmount"
+            style="@style/small_semib"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/main1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/textView"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="+140" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

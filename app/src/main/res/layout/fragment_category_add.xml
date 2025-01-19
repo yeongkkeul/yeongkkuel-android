@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- 상단 바 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:padding="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/iv_back"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_arrow_back"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <TextView
+            android:id="@+id/tv_category_manage_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/category_add"
+            style="@style/pageTitle"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/iv_back"
+            android:layout_marginStart="12dp"/>
+
+        <TextView
+            android:id="@+id/tv_category_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="저장"
+            style="@style/add_or_done"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- 콘텐츠 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/cl_toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/tv_category_add_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="제목"
+            style="@style/expense_sectionTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <EditText
+            android:id="@+id/et_category_add_input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="0/16"
+            android:padding="8dp"
+            android:gravity="end|center_vertical"
+            android:background="@drawable/bg_edit_text"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            android:layout_marginStart="20dp"
+            app:layout_constraintStart_toEndOf="@id/tv_category_add_title"
+            app:layout_constraintTop_toTopOf="@id/tv_category_add_title"
+            app:layout_constraintBottom_toBottomOf="@id/tv_category_add_title"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- 색상 텍스트 -->
+        <TextView
+            android:id="@+id/tv_color_label_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="색상"
+            style="@style/expense_sectionTitle"
+            android:textSize="16sp"
+            android:layout_marginTop="40dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_category_add_title" />
+
+        <!-- 선택된 색상 (동그라미) -->
+        <ImageView
+            android:id="@+id/iv_selected_color"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/bg_color_circle"
+            app:layout_constraintStart_toEndOf="@id/tv_color_label_title"
+            app:layout_constraintTop_toBottomOf="@id/tv_category_add_title" />
+
+        <!-- 드롭다운 아이콘 -->
+        <ImageView
+            android:id="@+id/iv_dropdown_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginStart="15dp"
+            android:src="@drawable/ic_dropdown_arrow"
+            app:layout_constraintStart_toEndOf="@id/iv_selected_color"
+            app:layout_constraintTop_toBottomOf="@id/tv_category_add_title"/>
+
+        <!-- 색상 팔레트 (드롭다운) -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@android:color/white"
+            android:visibility="gone"
+            android:layout_marginTop="20dp"
+            app:layout_constraintTop_toBottomOf="@id/iv_dropdown_icon">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_color_palette"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp" />
+        </androidx.cardview.widget.CardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
