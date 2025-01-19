@@ -1,10 +1,10 @@
 package com.example.yeongkkuel.presentation.home.category
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.yeongkkuel.R
-import com.example.yeongkkuel.presentation.home.category.Category
 
 class CategoryViewModel : ViewModel() {
 
@@ -19,11 +19,20 @@ class CategoryViewModel : ViewModel() {
     )
     val categories: LiveData<List<Category>> get() = _categories
 
-    // 카테고리 추가 함수
     fun addCategory(category: Category) {
-        if (_categories.value?.size ?: 0 >= 6) return // 최대 6개 제한
-        _categories.value = _categories.value?.plus(category)
+        if (_categories.value?.size ?: 0 >= 6) {
+            Log.d("CategoryViewModel", "카테고리 추가 전: ${_categories.value}")
+            return // 최대 6개 제한
+        }
+        // 기존 리스트에 새 카테고리 추가
+        val updatedList = _categories.value.orEmpty().toMutableList().apply {
+            add(category)
+        }
+        _categories.value = updatedList // 변경된 리스트 설정
+        Log.d("CategoryViewModel", "카테고리 추가 후: ${_categories.value}")
     }
+
+
 
     // 카테고리 삭제 함수
     fun removeCategory(category: Category) {

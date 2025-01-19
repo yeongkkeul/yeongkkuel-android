@@ -1,5 +1,7 @@
 package com.example.yeongkkuel.presentation.home.category
 
+import android.graphics.PorterDuff
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,7 +28,11 @@ class ColorPaletteAdapter(
     }
 
     override fun onBindViewHolder(holder: ColorViewHolder, position: Int) {
-        holder.bind(colorList[position])
+        val color = colorList[position]
+        holder.bind(color)
+
+        // 로그 추가
+        Log.d("ColorPaletteAdapter", "Binding color at position $position: $color")
     }
 
     override fun getItemCount(): Int = colorList.size
@@ -35,10 +41,12 @@ class ColorPaletteAdapter(
         private val colorView: View = itemView.findViewById(R.id.view_color_circle)
 
         fun bind(color: Int) {
-            colorView.setBackgroundColor(color)
+            colorView.setBackgroundResource(R.drawable.bg_color_circle) // 원형 배경 설정
+            colorView.background?.mutate()?.setTint(color) // 내부 색상 적용
             colorView.setOnClickListener {
-                onColorSelected(color)
+                onColorSelected(color) // 선택된 색상 콜백 전달
             }
         }
+
     }
 }
