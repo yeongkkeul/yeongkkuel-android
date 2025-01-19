@@ -34,7 +34,6 @@
             />
     </fragment>
 
-
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.example.yeongkkuel.presentation.home.HomeFragment"
@@ -49,9 +48,20 @@
             app:destination="@id/categoryManageFragment" />
     </fragment>
 
+    <!-- ExpenseEntryFragment 추가 -->
+    <fragment
+        android:id="@+id/fragment_expense_entry"
+        android:name="com.example.yeongkkuel.presentation.home.entry.ExpenseEntryFragment"
+        android:label="Expense Entry"
+        tools:layout="@layout/fragment_expense_entry" >
+        <action
+            android:id="@+id/action_expense_entry_to_homeFragment"
+            app:destination="@id/navigation_home"/>
+    </fragment>
+
     <fragment
         android:id="@+id/navigation_store"
-        android:name="com.example.yeongkkuel.presentation.home.StoreFragment"
+        android:name="com.example.yeongkkuel.presentation.home.store.StoreFragment"
         android:label="fragment_store"
         tools:layout="@layout/fragment_store" >
         <action

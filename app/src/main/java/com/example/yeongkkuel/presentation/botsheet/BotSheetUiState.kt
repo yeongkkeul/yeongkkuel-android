@@ -9,6 +9,7 @@ data class BotSheetUiState(
     val total: Int = 300000,
     val spendingList: List<Spending>,
     val date: Date
+
 ) {
     data class Spending(
         val kind: SpendingCategory,

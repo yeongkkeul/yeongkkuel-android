@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.presentation.home
+package com.example.yeongkkuel.presentation.home.store
 
 import android.graphics.Rect
 import android.os.Bundle

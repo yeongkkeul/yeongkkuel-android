@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.presentation.home
+package com.example.yeongkkuel.presentation.home.store
 
 enum class ProductCategory {
     SWING,

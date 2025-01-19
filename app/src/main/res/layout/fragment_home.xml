@@ -193,10 +193,21 @@
             android:layout_height="32dp"
             android:layout_marginEnd="16dp"
             android:src="@drawable/bg_whitecircle"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="@id/ly_coin_bar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/ly_coin_bar" />
 
+        <ImageView
+            android:id="@+id/bg_home_store_click"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/bg_graycircle"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/ly_coin_bar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/ly_coin_bar" />
         <ImageView
             android:id="@+id/img_home_store"
             android:layout_width="14dp"

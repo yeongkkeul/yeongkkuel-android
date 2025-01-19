@@ -1,7 +1,6 @@
-package com.example.yeongkkuel.presentation.home
+package com.example.yeongkkuel.presentation.home.store
 
 import com.example.yeongkkuel.R
-import com.example.yeongkkuel.presentation.home.ProductCategory
 
 data class ProductUiState(
     val totalProducts: Int = 8, // 총 상품 개수
