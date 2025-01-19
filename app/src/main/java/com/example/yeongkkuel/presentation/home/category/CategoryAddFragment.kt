@@ -1,7 +1,6 @@
 package com.example.yeongkkuel.presentation.home.category
 
 import android.content.Context
-import android.graphics.PorterDuff
 import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -14,6 +13,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -32,6 +32,7 @@ class CategoryAddFragment : Fragment() {
             updateSelectedColor(selectedColor)
         })
     }
+    private var selectedColor: Int? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,6 +48,7 @@ class CategoryAddFragment : Fragment() {
         setupRecyclerView()
         setupListeners()
         setupTextWatcher() // 글자 수 업데이트 로직 호출
+        updateSaveButtonState() // 초기 저장 버튼 상태 업데이트
     }
 
     private fun setupRecyclerView() {
@@ -68,7 +70,6 @@ class CategoryAddFragment : Fragment() {
         }
         colorPaletteAdapter.submitList(getColorList()) // 색상 팔레트 데이터 설정
     }
-
 
     private fun setupListeners() {
         // 드롭다운 아이콘 클릭 이벤트
@@ -96,43 +97,28 @@ class CategoryAddFragment : Fragment() {
         )
     }
 
-    private fun updateSelectedColor(selectedColor: Int) {
-        // 선택한 색상을 원형에 반영
+    private fun updateSelectedColor(color: Int) {
+        selectedColor = color
         binding.ivSelectedColor.setBackgroundResource(R.drawable.bg_color_circle)
-        val drawable = binding.ivSelectedColor.background
-        if (drawable != null) {
-            drawable.setTint(selectedColor) // VectorDrawable의 색상 채우기
-        }
-        // 팔레트 닫기
+        binding.ivSelectedColor.background.setTint(color)
         binding.rvColorPalette.visibility = View.GONE
         binding.cardColorPalette.visibility = View.GONE
         binding.ivDropdownIcon.setImageResource(R.drawable.ic_dropdown_arrow)
+        updateSaveButtonState() // 저장 버튼 상태 업데이트
     }
 
-    // 저장 버튼 클릭
     private fun saveCategory() {
         val title = binding.etCategoryAddInput.text.toString()
-        val color = (binding.ivSelectedColor.background as? ColorDrawable)?.color ?: return
-
-        Log.d("CategoryAddFragment", "저장 버튼 클릭됨: 제목 = $title, 색상 = $color")
+        val color = selectedColor ?: return
 
         if (title.isBlank()) {
-            Log.d("CategoryAddFragment", "저장 실패: 제목이 비어 있음")
-            // 제목이 비어 있으면 저장하지 않음
+            Toast.makeText(requireContext(), "제목을 입력해주세요.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // ViewModel에 새 카테고리 추가
         viewModel.addCategory(Category(name = title, color = color))
-        Toast.makeText(requireContext(), "제목: $title, 색상: $color", Toast.LENGTH_SHORT).show()
-
-        Log.d("CategoryAddFragment", "카테고리 추가 완료")
-
-        // 카테고리 관리 화면으로 이동
-        binding.tvCategoryAdd.setOnClickListener {
-            findNavController().navigate(R.id.action_categoryAddFragment_to_categoryManageFragment)
-        }
-        Log.d("CategoryAddFragment", "카테고리 관리 화면으로 이동")
+        Toast.makeText(requireContext(), "카테고리가 저장되었습니다.", Toast.LENGTH_SHORT).show()
+        findNavController().navigate(R.id.action_categoryAddFragment_to_categoryManageFragment)
     }
 
     private fun setupTextWatcher() {
@@ -140,21 +126,19 @@ class CategoryAddFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val currentLength = s?.length ?: 0
-                val maxLength = binding.etCategoryAddInput.maxLength()
-
-                // 글자 수 표시 업데이트
-                binding.tvCharacterCount.text = "$currentLength/$maxLength"
+                updateSaveButtonState() // 글자가 입력될 때마다 저장 버튼 상태 업데이트
             }
 
             override fun afterTextChanged(s: Editable?) {}
         })
     }
 
-    // EditText의 maxLength 값을 가져오는 확장 함수
-    private fun EditText.maxLength(): Int {
-        return filters.filterIsInstance<android.text.InputFilter.LengthFilter>()
-            .firstOrNull()?.max ?: Int.MAX_VALUE
+    private fun updateSaveButtonState() {
+        val title = binding.etCategoryAddInput.text.toString()
+        val isEnabled = title.isNotBlank() && selectedColor != null
+        binding.tvCategoryAdd.isEnabled = isEnabled
+        val buttonColor = if (isEnabled) R.color.button_enabled else R.color.button_disabled
+        binding.tvCategoryAdd.setBackgroundColor(ContextCompat.getColor(requireContext(), buttonColor))
     }
 
     override fun onDestroyView() {
@@ -163,11 +147,10 @@ class CategoryAddFragment : Fragment() {
     }
 
     private fun getColorList(): List<Int> {
-        val colors = listOf(
+        return listOf(
             R.color.red1, R.color.red2, R.color.pink3, R.color.purple4, R.color.purple5,
             R.color.blue6, R.color.blue7, R.color.blue8, R.color.green9, R.color.green10,
             R.color.green11, R.color.green12, R.color.yellow13, R.color.orange14, R.color.orange15
-        ).map { requireContext().getColor(it) }
-        return colors
+        ).map { ContextCompat.getColor(requireContext(), it) }
     }
 }

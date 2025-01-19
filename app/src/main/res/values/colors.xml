@@ -36,6 +36,10 @@
     <color name="orange14">#FB8809</color>
     <color name="orange15">#FF6316</color>
 
+    <color name="button_enabled">#6200EE</color> <!-- 활성화 상태 색상 (보라색 예시) -->
+    <color name="button_disabled">#BDBDBD</color> <!-- 비활성화 상태 색상 (회색 예시) -->
+
+
 
     <color name="pink">#FF5CA3</color>
     <color name="blue">#4385F7</color>
