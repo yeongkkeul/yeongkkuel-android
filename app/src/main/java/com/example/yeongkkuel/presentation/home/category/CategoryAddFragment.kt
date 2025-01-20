@@ -1,17 +1,12 @@
 package com.example.yeongkkuel.presentation.home.category
 
-import android.content.Context
 import android.graphics.Rect
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -126,12 +121,18 @@ class CategoryAddFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                updateSaveButtonState() // 글자가 입력될 때마다 저장 버튼 상태 업데이트
+                // 입력된 텍스트 길이 계산
+                val length = s?.length ?: 0
+                binding.tvCharacterCount.text = "$length/16"
+
+                // 저장 버튼 활성화 여부 업데이트
+                updateSaveButtonState()
             }
 
             override fun afterTextChanged(s: Editable?) {}
         })
     }
+
 
     private fun updateSaveButtonState() {
         val title = binding.etCategoryAddInput.text.toString()

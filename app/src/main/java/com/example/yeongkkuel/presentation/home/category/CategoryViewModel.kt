@@ -29,11 +29,23 @@ class CategoryViewModel : ViewModel() {
         Log.d("CategoryViewModel", "카테고리 추가 후: ${_categories.value}")
     }
 
-
-
-
     // 카테고리 삭제 함수
-    fun removeCategory(category: Category) {
-        _categories.value = _categories.value?.filterNot { it == category }
+    fun removeCategory(categoryName: String) {
+        val updatedList = _categories.value.orEmpty().filterNot { it.name == categoryName }
+        _categories.value = updatedList
+        Log.d("CategoryViewModel", "카테고리 삭제 후: ${_categories.value}")
+    }
+
+    // 카테고리 수정 함수
+    fun updateCategory(originalCategoryName: String, updatedCategory: Category) {
+        val currentList = _categories.value.orEmpty().toMutableList()
+        val index = currentList.indexOfFirst { it.name == originalCategoryName }
+        if (index != -1) {
+            currentList[index] = updatedCategory
+            _categories.value = currentList
+            Log.d("CategoryViewModel", "카테고리 수정 후: ${_categories.value}")
+        } else {
+            Log.d("CategoryViewModel", "수정할 카테고리를 찾을 수 없습니다.")
+        }
     }
 }

@@ -8,19 +8,20 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.databinding.ItemCategoryBinding
 
 class CategoryAdapter(
-    private val onCategoryClick: (Category) -> Unit // 카테고리 클릭 이벤트 콜백
-) : ListAdapter<Category, CategoryAdapter.CategoryViewHolder>(CategoryDiffUtil()) {
+    private val onCategoryClick: (Category) -> Unit // 클릭 이벤트 전달
+) : ListAdapter<Category, CategoryAdapter.CategoryViewHolder>(CategoryDiffCallback()) {
 
-    inner class CategoryViewHolder(
-        private val binding: ItemCategoryBinding
-    ) : RecyclerView.ViewHolder(binding.root) {
+    inner class CategoryViewHolder(private val binding: ItemCategoryBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: Category) = with(binding) {
             tvCategoryName.text = item.name
             tvCategoryName.setTextColor(item.color)
 
             // 클릭 이벤트 처리
-            root.setOnClickListener { onCategoryClick(item) }
+            root.setOnClickListener {
+                onCategoryClick(item)
+            }
         }
     }
 
@@ -36,14 +37,14 @@ class CategoryAdapter(
     override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
-}
 
-class CategoryDiffUtil : DiffUtil.ItemCallback<Category>() {
-    override fun areItemsTheSame(oldItem: Category, newItem: Category): Boolean {
-        return oldItem.name == newItem.name // 이름으로 비교
-    }
+    class CategoryDiffCallback : DiffUtil.ItemCallback<Category>() {
+        override fun areItemsTheSame(oldItem: Category, newItem: Category): Boolean {
+            return oldItem.name == newItem.name
+        }
 
-    override fun areContentsTheSame(oldItem: Category, newItem: Category): Boolean {
-        return oldItem == newItem // 전체 내용 비교
+        override fun areContentsTheSame(oldItem: Category, newItem: Category): Boolean {
+            return oldItem == newItem
+        }
     }
 }
