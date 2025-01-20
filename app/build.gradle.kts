@@ -11,6 +11,7 @@ val localProperties = Properties()
 localProperties.load(project.rootProject.file("local.properties").inputStream())
 val kakaoApiKey = localProperties.getProperty("kakao_NATIVE_APP_KEY")?:""
 val nativeAppKey = localProperties.getProperty("kakao_NATIVE_APP_KEY_MANIFEST")?:""
+val googleApiKey = localProperties.getProperty("google_CLIENT_ID")?:""
 
 android {
     namespace = "com.example.yeongkkuel"
@@ -18,6 +19,7 @@ android {
 
     defaultConfig {
         buildConfigField("String", "kakao_NATIVE_APP_KEY", "\"$kakaoApiKey\"")
+        buildConfigField("String","google_CLIENT_ID","\"$googleApiKey\"")
         manifestPlaceholders["NATIVE_APP_KEY"] = nativeAppKey
 
         applicationId = "com.example.yeongkkuel"
