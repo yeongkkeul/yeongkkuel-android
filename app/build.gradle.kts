@@ -63,4 +63,10 @@ dependencies {
 
     // ActivityViewModels
     implementation(libs.androidx.activity.ktx)
+
+    // RecyclerView
+    implementation (libs.recyclerview)
+
+    // Glide
+    implementation(libs.glide)
 }
