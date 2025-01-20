@@ -39,7 +39,6 @@ class ChatRoomAdapter(
             binding.apply {
                 Glide.with(ivThumbnail.context)
                     .load(chatRoom.thumbnailUrl) // URL에서 이미지 로드
-                    .apply(RequestOptions.bitmapTransform(RoundedCorners(12))) // 둥근 테두리 적용
                     .into(ivThumbnail)
                 tvTitleChatRoom.text = chatRoom.title
                 tvThumbnailMessage.text = chatRoom.recentMessage
@@ -59,7 +58,7 @@ class ChatRoomAdapter(
     }
 
     // 데이터 갱신 메서드
-    fun updateData(newData: List<ChatRoom>) {
+    fun updateData(newData: ArrayList<ChatRoom>) {
         chatRooms.clear()
         chatRooms.addAll(newData)
         notifyDataSetChanged()

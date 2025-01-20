@@ -60,6 +60,9 @@
                 android:id="@+id/iv_thumbnail"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
+                android:scaleType="centerCrop"
+                android:background="@drawable/bg_thumbnail_chat_room"
+                android:clipToOutline="true"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/guideline_iv_start__v" />

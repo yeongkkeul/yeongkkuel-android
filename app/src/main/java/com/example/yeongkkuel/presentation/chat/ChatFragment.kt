@@ -10,7 +10,6 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentChatBinding
 import com.example.yeongkkuel.utils.SwipeToDelete
 import timber.log.Timber
@@ -86,27 +85,32 @@ class ChatFragment : Fragment(), ChatRoomClickListener {
     }
 
     private fun loadDummyData() {
-        val dummyData = arrayListOf(
-            ChatRoom("1", "채팅방 1",
-                "https://helios-i.mashable.com/imagery/articles/04GeUVUQwZxpTYXdqbocKH2/hero-image.fill.size_1248x702.v1722586579.jpg",
-                "최근 메시지 1", "오후 2:30", 10),
-            ChatRoom("2", "채팅방 2",
-                "https://helios-i.mashable.com/imagery/articles/04GeUVUQwZxpTYXdqbocKH2/hero-image.fill.size_1248x702.v1722586579.jpg",
-                "최근 메시지 2", "오전 11:15", 5),
-            ChatRoom("3", "채팅방 3",
-                "https://helios-i.mashable.com/imagery/articles/04GeUVUQwZxpTYXdqbocKH2/hero-image.fill.size_1248x702.v1722586579.jpg",
-                "최근 메시지 1", "오후 4:00", 8)
-        )
+        val dummyData = generateDummyData(15)
         chatRoomAdapter = ChatRoomAdapter(dummyData, this)
         binding.rvChatRoom.adapter = chatRoomAdapter
         toggleEmptyView()
     }
 
+    private fun generateDummyData(count: Int): ArrayList<ChatRoom> {
+        return ArrayList(List(count) { index ->
+            ChatRoom(
+                id = (index + 1).toString(), // id를 1부터 시작하도록 설정
+                title = "채팅방 ${index + 1}",
+                thumbnailUrl = "https://helios-i.mashable.com/imagery/articles/04GeUVUQwZxpTYXdqbocKH2/hero-image.fill.size_1248x702.v1722586579.jpg",
+                recentMessage = "최근 메시지 ${index + 1}",
+                messageTime = "오후 2:${30 + index % 10}", // 예제 시간 가변 적용
+                participantCount = 10 + index // 참가자 수 증가
+            )
+        })
+    }
+
     override fun onItemDeleted(chatRoom: ChatRoom) {
         // 아이템 삭제 로직
-        chatRoomAdapter.updateData(chatRoomAdapter.chatRooms.filter { it.id != chatRoom.id })
+        val updatedList = ArrayList(chatRoomAdapter.chatRooms.filter { it.id != chatRoom.id })
+        chatRoomAdapter.updateData(updatedList)
         toggleEmptyView()
     }
+
 
     override fun onItemClicked(chatRoom: ChatRoom) {
         // 아이템 클릭 시 실행할 로직
