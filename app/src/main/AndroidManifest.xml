@@ -5,6 +5,8 @@
 
     <!-- 인터넷 사용 권한 설정-->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- 갤러리 사용 권한 설정-->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:name=".presentation.login.YeongKkuelApplication"

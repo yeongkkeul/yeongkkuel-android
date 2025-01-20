@@ -27,7 +27,6 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
         // Arguments로 전달된 showRewardModal 값 확인
@@ -35,7 +34,6 @@ class HomeFragment : Fragment() {
         if (showRewardModal) {
             showRewardDialog()
         }
-
         return binding.root
     }
 
@@ -44,7 +42,11 @@ class HomeFragment : Fragment() {
 
         navController = Navigation.findNavController(view)
 
-        // 더보기 버튼 클릭 시 카테고리 관리 페이지로 이동
+        binding.imgHomeStore.setOnClickListener {
+            binding.bgHomeStore.visibility = View.GONE
+            binding.bgHomeStoreClick.visibility = View.VISIBLE
+            navController.navigate(R.id.action_homeFragment_to_storeFragment)
+        }
         val ivHamberger = requireActivity().findViewById<ImageView>(R.id.iv_hamberger)
         ivHamberger.setOnClickListener {
             navController.navigate(R.id.categoryManageFragment)

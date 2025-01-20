@@ -4,8 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.splashscreen.SplashScreen
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.flowWithLifecycle
@@ -30,6 +29,9 @@ import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.core.splashscreen.SplashScreen
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.NavController
 
 class MainActivity : AppCompatActivity(), BotSheetListener {
 
@@ -45,6 +47,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
 
         // 스플래시 화면 설정
         val splashScreen = this.installSplashScreen()
+
 
         splashScreen.setOnExitAnimationListener { splashScreenView ->
             splashScreenView.iconView.animate()
@@ -75,7 +78,8 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
 
-
+        val navController = navHostFragment.navController
+        setupAddCategoryClickListener(navController)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -85,6 +89,12 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
 
         initView()
         initViewModel()
+        setupAddCategoryClickListener(navHostFragment.navController)
+    }
+    private fun setupAddCategoryClickListener(navController: NavController) {
+        binding.tvAddCategory.setOnClickListener {
+            navController.navigate(R.id.fragment_expense_entry)
+        }
     }
 
 

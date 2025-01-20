@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".presentation.base.MainActivity">
 
-
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fragment_container"
             android:name="androidx.navigation.fragment.NavHostFragment"
@@ -72,10 +71,53 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/tv_bottomSheetDate" />
 
+        <TextView
+            android:id="@+id/tv_empty_message1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="소비 카테고리를 추가하고"
+            android:textSize="15sp"
+            android:layout_marginTop="100dp"
+            app:layout_constraintTop_toBottomOf="@id/iv_hamberger"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+        <TextView
+            android:id="@+id/tv_empty_message2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="오늘의 소비를 기록해보세요!"
+            android:textSize="15sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_empty_message1" />
+
+        <ImageView
+            android:layout_width="127dp"
+            android:layout_height="36dp"
+            android:id="@+id/img_add_category"
+            android:src="@drawable/bg_box_purple"
+            android:layout_marginTop="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_empty_message2"/>
+
+
+        <TextView
+            android:id="@+id/tv_add_category"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="카테고리 추가"
+            android:textColor="@color/white"
+            app:layout_constraintTop_toTopOf="@id/img_add_category"
+            app:layout_constraintBottom_toBottomOf="@id/img_add_category"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_botSheet_category"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:visibility="gone"
             android:layout_marginVertical="@dimen/sp_small"
             app:layout_constraintTop_toBottomOf="@id/tv_bottomSheetDate"
             tools:listitem="@layout/item_botsheet_category" />

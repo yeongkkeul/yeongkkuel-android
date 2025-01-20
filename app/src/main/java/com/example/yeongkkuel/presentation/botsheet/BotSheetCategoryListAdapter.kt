@@ -22,7 +22,7 @@ class BotSheetCategoryListAdapter(
         fun onBind(item: BotSheetUiState.Spending) = with(binding) {
             tvCategory.text = item.kind.kor
             tvCategory.setTextColor(ContextCompat.getColor(binding.root.context, item.color.id))
-
+            ivBtnPlus.setImageResource(item.plusIconResId)
             rvHistory.run {
                 adapter = historyListAdapter
                 historyListAdapter.submitList(item.history)
