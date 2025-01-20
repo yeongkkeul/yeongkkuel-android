@@ -19,7 +19,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.fragment.app.activityViewModels
 import com.example.yeongkkuel.R
+import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
+import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
+import com.example.yeongkkuel.presentation.util.SpendingCategory
 import java.util.Calendar
 
 class ExpenseEntryFragment : Fragment() {
@@ -27,6 +31,9 @@ class ExpenseEntryFragment : Fragment() {
     private lateinit var navController: NavController
     private lateinit var sharedPreferences: SharedPreferences
     private val PICK_IMAGE_REQUEST = 1
+
+    // BotSheetViewModel 연결
+    private val botSheetViewModel: BotSheetViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,15 +44,12 @@ class ExpenseEntryFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_expense_entry, container, false)
     }
 
-
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         navController = Navigation.findNavController(view)
         sharedPreferences =
             requireContext().getSharedPreferences("ExpensePrefs", Context.MODE_PRIVATE)
-
 
         val btnBack = view.findViewById<ImageView>(R.id.btn_back)
         val rbNoExpense = view.findViewById<RadioButton>(R.id.rb_no_expense)
@@ -56,25 +60,37 @@ class ExpenseEntryFragment : Fragment() {
         val rbAutoSendChat = view.findViewById<RadioButton>(R.id.rb_auto_send_chat)
         val tvEntryComplete = view.findViewById<View>(R.id.tv_entry_complete)
 
-
-
         btnBack.setOnClickListener {
             navController.navigate(R.id.action_expense_entry_to_homeFragment)
         }
 
+        // 완료 버튼 클릭 이벤트
         tvEntryComplete.setOnClickListener {
-            val entryData = EntryData(
-                rbNoExpense.isChecked,
-                rbAutoSendChat.isChecked,
-                etDateInput.text.toString(),
-                etDetailInput.text.toString(),
-                etAmountInput.text.toString(),
-                sharedPreferences.getString("photoUri", null) // flPhotoFrame의 URI
+            val detail = etDetailInput.text.toString()
+            val amountString = etAmountInput.text.toString().replace(",", "")
+            val amount = amountString.toIntOrNull() ?: 0 // 숫자로 변환, 기본값 0
+            val date = etDateInput.text.toString()
+            val category = SpendingCategory.SNACK // 예: 간식 카테고리 (실제 선택값 적용 필요)
+
+            if (detail.isBlank() || amount <= 0) {
+                Toast.makeText(requireContext(), "지출 내용과 금액을 입력해주세요.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val newHistory = BotSheetUiState.Spending.History(
+                name = detail,
+                price = amount
             )
-            saveEntryData(entryData)
-            Toast.makeText(requireContext(), "데이터가 저장되었습니다.", Toast.LENGTH_SHORT).show()
+
+            // ViewModel에 지출 데이터 추가
+            botSheetViewModel.addExpenseToCategory(category, newHistory)
+
+            Toast.makeText(requireContext(), "지출이 저장되었습니다.", Toast.LENGTH_SHORT).show()
+
+            // 홈 화면으로 이동
             navController.navigate(R.id.action_expense_entry_to_homeFragment)
         }
+
 
         // RadioButton 초기화 - 저장된 상태 복원
         rbNoExpense.isChecked = sharedPreferences.getBoolean("noExpenseSelected", false)
