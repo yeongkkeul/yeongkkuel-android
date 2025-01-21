@@ -10,7 +10,9 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentChatBinding
+import com.example.yeongkkuel.presentation.chat.adapter.ChatRoomAdapter
 import com.example.yeongkkuel.utils.SwipeToDelete
 import timber.log.Timber
 
@@ -85,7 +87,7 @@ class ChatFragment : Fragment(), ChatRoomClickListener {
     }
 
     private fun loadDummyData() {
-        val dummyData = generateDummyData(15)
+        val dummyData = generateDummyData(4)
         chatRoomAdapter = ChatRoomAdapter(dummyData, this)
         binding.rvChatRoom.adapter = chatRoomAdapter
         toggleEmptyView()
@@ -115,6 +117,7 @@ class ChatFragment : Fragment(), ChatRoomClickListener {
     override fun onItemClicked(chatRoom: ChatRoom) {
         // 아이템 클릭 시 실행할 로직
         showToast("Clicked: ${chatRoom.title}")
+        navController.navigate(R.id.action_navigation_chat_to_navigation_chat_group)
     }
 
     private fun toggleEmptyView() {

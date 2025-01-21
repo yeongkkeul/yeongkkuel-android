@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.presentation.chat
+package com.example.yeongkkuel.presentation.chat.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -6,10 +6,10 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.request.RequestOptions
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.ItemChatRoomBinding
+import com.example.yeongkkuel.presentation.chat.ChatRoom
+import com.example.yeongkkuel.presentation.chat.ChatRoomClickListener
 
 class ChatRoomAdapter(
     val chatRooms: ArrayList<ChatRoom>,
