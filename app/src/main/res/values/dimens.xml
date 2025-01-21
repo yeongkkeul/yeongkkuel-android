@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <dimen name="space_xx_small">8dp</dimen>
     <dimen name="space_x_small">8dp</dimen>
     <dimen name="space_small">12dp</dimen>
@@ -8,7 +8,6 @@
     <dimen name="space_large">20dp</dimen>
     <dimen name="space_x_large">24dp</dimen>
 
-
     <!--Stat-->
     <dimen name="bottom_sheet_min_height">100dp</dimen>
     <dimen name="box_radius">16dp</dimen>
@@ -16,4 +15,7 @@
     <dimen name="sp_large">22sp</dimen>
     <dimen name="sp_standard">15sp</dimen>
     <dimen name="sp_small">12sp</dimen>
+
+    <dimen name="design_fab_size_normal" tools:override="true">48dp</dimen>
+    <dimen name="design_fab_image_size" tools:override="true">48dp</dimen>
 </resources>
