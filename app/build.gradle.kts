@@ -1,8 +1,14 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
 }
+
+val localProperties = Properties()
+localProperties.load(project.rootProject.file("local.properties").inputStream())
+val openAIAPIKEY = localProperties.getProperty("openAIAPIKEY")?:""
 
 android {
     namespace = "com.example.yeongkkuel"
@@ -16,6 +22,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "OPENAI_API_KEY", "\"$openAIAPIKEY\"")
     }
 
     buildTypes {
@@ -69,4 +77,8 @@ dependencies {
 
     // Glide
     implementation(libs.glide)
+
+    // Retrofit2
+    implementation(libs.retrofit2)
+    implementation(libs.converter.gson)
 }
