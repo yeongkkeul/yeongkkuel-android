@@ -9,7 +9,6 @@ class StatRecommendationViewPagerAdapter(
 ) : FragmentStateAdapter(fragment){
 
     private val fragments = listOf<Fragment>(
-        StatWeeklyFragment()
     )
 
     override fun getItemCount(): Int {
