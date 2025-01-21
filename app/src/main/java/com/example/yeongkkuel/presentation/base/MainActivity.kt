@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -17,12 +16,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.ActivityMainBinding
-import com.example.yeongkkuel.presentation.util.dpToPx
 import com.example.yeongkkuel.presentation.botsheet.BotSheetCategoryListAdapter
-import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
 import com.example.yeongkkuel.presentation.botsheet.BotSheetItemTouchHelper
+import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
+import com.example.yeongkkuel.presentation.util.dpToPx
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -213,6 +212,8 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                 when (destination.id) {
                     R.id.navigation_home,
                     R.id.navigation_stat -> setBotSheetVisible()
+
+                    R.id.navigation_stat_recommendation, R.id.navigation_stat_setting -> binding.bottomNavi.visibility = View.GONE
 
                     else -> setBotSheetGone()
                 }

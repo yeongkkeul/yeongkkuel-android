@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentStatBinding
@@ -33,7 +34,7 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        if(context is BotSheetListener){
+        if (context is BotSheetListener) {
             botSheetListener = context
         }
     }
@@ -74,7 +75,7 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
 
 
             // ViewPager2의 페이지가 변경될 때마다 호출되는 콜백
-            botSheetListener?.let{ listner ->
+            botSheetListener?.let { listner ->
                 registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                     override fun onPageSelected(position: Int) {
                         super.onPageSelected(position)
@@ -88,9 +89,11 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
                                     (displayHeight - 440.dpToPx(requireContext()))
                                 listner.setPeekHeight(peekHeight)
                             }
+
                             1 -> { // 두 번째 페이지 (StatWeeklyFragment)
                                 listner.setBotSheetGone()
                             }
+
                             2 -> { // 세 번째 페이지 (StatMonthlyFragment)
                                 listner.setBotSheetVisible()
 
@@ -103,10 +106,22 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
                     }
                 })
             }
+        }
+
+        fun initMore() {
+            ivMore.setOnClickListener {
+                if (clMore.visibility == View.GONE) clMore.visibility = View.VISIBLE
+                else clMore.visibility = View.GONE
+            }
+
+            tvMoreSettings.setOnClickListener { findNavController().navigate(R.id.navigation_stat_setting) }
+
+            tvMoreRecommendation.setOnClickListener { findNavController().navigate(R.id.navigation_stat_recommendation) }
 
         }
 
         initVp()
+        initMore()
     }
 
     // ViewPager의 터치 이벤트를 비활성화하는 함수
