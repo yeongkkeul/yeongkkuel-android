@@ -16,7 +16,7 @@
 
 
         <TextView
-            android:id="@+id/tv_targetSpending"
+            android:id="@+id/tv_recommendSpending"
             style="@style/body_medium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

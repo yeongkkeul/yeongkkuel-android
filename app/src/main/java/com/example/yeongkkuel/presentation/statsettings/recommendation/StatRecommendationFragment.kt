@@ -99,11 +99,11 @@ class StatRecommendationFragment : Fragment() {
             }
 
             btnGray.setOnClickListener {
-                if (currentItem > 0) {
-                    currentItem--
-                } else if (currentItem == 0) {
-                    findNavController().toNaviStat()
-                }
+               viewModel.prevPage(
+                   isFirstPage = {
+                       findNavController().toNaviStat()
+                   }
+               )
             }
         }
 
