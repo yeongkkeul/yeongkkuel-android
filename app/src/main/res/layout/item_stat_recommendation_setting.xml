@@ -29,7 +29,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cl_setTargetSpending"
+        android:id="@+id/cl_setRecommendSpending"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_small"
@@ -37,14 +37,18 @@
         app:layout_constraintStart_toStartOf="@id/cl_targetSpending"
         app:layout_constraintTop_toBottomOf="@id/cl_targetSpending">
 
-        <ImageView
-            android:id="@+id/iv_setTargetSpending"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/check_not"
+        <ToggleButton
+            android:id="@+id/tb_setTargetSpending"
+            android:layout_width="24dp"
+            android:layout_height="0dp"
+            android:background="@drawable/bg_toggle_stat_recommend"
+            android:textOff=""
+            android:textOn=""
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
 
         <TextView
             style="@style/body_regula"
@@ -52,9 +56,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_x_small"
             android:text="추천받은 하루 목표 지출액으로 설정하기"
-            app:layout_constraintBottom_toBottomOf="@id/iv_setTargetSpending"
-            app:layout_constraintStart_toEndOf="@id/iv_setTargetSpending"
-            app:layout_constraintTop_toTopOf="@id/iv_setTargetSpending" />
+            app:layout_constraintBottom_toBottomOf="@id/tb_setTargetSpending"
+            app:layout_constraintStart_toEndOf="@id/tb_setTargetSpending"
+            app:layout_constraintTop_toTopOf="@id/tb_setTargetSpending" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -67,7 +71,7 @@
         android:layout_margin="@dimen/space_median"
         android:text="하루 목표 지출액"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cl_setTargetSpending" />
+        app:layout_constraintTop_toBottomOf="@id/cl_setRecommendSpending" />
 
     <EditText
         android:id="@+id/et_set"

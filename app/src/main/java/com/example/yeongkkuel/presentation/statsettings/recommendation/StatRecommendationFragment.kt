@@ -94,7 +94,9 @@ class StatRecommendationFragment : Fragment() {
                         viewPagerAdapter.setRatio()
                     }
 
-                    2 -> {}
+                    2 -> {
+                        viewPagerAdapter.setTargetSpending()
+                    }
                 }
             }
 

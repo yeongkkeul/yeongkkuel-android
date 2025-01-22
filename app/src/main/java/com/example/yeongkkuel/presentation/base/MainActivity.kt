@@ -252,7 +252,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     } else if(previousBackStackEntry != null){
                         navController.popBackStack()
                     } else{
-                        onBackPressedDispatcher.onBackPressed()
+                        finish()
                     }
                 }
             }

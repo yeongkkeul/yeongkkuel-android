@@ -2,8 +2,10 @@ package com.example.yeongkkuel.presentation.statsettings.recommendation.fragment
 
 import android.graphics.Typeface
 import android.os.Bundle
+import android.text.Editable
 import android.text.Spannable
 import android.text.SpannableString
+import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.LayoutInflater
@@ -13,14 +15,17 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.ItemStatRecommendationSettingBinding
-import com.example.yeongkkuel.presentation.statsettings.RecommendStep
 import com.example.yeongkkuel.presentation.statsettings.StatSettingsUiState
 import com.example.yeongkkuel.presentation.statsettings.StatSettingsViewModel
+import com.example.yeongkkuel.presentation.util.clearComma
 import com.example.yeongkkuel.presentation.util.setLimit
 import com.example.yeongkkuel.presentation.util.setUnderlineBehavior
+import com.example.yeongkkuel.presentation.util.toEditable
 import com.example.yeongkkuel.presentation.util.toMoneyString
+import com.example.yeongkkuel.presentation.util.toNaviStat
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -53,9 +58,41 @@ class StatRecommendationSetFragment(
                 toMoneyString()
                 setUnderlineBehavior(tvSetError)
                 setLimit(Int.MAX_VALUE)
+
+                addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+                    override fun afterTextChanged(s: Editable?) {
+                        val currentSpending = s.toString().clearComma()
+                        val recommendedSpending = viewModel.uiState.value.recommendSpending
+
+                        // 추천 지출과 다르면 ToggleButton 상태를 변경
+                        if (currentSpending != recommendedSpending) {
+                            tbSetTargetSpending.isChecked = false
+                        } else {
+                            tbSetTargetSpending.isChecked = true
+                        }
+                    }
+                })
             }
         }
+
+        fun setRecommendSpending(){
+            clSetRecommendSpending.setOnClickListener {
+                tbSetTargetSpending.toggle()
+            }
+
+            tbSetTargetSpending.setOnCheckedChangeListener { buttonView, isChecked ->
+                if (isChecked) {
+                    etSet.text = viewModel.uiState.value.recommendSpending.toMoneyString().toEditable()
+                }
+            }
+
+        }
         initEtListener()
+        setRecommendSpending()
     }
 
     private fun initViewModel() = with(viewModel){
@@ -92,6 +129,24 @@ class StatRecommendationSetFragment(
 
         tvRecommendSpending.text = spannable
 
+    }
+
+
+    fun setTargetSpending(){
+        binding.run {
+            val targetSpending = etSet.text.toString().clearComma()
+
+            tvSetError.visibility = if (targetSpending == null) View.VISIBLE else View.GONE
+
+            if (targetSpending != null) {
+                viewModel.setTargetSpending(
+                    targetSpending = targetSpending,
+                    isSuccess = {
+                        findNavController().toNaviStat()
+                    }
+                )
+            }
+        }
     }
 
 

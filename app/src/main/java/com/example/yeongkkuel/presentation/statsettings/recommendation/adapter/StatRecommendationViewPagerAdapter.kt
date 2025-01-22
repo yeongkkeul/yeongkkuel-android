@@ -34,4 +34,8 @@ class StatRecommendationViewPagerAdapter(
         (fragments[1] as StatRecommendationRatioFragment).setRatio()
     }
 
+    fun setTargetSpending(){
+        (fragments[2] as StatRecommendationSetFragment).setTargetSpending()
+    }
+
 }
