@@ -34,7 +34,7 @@
             android:src="@drawable/ic_plus_blue"
             app:layout_constraintBottom_toBottomOf="@id/tv_category"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tv_category" />
+            app:layout_constraintTop_toTopOf="@id/tv_category"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_history"

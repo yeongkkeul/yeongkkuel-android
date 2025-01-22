@@ -61,7 +61,7 @@ class ExpenseEntryFragment : Fragment() {
         val tvEntryComplete = view.findViewById<View>(R.id.tv_entry_complete)
 
         btnBack.setOnClickListener {
-            navController.navigate(R.id.action_expense_entry_to_homeFragment)
+            //navController.navigate(R.id.action_expense_entry_to_homeFragment)
         }
 
         // 완료 버튼 클릭 이벤트
@@ -88,7 +88,7 @@ class ExpenseEntryFragment : Fragment() {
             Toast.makeText(requireContext(), "지출이 저장되었습니다.", Toast.LENGTH_SHORT).show()
 
             // 홈 화면으로 이동
-            navController.navigate(R.id.action_expense_entry_to_homeFragment)
+            //navController.navigate(R.id.action_expense_entry_to_homeFragment)
         }
 
 
