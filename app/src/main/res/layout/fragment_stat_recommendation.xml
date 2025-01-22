@@ -59,38 +59,40 @@
         android:id="@+id/cl_buttons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:padding="@dimen/space_median">
+        android:padding="@dimen/space_median"
+        app:layout_constraintBottom_toBottomOf="parent">
 
-        <androidx.appcompat.widget.AppCompatButton
+        <TextView
             android:id="@+id/btn_gray"
-            android:layout_width="wrap_content"
+            style="@style/body_medium"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/space_small"
+            android:background="@drawable/bg_btn_no"
+            android:gravity="center"
+            android:paddingVertical="@dimen/space_x_small"
+            android:text="이전"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/btn_blue"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:text="이전"
-            style="@style/body_medium"
-            android:background="@drawable/bg_btn_no"
-            android:paddingVertical="@dimen/space_x_small"
-            android:paddingHorizontal="68dp"/>
+            app:layout_constraintWidth_percent="0.48" />
 
 
-        <androidx.appcompat.widget.AppCompatButton
+        <TextView
             android:id="@+id/btn_blue"
-            android:layout_width="wrap_content"
+            style="@style/body_medium"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_small"
+            android:background="@drawable/bg_btn_yes"
+            android:gravity="center"
+            android:paddingVertical="@dimen/space_x_small"
+            android:text="다음"
+            android:textColor="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/btn_gray"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="다음"
-            style="@style/body_medium"
-            android:background="@drawable/bg_btn_yes"
-            android:textColor="@color/white"
-            android:paddingVertical="@dimen/space_x_small"
-            android:paddingHorizontal="68dp"/>
+            app:layout_constraintWidth_percent="0.48" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.yeongkkuel.databinding.ItemStatRecommendationSettingBinding
 import com.example.yeongkkuel.presentation.statsettings.StatSettingsViewModel
+import com.example.yeongkkuel.presentation.util.setLimit
 import com.example.yeongkkuel.presentation.util.setUnderlineBehavior
 import com.example.yeongkkuel.presentation.util.toMoneyString
 
@@ -36,7 +37,8 @@ class StatRecommendationSetFragment(
         fun initEtListener() {
             etSet.run {
                 toMoneyString()
-                setUnderlineBehavior()
+                setUnderlineBehavior(tvSetError)
+                setLimit(Int.MAX_VALUE)
             }
         }
         initEtListener()

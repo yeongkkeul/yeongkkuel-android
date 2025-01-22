@@ -26,4 +26,12 @@ class StatRecommendationViewPagerAdapter(
         return fragments[position]
     }
 
+    fun setAverage() {
+        (fragments[0] as StatRecommendationInputAverageFragment).setAverage()
+    }
+
+    fun setRatio(){
+        (fragments[1] as StatRecommendationRatioFragment).setRatio()
+    }
+
 }

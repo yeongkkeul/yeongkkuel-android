@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/tv_set"
+        android:id="@+id/tv_income"
         style="@style/humm_semibo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/space_median"
-        android:text="수입 대비 목표 지출 비용"
+        android:text="수입 대비 목표 지출 비율"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -26,9 +27,9 @@
         android:minWidth="60dp"
         android:singleLine="true"
         android:textColor="@color/main1"
-        app:layout_constraintBottom_toBottomOf="@id/tv_set"
+        app:layout_constraintBottom_toBottomOf="@id/tv_income"
         app:layout_constraintEnd_toStartOf="@id/tv_ratioUnit"
-        app:layout_constraintTop_toTopOf="@id/tv_set" />
+        app:layout_constraintTop_toTopOf="@id/tv_income" />
 
 
     <TextView
@@ -41,5 +42,18 @@
         app:layout_constraintBottom_toBottomOf="@id/et_ratio"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/et_ratio" />
+
+    <TextView
+        android:id="@+id/tv_ratioError"
+        style="@style/small_semib"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="수입 대비 목표 지출 비율을 입력해주세요."
+        android:textColor="@color/error"
+        app:layout_constraintEnd_toEndOf="@id/tv_ratioUnit"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@id/et_ratio" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

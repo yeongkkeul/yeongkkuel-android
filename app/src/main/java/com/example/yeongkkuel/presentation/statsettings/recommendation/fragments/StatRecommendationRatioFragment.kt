@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.yeongkkuel.databinding.ItemStatRecommendationRatioBinding
 import com.example.yeongkkuel.presentation.statsettings.StatSettingsViewModel
+import com.example.yeongkkuel.presentation.util.clearComma
+import com.example.yeongkkuel.presentation.util.setLimit
 import com.example.yeongkkuel.presentation.util.setUnderlineBehavior
 import com.example.yeongkkuel.presentation.util.toMoneyString
 
@@ -36,11 +38,23 @@ class StatRecommendationRatioFragment(
     private fun initView() = with(binding){
         fun initEtListener(){
             etRatio.run{
-                toMoneyString()
-                setUnderlineBehavior()
+                setUnderlineBehavior(tvRatioError)
+                setLimit(100)
             }
         }
         initEtListener()
+    }
+
+    fun setRatio(){
+        binding.run {
+            val ratio = etRatio.text.toString().clearComma()
+
+            tvRatioError.visibility = if (ratio == null) View.VISIBLE else View.GONE
+
+            if (ratio != null) {
+                viewModel.setRatio(ratio = ratio)
+            }
+        }
     }
 
     override fun onDestroyView() {

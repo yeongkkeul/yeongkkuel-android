@@ -19,3 +19,5 @@ fun Int.dpToPx(context: Context): Int {
 }
 
 fun String.clearComma(): Int? = this.replace(",", "").toIntOrNull()
+
+fun String.toEditable(): Editable = Editable.Factory.getInstance().newEditable(this)

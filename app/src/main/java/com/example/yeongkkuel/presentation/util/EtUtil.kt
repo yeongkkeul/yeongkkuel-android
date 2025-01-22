@@ -1,6 +1,5 @@
 package com.example.yeongkkuel.presentation.util
 
-import android.graphics.Paint
 import android.text.Editable
 import android.text.InputFilter
 import android.text.Spanned
@@ -104,8 +103,8 @@ fun EditText.errorUnderline() {
     this.backgroundTintList = ContextCompat.getColorStateList(context, R.color.error)
 }
 
-fun EditText.limitInt() {
-    val filter = InputFilterMinMax(0, Int.MAX_VALUE)
+fun EditText.setLimit(limit: Int) {
+    val filter = InputFilterMinMax(0, limit)
     this.filters = arrayOf(filter)  // 입력 필터 적용
 }
 

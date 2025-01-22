@@ -5,10 +5,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.example.yeongkkuel.databinding.ItemStatRecommendationInputAverageBinding
+import com.example.yeongkkuel.presentation.stat.weekly.StatWeeklyUiState
+import com.example.yeongkkuel.presentation.statsettings.StatSettingsUiState
 import com.example.yeongkkuel.presentation.statsettings.StatSettingsViewModel
+import com.example.yeongkkuel.presentation.util.clearComma
+import com.example.yeongkkuel.presentation.util.setLimit
 import com.example.yeongkkuel.presentation.util.setUnderlineBehavior
+import com.example.yeongkkuel.presentation.util.toEditable
 import com.example.yeongkkuel.presentation.util.toMoneyString
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class StatRecommendationInputAverageFragment(
     private val viewModel: StatSettingsViewModel
@@ -32,19 +41,36 @@ class StatRecommendationInputAverageFragment(
         initView()
     }
 
-    private fun initView() = with(binding){
-        fun initEtListener(){
-            etOutcome.run{
+    private fun initView() = with(binding) {
+        fun initEtListener() {
+            etOutcome.run {
                 toMoneyString()
-                setUnderlineBehavior()
+                setUnderlineBehavior(tvOutcomeError)
+                setLimit(Int.MAX_VALUE)
             }
-            etSpending.run{
+            etIncome.run {
                 toMoneyString()
-                setUnderlineBehavior()
+                setUnderlineBehavior(tvIncomeError)
+                setLimit(Int.MAX_VALUE)
             }
         }
         initEtListener()
     }
+
+    fun setAverage() {
+        binding.run {
+            val income = etIncome.text.toString().clearComma()
+            val outcome = etOutcome.text.toString().clearComma()
+
+            tvIncomeError.visibility = if (income == null) View.VISIBLE else View.GONE
+            tvOutcomeError.visibility = if (outcome == null) View.VISIBLE else View.GONE
+
+            if (income != null && outcome != null) {
+                viewModel.setAverage(income = income, outcome = outcome)
+            }
+        }
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
