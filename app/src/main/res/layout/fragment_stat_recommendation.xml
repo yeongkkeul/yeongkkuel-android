@@ -70,7 +70,7 @@
             app:layout_constraintEnd_toStartOf="@id/btn_blue"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="취소"
+            android:text="이전"
             style="@style/body_medium"
             android:background="@drawable/bg_btn_no"
             android:paddingVertical="@dimen/space_x_small"

@@ -213,12 +213,26 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             navController.addOnDestinationChangedListener { _, destination, _ ->
                 when (destination.id) {
                     R.id.navigation_home,
-                    R.id.navigation_stat -> setBotSheetVisible()
+                    R.id.navigation_stat,
+                        -> setBotSheetVisible()
 
-                    R.id.navigation_stat_recommendation, R.id.navigation_stat_setting -> binding.bottomNavi.visibility =
-                        View.GONE
 
                     else -> setBotSheetGone()
+                }
+            }
+
+            // 바텀네비게이션 뷰 숨김 처리 - 스플래시, 로그인
+            navController.addOnDestinationChangedListener { _, destination, _ ->
+                when (destination.id) {
+                    R.id.navigation_splash,
+                    R.id.navigation_login,
+                    R.id.navigation_signup,
+                    R.id.navigation_stat_setting,
+                    R.id.navigation_stat_recommendation -> hideBottomNavigation(
+                        true
+                    )
+
+                    else -> hideBottomNavigation(false)
                 }
             }
         }
@@ -262,17 +276,6 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                 .collectLatest { uiState ->
                     onBind(uiState)
                 }
-        }
-
-        // 바텀네비게이션 뷰 숨김 처리 - 스플래시, 로그인
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            when (destination.id) {
-                R.id.navigation_splash, R.id.navigation_login, R.id.navigation_signup -> hideBottomNavigation(
-                    true
-                )
-
-                else -> hideBottomNavigation(false)
-            }
         }
     }
 

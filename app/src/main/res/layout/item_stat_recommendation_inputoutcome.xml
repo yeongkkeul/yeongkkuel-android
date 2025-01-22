@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/tv_set"
+        style="@style/humm_semibo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/space_median"
+        android:text="월 평균 수입"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/et_outcome"
+        style="@style/body_medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/main1"
+        android:maxLines="1"
+        android:maxWidth="200dp"
+        android:minWidth="60dp"
+        app:layout_constraintBottom_toBottomOf="@id/tv_set"
+        app:layout_constraintEnd_toStartOf="@id/tv_outcomeUnit"
+        app:layout_constraintTop_toTopOf="@id/tv_set" />
+
+
+    <TextView
+        android:id="@+id/tv_outcomeUnit"
+        style="@style/body_medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/space_median"
+        android:text=" 원"
+        app:layout_constraintBottom_toBottomOf="@id/et_outcome"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_spending"
+        style="@style/humm_semibo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/space_median"
+        android:text="월 평균 지출"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_set" />
+
+    <EditText
+        android:id="@+id/et_spending"
+        style="@style/body_medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/main1"
+        android:maxLines="1"
+        android:maxWidth="200dp"
+        android:minWidth="60dp"
+        app:layout_constraintBottom_toBottomOf="@id/tv_spending"
+        app:layout_constraintEnd_toStartOf="@id/tv_spendingUnit"
+        app:layout_constraintTop_toTopOf="@id/tv_spending" />
+
+    <TextView
+        android:id="@+id/tv_spendingUnit"
+        style="@style/body_medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/space_median"
+        android:text=" 원"
+        app:layout_constraintBottom_toBottomOf="@id/et_spending"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

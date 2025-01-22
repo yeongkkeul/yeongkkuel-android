@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="title_semib">
         <item name="android:fontStyle">normal</item>
         <item name="android:fontFamily">sans-serif</item>

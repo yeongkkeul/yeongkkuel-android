@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_targetSpending"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/space_median"
+        android:background="@drawable/bg_box_black0"
+        android:padding="@dimen/space_median"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <TextView
+            android:id="@+id/tv_targetSpending"
+            style="@style/body_medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="당신의 하루 목표 지출액은\n2,3000원입니다." />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_setTargetSpending"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_small"
+        android:padding="@dimen/space_xx_small"
+        app:layout_constraintStart_toStartOf="@id/cl_targetSpending"
+        app:layout_constraintTop_toBottomOf="@id/cl_targetSpending">
+
+        <ImageView
+            android:id="@+id/iv_setTargetSpending"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/check_not"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            style="@style/body_regula"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_x_small"
+            android:text="추천받은 하루 목표 지출액으로 설정하기"
+            app:layout_constraintBottom_toBottomOf="@id/iv_setTargetSpending"
+            app:layout_constraintStart_toEndOf="@id/iv_setTargetSpending"
+            app:layout_constraintTop_toTopOf="@id/iv_setTargetSpending" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <TextView
+        android:id="@+id/tv_set"
+        style="@style/humm_semibo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/space_median"
+        android:text="하루 목표 지출액"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cl_setTargetSpending" />
+
+    <EditText
+        android:id="@+id/et_set"
+        style="@style/body_medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/main1"
+        android:maxLines="1"
+        android:maxHeight="200dp"
+        android:minWidth="60dp"
+        app:layout_constraintBottom_toBottomOf="@id/tv_set"
+        app:layout_constraintEnd_toStartOf="@id/tv_setUnit"
+        app:layout_constraintTop_toTopOf="@id/tv_set" />
+
+
+    <TextView
+        android:id="@+id/tv_setUnit"
+        style="@style/body_medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/space_median"
+        android:text=" 원"
+        app:layout_constraintBottom_toBottomOf="@id/et_set"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
