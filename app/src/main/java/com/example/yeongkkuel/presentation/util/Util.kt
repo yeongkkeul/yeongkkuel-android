@@ -17,3 +17,5 @@ fun Int.toMoneyString(): String {
 fun Int.dpToPx(context: Context): Int {
     return (this * context.resources.displayMetrics.density).toInt()
 }
+
+fun String.clearComma(): Int? = this.replace(",", "").toIntOrNull()

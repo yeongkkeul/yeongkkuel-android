@@ -249,8 +249,9 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     val previousBackStackEntry = navController.previousBackStackEntry
                     if (previousBackStackEntry?.destination?.id == R.id.navigation_stat) {
                         navController.toNaviStat()
-                    } else {
-                        // 기본 뒤로 가기 동작을 수행하려면 onBackPressedDispatcher 호출
+                    } else if(previousBackStackEntry != null){
+                        navController.popBackStack()
+                    } else{
                         onBackPressedDispatcher.onBackPressed()
                     }
                 }

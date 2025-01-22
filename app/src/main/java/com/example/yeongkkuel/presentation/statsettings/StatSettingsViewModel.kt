@@ -13,7 +13,7 @@ class StatSettingsViewModel:ViewModel() {
 
     fun setTargetSpending(targetSpending: Int, isSuccess: () -> Unit) = viewModelScope.launch {
         try {
-            isSuccess
+            isSuccess()
         } catch (e:Exception){
             e.printStackTrace()
         }

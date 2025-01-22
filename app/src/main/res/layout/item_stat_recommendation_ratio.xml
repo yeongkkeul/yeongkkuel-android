@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:backgroundTint="@color/main1"
         android:inputType="number"
-        android:maxHeight="200dp"
+        android:maxWidth="180dp"
         android:maxLines="1"
         android:minWidth="60dp"
         android:singleLine="true"
