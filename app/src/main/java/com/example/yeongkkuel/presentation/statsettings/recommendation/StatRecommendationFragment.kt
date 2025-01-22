@@ -6,11 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import androidx.viewpager2.widget.ViewPager2
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentStatRecommendationBinding
+import com.example.yeongkkuel.presentation.statsettings.StatSettingsViewModel
 import com.example.yeongkkuel.presentation.statsettings.recommendation.adapter.StatRecommendationViewPagerAdapter
 
 class StatRecommendationFragment : Fragment() {
@@ -18,8 +20,13 @@ class StatRecommendationFragment : Fragment() {
     private val binding: FragmentStatRecommendationBinding
         get() = requireNotNull(_binding) { "FragmentStatRecommendationBinding -> null" }
 
+    private val viewModel: StatSettingsViewModel by viewModels()
+
+
     private val viewPagerAdapter by lazy {
-        StatRecommendationViewPagerAdapter(this@StatRecommendationFragment)
+        StatRecommendationViewPagerAdapter(
+            fragment = this@StatRecommendationFragment,
+            viewModel = viewModel)
     }
 
     override fun onCreateView(

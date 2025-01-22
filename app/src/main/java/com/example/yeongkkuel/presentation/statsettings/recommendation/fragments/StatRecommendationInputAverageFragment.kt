@@ -6,10 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.yeongkkuel.databinding.ItemStatRecommendationInputAverageBinding
+import com.example.yeongkkuel.presentation.statsettings.StatSettingsViewModel
 import com.example.yeongkkuel.presentation.util.setUnderlineBehavior
 import com.example.yeongkkuel.presentation.util.toMoneyString
 
-class StatRecommendationInputAverageFragment : Fragment() {
+class StatRecommendationInputAverageFragment(
+    private val viewModel: StatSettingsViewModel
+) : Fragment() {
     private var _binding: ItemStatRecommendationInputAverageBinding? = null
     private val binding: ItemStatRecommendationInputAverageBinding
         get() = requireNotNull(_binding) { "ItemStatRecommendationInputAverageBinding -> null" }

@@ -5,12 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.example.yeongkkuel.databinding.ItemStatRecommendationRatioBinding
 import com.example.yeongkkuel.databinding.ItemStatRecommendationSettingBinding
+import com.example.yeongkkuel.presentation.statsettings.StatSettingsViewModel
 import com.example.yeongkkuel.presentation.util.setUnderlineBehavior
 import com.example.yeongkkuel.presentation.util.toMoneyString
 
-class StatRecommendationSetFragment : Fragment() {
+class StatRecommendationSetFragment(
+    private val viewModel: StatSettingsViewModel
+) : Fragment() {
     private var _binding: ItemStatRecommendationSettingBinding? = null
     private val binding: ItemStatRecommendationSettingBinding
         get() = requireNotNull(_binding) { "ItemStatRecommendationSettingBinding -> null" }

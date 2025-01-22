@@ -7,7 +7,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.example.yeongkkuel.databinding.FragmentStatSettingsBinding
+import com.example.yeongkkuel.presentation.statsettings.StatSettingsViewModel
 import com.example.yeongkkuel.presentation.util.setUnderlineBehavior
 import com.example.yeongkkuel.presentation.util.toMoneyString
 
@@ -15,6 +17,8 @@ class StatSettingsFragment : Fragment() {
     private var _binding: FragmentStatSettingsBinding? = null
     private val binding: FragmentStatSettingsBinding
         get() = requireNotNull(_binding) { "FragmentStatSettingsBinding -> null" }
+
+    private val viewModel: StatSettingsViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
