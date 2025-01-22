@@ -82,7 +82,6 @@ class StatRecommendationFragment : Fragment() {
 
         initVp()
         initBack()
-
     }
 
 

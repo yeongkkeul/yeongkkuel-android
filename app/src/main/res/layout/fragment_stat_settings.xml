@@ -8,8 +8,8 @@
         android:id="@+id/cl_topBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="@dimen/space_median"
-        android:paddingVertical="@dimen/space_x_small"
+        android:paddingHorizontal="@dimen/space_large"
+        android:paddingVertical="@dimen/space_median"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
@@ -58,22 +58,27 @@
 
     <EditText
         android:id="@+id/et_targetSpending"
+        style="@style/body_medium"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:backgroundTint="@color/main1"
+        android:inputType="number"
         android:maxWidth="200dp"
         android:minWidth="60dp"
+        android:singleLine="true"
+        android:textColor="@color/main1"
         app:layout_constraintBottom_toBottomOf="@id/tv_spendingMoney"
         app:layout_constraintEnd_toStartOf="@id/tv_unit"
         app:layout_constraintTop_toTopOf="@id/tv_spendingMoney" />
 
     <TextView
         android:id="@+id/tv_unit"
+        style="@style/body_medium"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/body_medium"
+        android:layout_marginEnd="@dimen/space_median"
         android:text=" 원"
         app:layout_constraintBottom_toBottomOf="@id/et_targetSpending"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="@dimen/space_median"/>
+        app:layout_constraintTop_toTopOf="@id/et_targetSpending" />
 </androidx.constraintlayout.widget.ConstraintLayout>

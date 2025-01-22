@@ -1,0 +1,13 @@
+package com.example.yeongkkuel.presentation.statsettings
+
+data class StatSettingsUiState(
+    val targetSpending: Int? = null,
+    val averageIncome: Int? = null,
+    val averageOutcome: Int? = null,
+    val targetRatio: Int? = null,
+    val recommendSpending: Int? = null
+) {
+    companion object {
+        fun init() = StatSettingsUiState()
+    }
+}

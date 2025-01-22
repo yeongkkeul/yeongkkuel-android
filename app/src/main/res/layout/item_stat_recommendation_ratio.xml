@@ -15,27 +15,31 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/et_set"
+        android:id="@+id/et_ratio"
+        style="@style/body_medium"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/main1"
-        style="@style/body_medium"
-        android:maxLines="1"
+        android:inputType="number"
         android:maxHeight="200dp"
+        android:maxLines="1"
         android:minWidth="60dp"
+        android:singleLine="true"
+        android:textColor="@color/main1"
         app:layout_constraintBottom_toBottomOf="@id/tv_set"
-        app:layout_constraintEnd_toStartOf="@id/tv_setUnit"
+        app:layout_constraintEnd_toStartOf="@id/tv_ratioUnit"
         app:layout_constraintTop_toTopOf="@id/tv_set" />
 
 
     <TextView
-        android:id="@+id/tv_setUnit"
+        android:id="@+id/tv_ratioUnit"
         style="@style/body_medium"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/space_median"
         android:text=" %"
-        app:layout_constraintBottom_toBottomOf="@id/et_set"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@id/et_ratio"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/et_ratio" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

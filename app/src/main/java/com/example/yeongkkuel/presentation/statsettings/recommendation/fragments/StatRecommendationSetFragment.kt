@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.yeongkkuel.databinding.ItemStatRecommendationRatioBinding
 import com.example.yeongkkuel.databinding.ItemStatRecommendationSettingBinding
+import com.example.yeongkkuel.presentation.util.setUnderlineBehavior
+import com.example.yeongkkuel.presentation.util.toMoneyString
 
 class StatRecommendationSetFragment : Fragment() {
     private var _binding: ItemStatRecommendationSettingBinding? = null
@@ -25,6 +27,17 @@ class StatRecommendationSetFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initView()
+    }
+
+    private fun initView() = with(binding) {
+        fun initEtListener() {
+            etSet.run {
+                toMoneyString()
+                setUnderlineBehavior()
+            }
+        }
+        initEtListener()
     }
 
     override fun onDestroyView() {

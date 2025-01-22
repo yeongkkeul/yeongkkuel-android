@@ -1,15 +1,15 @@
 package com.example.yeongkkuel.presentation.statsettings.settings
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.navOptions
-import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentStatSettingsBinding
+import com.example.yeongkkuel.presentation.util.setUnderlineBehavior
+import com.example.yeongkkuel.presentation.util.toMoneyString
 
 class StatSettingsFragment : Fragment() {
     private var _binding: FragmentStatSettingsBinding? = null
@@ -39,7 +39,15 @@ class StatSettingsFragment : Fragment() {
             }
         }
 
+        fun initEtListener() {
+            etTargetSpending.run {
+                toMoneyString()
+                setUnderlineBehavior()
+            }
+        }
+
         initBack()
+        initEtListener()
     }
 
 

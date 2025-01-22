@@ -76,8 +76,8 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
             TabLayoutMediator(tlStat, vpStat) { tab, position ->
                 val tabView = TextView(context).apply {
                     setText(viewPagerAdapter.getTitle(position))
-                    setTextAppearance(R.style.body_semibo) // 스타일 적용
-                    setTextColor(ContextCompat.getColor(context, R.color.main1))
+                    setTextAppearance(R.style.body_semibo)
+                    setTextColor(ContextCompat.getColorStateList(context, R.color.tab_stat_text))
                     gravity = Gravity.CENTER
                 }
                 tab.customView = tabView

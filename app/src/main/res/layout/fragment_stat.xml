@@ -9,8 +9,8 @@
         android:id="@+id/cl_appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/space_median"
-        android:layout_marginVertical="@dimen/space_x_small"
+        android:layout_marginHorizontal="@dimen/space_large"
+        android:layout_marginVertical="@dimen/space_median"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
@@ -51,12 +51,12 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/space_median"
         android:background="@drawable/bg_box_main1"
+        android:elevation="9dp"
         android:padding="@dimen/space_small"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cl_appBar"
-        tools:visibility="visible"
-        android:visibility="gone"
-        android:elevation="9dp">
+        tools:visibility="visible">
 
         <TextView
             android:id="@+id/tv_moreSettings"
@@ -95,9 +95,9 @@
         app:tabGravity="fill"
         app:tabIndicatorColor="@color/main1"
         app:tabIndicatorFullWidth="true"
-        app:tabMaxWidth="0dp"
-        app:tabSelectedTextColor="@color/black3"
-        app:tabTextColor="@color/black2" />
+        app:tabSelectedTextColor="@color/main1"
+        app:tabTextColor="@color/tab_stat_text" />
+
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/vp_stat"

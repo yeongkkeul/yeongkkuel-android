@@ -9,8 +9,8 @@
         android:id="@+id/cl_topBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="@dimen/space_median"
-        android:paddingVertical="@dimen/space_x_small"
+        android:paddingHorizontal="@dimen/space_large"
+        android:paddingVertical="@dimen/space_median"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView

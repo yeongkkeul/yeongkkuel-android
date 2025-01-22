@@ -21,9 +21,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/main1"
-        android:maxLines="1"
+        android:inputType="number"
         android:maxWidth="200dp"
+        android:maxLines="1"
         android:minWidth="60dp"
+        android:singleLine="true"
+        android:textColor="@color/main1"
         app:layout_constraintBottom_toBottomOf="@id/tv_set"
         app:layout_constraintEnd_toStartOf="@id/tv_outcomeUnit"
         app:layout_constraintTop_toTopOf="@id/tv_set" />
@@ -37,7 +40,8 @@
         android:layout_marginEnd="@dimen/space_median"
         android:text=" 원"
         app:layout_constraintBottom_toBottomOf="@id/et_outcome"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/et_outcome" />
 
     <TextView
         android:id="@+id/tv_spending"
@@ -55,9 +59,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/main1"
-        android:maxLines="1"
+        android:inputType="number"
         android:maxWidth="200dp"
+        android:maxLines="1"
         android:minWidth="60dp"
+        android:textColor="@color/main1"
         app:layout_constraintBottom_toBottomOf="@id/tv_spending"
         app:layout_constraintEnd_toStartOf="@id/tv_spendingUnit"
         app:layout_constraintTop_toTopOf="@id/tv_spending" />
@@ -70,6 +76,7 @@
         android:layout_marginEnd="@dimen/space_median"
         android:text=" 원"
         app:layout_constraintBottom_toBottomOf="@id/et_spending"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/et_spending" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
