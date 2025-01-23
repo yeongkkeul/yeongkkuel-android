@@ -35,6 +35,8 @@ class SignupFragment : Fragment() {
         // 바인딩 객체 초기화
         _binding = FragmentSignupBinding.inflate(inflater, container, false)
         val rootView = binding.root
+        // ic back 클릭 시 뒤로가기
+        binding.ivBack.setOnClickListener { findNavController().popBackStack() }
 
         // 입력 값 검증
         setupNicknameValidation()
@@ -164,7 +166,7 @@ class SignupFragment : Fragment() {
         // 건너뛰기
         btnSkip.setOnClickListener {
             dialog.dismiss()
-            navigateToHomeScreen(showRewardModal = false)
+            navigateToTermsAgree(showRewardModal = false)
         }
 
         // 확인
@@ -175,7 +177,7 @@ class SignupFragment : Fragment() {
                 val isCodeValid = true // 임시
                 if (isCodeValid) {
                     dialog.dismiss()
-                    navigateToHomeScreen(showRewardModal = true)
+                    navigateToTermsAgree(showRewardModal = true)
                 } else {
                     errorTextView.visibility = View.VISIBLE
                     errorTextView.text = "존재하지 않는 코드입니다."
@@ -197,10 +199,10 @@ class SignupFragment : Fragment() {
         // TODO: Retrofit 통신 등 실제 서버 전송
     }
 
-    private fun navigateToHomeScreen(showRewardModal: Boolean) {
+    private fun navigateToTermsAgree(showRewardModal: Boolean) {
         val bundle = Bundle()
         bundle.putBoolean("showRewardModal", showRewardModal)
-        findNavController().navigate(R.id.action_signupFragment_to_navigation_home, bundle)
+        findNavController().navigate(R.id.action_signupFragment_to_navigation_terms_agree, bundle)
     }
 
     override fun onDestroyView() {

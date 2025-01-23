@@ -134,7 +134,6 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                             rvBotSheetCategory.layoutParams.height = height
                             rvBotSheetCategory.requestLayout() // 레이아웃 강제 갱신
                         }
-
                         else -> {
                             // 기타 상태 처리 (예: 드래그 상태 등)
                         }
@@ -175,7 +174,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                         onMove = { fromPosition, toPosition ->
                             botSheetViewModel.moveCategory(
                                 fromPosition = fromPosition,
-                                toPosition = toPosition
+                                toPosition =toPosition
                             )
                         })
                 )
@@ -188,7 +187,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             tvBottomSheetDate.text = formattedDateSheet
         }
 
-        fun initNav() {
+        fun initNav(){
             val navHostFragment =
                 supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
 
@@ -256,13 +255,11 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     onBind(uiState)
                 }
         }
-        // 바텀네비게이션 뷰 숨김 처리 - 스플래시, 로그인
+
+        // 바텀네비게이션 뷰 숨김 처리 - 스플래시, 로그인 , 회원가입 , 약관동의
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.navigation_splash, R.id.navigation_login, R.id.navigation_signup -> hideBottomNavigation(
-                    true
-                )
-
+                R.id.navigation_splash, R.id.navigation_login, R.id.navigation_signup, R.id.navigation_terms_agree -> hideBottomNavigation(true)
                 else -> hideBottomNavigation(false)
             }
         }
@@ -277,7 +274,6 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     private fun checkInitialization(): Boolean {
         return false // false를 반환하면 스플래시 화면 종료
     }
-
     private fun setupHamburgerClickListener() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
@@ -290,7 +286,6 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED // BottomSheet 닫기
         }
     }
-
 
     private fun onBind(uiState: BotSheetUiState) = with(binding) {
         // RecyclerView 데이터 업데이트
@@ -308,6 +303,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         binding.imgAddCategory.visibility = if (isEmpty) View.VISIBLE else View.GONE
 
     }
+
 
     override fun setPeekHeight(peekHeight: Int){
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.clItemBotSheet)

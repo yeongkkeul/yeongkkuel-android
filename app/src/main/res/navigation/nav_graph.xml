@@ -78,7 +78,18 @@
         android:label="fragment_signup"
         tools:layout="@layout/fragment_signup">
         <action
-            android:id="@+id/action_signupFragment_to_navigation_home"
+            android:id="@+id/action_signupFragment_to_navigation_terms_agree"
+            app:destination="@id/navigation_terms_agree"
+            />
+    </fragment>
+
+    <fragment
+        android:id= "@+id/navigation_terms_agree"
+        android:name= "com.example.yeongkkuel.presentation.signup.TermsAgreeFragment"
+        android:label= "fragment_terms_agree"
+        tools:layout="@layout/fragment_terms_agree">
+        <action
+            android:id="@+id/action_termsAgreeFragment_to_navigation_home"
             app:destination="@id/navigation_home"
             app:popUpTo="@id/navigation_login"
             app:popUpToInclusive="true" />
