@@ -1,5 +1,6 @@
 package com.example.yeongkkuel.presentation.botsheet
 
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.presentation.home.category.Category
@@ -20,9 +21,7 @@ class BotSheetViewModel : ViewModel() {
         updateList.add(toPosition, item)
 
         _uiState.update { prev ->
-            prev.copy(
-                spendingList = updateList
-            )
+            prev.copy(spendingList = updateList)
         }
     }
 
@@ -31,9 +30,7 @@ class BotSheetViewModel : ViewModel() {
         _uiState.update { prev ->
             val updatedList = prev.spendingList.map { spending ->
                 if (spending.kind == category) {
-                    spending.copy(
-                        history = spending.history + history // 기존 내역에 새 내역 추가
-                    )
+                    spending.copy(history = spending.history + history) // 기존 내역에 새 내역 추가
                 } else {
                     spending
                 }
@@ -41,11 +38,12 @@ class BotSheetViewModel : ViewModel() {
             prev.copy(spendingList = updatedList)
         }
     }
-    // BotSheetViewModel
+
+    // 카테고리 추가 기능
     fun addCategory(category: Category) {
-        val spendingCategory = mapCategoryToSpendingCategory(category.name)
-        val categoryColor = mapCategoryToColor(category.name)
-        val plusIconResId = mapCategoryToIcon(categoryColor)
+        val spendingCategory = SpendingCategory.CUSTOM(category.name)
+        val categoryColor = mapCategoryToColor(category.color) // Int 값을 Colors로 변환
+        val plusIconResId = mapCategoryToIcon(categoryColor)  // 아이콘도 색상에 맞게 설정
 
         _uiState.update { prev ->
             val updatedList = prev.spendingList.toMutableList().apply {
@@ -54,7 +52,7 @@ class BotSheetViewModel : ViewModel() {
                         kind = spendingCategory,
                         color = categoryColor,
                         plusIconResId = plusIconResId,
-                        history = emptyList()
+                        history = emptyList() // 초기값으로 빈 리스트
                     )
                 )
             }
@@ -62,24 +60,15 @@ class BotSheetViewModel : ViewModel() {
         }
     }
 
+    // 카테고리 이름을 매핑하는 함수 (이제 입력된 이름을 그대로 사용)
     private fun mapCategoryToSpendingCategory(categoryName: String): SpendingCategory {
-        return when (categoryName) {
-            "간식/음료" -> SpendingCategory.SNACK
-            "밥/배달" -> SpendingCategory.SHOP
-            "화장품" -> SpendingCategory.BEAUTY
-            else -> SpendingCategory.IMPROVEMENT
-        }
+        return SpendingCategory.CUSTOM(categoryName)// 모든 카테고리를 기본 CUSTOM으로 설정
     }
 
-    private fun mapCategoryToColor(categoryName: String): Colors {
-        return when (categoryName) {
-            "간식/음료" -> Colors.PINK
-            "밥/배달" -> Colors.BLUE
-            "화장품" -> Colors.GREEN
-            else -> Colors.GREEN
-        }
+    private fun mapCategoryToColor(categoryColor: Int): Colors {
+        // 이제 Colors enum으로 변환할 필요 없이 그대로 반환
+        return Colors.values().firstOrNull { it.id == categoryColor } ?: Colors.GREEN
     }
-
     private fun mapCategoryToIcon(color: Colors): Int {
         return when (color) {
             Colors.PINK -> R.drawable.ic_plus_pink

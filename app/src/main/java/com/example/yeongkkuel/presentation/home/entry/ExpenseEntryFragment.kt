@@ -70,7 +70,7 @@ class ExpenseEntryFragment : Fragment() {
             val amountString = etAmountInput.text.toString().replace(",", "")
             val amount = amountString.toIntOrNull() ?: 0 // 숫자로 변환, 기본값 0
             val date = etDateInput.text.toString()
-            val category = SpendingCategory.SNACK // 예: 간식 카테고리 (실제 선택값 적용 필요)
+            val category = SpendingCategory.CUSTOM(detail) // 예시로 `detail`을 사용하여 name을 설정
 
             if (detail.isBlank() || amount <= 0) {
                 Toast.makeText(requireContext(), "지출 내용과 금액을 입력해주세요.", Toast.LENGTH_SHORT).show()
@@ -88,7 +88,7 @@ class ExpenseEntryFragment : Fragment() {
             Toast.makeText(requireContext(), "지출이 저장되었습니다.", Toast.LENGTH_SHORT).show()
 
             // 홈 화면으로 이동
-            navController.navigate(R.id.action_expense_entry_to_homeFragment)
+            //navController.navigate(R.id.action_expense_entry_to_homeFragment)
         }
 
 

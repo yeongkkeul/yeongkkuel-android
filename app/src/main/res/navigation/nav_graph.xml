@@ -49,15 +49,16 @@
             app:destination="@id/categoryAddFragment" />
     </fragment>
 
-    <!-- ExpenseEntryFragment 추가 -->
+
     <fragment
-        android:id="@+id/fragment_expense_entry"
+        android:id="@+id/expenseEntryFragment"
         android:name="com.example.yeongkkuel.presentation.home.entry.ExpenseEntryFragment"
-        android:label="Expense Entry"
-        tools:layout="@layout/fragment_expense_entry" >
+        android:label="지출 기입 화면"
+        tools:layout="@layout/fragment_expense_entry">
+
         <action
-            android:id="@+id/action_expense_entry_to_homeFragment"
-            app:destination="@id/navigation_home"/>
+        android:id="@+id/action_expense_entry_to_homeFragment"
+        app:destination="@id/navigation_home" />
     </fragment>
 
     <fragment
@@ -82,6 +83,7 @@
             app:popUpTo="@id/navigation_login"
             app:popUpToInclusive="true" />
     </fragment>
+
 
     <fragment
         android:id="@+id/categoryManageFragment"

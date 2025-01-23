@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     private val botSheetViewModel: BotSheetViewModel by viewModels()
 
     private val botSheetCategoryListAdapter by lazy {
-        BotSheetCategoryListAdapter()
+        BotSheetCategoryListAdapter(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,12 +93,12 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         initViewModel()
         setupAddCategoryClickListener(navHostFragment.navController)
     }
+
     private fun setupAddCategoryClickListener(navController: NavController) {
         binding.tvAddCategory.setOnClickListener {
             navController.navigate(R.id.categoryAddFragment)
         }
     }
-
 
 
     private fun initView() = with(binding) {
@@ -134,6 +134,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                             rvBotSheetCategory.layoutParams.height = height
                             rvBotSheetCategory.requestLayout() // 레이아웃 강제 갱신
                         }
+
                         else -> {
                             // 기타 상태 처리 (예: 드래그 상태 등)
                         }
@@ -174,7 +175,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                         onMove = { fromPosition, toPosition ->
                             botSheetViewModel.moveCategory(
                                 fromPosition = fromPosition,
-                                toPosition =toPosition
+                                toPosition = toPosition
                             )
                         })
                 )
@@ -187,7 +188,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             tvBottomSheetDate.text = formattedDateSheet
         }
 
-        fun initNav(){
+        fun initNav() {
             val navHostFragment =
                 supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
 
@@ -238,7 +239,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         initNav()
     }
 
-    private fun initViewModel() = with(botSheetViewModel){
+    private fun initViewModel() = with(botSheetViewModel) {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
 
@@ -258,7 +259,10 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         // 바텀네비게이션 뷰 숨김 처리 - 스플래시, 로그인
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.navigation_splash, R.id.navigation_login, R.id.navigation_signup -> hideBottomNavigation(true)
+                R.id.navigation_splash, R.id.navigation_login, R.id.navigation_signup -> hideBottomNavigation(
+                    true
+                )
+
                 else -> hideBottomNavigation(false)
             }
         }
@@ -269,6 +273,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         if (state) binding.bottomNavi.visibility = View.GONE else binding.bottomNavi.visibility =
             View.VISIBLE
     }
+
     private fun checkInitialization(): Boolean {
         return false // false를 반환하면 스플래시 화면 종료
     }
@@ -301,60 +306,8 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         binding.tvEmptyMessage1.visibility = if (isEmpty) View.VISIBLE else View.GONE
         binding.tvEmptyMessage2.visibility = if (isEmpty) View.VISIBLE else View.GONE
         binding.imgAddCategory.visibility = if (isEmpty) View.VISIBLE else View.GONE
-        if (isEmpty) {
-            binding.imgWarningStart.visibility = View.VISIBLE
-            setupSwipeToDismiss(binding.imgWarningStart) // 스와이프 동작 설정
 
-        } else {
-            binding.imgWarningStart.visibility = View.GONE
-        }
     }
-    private fun setupSwipeToDismiss(view: View) {
-        var startY = 0f
-        var isSwipingDown = false
-
-        view.setOnTouchListener { v, event ->
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    startY = event.y // 시작 Y 좌표 저장
-                    isSwipingDown = false
-                    true
-                }
-                MotionEvent.ACTION_MOVE -> {
-                    val deltaY = event.y - startY // Y 좌표 변화량 계산
-                    if (deltaY > 100) { // 아래로 스와이프 거리 임계값
-                        isSwipingDown = true
-                    }
-                    true
-                }
-                MotionEvent.ACTION_UP -> {
-                    if (isSwipingDown) {
-                        // 아래로 스와이프 완료 시 애니메이션 추가
-                        v.animate()
-                            .translationY(v.height.toFloat()) // 화면 아래로 이동
-                            .alpha(0f) // 투명도 0으로
-                            .setDuration(300) // 300ms 애니메이션
-                            .withEndAction {
-                                v.visibility = View.GONE // 애니메이션 후 뷰 숨김
-                            }
-                            .start()
-                    } else {
-                        // 클릭 동작 처리
-                        v.performClick()
-                    }
-                    true
-                }
-                else -> false
-            }
-        }
-
-        // performClick을 오버라이드하여 클릭 동작 처리
-        view.setOnClickListener {
-            // 클릭 동작 처리 코드 추가
-            // 예: Log.d("TAG", "View clicked")
-        }
-    }
-
 
     override fun setPeekHeight(peekHeight: Int){
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.clItemBotSheet)
@@ -373,6 +326,16 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
 
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.clItemBotSheet)
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+
+    override fun navigateToExpenseEntry() {
+        // NavController를 이용해 지출 기입 페이지로 이동
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        // 지출 기입 페이지로 이동
+        navController.navigate(R.id.expenseEntryFragment)
     }
 
 
