@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     private val botSheetViewModel: BotSheetViewModel by viewModels()
 
     private val botSheetCategoryListAdapter by lazy {
-        BotSheetCategoryListAdapter()
+        BotSheetCategoryListAdapter(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -296,6 +296,16 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
 
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.clItemBotSheet)
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+
+    override fun navigateToExpenseEntry() {
+        // NavController를 이용해 지출 기입 페이지로 이동
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        // 지출 기입 페이지로 이동
+        navController.navigate(R.id.expenseEntryFragment)
     }
 
 

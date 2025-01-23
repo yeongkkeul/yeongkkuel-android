@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.databinding.ItemBotsheetCategoryBinding
 
 class BotSheetCategoryListAdapter(
+    private val botSheetListener: BotSheetListener
 ) : ListAdapter<BotSheetUiState.Spending, BotSheetCategoryListAdapter.ViewHolder>(
     SpendingCategoryListDiffUtil()
 ) {
@@ -27,6 +28,10 @@ class BotSheetCategoryListAdapter(
                 adapter = historyListAdapter
                 historyListAdapter.submitList(item.history)
                 layoutManager = LinearLayoutManager(binding.root.context)
+            }
+            // + 버튼 클릭 리스너 추가
+            ivBtnPlus.setOnClickListener {
+                botSheetListener.navigateToExpenseEntry() // BotSheetListener의 메서드를 호출해 MainActivity로 이벤트 전달
             }
         }
     }

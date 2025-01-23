@@ -5,4 +5,5 @@ interface BotSheetListener {
 
     fun setBotSheetGone()
     fun setBotSheetVisible()
+    fun navigateToExpenseEntry()
 }
