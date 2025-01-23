@@ -56,16 +56,16 @@ android {
 dependencies {
 
     //Google Credential Manager
-    implementation("androidx.credentials:credentials:1.3.0")
+    implementation(libs.credentials)
 
     // optional - needed for credentials support from play services, for devices running
     // Android 13 and below.
-    implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
-    implementation ("com.google.android.libraries.identity.googleid:googleid:1.1.0 ")
-    implementation ("androidx.core:core-splashscreen:1.0.1") //splash Theme 적용
-    implementation ("com.kakao.sdk:v2-all:2.20.6") // 전체 모듈 설치, 2.11.0 버전부터 지원
-    implementation ("com.kakao.sdk:v2-user:2.20.6") // 카카오 로그인 API 모듈
-    implementation ("com.kakao.sdk:v2-cert:2.20.6") // 카카오톡 인증 서비스 API 모듈
+    implementation(libs.credentials.play.services.auth)
+    implementation(libs.googleid)
+    implementation(libs.splashscreen) //splash Theme 적용
+    implementation(libs.kakao.all) // 전체 모듈 설치, 2.11.0 버전부터 지원
+    implementation(libs.kakao.user) // 카카오 로그인 API 모듈
+    implementation(libs.kakao.cert) // 카카오톡 인증 서비스 API 모듈
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
