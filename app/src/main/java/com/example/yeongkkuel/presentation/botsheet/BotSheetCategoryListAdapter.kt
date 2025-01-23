@@ -31,7 +31,7 @@ class BotSheetCategoryListAdapter(
             }
             // + 버튼 클릭 리스너 추가
             ivBtnPlus.setOnClickListener {
-                botSheetListener.navigateToExpenseEntry() // BotSheetListener의 메서드를 호출해 MainActivity로 이벤트 전달
+                botSheetListener.navigateToExpenseEntry(item.kind.kor, item.color.id) // BotSheetListener의 메서드를 호출해 MainActivity로 이벤트 전달
             }
         }
     }

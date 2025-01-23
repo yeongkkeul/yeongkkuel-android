@@ -28,9 +28,12 @@ class BotSheetViewModel : ViewModel() {
         _uiState.update { prev ->
             val updatedList = prev.spendingList.map { spending ->
                 if (spending.kind == category) {
-                    spending.copy(
-                        history = spending.history + history // 기존 내역에 새 내역 추가
-                    )
+                    // 중복 데이터 방지
+                    if (spending.history.contains(history)) {
+                        spending
+                    } else {
+                        spending.copy(history = spending.history + history)
+                    }
                 } else {
                     spending
                 }

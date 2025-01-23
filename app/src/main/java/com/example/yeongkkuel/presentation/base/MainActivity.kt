@@ -34,9 +34,7 @@ import java.util.Locale
 class MainActivity : AppCompatActivity(), BotSheetListener {
 
     private lateinit var binding: ActivityMainBinding
-
     private val botSheetViewModel: BotSheetViewModel by viewModels()
-
     private val botSheetCategoryListAdapter by lazy {
         BotSheetCategoryListAdapter(this)
     }
@@ -62,7 +60,6 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
 
         // 스플래시 화면 종료 조건 설정 (예: 데이터 초기화 완료)
         splashScreen.setKeepOnScreenCondition {
@@ -298,14 +295,17 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
 
-    override fun navigateToExpenseEntry() {
-        // NavController를 이용해 지출 기입 페이지로 이동
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+    override fun navigateToExpenseEntry(selectedCategory: String, categoryColor: Int) {
+        // NavController를 통해 지출 기입 페이지로 이동
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         val navController = navHostFragment.navController
 
-        // 지출 기입 페이지로 이동
-        navController.navigate(R.id.expenseEntryFragment)
+        // 지출 기입 페이지로 이동하며 선택된 카테고리를 전달
+        val bundle = Bundle().apply {
+            putString("selectedCategory", selectedCategory) // 선택된 카테고리 전달
+            putInt("categoryColor", categoryColor) // 선택된 카테고리 색상 전달
+        }
+        navController.navigate(R.id.expenseEntryFragment, bundle)
     }
 
 

@@ -3,4 +3,5 @@
         <style name="CustomTabLayoutStyle" parent="Widget.Design.TabLayout">
             <item name="tabRippleColor">@null</item>
         </style>
+    <string name="date_format">%1$d년 %2$d월 %3$d일 %4$s</string>
 </resources>

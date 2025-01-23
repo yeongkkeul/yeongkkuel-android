@@ -13,18 +13,21 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.RadioButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
-import androidx.fragment.app.activityViewModels
 import com.example.yeongkkuel.R
-import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
+import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import com.example.yeongkkuel.presentation.util.SpendingCategory
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 class ExpenseEntryFragment : Fragment() {
 
@@ -32,7 +35,6 @@ class ExpenseEntryFragment : Fragment() {
     private lateinit var sharedPreferences: SharedPreferences
     private val PICK_IMAGE_REQUEST = 1
 
-    // BotSheetViewModel 연결
     private val botSheetViewModel: BotSheetViewModel by activityViewModels()
 
     override fun onCreateView(
@@ -40,7 +42,6 @@ class ExpenseEntryFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // 레이아웃 파일을 인플레이트
         return inflater.inflate(R.layout.fragment_expense_entry, container, false)
     }
 
@@ -48,73 +49,92 @@ class ExpenseEntryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         navController = Navigation.findNavController(view)
-        sharedPreferences =
-            requireContext().getSharedPreferences("ExpensePrefs", Context.MODE_PRIVATE)
+        sharedPreferences = requireContext().getSharedPreferences("ExpensePrefs", Context.MODE_PRIVATE)
 
-        val btnBack = view.findViewById<ImageView>(R.id.btn_back)
-        val rbNoExpense = view.findViewById<RadioButton>(R.id.rb_no_expense)
-        val etDateInput = view.findViewById<EditText>(R.id.et_date_input)
+        // Bundle에서 카테고리 이름과 색상 데이터를 받음
+        val selectedCategory = arguments?.getString("selectedCategory") ?: "기본 카테고리"
+        val categoryColor = arguments?.getInt("categoryColor") ?: R.color.black2
+
+        // 카테고리 이름 및 색상 설정
+        val tvCategoryInput = view.findViewById<TextView>(R.id.tv_category_input)
+        tvCategoryInput.text = selectedCategory
+        tvCategoryInput.setTextColor(requireContext().getColor(categoryColor))
+
+        // View 요소 초기화
+        val tvDateInput = view.findViewById<TextView>(R.id.tv_date_input)
         val etDetailInput = view.findViewById<EditText>(R.id.et_detail_input)
         val etAmountInput = view.findViewById<EditText>(R.id.et_amount_input)
+        val tvCharacterCount = view.findViewById<TextView>(R.id.tv_character_count)
         val flPhotoFrame = view.findViewById<FrameLayout>(R.id.fl_photo_frame)
-        val rbAutoSendChat = view.findViewById<RadioButton>(R.id.rb_auto_send_chat)
         val tvEntryComplete = view.findViewById<View>(R.id.tv_entry_complete)
+        val btnBack = view.findViewById<ImageView>(R.id.btn_back)
+        val ivCircleExpenseUnchecked = view.findViewById<ImageView>(R.id.iv_circle_expense_unchecked)
+        val ivCircleExpenseChecked = view.findViewById<ImageView>(R.id.iv_circle_expense_checked)
 
-        btnBack.setOnClickListener {
-            //navController.navigate(R.id.action_expense_entry_to_homeFragment)
-        }
-
-        // 완료 버튼 클릭 이벤트
-        tvEntryComplete.setOnClickListener {
-            val detail = etDetailInput.text.toString()
-            val amountString = etAmountInput.text.toString().replace(",", "")
-            val amount = amountString.toIntOrNull() ?: 0 // 숫자로 변환, 기본값 0
-            val date = etDateInput.text.toString()
-            val category = SpendingCategory.SNACK // 예: 간식 카테고리 (실제 선택값 적용 필요)
-
-            if (detail.isBlank() || amount <= 0) {
-                Toast.makeText(requireContext(), "지출 내용과 금액을 입력해주세요.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+        // 글자 수 제한 로직 추가
+        etDetailInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val length = s?.length ?: 0
+                tvCharacterCount.text = "$length/24" // 글자 수 업데이트
+                if (length > 24) {
+                    etDetailInput.error = "최대 24자까지 입력 가능합니다."
+                }
             }
+            override fun afterTextChanged(s: Editable?) {}
+        })
 
-            val newHistory = BotSheetUiState.Spending.History(
-                name = detail,
-                price = amount
-            )
+        // 지출액 입력란 포맷팅
+        etAmountInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val input = s?.toString()?.replace(",", "")?.toLongOrNull() ?: return
 
-            // ViewModel에 지출 데이터 추가
-            botSheetViewModel.addExpenseToCategory(category, newHistory)
+                // 최대값 제한
+                val limitedValue = if (input > 99_999_999) 99_999_999 else input
 
-            Toast.makeText(requireContext(), "지출이 저장되었습니다.", Toast.LENGTH_SHORT).show()
+                // 천 단위 콤마 추가
+                val formatted = String.format("%,d", limitedValue)
+                if (formatted != s.toString()) {
+                    etAmountInput.removeTextChangedListener(this) // 무한 루프 방지
+                    etAmountInput.setText(formatted)
+                    etAmountInput.setSelection(formatted.length) // 커서 위치 조정
+                    etAmountInput.addTextChangedListener(this)
+                }
+            }
+        })
 
-            // 홈 화면으로 이동
-            //navController.navigate(R.id.action_expense_entry_to_homeFragment)
+        // 무지출 체크박스 로직
+        ivCircleExpenseUnchecked.setOnClickListener {
+            ivCircleExpenseChecked.visibility = View.VISIBLE
+            ivCircleExpenseUnchecked.visibility = View.INVISIBLE
+            etAmountInput.setText("0") // 지출액 0원 설정
+            etAmountInput.isEnabled = false // 지출액 입력 비활성화
         }
 
-
-        // RadioButton 초기화 - 저장된 상태 복원
-        rbNoExpense.isChecked = sharedPreferences.getBoolean("noExpenseSelected", false)
-        rbAutoSendChat.isChecked = sharedPreferences.getBoolean("autoSendChat", true)
-
-        // RadioButton 클릭 이벤트
-        rbNoExpense.setOnCheckedChangeListener { _, isChecked ->
-            sharedPreferences.edit().putBoolean("noExpenseSelected", isChecked).apply()
+        ivCircleExpenseChecked.setOnClickListener {
+            ivCircleExpenseChecked.visibility = View.INVISIBLE
+            ivCircleExpenseUnchecked.visibility = View.VISIBLE
+            etAmountInput.isEnabled = true // 지출액 입력 활성화
+            etAmountInput.text.clear() // 지출액 초기화
         }
 
-        // rb_auto_send_chat 클릭 이벤트
-        rbAutoSendChat.setOnClickListener {
-            // 상태를 반전시켜 저장
-            val isChecked = !rbAutoSendChat.isChecked
-            rbAutoSendChat.isChecked = isChecked
-            sharedPreferences.edit().putBoolean("autoSendChat", isChecked).apply()
+        // 뒤로가기 버튼 이벤트
+        btnBack.setOnClickListener {
+            navController.popBackStack()
         }
 
-        flPhotoFrame.setOnClickListener {
-            openGallery()
-        }
+        // 날짜 초기화
+        val today = Calendar.getInstance()
+        val year = today.get(Calendar.YEAR)
+        val month = today.get(Calendar.MONTH) + 1 // 월은 0부터 시작하므로 +1
+        val day = today.get(Calendar.DAY_OF_MONTH)
+        val dayOfWeek = getDayOfWeek(year, today.get(Calendar.MONTH), day)
+        val formattedDate = getString(R.string.date_format, year, month, day, dayOfWeek)
+        tvDateInput.text = formattedDate
 
-        // et_date_input 클릭 이벤트
-        etDateInput.setOnClickListener {
+        tvDateInput.setOnClickListener {
             val calendar = Calendar.getInstance()
             val year = calendar.get(Calendar.YEAR)
             val month = calendar.get(Calendar.MONTH)
@@ -124,105 +144,105 @@ class ExpenseEntryFragment : Fragment() {
                 requireContext(),
                 { _, selectedYear, selectedMonth, selectedDay ->
                     val dayOfWeek = getDayOfWeek(selectedYear, selectedMonth, selectedDay)
-                    etDateInput.setText("${selectedYear}년 ${selectedMonth + 1}월 ${selectedDay}일 $dayOfWeek")
+                    tvDateInput.text = "${selectedYear}년 ${selectedMonth + 1}월 ${selectedDay}일 $dayOfWeek"
                 },
                 year,
                 month,
                 day
             )
+
             datePickerDialog.show()
         }
 
-        // et_detail_input 초기화
-        etDetailInput.setText(sharedPreferences.getString("detailInput", ""))
+        // 완료 버튼 클릭 이벤트
+        tvEntryComplete.setOnClickListener {
+            val detail = etDetailInput.text.toString().trim()
+            val amountString = etAmountInput.text.toString().replace(",", "").trim()
+            val amount = amountString.toIntOrNull() ?: 0
+            val isNoExpenseChecked = ivCircleExpenseChecked.visibility == View.VISIBLE
 
-        // et_detail_input 텍스트 변경 리스너
-        etDetailInput.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                s?.let {
-                    if (it.length > 24) {
-                        etDetailInput.error = "최대 24자까지 입력 가능합니다."
-                    } else {
-                        sharedPreferences.edit().putString("detailInput", it.toString()).apply()
-                    }
-                }
+            // 에러 테두리를 위한 리소스
+            val errorBackground = ContextCompat.getDrawable(requireContext(), R.drawable.bg_edit_text_error)
+            val normalBackground = ContextCompat.getDrawable(requireContext(), R.drawable.bg_edit_text)
+
+            var hasError = false
+
+            // 지출 내용 확인
+            if (detail.isBlank() && !isNoExpenseChecked) {
+                etDetailInput.background = errorBackground
+                hasError = true
+            } else {
+                etDetailInput.background = normalBackground
             }
-        })
 
-        // et_amount_input 초기화
-        etAmountInput.setText(sharedPreferences.getString("amountInput", ""))
-
-        // et_amount_input 텍스트 변경 리스너
-        etAmountInput.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
-            override fun afterTextChanged(s: Editable?) {
-                s?.let {
-                    val input = it.toString().replace(",", "") // 숫자만 추출
-                    if (input.isNotEmpty()) {
-                        val number = input.toLong()
-
-                        // 99,999,999를 초과하면 최대값으로 설정
-                        if (number > 99_999_999) {
-                            etAmountInput.setText("99,999,999")
-                            etAmountInput.setSelection(etAmountInput.text.length)
-                            sharedPreferences.edit().putString("amountInput", "99,999,999").apply()
-                        } else {
-                            // 천 단위 콤마 추가
-                            val formatted = String.format("%,d", number)
-                            if (formatted != it.toString()) {
-                                etAmountInput.setText(formatted)
-                                etAmountInput.setSelection(etAmountInput.text.length)
-                            }
-                            sharedPreferences.edit().putString("amountInput", formatted).apply()
-                        }
-                    }
-                }
+            // 지출액 확인
+            if (amount <= 0 && !isNoExpenseChecked) {
+                etAmountInput.background = errorBackground
+                hasError = true
+            } else {
+                etAmountInput.background = normalBackground
             }
-        })
 
-    }
-    private fun saveEntryData(entryData: EntryData) {
-        with(sharedPreferences.edit()) {
-            putBoolean("noExpenseSelected", entryData.noExpense)
-            putBoolean("autoSendChat", entryData.autoSendChat)
-            putString("dateInput", entryData.dateInput)
-            putString("detailInput", entryData.detailInput)
-            putString("amountInput", entryData.amountInput)
-            putString("photoUri", entryData.photoUri)
-            apply() // 변경 사항 저장
+            // 무지출 상태에서 사진만 첨부한 경우 처리
+            val isPhotoAttached = sharedPreferences.getString("photoUri", null) != null
+            if (isNoExpenseChecked && detail.isBlank() && isPhotoAttached) {
+                etDetailInput.background = errorBackground
+                hasError = true
+            }
+
+            // 에러가 발생하면 저장 로직 중단
+            if (hasError) {
+                Toast.makeText(requireContext(), "필수 항목을 확인해주세요.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // ViewModel에 데이터 저장
+            val newHistory = BotSheetUiState.Spending.History(
+                name = detail,
+                price = if (isNoExpenseChecked) 0 else amount
+            )
+
+            botSheetViewModel.addExpenseToCategory(
+                SpendingCategory.valueOf(selectedCategory.uppercase()),
+                newHistory
+            )
+
+            // ViewModel에 데이터 추가
+            botSheetViewModel.addExpenseToCategory(
+                SpendingCategory.valueOf(selectedCategory.uppercase()),
+                newHistory
+            )
+
+            Toast.makeText(requireContext(), "지출 내역이 저장되었습니다.", Toast.LENGTH_SHORT).show()
+
+            // 화면 이동 처리
+            navController.popBackStack() // 홈 화면으로 이동
+        }
+
+        // 사진 첨부 버튼 클릭 이벤트
+        flPhotoFrame.setOnClickListener {
+            openGallery()
         }
     }
 
     private fun openGallery() {
-        // 갤러리를 여는 Intent 생성
         val intent = Intent(Intent.ACTION_PICK).apply {
-            type = "image/*"
+            type = "image/*" // 이미지 파일만 선택
         }
         startActivityForResult(intent, PICK_IMAGE_REQUEST)
     }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == AppCompatActivity.RESULT_OK) {
             data?.data?.let { uri ->
                 val imgPhotoFrame = view?.findViewById<ImageView>(R.id.img_photo_frame)
-                val ivPhotoIcon = view?.findViewById<ImageView>(R.id.iv_photo_icon)
-
-                // 선택된 이미지 URI를 ImageView에 표시
                 imgPhotoFrame?.setImageURI(uri)
-                // 선택된 사진 URI를 SharedPreferences에 저장
                 sharedPreferences.edit().putString("photoUri", uri.toString()).apply()
-                // FrameLayout의 배경 제거 (선택된 이미지만 표시)
-                ivPhotoIcon?.visibility = View.GONE
             }
         }
     }
 
-    // 요일 반환 함수
     private fun getDayOfWeek(year: Int, month: Int, day: Int): String {
         val calendar = Calendar.getInstance()
         calendar.set(year, month, day)
@@ -236,15 +256,5 @@ class ExpenseEntryFragment : Fragment() {
             Calendar.SATURDAY -> "토요일"
             else -> ""
         }
-    }
-    private fun clearData() {
-        with(sharedPreferences.edit()) {
-            clear() // 모든 데이터 삭제
-            apply()
-        }
-    }
-    override fun onStop() {
-        super.onStop()
-        clearData() // 화면 종료 시 데이터 초기화
     }
 }
