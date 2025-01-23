@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="328dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_dialog_background"
+    android:paddingVertical="12dp"
+    android:paddingHorizontal="24dp"
+    android:elevation="10dp"
+    android:layout_gravity="center">
+
+    <TextView
+        style="@style/title_semib"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="떠나시는 이유를 알려주세요"
+        android:layout_marginTop="32dp"
+        android:layout_marginRight="@dimen/space_x_small"
+        android:textColor="@color/main1"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            style="@style/body_regula"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="사용 빈도가 줄어서"
+            android:textColor="@color/black3" />
+
+        <ImageView
+            android:id="@+id/ivCheckLowUsage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/selector_small_checkbox" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            style="@style/body_regula"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="대체 서비스를 발견해서"
+            android:textColor="@color/black3" />
+
+        <ImageView
+            android:id="@+id/ivCheckService"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/selector_small_checkbox" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical">
+
+        <TextView
+
+            style="@style/body_regula"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="재미가 없어서"
+            android:textColor="@color/black3" />
+
+        <ImageView
+            android:id="@+id/ivCheckBoredom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/selector_small_checkbox" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            style="@style/body_regula"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="사용 방법이 어려워서"
+            android:textColor="@color/black3" />
+
+        <ImageView
+            android:id="@+id/ivCheckDifficulty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/selector_small_checkbox" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            style="@style/body_regula"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="기타"
+            android:textColor="@color/black3" />
+
+        <ImageView
+            android:id="@+id/ivCheckElse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/selector_small_checkbox" />
+    </LinearLayout>
+
+
+
+
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="9dp"
+        android:layout_marginBottom="31dp"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/etNickname"
+            android:layout_width="match_parent"
+            android:layout_height="76dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_my_description"
+            android:hint=""
+            android:maxLength="30"
+            android:padding="8dp"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tvNicknameCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="0/30"
+            android:layout_gravity="bottom|end"
+            android:textColor="@color/black2"
+            android:textSize="12sp" />
+    </FrameLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:weightSum="2">
+
+        <TextView
+            android:id="@+id/tv_cancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="10dp"
+            android:layout_marginRight="@dimen/space_x_small"
+            android:background="@drawable/bg_button_gray"
+            android:textColor="@color/black"
+            android:clickable="true"
+            android:focusable="true"
+            style="@style/body_medium"
+            android:text="취소"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/tv_withdraw"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="탈퇴"
+            android:gravity="center"
+            android:padding="10dp"
+            android:background="@drawable/bg_my_withdraw"
+            android:textColor="@color/white"
+            android:clickable="true"
+            android:enabled="false"
+            android:focusable="true"
+            style="@style/body_medium"
+            android:layout_weight="1" /> <!-- 동일 비율 -->
+
+    </LinearLayout>
+
+</LinearLayout>
