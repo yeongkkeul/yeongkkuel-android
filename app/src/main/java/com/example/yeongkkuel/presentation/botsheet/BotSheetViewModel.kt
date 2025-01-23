@@ -1,6 +1,9 @@
 package com.example.yeongkkuel.presentation.botsheet
 
 import androidx.lifecycle.ViewModel
+import com.example.yeongkkuel.R
+import com.example.yeongkkuel.presentation.home.category.Category
+import com.example.yeongkkuel.presentation.util.Colors
 import com.example.yeongkkuel.presentation.util.SpendingCategory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,6 +39,52 @@ class BotSheetViewModel : ViewModel() {
                 }
             }
             prev.copy(spendingList = updatedList)
+        }
+    }
+    // BotSheetViewModel
+    fun addCategory(category: Category) {
+        val spendingCategory = mapCategoryToSpendingCategory(category.name)
+        val categoryColor = mapCategoryToColor(category.name)
+        val plusIconResId = mapCategoryToIcon(categoryColor)
+
+        _uiState.update { prev ->
+            val updatedList = prev.spendingList.toMutableList().apply {
+                add(
+                    BotSheetUiState.Spending(
+                        kind = spendingCategory,
+                        color = categoryColor,
+                        plusIconResId = plusIconResId,
+                        history = emptyList()
+                    )
+                )
+            }
+            prev.copy(spendingList = updatedList)
+        }
+    }
+
+    private fun mapCategoryToSpendingCategory(categoryName: String): SpendingCategory {
+        return when (categoryName) {
+            "간식/음료" -> SpendingCategory.SNACK
+            "밥/배달" -> SpendingCategory.SHOP
+            "화장품" -> SpendingCategory.BEAUTY
+            else -> SpendingCategory.IMPROVEMENT
+        }
+    }
+
+    private fun mapCategoryToColor(categoryName: String): Colors {
+        return when (categoryName) {
+            "간식/음료" -> Colors.PINK
+            "밥/배달" -> Colors.BLUE
+            "화장품" -> Colors.GREEN
+            else -> Colors.GREEN
+        }
+    }
+
+    private fun mapCategoryToIcon(color: Colors): Int {
+        return when (color) {
+            Colors.PINK -> R.drawable.ic_plus_pink
+            Colors.BLUE -> R.drawable.ic_plus_blue
+            Colors.GREEN -> R.drawable.ic_plus_green
         }
     }
 }

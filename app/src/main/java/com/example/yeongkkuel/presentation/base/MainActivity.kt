@@ -1,11 +1,11 @@
 package com.example.yeongkkuel.presentation.base
 
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.splashscreen.SplashScreen
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.flowWithLifecycle
@@ -30,10 +30,14 @@ import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.core.splashscreen.SplashScreen
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.NavController
 
 class MainActivity : AppCompatActivity(), BotSheetListener {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var navController: NavController
 
     private val botSheetViewModel: BotSheetViewModel by viewModels()
 
@@ -45,6 +49,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
 
         // 스플래시 화면 설정
         val splashScreen = this.installSplashScreen()
+
 
         splashScreen.setOnExitAnimationListener { splashScreenView ->
             splashScreenView.iconView.animate()
@@ -75,7 +80,8 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
 
-
+        val navController = navHostFragment.navController
+        setupAddCategoryClickListener(navController)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -85,6 +91,12 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
 
         initView()
         initViewModel()
+        setupAddCategoryClickListener(navHostFragment.navController)
+    }
+    private fun setupAddCategoryClickListener(navController: NavController) {
+        binding.tvAddCategory.setOnClickListener {
+            navController.navigate(R.id.categoryAddFragment)
+        }
     }
 
 
@@ -237,8 +249,12 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                 .collectLatest { uiState ->
                     onBind(uiState)
                 }
+            botSheetViewModel.uiState
+                .flowWithLifecycle(lifecycle)
+                .collectLatest { uiState ->
+                    onBind(uiState)
+                }
         }
-
         // 바텀네비게이션 뷰 숨김 처리 - 스플래시, 로그인
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
@@ -271,13 +287,74 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     }
 
 
-    private fun onBind(uiState: BotSheetUiState) = with(binding){
-        fun initRvData() {
-            botSheetCategoryListAdapter.submitList(uiState.spendingList)
+    private fun onBind(uiState: BotSheetUiState) = with(binding) {
+        // RecyclerView 데이터 업데이트
+        botSheetCategoryListAdapter.submitList(uiState.spendingList)
+
+        val isEmpty = uiState.spendingList.isEmpty()
+
+        // 데이터 존재 여부에 따라 RecyclerView visibility 변경
+        binding.rvBotSheetCategory.visibility = if (isEmpty) View.GONE else View.VISIBLE
+        binding.ivHamberger.visibility = if (isEmpty) View.GONE else View.VISIBLE
+
+        // 데이터가 없으면 빈 메시지와 이미지 보이기, 있으면 숨기기
+        binding.tvEmptyMessage1.visibility = if (isEmpty) View.VISIBLE else View.GONE
+        binding.tvEmptyMessage2.visibility = if (isEmpty) View.VISIBLE else View.GONE
+        binding.imgAddCategory.visibility = if (isEmpty) View.VISIBLE else View.GONE
+        if (isEmpty) {
+            binding.imgWarningStart.visibility = View.VISIBLE
+            setupSwipeToDismiss(binding.imgWarningStart) // 스와이프 동작 설정
+
+        } else {
+            binding.imgWarningStart.visibility = View.GONE
+        }
+    }
+    private fun setupSwipeToDismiss(view: View) {
+        var startY = 0f
+        var isSwipingDown = false
+
+        view.setOnTouchListener { v, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    startY = event.y // 시작 Y 좌표 저장
+                    isSwipingDown = false
+                    true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    val deltaY = event.y - startY // Y 좌표 변화량 계산
+                    if (deltaY > 100) { // 아래로 스와이프 거리 임계값
+                        isSwipingDown = true
+                    }
+                    true
+                }
+                MotionEvent.ACTION_UP -> {
+                    if (isSwipingDown) {
+                        // 아래로 스와이프 완료 시 애니메이션 추가
+                        v.animate()
+                            .translationY(v.height.toFloat()) // 화면 아래로 이동
+                            .alpha(0f) // 투명도 0으로
+                            .setDuration(300) // 300ms 애니메이션
+                            .withEndAction {
+                                v.visibility = View.GONE // 애니메이션 후 뷰 숨김
+                            }
+                            .start()
+                    } else {
+                        // 클릭 동작 처리
+                        v.performClick()
+                    }
+                    true
+                }
+                else -> false
+            }
         }
 
-        initRvData()
+        // performClick을 오버라이드하여 클릭 동작 처리
+        view.setOnClickListener {
+            // 클릭 동작 처리 코드 추가
+            // 예: Log.d("TAG", "View clicked")
+        }
     }
+
 
     override fun setPeekHeight(peekHeight: Int){
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.clItemBotSheet)

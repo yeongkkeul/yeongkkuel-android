@@ -25,46 +25,7 @@ data class BotSheetUiState(
 
     companion object {
         fun init() = BotSheetUiState(
-            spendingList = listOf(
-                Spending(
-                    kind = SpendingCategory.SNACK,
-                    color = Colors.PINK,
-                    plusIconResId = R.drawable.ic_plus_pink,
-                    history = listOf(
-                        Spending.History("아아", 16000)
-                    )
-                ),
-                Spending(
-                    kind = SpendingCategory.SHOP,
-                    color = Colors.BLUE,
-                    plusIconResId = R.drawable.ic_plus_blue,
-                    history = listOf(
-                        Spending.History("아아", 15000)
-                    )
-                ),Spending(
-                    kind = SpendingCategory.BEAUTY,
-                    color = Colors.GREEN,
-                    plusIconResId = R.drawable.ic_plus_green,
-                    history = listOf(
-                        Spending.History("아아", 17000)
-                    )
-                ),Spending(
-                    kind = SpendingCategory.ETC,
-                    color = Colors.GREEN,
-                    plusIconResId = R.drawable.ic_plus_green,
-                    history = listOf(
-                        Spending.History("아아", 15000)
-                    )
-                ),
-                Spending(
-                    kind = SpendingCategory.IMPROVEMENT,
-                    color = Colors.GREEN,
-                    plusIconResId = R.drawable.ic_plus_green,
-                    history = listOf(
-                        Spending.History("아아", 15000)
-                    )
-                )
-            ),
+            spendingList = emptyList(), // 초기 상태는 빈 리스트
             date = Date()
         )
     }

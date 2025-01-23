@@ -19,24 +19,39 @@ class CategoryViewModel : ViewModel() {
     )
     val categories: LiveData<List<Category>> get() = _categories
 
-    fun addCategory(category: Category) {
-        if (_categories.value?.size ?: 0 >= 6) {
+    // 최대 카테고리 개수
+    private val maxCategories = 6
+
+    /**
+     * 카테고리 추가 함수
+     */
+    fun addCategory(category: Category): Boolean {
+        val currentList = _categories.value.orEmpty()
+
+        if (currentList.size >= maxCategories) {
             Log.d("CategoryViewModel", "카테고리 추가 제한 도달")
-            return
+            return false
         }
-        val updatedList = _categories.value.orEmpty().toMutableList().apply { add(category) }
+
+        // 새로운 카테고리 리스트로 업데이트
+        val updatedList = currentList.toMutableList().apply { add(category) }
         _categories.value = updatedList
         Log.d("CategoryViewModel", "카테고리 추가 후: ${_categories.value}")
+        return true
     }
 
-    // 카테고리 삭제 함수
+    /**
+     * 카테고리 삭제 함수
+     */
     fun removeCategory(categoryName: String) {
         val updatedList = _categories.value.orEmpty().filterNot { it.name == categoryName }
         _categories.value = updatedList
         Log.d("CategoryViewModel", "카테고리 삭제 후: ${_categories.value}")
     }
 
-    // 카테고리 수정 함수
+    /**
+     * 카테고리 수정 함수
+     */
     fun updateCategory(originalCategoryName: String, updatedCategory: Category) {
         val currentList = _categories.value.orEmpty().toMutableList()
         val index = currentList.indexOfFirst { it.name == originalCategoryName }
@@ -47,5 +62,10 @@ class CategoryViewModel : ViewModel() {
         } else {
             Log.d("CategoryViewModel", "수정할 카테고리를 찾을 수 없습니다.")
         }
+    }
+
+
+    fun isCategoryListEmpty(): Boolean {
+        return _categories.value.isNullOrEmpty()
     }
 }

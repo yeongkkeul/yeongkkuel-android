@@ -28,7 +28,6 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
-
         // Arguments로 전달된 showRewardModal 값 확인
         val showRewardModal = arguments?.getBoolean("showRewardModal") ?: false
         if (showRewardModal) {
@@ -82,4 +81,7 @@ class HomeFragment : Fragment() {
 
         dialog.show()
     }
+
+
+
 }

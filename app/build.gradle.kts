@@ -81,4 +81,8 @@ dependencies {
     // GridLayout 추가
     implementation(libs.androidx.gridlayout)
 
+    // LiveData 및 ViewModel
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+
 }

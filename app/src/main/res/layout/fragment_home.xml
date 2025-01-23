@@ -219,4 +219,5 @@
             app:layout_constraintTop_toTopOf="@id/ly_coin_bar" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+
 </androidx.constraintlayout.widget.ConstraintLayout>

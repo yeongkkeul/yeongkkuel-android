@@ -43,6 +43,10 @@
         <action
             android:id="@+id/action_navigation_home_to_categoryManageFragment"
             app:destination="@id/categoryManageFragment" />
+
+        <action
+            android:id="@+id/action_navigation_home_to_categoryAddFragment"
+            app:destination="@id/categoryAddFragment" />
     </fragment>
 
     <!-- ExpenseEntryFragment 추가 -->
@@ -100,6 +104,10 @@
         <action
             android:id="@+id/action_categoryAddFragment_to_categoryManageFragment"
             app:destination="@id/categoryManageFragment" />
+        <action
+            android:id="@+id/action_categoryAddFragment_to_navigation_home"
+            app:destination="@id/navigation_home" />
+
     </fragment>
 
     <fragment

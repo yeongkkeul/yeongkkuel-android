@@ -16,12 +16,17 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentCategoryAddBinding
+import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 
 class CategoryAddFragment : Fragment() {
 
     private var _binding: FragmentCategoryAddBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: CategoryViewModel by activityViewModels()
+
+    // ViewModels
+    private val categoryViewModel: CategoryViewModel by activityViewModels()
+    private val botSheetViewModel: BotSheetViewModel by activityViewModels()
+
     private val colorPaletteAdapter by lazy {
         ColorPaletteAdapter(onColorSelected = { selectedColor ->
             updateSelectedColor(selectedColor)
@@ -42,7 +47,7 @@ class CategoryAddFragment : Fragment() {
 
         setupRecyclerView()
         setupListeners()
-        setupTextWatcher() // 글자 수 업데이트 로직 호출
+        setupTextWatcher()
         updateSaveButtonState() // 초기 저장 버튼 상태 업데이트
     }
 
@@ -59,7 +64,7 @@ class CategoryAddFragment : Fragment() {
                     parent: RecyclerView,
                     state: RecyclerView.State
                 ) {
-                    outRect.set(0, 1, 0, 1) // 좌우/상하 8dp 간격 추가
+                    outRect.set(0, 1, 0, 1) // 좌우/상하 1dp 간격 추가
                 }
             })
         }
@@ -111,9 +116,14 @@ class CategoryAddFragment : Fragment() {
             return
         }
 
-        viewModel.addCategory(Category(name = title, color = color))
+        val newCategory = Category(name = title, color = color)
+
+        // ViewModel에 카테고리 추가
+        categoryViewModel.addCategory(newCategory)
+        botSheetViewModel.addCategory(newCategory)
+
         Toast.makeText(requireContext(), "카테고리가 저장되었습니다.", Toast.LENGTH_SHORT).show()
-        findNavController().navigate(R.id.action_categoryAddFragment_to_categoryManageFragment)
+        findNavController().navigate(R.id.action_categoryAddFragment_to_navigation_home)
     }
 
     private fun setupTextWatcher() {
@@ -129,10 +139,13 @@ class CategoryAddFragment : Fragment() {
                 updateSaveButtonState()
             }
 
-            override fun afterTextChanged(s: Editable?) {}
+            override fun afterTextChanged(s: Editable?) {
+                // 텍스트 입력값 저장
+                val inputText = s?.toString() ?: ""
+                binding.tvCategoryAdd.isEnabled = inputText.isNotBlank()
+            }
         })
     }
-
 
     private fun updateSaveButtonState() {
         val title = binding.etCategoryAddInput.text.toString()
@@ -153,5 +166,12 @@ class CategoryAddFragment : Fragment() {
             R.color.blue6, R.color.blue7, R.color.blue8, R.color.green9, R.color.green10,
             R.color.green11, R.color.green12, R.color.yellow13, R.color.orange14, R.color.orange15
         ).map { ContextCompat.getColor(requireContext(), it) }
+    }
+    private fun setupColorPalette() {
+        val adapter = ColorPaletteAdapter { color ->
+            selectedColor = color // 선택된 색상 저장
+        }
+        binding.rvColorPalette.adapter = adapter // XML ID와 일치하게 수정
+        adapter.submitList(getColorList()) // getColorList의 색상을 RecyclerView에 전달
     }
 }
