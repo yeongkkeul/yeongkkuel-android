@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         // 스플래시 화면 설정
-        val splashScreen = this.installSplashScreen()
+        /*val splashScreen = this.installSplashScreen()
 
         splashScreen.setOnExitAnimationListener { splashScreenView ->
             splashScreenView.iconView.animate()
@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     splashScreenView.remove()
                 }
                 .start()
-        }
+        }*/
 
         super.onCreate(savedInstanceState)
 
@@ -72,10 +72,10 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
 
 
         // 스플래시 화면 종료 조건 설정 (예: 데이터 초기화 완료)
-        splashScreen.setKeepOnScreenCondition {
+        /*splashScreen.setKeepOnScreenCondition {
             // 앱 초기화 작업이 완료될 때까지 유지
             checkInitialization()
-        }
+        }*/
 
         setupHamburgerClickListener() // 카테고리 더보기 기능 추가
 

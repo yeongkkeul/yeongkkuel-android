@@ -55,14 +55,17 @@ android {
 
 dependencies {
 
-    //Google Credential Manager
+    // Splash Screen API
+    implementation("androidx.core:core-splashscreen:1.0.1") // Splash Screen 라이브러리
+
+    // Google Credential Manager
     implementation(libs.credentials)
 
     // optional - needed for credentials support from play services, for devices running
     // Android 13 and below.
     implementation(libs.credentials.play.services.auth)
     implementation(libs.googleid)
-    implementation(libs.splashscreen) //splash Theme 적용
+    implementation(libs.splashscreen) // splash Theme 적용
     implementation(libs.kakao.all) // 전체 모듈 설치, 2.11.0 버전부터 지원
     implementation(libs.kakao.user) // 카카오 로그인 API 모듈
     implementation(libs.kakao.cert) // 카카오톡 인증 서비스 API 모듈
@@ -93,5 +96,4 @@ dependencies {
     // LiveData 및 ViewModel
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
-
 }
