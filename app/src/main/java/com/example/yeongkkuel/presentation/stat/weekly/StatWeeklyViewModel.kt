@@ -3,6 +3,8 @@ package com.example.yeongkkuel.presentation.stat.weekly
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yeongkkuel.presentation.network.RetrofitClient
+import com.example.yeongkkuel.presentation.util.Colors
+import com.example.yeongkkuel.presentation.util.SpendingCategory
 import com.example.yeongkkuel.presentation.util.Week
 import com.github.mikephil.charting.data.Entry
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,12 +21,15 @@ class StatWeeklyViewModel : ViewModel() {
     fun getWeekExpenditureList() = viewModelScope.launch {
         try {
             yeongkkuelService.getExpendituresWeekExpenses().run {
-                if (isSuccess == true) {
+                if (isSuccess) {
                     result.run {
                         _uiState.update { prev ->
                             prev.copy(
                                 weekList = expenses.map {
-                                    StatWeeklyUiState.DayData(getDayOfWeek(date = it.expenseDate), Entry(0f, it.expenditure.toFloat()))
+                                    StatWeeklyUiState.DayData(
+                                        getDayOfWeek(date = it.expenseDate),
+                                        Entry(0f, it.expenditure.toFloat())
+                                    )
                                 },
                                 totalSpending = weekExpenditure,
                                 targetSpending = dayTargetExpenditure
@@ -39,6 +44,43 @@ class StatWeeklyViewModel : ViewModel() {
     }
 
 
+    fun getWeekExpenditureAverage() = viewModelScope.launch {
+        try {
+            yeongkkuelService.getExpendituresWeekAverage().run {
+                if (isSuccess) {
+                    result.run {
+                        _uiState.update { prev ->
+                            prev.copy(
+                                compareList = listOf(
+                                    StatWeeklyUiState.CompareData.OthersCompare(
+                                        target = "${age}대 ${job}",
+                                        targetSpending = averageExpenditure,
+                                        mySpending = myAverageExpenditure,
+                                        spendingUnit = SpendingUnit.WEEK,
+                                        percentile = topPercent
+                                    ),
+                                    StatWeeklyUiState.CompareData.PastCompare(
+                                        pastSpending = lastWeekExpenditure,
+                                        currentSpending = thisWeekExpenditure,
+                                        spendingUnit = SpendingUnit.WEEK
+                                    )
+                                ),
+                                pieChartList = categories.map {
+                                    StatWeeklyUiState.PieChartData(
+                                        category = SpendingCategory.fromKor(it.categoryName),
+                                        expenditure = it.totalExpenditure,
+                                        color = Colors.fromCode(it.categoryColor)
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 
 
     private fun getDayOfWeek(date: String): Week {

@@ -56,13 +56,13 @@ data class StatWeeklyUiState(
                     target = "20대 직장인",
                     targetSpending = 15700,
                     mySpending = 8100,
-                    spendingUnit = SpendingUnit.DAY,
+                    spendingUnit = SpendingUnit.WEEK,
                     percentile = 10
                 ),
                 CompareData.PastCompare(
                     pastSpending = 122038,
                     currentSpending = 100383,
-                    spendingUnit = SpendingUnit.DAY
+                    spendingUnit = SpendingUnit.WEEK
                 )
             ),
             pieChartList = listOf(
