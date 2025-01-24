@@ -14,6 +14,7 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.RadioButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -46,6 +47,7 @@ class ExpenseEntryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val tvCategoryInput = view.findViewById<TextView>(R.id.tv_category_input) // 추가한 TextView 바인딩
 
         navController = Navigation.findNavController(view)
         sharedPreferences =
@@ -64,6 +66,7 @@ class ExpenseEntryFragment : Fragment() {
             navController.navigate(R.id.action_expense_entry_to_homeFragment)
         }
 
+
         // 완료 버튼 클릭 이벤트
         tvEntryComplete.setOnClickListener {
             val detail = etDetailInput.text.toString()
@@ -71,6 +74,8 @@ class ExpenseEntryFragment : Fragment() {
             val amount = amountString.toIntOrNull() ?: 0 // 숫자로 변환, 기본값 0
             val date = etDateInput.text.toString()
             val category = SpendingCategory.CUSTOM(detail) // 예시로 `detail`을 사용하여 name을 설정
+
+            tvCategoryInput.text = category.kor
 
             if (detail.isBlank() || amount <= 0) {
                 Toast.makeText(requireContext(), "지출 내용과 금액을 입력해주세요.", Toast.LENGTH_SHORT).show()

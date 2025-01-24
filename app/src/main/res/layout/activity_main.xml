@@ -31,7 +31,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/bottom_navi_item" />
 
-
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
