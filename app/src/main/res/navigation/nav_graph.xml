@@ -42,7 +42,18 @@
         android:label="fragment_signup"
         tools:layout="@layout/fragment_signup">
         <action
-            android:id="@+id/action_signupFragment_to_navigation_home"
+            android:id="@+id/action_signupFragment_to_navigation_terms_agree"
+            app:destination="@id/navigation_terms_agree"
+            />
+    </fragment>
+
+    <fragment
+        android:id= "@+id/navigation_terms_agree"
+        android:name= "com.example.yeongkkuel.presentation.signup.TermsAgreeFragment"
+        android:label= "fragment_terms_agree"
+        tools:layout="@layout/fragment_terms_agree">
+        <action
+            android:id="@+id/action_termsAgreeFragment_to_navigation_home"
             app:destination="@id/navigation_home"
             app:popUpTo="@id/navigation_login"
             app:popUpToInclusive="true" />
@@ -54,6 +65,8 @@
         android:label="fragment_chat"
         tools:layout="@layout/fragment_chat"></fragment>
 
+
+    <!-- stat -->
     <fragment
         android:id="@+id/navigation_stat"
         android:name="com.example.yeongkkuel.presentation.stat.StatFragment"
@@ -61,9 +74,22 @@
         tools:layout="@layout/fragment_stat"></fragment>
 
     <fragment
+        android:id="@+id/navigation_stat_setting"
+        android:name="com.example.yeongkkuel.presentation.statsettings.settings.StatSettingsFragment"
+        android:label="fragment_stat_settings"
+        tools:layout="@layout/fragment_stat_settings"></fragment>
+
+    <fragment
+        android:id="@+id/navigation_stat_recommendation"
+        android:name="com.example.yeongkkuel.presentation.statsettings.recommendation.StatRecommendationFragment"
+        android:label="fragment_stat_recommendation"
+        tools:layout="@layout/fragment_stat_recommendation"></fragment>
+
+    <fragment
         android:id="@+id/navigation_my"
         android:name="com.example.yeongkkuel.presentation.my.MyFragment"
         android:label="fragment_my"
+
         tools:layout="@layout/fragment_my">
         <action
             android:id="@+id/action_myFragment_to_navigation_my_edit"
@@ -78,6 +104,7 @@
             android:id="@+id/action_myPageFragment_to_rewardFragment"
             app:destination="@+id/navigation_reward"/>
     </fragment>
+
 
 
 <!--TODO 나의 챌린저 그룹, 지출/일간 화면으로 이동 -->

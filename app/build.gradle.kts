@@ -11,6 +11,7 @@ val localProperties = Properties()
 localProperties.load(project.rootProject.file("local.properties").inputStream())
 val kakaoApiKey = localProperties.getProperty("kakao_NATIVE_APP_KEY")?:""
 val nativeAppKey = localProperties.getProperty("kakao_NATIVE_APP_KEY_MANIFEST")?:""
+val googleApiKey = localProperties.getProperty("google_CLIENT_ID")?:""
 
 android {
     namespace = "com.example.yeongkkuel"
@@ -18,6 +19,7 @@ android {
 
     defaultConfig {
         buildConfigField("String", "kakao_NATIVE_APP_KEY", "\"$kakaoApiKey\"")
+        buildConfigField("String","google_CLIENT_ID","\"$googleApiKey\"")
         manifestPlaceholders["NATIVE_APP_KEY"] = nativeAppKey
 
         applicationId = "com.example.yeongkkuel"
@@ -53,10 +55,17 @@ android {
 
 dependencies {
 
-    implementation ("androidx.core:core-splashscreen:1.0.1") //splash Theme 적용
-    implementation ("com.kakao.sdk:v2-all:2.20.6") // 전체 모듈 설치, 2.11.0 버전부터 지원
-    implementation ("com.kakao.sdk:v2-user:2.20.6") // 카카오 로그인 API 모듈
-    implementation ("com.kakao.sdk:v2-cert:2.20.6") // 카카오톡 인증 서비스 API 모듈
+    //Google Credential Manager
+    implementation(libs.credentials)
+
+    // optional - needed for credentials support from play services, for devices running
+    // Android 13 and below.
+    implementation(libs.credentials.play.services.auth)
+    implementation(libs.googleid)
+    implementation(libs.splashscreen) //splash Theme 적용
+    implementation(libs.kakao.all) // 전체 모듈 설치, 2.11.0 버전부터 지원
+    implementation(libs.kakao.user) // 카카오 로그인 API 모듈
+    implementation(libs.kakao.cert) // 카카오톡 인증 서비스 API 모듈
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -77,4 +86,11 @@ dependencies {
 
     // ActivityViewModels
     implementation(libs.androidx.activity.ktx)
+
+    // Retrofit
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
+    implementation(libs.gson)
 }
