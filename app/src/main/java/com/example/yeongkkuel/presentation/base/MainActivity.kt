@@ -228,7 +228,8 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     R.id.navigation_login,
                     R.id.navigation_signup,
                     R.id.navigation_stat_setting,
-                    R.id.navigation_stat_recommendation -> hideBottomNavigation(
+                    R.id.navigation_stat_recommendation,
+                    R.id.navigation_terms_agree -> hideBottomNavigation(
                         true
                     )
 
@@ -249,9 +250,9 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     val previousBackStackEntry = navController.previousBackStackEntry
                     if (previousBackStackEntry?.destination?.id == R.id.navigation_stat) {
                         navController.toNaviStat()
-                    } else if(previousBackStackEntry != null){
+                    } else if (previousBackStackEntry != null) {
                         navController.popBackStack()
-                    } else{
+                    } else {
                         finish()
                     }
                 }

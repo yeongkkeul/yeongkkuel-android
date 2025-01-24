@@ -1,29 +1,45 @@
 package com.example.yeongkkuel.presentation.login
 
+
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialRequest
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.example.yeongkkuel.BuildConfig
 
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentLoginBinding
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.kakao.sdk.auth.AuthApiClient
 import com.kakao.sdk.common.model.AuthError
 import com.kakao.sdk.common.model.AuthErrorCause
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.logging.HttpLoggingInterceptor
 import timber.log.Timber
+import java.util.logging.Logger
 
 // local.properties 파일에 저장된 native_app_key를 가져옴
 
 
 class LoginFragment : Fragment() {
-
 
 
     private var _binding: FragmentLoginBinding? = null
@@ -37,12 +53,11 @@ class LoginFragment : Fragment() {
     ): View {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
         return binding.root
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
 
         // 카카오 버튼 클릭 시
         binding.btnKakaoLogin.setOnClickListener {
@@ -59,8 +74,84 @@ class LoginFragment : Fragment() {
 
         // TODO: 구글 로그인 구현
         binding.btnGoogleLogin.setOnClickListener {
-            findNavController().navigate(R.id.action_loginFragment_to_navigation_home)
+            signInWithGoogle()
+//            findNavController().navigate(R.id.action_loginFragment_to_navigation_home)
+
         }
+    }
+
+
+    private fun signInWithGoogle() {
+        // BeginSignInRequest 빌드
+        val credentialManager = CredentialManager.create(requireContext())
+        val googleClientID: String = BuildConfig.google_CLIENT_ID
+        val googleIdOption = GetGoogleIdOption.Builder()
+            .setFilterByAuthorizedAccounts(false)   // 구글 계정 유무 체크
+            .setServerClientId(googleClientID)  // 웹 클라이언트 키값
+            .setAutoSelectEnabled(true)            // 자동 로그인 활성화
+            .build()
+
+        val request = GetCredentialRequest.Builder()
+            .addCredentialOption(googleIdOption)
+            .build()
+
+        CoroutineScope(Dispatchers.Main).launch {
+            runCatching {
+                val result = credentialManager.getCredential(requireContext(), request)
+
+                // Credential 처리
+                when (val data = result.credential) {
+                    is CustomCredential -> {
+                        if (data.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                            val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(data.data)
+
+                            val idToken = googleIdTokenCredential.idToken
+                            Timber.e("ID Token: $idToken")
+
+                            // ID 토큰 전달 후 처리
+                            fetchUserInfoWithGoogle(idToken)
+                        }
+                    }
+                }
+            }.onFailure { error ->
+                Timber.e("Google Login Error: $error")
+            }
+        }
+    }
+
+    private fun fetchUserInfoWithGoogle(idToken: String?) {
+        if (idToken == null) {
+            Timber.e("ID Token is null, cannot proceed to fetch user info")
+            return
+        }
+
+        // 백엔드로 ID 토큰 전송
+        CoroutineScope(Dispatchers.IO).launch {
+            val success = postIdTokenToBackend(idToken) // ID 토큰을 서버로 전송하고 성공 여부 반환
+            withContext(Dispatchers.Main) {
+                if (success) {
+                    // 성공 시 회원가입 페이지로 이동
+                    navigateToSignUp()
+                } else {
+                    // 실패 처리
+                    Timber.e("Failed to verify ID Token with backend")
+                }
+            }
+        }
+    }
+
+    // TODO: 서버와 통신하여 ID 토큰 검증 (Retrofit 구현)
+    private suspend fun postIdTokenToBackend(idToken: String): Boolean {
+        return true
+
+        /*try {
+            // 서버 API 호출 (예: Retrofit)
+            val response = apiService.verifyGoogleIdToken(idToken) // 서버 검증 엔드포인트 호출
+            response.isSuccessful
+        } catch (e: Exception) {
+            Timber.e("Error while verifying ID Token: $e")
+            false
+        }*/
     }
 
     private fun logoutAndReLogin() {
