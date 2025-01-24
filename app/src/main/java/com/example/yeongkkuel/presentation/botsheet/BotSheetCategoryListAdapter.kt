@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.databinding.ItemBotsheetCategoryBinding
+import android.content.res.ColorStateList
 
 class BotSheetCategoryListAdapter(
     private val botSheetListener: BotSheetListener
@@ -34,10 +35,10 @@ class BotSheetCategoryListAdapter(
                 historyListAdapter.submitList(item.history)
                 layoutManager = LinearLayoutManager(binding.root.context)
             }
-            // + 버튼 클릭 리스너 추가
+            /*// + 버튼 클릭 리스너 추가
             ivBtnPlus.setOnClickListener {
                 botSheetListener.navigateToExpenseEntry() // BotSheetListener의 메서드를 호출해 MainActivity로 이벤트 전달
-            }
+            }*/
         }
     }
 
