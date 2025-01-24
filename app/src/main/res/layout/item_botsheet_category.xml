@@ -19,22 +19,34 @@
 
         <TextView
             android:id="@+id/tv_category"
+            style="@style/body_semibo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="쇼핑"
+            android:text="간식/음료"
             android:textColor="@color/blue"
-            style="@style/body_semibo"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/iv_btnPlus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_plus_blue"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_btnAdd"
+            android:layout_width="22dp"
+            android:layout_height="0dp"
+            android:background="@drawable/bg_oval"
+            android:backgroundTint="@color/blue"
+            android:clipToOutline="true"
             app:layout_constraintBottom_toBottomOf="@id/tv_category"
+            app:layout_constraintDimensionRatio="1"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tv_category"/>
+            app:layout_constraintTop_toTopOf="@id/tv_category">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:src="@drawable/ic_add"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_history"

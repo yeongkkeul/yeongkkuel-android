@@ -17,12 +17,13 @@ import com.kakao.sdk.friend.view.NestedScrollableHost
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class StatMonthlyFragment : Fragment() {
+class StatMonthlyFragment(
+    private val viewModel: StatMonthlyViewModel
+) : Fragment() {
     private var _binding: FragmentStatMonthlyBinding? = null
     private val binding: FragmentStatMonthlyBinding
         get() = requireNotNull(_binding) { "FragmentStatMonthlyBinding -> null" }
 
-    private val viewModel: StatMonthlyViewModel by viewModels()
 
     private val calendarViewPagerAdapter by lazy {
         StatMonthlyCalenderViewPagerAdapter(requireActivity(), viewModel)

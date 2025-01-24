@@ -9,12 +9,16 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentStatBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
+import com.example.yeongkkuel.presentation.stat.monthly.StatMonthlyViewModel
+import com.example.yeongkkuel.presentation.stat.weekly.StatWeeklyViewModel
 import com.example.yeongkkuel.presentation.util.dpToPx
 import com.google.android.material.tabs.TabLayoutMediator
 
@@ -24,8 +28,15 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
     private val binding: FragmentStatBinding
         get() = requireNotNull(_binding) { "FragmentStatBinding -> null" }
 
+    private val weeklyViewModel: StatWeeklyViewModel by viewModels()
+    private val monthlyViewModel: StatMonthlyViewModel by viewModels()
+
     private val viewPagerAdapter: StatViewPagerAdapter by lazy {
-        StatViewPagerAdapter(this@StatFragment)
+        StatViewPagerAdapter(
+            fragment = this@StatFragment,
+            weeklyViewModel = weeklyViewModel,
+            monthlyViewModel = monthlyViewModel)
+
     }
 
     private var botSheetListener: BotSheetListener? = null
@@ -33,7 +44,7 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        if(context is BotSheetListener){
+        if (context is BotSheetListener) {
             botSheetListener = context
         }
     }
@@ -65,8 +76,8 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
             TabLayoutMediator(tlStat, vpStat) { tab, position ->
                 val tabView = TextView(context).apply {
                     setText(viewPagerAdapter.getTitle(position))
-                    setTextAppearance(R.style.body_semibo) // 스타일 적용
-                    setTextColor(ContextCompat.getColor(context, R.color.main1))
+                    setTextAppearance(R.style.body_semibo)
+                    setTextColor(ContextCompat.getColorStateList(context, R.color.tab_stat_text))
                     gravity = Gravity.CENTER
                 }
                 tab.customView = tabView
@@ -74,7 +85,7 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
 
 
             // ViewPager2의 페이지가 변경될 때마다 호출되는 콜백
-            botSheetListener?.let{ listner ->
+            botSheetListener?.let { listner ->
                 registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                     override fun onPageSelected(position: Int) {
                         super.onPageSelected(position)
@@ -85,12 +96,14 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
 
                                 val displayHeight = resources.displayMetrics.heightPixels
                                 val peekHeight =
-                                    (displayHeight - 440.dpToPx(requireContext()))
+                                    (displayHeight - 430.dpToPx(requireContext()))
                                 listner.setPeekHeight(peekHeight)
                             }
+
                             1 -> { // 두 번째 페이지 (StatWeeklyFragment)
                                 listner.setBotSheetGone()
                             }
+
                             2 -> { // 세 번째 페이지 (StatMonthlyFragment)
                                 listner.setBotSheetVisible()
 
@@ -103,10 +116,22 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
                     }
                 })
             }
+        }
+
+        fun initMore() {
+            ivMore.setOnClickListener {
+                if (clMore.visibility == View.GONE) clMore.visibility = View.VISIBLE
+                else clMore.visibility = View.GONE
+            }
+
+            tvMoreSettings.setOnClickListener { findNavController().navigate(R.id.navigation_stat_setting) }
+
+            tvMoreRecommendation.setOnClickListener { findNavController().navigate(R.id.navigation_stat_recommendation) }
 
         }
 
         initVp()
+        initMore()
     }
 
     // ViewPager의 터치 이벤트를 비활성화하는 함수

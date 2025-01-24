@@ -23,7 +23,12 @@ class BotSheetCategoryListAdapter(
         fun onBind(item: BotSheetUiState.Spending) = with(binding) {
             tvCategory.text = item.kind.kor
             tvCategory.setTextColor(ContextCompat.getColor(binding.root.context, item.color.id))
-            ivBtnPlus.setImageResource(item.plusIconResId)
+            item.color.id.let {
+                val context = binding.root.context
+                tvCategory.setTextColor(ContextCompat.getColor(context, it))
+                clBtnAdd.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, it))
+            }
+
             rvHistory.run {
                 adapter = historyListAdapter
                 historyListAdapter.submitList(item.history)

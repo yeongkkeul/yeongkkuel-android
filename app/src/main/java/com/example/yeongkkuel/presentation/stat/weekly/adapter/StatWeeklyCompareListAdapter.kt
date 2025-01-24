@@ -1,5 +1,9 @@
 package com.example.yeongkkuel.presentation.stat.weekly.adapter
 
+import android.graphics.Typeface
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -23,7 +27,23 @@ class StatWeeklyCompareListAdapter(
                     tvComparedUnit.text = item.spendingUnit.kor
                     tvMyUnit.text = item.spendingUnit.kor
 
-                    tvCompareDescription.text = "${item.target} 중 상위 ${item.percentile}%"
+                    val descriptionText = "${item.target} 중 상위 ${item.percentile}%"
+                    val boldText = "상위 ${item.percentile}%" // Bold 처리할 텍스트
+
+                    val spannableString = SpannableString(descriptionText)
+
+                    val start = descriptionText.indexOf(boldText)
+                    if (start != -1) {
+                        val end = start + boldText.length
+                        spannableString.setSpan(
+                            StyleSpan(Typeface.BOLD), // Bold 스타일
+                            start,
+                            end,
+                            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                        )
+                    }
+
+                    tvCompareDescription.text = spannableString
 
                     tvComparedTarget.text = "${item.target} 평균"
                     tvComparedMoney.text = "${item.targetSpending.toMoneyString()}원"
@@ -42,30 +62,42 @@ class StatWeeklyCompareListAdapter(
                         SpendingUnit.DAY -> {
                             tvComparedTarget.text = "어제"
                             tvMyTarget.text = "오늘"
-
-                            tvCompareDescription.text =
-                                if (spendingDiff >= 0) "어제보다 ${spendingDiff} 덜 썼어요"
-                                else "어제보다 ${-spendingDiff} 더 썼어요"
                         }
 
                         SpendingUnit.WEEK -> {
                             tvComparedTarget.text = "저번 주"
                             tvMyTarget.text = "이번 주"
-
-                            tvCompareDescription.text =
-                                if (spendingDiff >= 0) "저번 주보다 ${spendingDiff} 덜 썼어요"
-                            else "저번 주보다 ${-spendingDiff} 더 썼어요"
                         }
 
                         SpendingUnit.MONTH -> {
                             tvComparedTarget.text = "저번 달"
                             tvMyTarget.text = "이번 달"
-
-                            tvCompareDescription.text =
-                                if (spendingDiff >= 0) "저번 달보다 ${spendingDiff} 덜 썼어요"
-                                else "저번 달보다 ${-spendingDiff} 더 썼어요"
                         }
                     }
+
+                    val descriptionText = if (spendingDiff >= 0) {
+                        "${tvComparedTarget.text}보다 ${spendingDiff.toMoneyString()} 원 덜 썼어요"
+                    } else {
+                        "${tvComparedTarget.text}보다 ${(-spendingDiff).toMoneyString()} 원 더 썼어요"
+                    }
+
+                    val boldText = if (spendingDiff >= 0) "${spendingDiff.toMoneyString()} 원"
+                    else "${(-spendingDiff).toMoneyString()} 원"
+                    val spannableString = SpannableString(descriptionText)
+
+                    val start = descriptionText.indexOf(boldText)
+                    if (start != -1) {
+                        val end = start + boldText.length
+                        spannableString.setSpan(
+                            StyleSpan(Typeface.BOLD), // Bold 스타일
+                            start,
+                            end,
+                            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                        )
+                    }
+
+                    tvCompareDescription.text = spannableString
+
 
                     tvComparedMoney.text = "${item.pastSpending.toMoneyString()}원"
                     tvMyMoney.text = "${item.currentSpending.toMoneyString()}원"

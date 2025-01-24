@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_topBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/space_large"
+        android:paddingVertical="@dimen/space_median"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/iv_topArrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/space_xx_small"
+            android:src="@drawable/ic_left_arrow"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            style="@style/humm_medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_median"
+            android:text="하루 목표 지출액 설정"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/iv_topArrow"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_storage"
+            style="@style/body_semibo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/space_xx_small"
+            android:text="저장"
+            android:textColor="@color/main1"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="@id/iv_topArrow"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/iv_topArrow" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/tv_spendingMoney"
+        style="@style/humm_semibo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/space_median"
+        android:text="하루 목표 지출액"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cl_topBar" />
+
+    <EditText
+        android:id="@+id/et_targetSpending"
+        style="@style/body_medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/main1"
+        android:inputType="number"
+        android:maxWidth="180dp"
+        android:minWidth="60dp"
+        android:singleLine="true"
+        android:textColor="@color/main1"
+        app:layout_constraintBottom_toBottomOf="@id/tv_spendingMoney"
+        app:layout_constraintEnd_toStartOf="@id/tv_unit"
+        app:layout_constraintTop_toTopOf="@id/tv_spendingMoney" />
+
+    <TextView
+        android:id="@+id/tv_unit"
+        style="@style/body_medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/space_median"
+        android:text=" 원"
+        app:layout_constraintBottom_toBottomOf="@id/et_targetSpending"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/et_targetSpending" />
+
+    <TextView
+        android:id="@+id/tv_targetSpendingError"
+        style="@style/small_semib"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="하루 목표 지출액을 입력해주세요."
+        android:textColor="@color/error"
+        app:layout_constraintEnd_toEndOf="@id/tv_unit"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@id/et_targetSpending" />
+</androidx.constraintlayout.widget.ConstraintLayout>

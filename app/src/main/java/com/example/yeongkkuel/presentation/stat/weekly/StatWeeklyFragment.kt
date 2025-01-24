@@ -37,12 +37,12 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
-class StatWeeklyFragment : Fragment() {
+class StatWeeklyFragment(
+    private val viewModel: StatWeeklyViewModel
+) : Fragment() {
     private var _binding: FragmentStatWeeklyBinding? = null
     private val binding: FragmentStatWeeklyBinding
         get() = requireNotNull(_binding) { "FragmentStatWeeklyBinding -> null" }
-
-    private val viewModel: StatWeeklyViewModel by viewModels()
 
     private val weekListAdapter by lazy {
         StatWeeklyWeekListAdapter()
