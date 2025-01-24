@@ -223,7 +223,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         initNav()
     }
 
-    private fun initViewModel() = with(botSheetViewModel){
+    fun initViewModel() = with(botSheetViewModel){
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
 
@@ -268,12 +268,12 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     }
 
 
-    private fun onBind(uiState: BotSheetUiState) = with(binding){
-        fun initRvData() {
-            botSheetCategoryListAdapter.submitList(uiState.spendingList)
+    private fun onBind(uiState: BotSheetUiState) = with(binding) {
+        rvBotSheetCategory.adapter?.let { adapter ->
+            if (adapter is BotSheetCategoryListAdapter) {
+                adapter.submitList(uiState.spendingList)
+            }
         }
-
-        initRvData()
     }
 
     override fun setPeekHeight(peekHeight: Int){

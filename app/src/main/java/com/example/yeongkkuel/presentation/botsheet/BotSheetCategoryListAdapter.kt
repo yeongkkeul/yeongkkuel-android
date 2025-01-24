@@ -29,9 +29,11 @@ class BotSheetCategoryListAdapter(
                 historyListAdapter.submitList(item.history)
                 layoutManager = LinearLayoutManager(binding.root.context)
             }
+
             // + 버튼 클릭 리스너 추가
             ivBtnPlus.setOnClickListener {
-                botSheetListener.navigateToExpenseEntry(item.kind.kor, item.color.id) // BotSheetListener의 메서드를 호출해 MainActivity로 이벤트 전달
+                // ViewModel을 통해 새로운 데이터 추가 로직
+                botSheetListener.navigateToExpenseEntry(item.kind.kor, item.color.id)
             }
         }
     }
@@ -66,13 +68,13 @@ class SpendingCategoryListDiffUtil : DiffUtil.ItemCallback<BotSheetUiState.Spend
         oldItem: BotSheetUiState.Spending,
         newItem: BotSheetUiState.Spending
     ): Boolean {
-        return oldItem == newItem
+        return oldItem.kind == newItem.kind
     }
 
     override fun areContentsTheSame(
         oldItem: BotSheetUiState.Spending,
         newItem: BotSheetUiState.Spending
     ): Boolean {
-        return  oldItem.kind == newItem.kind && oldItem.color == newItem.color
+        return oldItem == newItem
     }
 }

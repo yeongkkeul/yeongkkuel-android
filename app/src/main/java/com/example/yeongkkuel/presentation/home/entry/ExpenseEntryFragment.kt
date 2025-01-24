@@ -7,6 +7,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +23,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.example.yeongkkuel.R
+import com.example.yeongkkuel.presentation.base.MainActivity
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import com.example.yeongkkuel.presentation.util.SpendingCategory
@@ -36,6 +38,8 @@ class ExpenseEntryFragment : Fragment() {
     private val PICK_IMAGE_REQUEST = 1
 
     private val botSheetViewModel: BotSheetViewModel by activityViewModels()
+    private val entryViewModel: ExpenseEntryViewModel by activityViewModels()
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -68,8 +72,15 @@ class ExpenseEntryFragment : Fragment() {
         val flPhotoFrame = view.findViewById<FrameLayout>(R.id.fl_photo_frame)
         val tvEntryComplete = view.findViewById<View>(R.id.tv_entry_complete)
         val btnBack = view.findViewById<ImageView>(R.id.btn_back)
+
+        // 무지출 체크 버튼
         val ivCircleExpenseUnchecked = view.findViewById<ImageView>(R.id.iv_circle_expense_unchecked)
         val ivCircleExpenseChecked = view.findViewById<ImageView>(R.id.iv_circle_expense_checked)
+
+        // 채팅방 자동전송 체크 버튼
+        val ivCircleSendAutoChecked = view.findViewById<ImageView>(R.id.iv_circle_send_auto_checked)
+        val ivCircleSendAutoUnchecked = view.findViewById<ImageView>(R.id.iv_circle_send_auto_unchecked)
+
 
         // 글자 수 제한 로직 추가
         etDetailInput.addTextChangedListener(object : TextWatcher {
@@ -118,6 +129,22 @@ class ExpenseEntryFragment : Fragment() {
             ivCircleExpenseUnchecked.visibility = View.VISIBLE
             etAmountInput.isEnabled = true // 지출액 입력 활성화
             etAmountInput.text.clear() // 지출액 초기화
+        }
+
+        // 채팅방 자동 전송 체크박스 로직
+        // 초기 상태를 체크 상태로 설정
+        ivCircleSendAutoChecked.visibility = View.VISIBLE
+        ivCircleSendAutoUnchecked.visibility = View.INVISIBLE
+
+        // 클릭 이벤트로 상태 전환 로직 추가
+        ivCircleSendAutoUnchecked.setOnClickListener {
+            ivCircleSendAutoChecked.visibility = View.VISIBLE
+            ivCircleSendAutoUnchecked.visibility = View.INVISIBLE
+        }
+
+        ivCircleSendAutoChecked.setOnClickListener {
+            ivCircleSendAutoChecked.visibility = View.INVISIBLE
+            ivCircleSendAutoUnchecked.visibility = View.VISIBLE
         }
 
         // 뒤로가기 버튼 이벤트
@@ -196,29 +223,43 @@ class ExpenseEntryFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            // ViewModel에 데이터 저장
-            val newHistory = BotSheetUiState.Spending.History(
-                name = detail,
+            // 무지출 처리
+            val expenseHistory = BotSheetUiState.Spending.History(
+                name = if (isNoExpenseChecked) "무지출" else detail,
                 price = if (isNoExpenseChecked) 0 else amount
             )
 
+            // ViewModel에 저장
             botSheetViewModel.addExpenseToCategory(
                 SpendingCategory.valueOf(selectedCategory.uppercase()),
-                newHistory
-            )
-
-            // ViewModel에 데이터 추가
-            botSheetViewModel.addExpenseToCategory(
-                SpendingCategory.valueOf(selectedCategory.uppercase()),
-                newHistory
+                expenseHistory
             )
 
             Toast.makeText(requireContext(), "지출 내역이 저장되었습니다.", Toast.LENGTH_SHORT).show()
 
-            // 화면 이동 처리
-            navController.popBackStack() // 홈 화면으로 이동
-        }
+            // MainActivity의 바텀시트 RecyclerView 업데이트를 요청
+            (requireActivity() as? MainActivity)?.let { mainActivity ->
+                mainActivity.initViewModel() // ViewModel 데이터에 기반하여 바텀시트 갱신
+            }
 
+            // 날짜 비교 후 화면 이동 처리
+            val selectedDateText = tvDateInput.text.toString() // 선택된 날짜 텍스트 가져오기
+            val today = Calendar.getInstance() // 현재 날짜 가져오기
+            val dateFormat = SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREAN) // 날짜 형식 지정
+            val selectedDate = try {
+                dateFormat.parse(selectedDateText.substring(0, 13)) // 날짜 텍스트 파싱
+            } catch (e: Exception) {
+                null // 파싱 실패 시 null 반환
+            }
+
+            if (selectedDate != null && dateFormat.format(selectedDate) != dateFormat.format(today.time)) {
+                // 다른 날짜일 경우 지출탭(월간)으로 이동
+                navController.navigate(R.id.action_expenseEntryFragment_to_navigation_stat)
+            } else {
+                // 오늘 날짜일 경우 홈 화면으로 이동
+                navController.navigate(R.id.action_expenseEntryFragment_to_navigation_home)
+            }
+        }
         // 사진 첨부 버튼 클릭 이벤트
         flPhotoFrame.setOnClickListener {
             openGallery()
@@ -237,7 +278,9 @@ class ExpenseEntryFragment : Fragment() {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == AppCompatActivity.RESULT_OK) {
             data?.data?.let { uri ->
                 val imgPhotoFrame = view?.findViewById<ImageView>(R.id.img_photo_frame)
+                val ivPhotoIcon = view?.findViewById<ImageView>(R.id.iv_photo_icon)
                 imgPhotoFrame?.setImageURI(uri)
+                ivPhotoIcon?.visibility = View.GONE
                 sharedPreferences.edit().putString("photoUri", uri.toString()).apply()
             }
         }

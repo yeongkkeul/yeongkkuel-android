@@ -50,7 +50,17 @@
         android:id="@+id/expenseEntryFragment"
         android:name="com.example.yeongkkuel.presentation.home.entry.ExpenseEntryFragment"
         android:label="지출 기입 화면"
-        tools:layout="@layout/fragment_expense_entry" />
+        tools:layout="@layout/fragment_expense_entry">
+        <!-- 홈 화면으로 이동 -->
+        <action
+            android:id="@+id/action_expenseEntryFragment_to_navigation_home"
+            app:destination="@id/navigation_home" />
+
+        <!-- 지출 탭(월간)으로 이동 -->
+        <action
+            android:id="@+id/action_expenseEntryFragment_to_navigation_stat"
+            app:destination="@id/navigation_stat" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_store"
