@@ -4,9 +4,9 @@ import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,17 +15,11 @@ import android.view.Window
 import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.core.content.ContextCompat.startActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.NavController
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentMyBinding
-import com.example.yeongkkuel.presentation.base.MainActivity
 import com.kakao.sdk.user.UserApiClient
 
 class MyFragment : Fragment() {
@@ -33,8 +27,7 @@ class MyFragment : Fragment() {
     private var _binding: FragmentMyBinding? = null
     private val binding get() = _binding!!
 
-    private val myPageViewModel: MyPageViewModel by viewModels()
-
+    private val viewModel: ProfileViewModel by viewModels({ requireActivity() })
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -46,30 +39,25 @@ class MyFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // ViewModel LiveData observe
-        myPageViewModel.userInfo.observe(viewLifecycleOwner) { user ->
-            // 프로필
-            // 이미지 (Glide 등 사용 가능), 여기선 더미
-            // Glide.with(this).load(user.profileImageUrl).into(binding.ivProfile)
-            binding.tvNickname.text = user.nickname
-            binding.tvAge.text = user.age
-            binding.tvJob.text = user.job
-            binding.tvEmail.text = user.email
-        }
-
-        myPageViewModel.dailyLimit.observe(viewLifecycleOwner) { limit ->
-            // 예: "-원" → "5000원"
-            binding.tvDailyLimit.text = "${limit}원"
-        }
-
-        myPageViewModel.weeklyPercent.observe(viewLifecycleOwner) { percent ->
-            // "-%" → "63%"
-            binding.tvDailyPercent.text = "${percent}%"
-        }
-
+        observeViewModel()
         // 클릭 리스너들
         setupClickListeners()
     }
+
+    private fun observeViewModel() {
+        viewModel.profileResponse.observe(viewLifecycleOwner) { response ->
+            response.result?.let { result ->
+                binding.tvNickname.text = result.nickname
+                binding.tvAge.text = result.ageGroup + "대"
+                binding.tvJob.text = result.job
+                binding.ivProfile.setImageURI(Uri.parse(result.profileImageUrl))
+                binding.tvEmail.text = result.email
+                binding.tvDailyLimit.text = result.dayTargetExpenditure.toString() + "원"
+                binding.tvDailyPercent.text = result.weeklyAchievementRate.toString() + "%"
+            }
+        }
+    }
+
 
     private fun setupClickListeners() {
         // 1. 프로필 수정
@@ -85,10 +73,14 @@ class MyFragment : Fragment() {
         }
 
         // 알림 아이콘
-        /*binding.ivNoti.setOnClickListener {
+        binding.ivNoti.setOnClickListener {
             // 이동: MyPage -> NotiFragment
             findNavController().navigate(R.id.action_myPageFragment_to_notificationFragment)
-        }*/
+        }
+        binding.ivRewardMore.setOnClickListener{
+            // 이동: MyPage -> RewardFragment
+            findNavController().navigate(R.id.action_myPageFragment_to_rewardFragment)
+        }
 
         // 친구초대
         binding.tvInviteFriend.setOnClickListener {
@@ -106,7 +98,7 @@ class MyFragment : Fragment() {
         }
     }
 
-    // 모달 예시
+    // 모달
     private fun showInviteCodeModal() {
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -130,7 +122,7 @@ class MyFragment : Fragment() {
         //클립보드에 복사 하고 모달 나가기
         copyBtn.setOnClickListener {
             val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            val clip = ClipData.newPlainText("inviteCode", codeTv.text)
+            val clip = ClipData.newPlainText(/* label = */ "inviteCode", /* text = */ codeTv.text)
             clipboard.setPrimaryClip(clip)
             dialog.dismiss()
         }

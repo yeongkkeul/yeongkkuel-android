@@ -68,15 +68,15 @@
             android:layout_gravity="center"
             android:contentDescription="프로필"
             android:scaleType="centerCrop"
+            android:background="@drawable/bg_whitecircle"
             android:src="@drawable/ic_my_profile" />
 
-        <!-- 그림자/그라디언트 오버레이 (Figma에서 추출한 PNG/SVG) -->
+
         <ImageView
             android:id="@+id/ivProfileShadow"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_gravity="center"
-
             android:src="@drawable/bg_my_edit_shadow"
             android:scaleType="fitXY"
             />
@@ -110,7 +110,7 @@
         style="@style/body_semibo"
         android:textColor="@color/black"
         android:textStyle="bold"
-        android:layout_marginStart="@dimen/space_large"
+        android:layout_marginStart="@dimen/space_median"
         android:layout_marginTop="45dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/fl_profile_image"
