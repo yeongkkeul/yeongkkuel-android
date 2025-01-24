@@ -33,7 +33,6 @@ import java.util.Date
 import java.util.Locale
 
 class MainActivity : AppCompatActivity(), BotSheetListener {
-
     private lateinit var binding: ActivityMainBinding
 
     private val botSheetViewModel: BotSheetViewModel by viewModels()

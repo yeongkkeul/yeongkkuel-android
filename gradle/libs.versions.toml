@@ -19,9 +19,12 @@ kakao = "2.20.6"
 
 
 mpandroidchart = "3.1.0"
-gson = "2.8.9"
 
 activity-ktx = "1.9.3"
+
+retrofit = "2.9.0" # Retrofit 버전
+okhttp = "4.11.0" # OkHttp 버전
+gson = "2.10.1" # Gson 버전
 
 [libraries]
 credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
@@ -51,6 +54,12 @@ gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 
 # Activity
 androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activity-ktx" }
+
+# Rtrofit
+retrofit-core = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+okhttp-logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
