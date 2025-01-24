@@ -2,6 +2,7 @@ package com.example.yeongkkuel.presentation.home.store
 
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.databinding.ItemStoreProductBinding
@@ -16,7 +17,9 @@ data class Product(
 class StoreAdapter(
     private val products: List<Product>,
     private val onItemClick: (Product) -> Unit
+
 ) : RecyclerView.Adapter<StoreAdapter.StoreViewHolder>() {
+    private var selectedPosition: Int = RecyclerView.NO_POSITION
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StoreViewHolder {
         val binding = ItemStoreProductBinding.inflate(
@@ -29,9 +32,18 @@ class StoreAdapter(
 
     override fun onBindViewHolder(holder: StoreViewHolder, position: Int) {
         val product = products[position]
-        holder.bind(product)
+        holder.bind(product, position == selectedPosition)
+
+        // 아이템 클릭 이벤트 처리
         holder.itemView.setOnClickListener {
-            Log.d("StoreAdapter", "Selected Product: ${product.name}, ResId: ${product.imageResId}")
+            val previousPosition = selectedPosition
+            selectedPosition = position
+
+            // 이전 선택된 아이템과 현재 선택된 아이템만 업데이트
+            notifyItemChanged(previousPosition)
+            notifyItemChanged(selectedPosition)
+
+            // 클릭된 상품 전달
             onItemClick(product)
         }
     }
@@ -41,9 +53,12 @@ class StoreAdapter(
     inner class StoreViewHolder(private val binding: ItemStoreProductBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(product: Product) {
+        fun bind(product: Product, isSelected: Boolean) {
             binding.imgStoreProduct.setImageResource(product.imageResId)
             binding.tvStoreProductName.text = product.name
+
+            binding.imgStoreCollect.visibility = if (isSelected) View.VISIBLE else View.GONE
+
         }
     }
 }

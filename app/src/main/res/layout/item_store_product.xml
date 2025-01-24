@@ -21,9 +21,9 @@
         android:layout_width="72dp"
         android:layout_height="72dp"
         android:src="@drawable/img_product_bowl1"
-        app:layout_constraintTop_toTopOf="@id/bg_product_box"
+        app:layout_constraintEnd_toEndOf="@id/bg_product_box"
         app:layout_constraintStart_toStartOf="@id/bg_product_box"
-        app:layout_constraintEnd_toEndOf="@id/bg_product_box" />
+        app:layout_constraintTop_toTopOf="@id/bg_product_box" />
 
     <LinearLayout
         android:id="@+id/ly_coin_price"
@@ -64,4 +64,13 @@
         app:layout_constraintTop_toBottomOf="@id/ly_coin_price"
         app:layout_constraintStart_toStartOf="@id/bg_product_box"
         app:layout_constraintEnd_toEndOf="@id/bg_product_box" />
+    <ImageView
+        android:id="@+id/img_store_collect"
+        android:layout_width="100dp"
+        android:layout_height="128dp"
+        android:visibility="gone"
+        android:src="@drawable/img_store_choose"
+        android:background="#80000000"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -75,8 +75,6 @@ class ExpenseEntryFragment : Fragment() {
             val date = etDateInput.text.toString()
             val category = SpendingCategory.CUSTOM(detail) // 예시로 `detail`을 사용하여 name을 설정
 
-            tvCategoryInput.text = category.kor
-
             if (detail.isBlank() || amount <= 0) {
                 Toast.makeText(requireContext(), "지출 내용과 금액을 입력해주세요.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
