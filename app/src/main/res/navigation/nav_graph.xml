@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<navigation
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
@@ -15,8 +14,7 @@
             android:id="@+id/action_splashFragment_to_loginFragment"
             app:destination="@id/navigation_login"
             app:popUpTo="@id/navigation_splash"
-            app:popUpToInclusive="true"
-            />
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -26,20 +24,17 @@
         tools:layout="@layout/fragment_login">
         <action
             android:id="@+id/action_loginFragment_to_navigation_home"
-            app:destination="@id/navigation_home"
-            />
+            app:destination="@id/navigation_home" />
         <action
             android:id="@+id/action_loginFragment_to_signupFragment"
-            app:destination="@id/navigation_signup"
-            />
+            app:destination="@id/navigation_signup" />
     </fragment>
 
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.example.yeongkkuel.presentation.home.HomeFragment"
         android:label="fragment_home"
-        tools:layout="@layout/fragment_home">
-    </fragment>
+        tools:layout="@layout/fragment_home"></fragment>
 
     <fragment
         android:id="@+id/navigation_signup"
@@ -61,16 +56,17 @@
             android:id="@+id/action_termsAgreeFragment_to_navigation_home"
             app:destination="@id/navigation_home"
             app:popUpTo="@id/navigation_login"
-            app:popUpToInclusive="true"/>
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
         android:id="@+id/navigation_chat"
         android:name="com.example.yeongkkuel.presentation.chat.ChatFragment"
         android:label="fragment_chat"
-        tools:layout="@layout/fragment_chat">
-    </fragment>
+        tools:layout="@layout/fragment_chat"></fragment>
 
+
+    <!-- stat -->
     <fragment
         android:id="@+id/navigation_stat"
         android:name="com.example.yeongkkuel.presentation.stat.StatFragment"
@@ -79,11 +75,22 @@
     </fragment>
 
     <fragment
+        android:id="@+id/navigation_stat_setting"
+        android:name="com.example.yeongkkuel.presentation.statsettings.settings.StatSettingsFragment"
+        android:label="fragment_stat_settings"
+        tools:layout="@layout/fragment_stat_settings"></fragment>
+
+    <fragment
+        android:id="@+id/navigation_stat_recommendation"
+        android:name="com.example.yeongkkuel.presentation.statsettings.recommendation.StatRecommendationFragment"
+        android:label="fragment_stat_recommendation"
+        tools:layout="@layout/fragment_stat_recommendation"></fragment>
+
+    <fragment
         android:id="@+id/navigation_my"
         android:name="com.example.yeongkkuel.presentation.my.MyFragment"
         android:label="fragment_my"
-        tools:layout="@layout/fragment_my">
-    </fragment>
+        tools:layout="@layout/fragment_my"></fragment>
 
 
 </navigation>

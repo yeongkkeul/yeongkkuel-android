@@ -2,9 +2,9 @@ package com.example.yeongkkuel.presentation.base
 
 import android.os.Bundle
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -17,12 +17,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.ActivityMainBinding
-import com.example.yeongkkuel.presentation.util.dpToPx
 import com.example.yeongkkuel.presentation.botsheet.BotSheetCategoryListAdapter
-import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
 import com.example.yeongkkuel.presentation.botsheet.BotSheetItemTouchHelper
+import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
+import com.example.yeongkkuel.presentation.util.dpToPx
+import com.example.yeongkkuel.presentation.util.toNaviStat
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -40,6 +41,8 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     private val botSheetCategoryListAdapter by lazy {
         BotSheetCategoryListAdapter()
     }
+
+    private var rvBottomSheetCollapseStateHeight: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -86,23 +89,23 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     }
 
 
-
     private fun initView() = with(binding) {
         fun initBottomSheet() {
             val bottomSheet = binding.clItemBotSheet
             val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
 
             val displayHeight = resources.displayMetrics.heightPixels
-            val peekHeight =
-                (displayHeight - 440.dpToPx(this@MainActivity))
+            rvBottomSheetCollapseStateHeight = displayHeight - 500.dpToPx(this@MainActivity)
+            val peekHeight = rvBottomSheetCollapseStateHeight + 60.dpToPx(this@MainActivity)
 
-            // BottomSheet의 초기 상태 설정
+            // BottomSheet 초기 상태 설정
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            bottomSheetBehavior.peekHeight = peekHeight // 계산된 값 설정
+            bottomSheetBehavior.peekHeight = peekHeight
 
-            val height = displayHeight - (440 + 60).dpToPx(this@MainActivity)
-            rvBotSheetCategory.layoutParams.height = height
-            rvBotSheetCategory.requestLayout() // 레이아웃 강제 갱신
+            // RecyclerView 초기 높이 설정
+
+            binding.rvBotSheetCategory.layoutParams.height = rvBottomSheetCollapseStateHeight
+            binding.rvBotSheetCategory.requestLayout()
 
             // BottomSheet 이벤트 핸들링
             bottomSheetBehavior.addBottomSheetCallback(object :
@@ -110,18 +113,17 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
                     when (newState) {
                         BottomSheetBehavior.STATE_COLLAPSED -> {
-                            val height = displayHeight - (440 + 60).dpToPx(this@MainActivity)
-                            rvBotSheetCategory.layoutParams.height = height
-                            rvBotSheetCategory.requestLayout() // 레이아웃 강제 갱신
+                            val collapsedHeight = rvBottomSheetCollapseStateHeight
+                            updateRecyclerViewHeight(collapsedHeight)
                         }
 
                         BottomSheetBehavior.STATE_EXPANDED -> {
-                            val height = displayHeight - 140.dpToPx(this@MainActivity)
-                            rvBotSheetCategory.layoutParams.height = height
-                            rvBotSheetCategory.requestLayout() // 레이아웃 강제 갱신
+                            val expandedHeight = displayHeight - 140.dpToPx(this@MainActivity)
+                            updateRecyclerViewHeight(expandedHeight)
                         }
+
                         else -> {
-                            // 기타 상태 처리 (예: 드래그 상태 등)
+                            // 기타 상태 처리
                         }
                     }
                 }
@@ -160,7 +162,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                         onMove = { fromPosition, toPosition ->
                             botSheetViewModel.moveCategory(
                                 fromPosition = fromPosition,
-                                toPosition =toPosition
+                                toPosition = toPosition
                             )
                         })
                 )
@@ -173,7 +175,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             tvBottomSheetDate.text = formattedDateSheet
         }
 
-        fun initNav(){
+        fun initNav() {
             val navHostFragment =
                 supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
 
@@ -212,19 +214,61 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             navController.addOnDestinationChangedListener { _, destination, _ ->
                 when (destination.id) {
                     R.id.navigation_home,
-                    R.id.navigation_stat -> setBotSheetVisible()
+                    R.id.navigation_stat,
+                        -> setBotSheetVisible()
+
 
                     else -> setBotSheetGone()
                 }
             }
+
+            // 바텀네비게이션 뷰 숨김 처리 - 스플래시, 로그인
+            navController.addOnDestinationChangedListener { _, destination, _ ->
+                when (destination.id) {
+                    R.id.navigation_splash,
+                    R.id.navigation_login,
+                    R.id.navigation_signup,
+                    R.id.navigation_stat_setting,
+                    R.id.navigation_stat_recommendation,
+                    R.id.navigation_terms_agree -> hideBottomNavigation(
+                        true
+                    )
+
+                    else -> hideBottomNavigation(false)
+                }
+            }
+        }
+
+        fun initBack() {
+            val backPressedCallback = object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    // NavHostFragment를 통해 NavController 가져오기
+                    val navHostFragment =
+                        supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+                    val navController = navHostFragment.navController
+
+                    // 이전 백 스택 항목이 navigation_stat인지 확인
+                    val previousBackStackEntry = navController.previousBackStackEntry
+                    if (previousBackStackEntry?.destination?.id == R.id.navigation_stat) {
+                        navController.toNaviStat()
+                    } else if (previousBackStackEntry != null) {
+                        navController.popBackStack()
+                    } else {
+                        finish()
+                    }
+                }
+            }
+
+            onBackPressedDispatcher.addCallback(this@MainActivity, backPressedCallback)
         }
 
 
         initBottomSheet()
         initNav()
+        initBack()
     }
 
-    private fun initViewModel() = with(botSheetViewModel){
+    private fun initViewModel() = with(botSheetViewModel) {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
 
@@ -236,14 +280,13 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     onBind(uiState)
                 }
         }
+    }
 
-        // 바텀네비게이션 뷰 숨김 처리 - 스플래시, 로그인 , 회원가입 , 약관동의
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            when (destination.id) {
-                R.id.navigation_splash, R.id.navigation_login, R.id.navigation_signup, R.id.navigation_terms_agree -> hideBottomNavigation(true)
-                else -> hideBottomNavigation(false)
-            }
+    private fun updateRecyclerViewHeight(newHeight: Int) {
+        binding.rvBotSheetCategory.layoutParams = binding.rvBotSheetCategory.layoutParams.apply {
+            height = newHeight
         }
+        binding.rvBotSheetCategory.requestLayout()
     }
 
 
@@ -251,11 +294,12 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         if (state) binding.bottomNavi.visibility = View.GONE else binding.bottomNavi.visibility =
             View.VISIBLE
     }
+
     private fun checkInitialization(): Boolean {
         return false // false를 반환하면 스플래시 화면 종료
     }
 
-    private fun onBind(uiState: BotSheetUiState) = with(binding){
+    private fun onBind(uiState: BotSheetUiState) = with(binding) {
         fun initRvData() {
             botSheetCategoryListAdapter.submitList(uiState.spendingList)
         }
@@ -263,9 +307,12 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         initRvData()
     }
 
-    override fun setPeekHeight(peekHeight: Int){
+    override fun setPeekHeight(peekHeight: Int) {
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.clItemBotSheet)
         bottomSheetBehavior.peekHeight = peekHeight
+
+        rvBottomSheetCollapseStateHeight = peekHeight - 60.dpToPx(this@MainActivity)
+        updateRecyclerViewHeight(rvBottomSheetCollapseStateHeight)
     }
 
     override fun setBotSheetGone() {
