@@ -86,4 +86,11 @@ dependencies {
 
     // ActivityViewModels
     implementation(libs.androidx.activity.ktx)
+
+    // Retrofit
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
+    implementation(libs.gson)
 }
