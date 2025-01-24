@@ -37,7 +37,6 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavController
 
 class MainActivity : AppCompatActivity(), BotSheetListener {
-
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
 
