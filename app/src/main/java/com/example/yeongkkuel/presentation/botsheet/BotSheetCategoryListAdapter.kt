@@ -1,5 +1,6 @@
 package com.example.yeongkkuel.presentation.botsheet
 
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -21,7 +22,11 @@ class BotSheetCategoryListAdapter(
 
         fun onBind(item: BotSheetUiState.Spending) = with(binding) {
             tvCategory.text = item.kind.kor
-            tvCategory.setTextColor(ContextCompat.getColor(binding.root.context, item.color.id))
+            item.color.id.let {
+                val context = binding.root.context
+                tvCategory.setTextColor(ContextCompat.getColor(context, it))
+                clBtnAdd.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, it))
+            }
 
             rvHistory.run {
                 adapter = historyListAdapter
