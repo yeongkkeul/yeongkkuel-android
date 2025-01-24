@@ -42,6 +42,8 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         BotSheetCategoryListAdapter()
     }
 
+    private var rvBottomSheetCollapseStateHeight: Int = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         // 스플래시 화면 설정
@@ -93,16 +95,17 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
 
             val displayHeight = resources.displayMetrics.heightPixels
-            val peekHeight =
-                (displayHeight - 440.dpToPx(this@MainActivity))
+            rvBottomSheetCollapseStateHeight = displayHeight - 500.dpToPx(this@MainActivity)
+            val peekHeight = rvBottomSheetCollapseStateHeight + 60.dpToPx(this@MainActivity)
 
-            // BottomSheet의 초기 상태 설정
+            // BottomSheet 초기 상태 설정
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            bottomSheetBehavior.peekHeight = peekHeight // 계산된 값 설정
+            bottomSheetBehavior.peekHeight = peekHeight
 
-            val height = displayHeight - (440 + 60).dpToPx(this@MainActivity)
-            rvBotSheetCategory.layoutParams.height = height
-            rvBotSheetCategory.requestLayout() // 레이아웃 강제 갱신
+            // RecyclerView 초기 높이 설정
+
+            binding.rvBotSheetCategory.layoutParams.height = rvBottomSheetCollapseStateHeight
+            binding.rvBotSheetCategory.requestLayout()
 
             // BottomSheet 이벤트 핸들링
             bottomSheetBehavior.addBottomSheetCallback(object :
@@ -110,19 +113,17 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
                     when (newState) {
                         BottomSheetBehavior.STATE_COLLAPSED -> {
-                            val height = displayHeight - (440 + 60).dpToPx(this@MainActivity)
-                            rvBotSheetCategory.layoutParams.height = height
-                            rvBotSheetCategory.requestLayout() // 레이아웃 강제 갱신
+                            val collapsedHeight = rvBottomSheetCollapseStateHeight
+                            updateRecyclerViewHeight(collapsedHeight)
                         }
 
                         BottomSheetBehavior.STATE_EXPANDED -> {
-                            val height = displayHeight - 140.dpToPx(this@MainActivity)
-                            rvBotSheetCategory.layoutParams.height = height
-                            rvBotSheetCategory.requestLayout() // 레이아웃 강제 갱신
+                            val expandedHeight = displayHeight - 140.dpToPx(this@MainActivity)
+                            updateRecyclerViewHeight(expandedHeight)
                         }
 
                         else -> {
-                            // 기타 상태 처리 (예: 드래그 상태 등)
+                            // 기타 상태 처리
                         }
                     }
                 }
@@ -281,6 +282,13 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         }
     }
 
+    private fun updateRecyclerViewHeight(newHeight: Int) {
+        binding.rvBotSheetCategory.layoutParams = binding.rvBotSheetCategory.layoutParams.apply {
+            height = newHeight
+        }
+        binding.rvBotSheetCategory.requestLayout()
+    }
+
 
     private fun hideBottomNavigation(state: Boolean) {
         if (state) binding.bottomNavi.visibility = View.GONE else binding.bottomNavi.visibility =
@@ -302,6 +310,9 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     override fun setPeekHeight(peekHeight: Int) {
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.clItemBotSheet)
         bottomSheetBehavior.peekHeight = peekHeight
+
+        rvBottomSheetCollapseStateHeight = peekHeight - 60.dpToPx(this@MainActivity)
+        updateRecyclerViewHeight(rvBottomSheetCollapseStateHeight)
     }
 
     override fun setBotSheetGone() {
