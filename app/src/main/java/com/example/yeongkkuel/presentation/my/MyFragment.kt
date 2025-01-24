@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -38,6 +39,9 @@ class MyFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
+
 
         observeViewModel()
         // 클릭 리스너들
@@ -96,6 +100,8 @@ class MyFragment : Fragment() {
         binding.tvWithdraw.setOnClickListener {
             showWithdrawModal()
         }
+
+
     }
 
     // 모달
@@ -230,8 +236,60 @@ class MyFragment : Fragment() {
         dialog.setCancelable(false)
 
 
+        val ivCheckLowUsage = dialog.findViewById<ImageView>(R.id.ivCheckLowUsage)
+        val ivCheckService = dialog.findViewById<ImageView>(R.id.ivCheckService)
+        val ivCheckBoredom = dialog.findViewById<ImageView>(R.id.ivCheckBoredom)
+        val ivCheckDifficulty = dialog.findViewById<ImageView>(R.id.ivCheckDifficulty)
+        val ivCheckElse = dialog.findViewById<ImageView>(R.id.ivCheckElse)
+
         val withdrawBtn = dialog.findViewById<TextView>(R.id.tv_withdraw)
         val cancelBtn = dialog.findViewById<TextView>(R.id.tv_cancel)
+        val tvElseDetailCount = dialog.findViewById<TextView>(R.id.tvElseDetailCount)
+
+        val etElseDetail = dialog.findViewById<EditText>(R.id.et_else_detail)
+
+        ivCheckLowUsage.setOnClickListener {
+            resetAllChecks(dialog)
+            ivCheckLowUsage.isSelected = !ivCheckLowUsage.isSelected
+            withdrawBtn.isEnabled = ivCheckLowUsage.isSelected
+
+        }
+        ivCheckService.setOnClickListener {
+            resetAllChecks(dialog)
+            ivCheckService.isSelected = !ivCheckService.isSelected
+            withdrawBtn.isEnabled = ivCheckService.isSelected
+
+        }
+        ivCheckBoredom.setOnClickListener {
+            resetAllChecks(dialog)
+            ivCheckBoredom.isSelected = !ivCheckBoredom.isSelected
+            withdrawBtn.isEnabled = ivCheckBoredom.isSelected
+        }
+        ivCheckDifficulty.setOnClickListener {
+            resetAllChecks(dialog)
+            ivCheckDifficulty.isSelected = !ivCheckDifficulty.isSelected
+            withdrawBtn.isEnabled = ivCheckDifficulty.isSelected
+        }
+        ivCheckElse.setOnClickListener {
+            resetAllChecks(dialog)
+            ivCheckElse.isSelected = !ivCheckElse.isSelected
+            etElseDetail.isEnabled = ivCheckElse.isSelected
+
+
+            etElseDetail.addTextChangedListener(object : android.text.TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                }
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    tvElseDetailCount.text = "${s?.length ?: 0}/100"
+                }
+
+                override fun afterTextChanged(s: android.text.Editable?) {
+                    withdrawBtn.isEnabled = s?.length!! > 0
+                }
+            })
+
+        }
 
         withdrawBtn.setOnClickListener {
             //TODO: 탈퇴 로직
@@ -246,7 +304,27 @@ class MyFragment : Fragment() {
         cancelBtn.setOnClickListener {
             dialog.dismiss()
         }
+
     }
+
+    private fun resetAllChecks(dialog: Dialog) {
+        val ivCheckLowUsage = dialog.findViewById<ImageView>(R.id.ivCheckLowUsage)
+        val ivCheckService = dialog.findViewById<ImageView>(R.id.ivCheckService)
+        val ivCheckBoredom = dialog.findViewById<ImageView>(R.id.ivCheckBoredom)
+        val ivCheckDifficulty = dialog.findViewById<ImageView>(R.id.ivCheckDifficulty)
+        val ivCheckElse = dialog.findViewById<ImageView>(R.id.ivCheckElse)
+        val etElseDetail = dialog.findViewById<EditText>(R.id.et_else_detail)
+        val withdrawBtn = dialog.findViewById<TextView>(R.id.tv_withdraw)
+
+        ivCheckLowUsage.isSelected = false
+        ivCheckService.isSelected = false
+        ivCheckBoredom.isSelected = false
+        ivCheckDifficulty.isSelected = false
+        ivCheckElse.isSelected = false
+        etElseDetail.isEnabled = false
+        withdrawBtn.isEnabled = false
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

@@ -155,7 +155,7 @@
         android:orientation="vertical">
 
         <EditText
-            android:id="@+id/etNickname"
+            android:id="@+id/et_else_detail"
             android:layout_width="match_parent"
             android:layout_height="76dp"
             android:layout_weight="1"
@@ -163,10 +163,11 @@
             android:hint=""
             android:maxLength="30"
             android:padding="8dp"
+            android:enabled="false"
             android:textSize="14sp" />
 
         <TextView
-            android:id="@+id/tvNicknameCount"
+            android:id="@+id/tvElseDetailCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
