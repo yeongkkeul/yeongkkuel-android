@@ -26,7 +26,7 @@ object RetrofitClient {
             .build()
     }
 
-    val search: YeongkkuelService by lazy {
+    val yeongkkuelService: YeongkkuelService by lazy {
         retrofit.create(YeongkkuelService::class.java)
     }
 }

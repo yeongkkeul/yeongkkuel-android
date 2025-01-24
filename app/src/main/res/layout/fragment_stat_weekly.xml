@@ -24,7 +24,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
-                android:id="@+id/tv_targetSpending"
+                android:id="@+id/tv_totalSpending"
                 style="@style/title_semib"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -41,8 +41,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/space_x_small"
                 android:textColor="@color/white"
-                app:layout_constraintBottom_toBottomOf="@id/tv_targetSpending"
-                app:layout_constraintStart_toEndOf="@id/tv_targetSpending"
+                app:layout_constraintBottom_toBottomOf="@id/tv_totalSpending"
+                app:layout_constraintStart_toEndOf="@id/tv_totalSpending"
                 tools:text="11월 2주" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 

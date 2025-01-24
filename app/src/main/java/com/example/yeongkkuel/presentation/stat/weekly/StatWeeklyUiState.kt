@@ -7,6 +7,7 @@ import com.github.mikephil.charting.data.Entry
 
 data class StatWeeklyUiState(
     val targetSpending: Int,
+    val totalSpending: Int,
     val weekList: List<DayData>,
     val compareList: List<CompareData>,
     val pieChartList: List<PieChartData>
@@ -80,7 +81,8 @@ data class StatWeeklyUiState(
                     expenditure = 158000,
                     Colors.BLUE
                 ),
-            )
+            ),
+            totalSpending = 56700
         )
     }
 }
