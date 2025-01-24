@@ -8,8 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.example.yeongkkuel.databinding.ItemStatRecommendationInputAverageBinding
-import com.example.yeongkkuel.presentation.stat.weekly.StatWeeklyUiState
-import com.example.yeongkkuel.presentation.statsettings.StatSettingsUiState
 import com.example.yeongkkuel.presentation.statsettings.StatSettingsViewModel
 import com.example.yeongkkuel.presentation.util.clearComma
 import com.example.yeongkkuel.presentation.util.setLimit
@@ -39,6 +37,7 @@ class StatRecommendationInputAverageFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
+        initViewModel()
     }
 
     private fun initView() = with(binding) {
@@ -71,6 +70,14 @@ class StatRecommendationInputAverageFragment(
         }
     }
 
+    private fun initViewModel() = with(viewModel){
+        viewLifecycleOwner.lifecycleScope.launch {
+            uiState.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+                .collectLatest { uiState ->
+                    binding.etOutcome.text = uiState.averageOutcome?.toMoneyString()?.toEditable()
+                }
+        }
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
