@@ -49,7 +49,21 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         navController = Navigation.findNavController(view)
-
+        val productIcons = arguments?.getIntArray("productIcons") ?: intArrayOf()
+        if (productIcons.isNotEmpty()) {
+            binding.productContainer.removeAllViews() // 기존 뷰 초기화
+            productIcons.forEach { iconResId ->
+                val imageView = ImageView(requireContext()).apply {
+                    layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    )
+                    setImageResource(iconResId)
+                    scaleType = ImageView.ScaleType.CENTER_CROP
+                }
+                binding.productContainer.addView(imageView)
+            }
+        }
         binding.imgHomeStore.setOnClickListener {
             binding.bgHomeStore.visibility = View.GONE
             binding.bgHomeStoreClick.visibility = View.VISIBLE

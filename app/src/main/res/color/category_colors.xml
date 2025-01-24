@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/red1" android:state_checked="true" />
+    <item android:color="@color/red2" android:state_pressed="true" />
+    <item android:color="@color/pink3" android:state_enabled="true" />
+    <item android:color="@color/purple4" android:state_enabled="true" />
+    <item android:color="@color/purple5" android:state_enabled="true" />
+    <item android:color="@color/blue6" android:state_enabled="true" />
+    <item android:color="@color/blue7" android:state_enabled="true" />
+    <item android:color="@color/blue8" android:state_enabled="true" />
+    <item android:color="@color/green9" android:state_enabled="true" />
+    <item android:color="@color/green10" android:state_enabled="true" />
+    <item android:color="@color/green11" android:state_enabled="true" />
+    <item android:color="@color/green12" android:state_enabled="true" />
+    <item android:color="@color/yellow13" android:state_enabled="true" />
+    <item android:color="@color/orange14" android:state_enabled="true" />
+    <item android:color="@color/orange15" />
+</selector>

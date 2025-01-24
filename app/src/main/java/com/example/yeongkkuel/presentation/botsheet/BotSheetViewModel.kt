@@ -4,11 +4,11 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.presentation.home.category.Category
-import com.example.yeongkkuel.presentation.util.Colors
 import com.example.yeongkkuel.presentation.util.SpendingCategory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import com.example.yeongkkuel.presentation.util.Colors
 
 class BotSheetViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<BotSheetUiState>(BotSheetUiState.init())
@@ -42,7 +42,7 @@ class BotSheetViewModel : ViewModel() {
     // 카테고리 추가 기능
     fun addCategory(category: Category) {
         val spendingCategory = SpendingCategory.CUSTOM(category.name)
-        val categoryColor = mapCategoryToColor(category.color) // Int 값을 Colors로 변환
+        val categoryColor = Colors.fromId(category.color) ?: Colors.RED1 // Enum으로 변환, 기본값 RED1
         val plusIconResId = mapCategoryToIcon(categoryColor)  // 아이콘도 색상에 맞게 설정
 
         _uiState.update { prev ->
@@ -60,20 +60,7 @@ class BotSheetViewModel : ViewModel() {
         }
     }
 
-    // 카테고리 이름을 매핑하는 함수 (이제 입력된 이름을 그대로 사용)
-    private fun mapCategoryToSpendingCategory(categoryName: String): SpendingCategory {
-        return SpendingCategory.CUSTOM(categoryName)// 모든 카테고리를 기본 CUSTOM으로 설정
-    }
-
-    private fun mapCategoryToColor(categoryColor: Int): Colors {
-        // 이제 Colors enum으로 변환할 필요 없이 그대로 반환
-        return Colors.values().firstOrNull { it.id == categoryColor } ?: Colors.GREEN
-    }
     private fun mapCategoryToIcon(color: Colors): Int {
-        return when (color) {
-            Colors.PINK -> R.drawable.ic_plus_pink
-            Colors.BLUE -> R.drawable.ic_plus_blue
-            Colors.GREEN -> R.drawable.ic_plus_green
-        }
+        return R.drawable.ic_plus_default // 모든 아이콘은 동일한 XML을 사용
     }
 }

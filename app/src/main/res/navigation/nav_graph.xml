@@ -158,13 +158,17 @@
         android:id="@+id/navigation_stat_setting"
         android:name="com.example.yeongkkuel.presentation.statsettings.settings.StatSettingsFragment"
         android:label="fragment_stat_settings"
-        tools:layout="@layout/fragment_stat_settings"></fragment>
+        tools:layout="@layout/fragment_stat_settings">
+
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_stat_recommendation"
         android:name="com.example.yeongkkuel.presentation.statsettings.recommendation.StatRecommendationFragment"
         android:label="fragment_stat_recommendation"
-        tools:layout="@layout/fragment_stat_recommendation"></fragment>
+        tools:layout="@layout/fragment_stat_recommendation">
+
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_my"

@@ -183,11 +183,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_box_white"
+        app:tabIndicatorHeight="0dp"
         app:tabIndicatorColor="@color/main3"
         app:layout_constraintTop_toBottomOf="@id/img_bird_background"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:tabIndicatorHeight="4dp"
+        android:layout_marginStart="20dp"
         app:tabGravity="center"
         app:tabPaddingStart="0dp"
         app:tabPaddingEnd="0dp"/>
@@ -201,44 +201,29 @@
         android:padding="16dp"
         android:scrollbars="horizontal"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintTop_toBottomOf="@id/tab_layout"
-        app:layout_constraintBottom_toTopOf="@id/ly_purchase_button" />
-
-    <!-- 구매 버튼 -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/ly_purchase_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/tab_layout" />
 
         <ImageView
             android:id="@+id/img_purchase_icon"
             android:layout_width="80dp"
             android:layout_height="40dp"
             android:layout_marginStart="4dp"
-            android:layout_marginTop="8dp"
             android:layout_marginBottom="20dp"
-            android:visibility="invisible"
+            android:visibility="visible"
             android:src="@drawable/ic_store_topurchase"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent" />
         <ImageView
             android:id="@+id/img_save_icon"
             android:layout_width="80dp"
             android:layout_height="40dp"
             android:layout_marginStart="4dp"
-            android:layout_marginTop="8dp"
             android:layout_marginBottom="20dp"
             android:visibility="gone"
             android:src="@drawable/ic_store_tosave"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

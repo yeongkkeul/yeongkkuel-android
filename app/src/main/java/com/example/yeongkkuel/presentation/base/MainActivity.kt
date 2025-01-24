@@ -1,7 +1,6 @@
 package com.example.yeongkkuel.presentation.base
 
 import android.os.Bundle
-import android.view.MotionEvent
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
@@ -32,8 +31,6 @@ import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import androidx.core.splashscreen.SplashScreen
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavController
 
 class MainActivity : AppCompatActivity(), BotSheetListener {
@@ -51,7 +48,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         // 스플래시 화면 설정
-        /*val splashScreen = this.installSplashScreen()
+        val splashScreen = this.installSplashScreen()
 
         splashScreen.setOnExitAnimationListener { splashScreenView ->
             splashScreenView.iconView.animate()
@@ -61,7 +58,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     splashScreenView.remove()
                 }
                 .start()
-        }*/
+        }
 
         super.onCreate(savedInstanceState)
 
@@ -72,10 +69,10 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
 
 
         // 스플래시 화면 종료 조건 설정 (예: 데이터 초기화 완료)
-        /*splashScreen.setKeepOnScreenCondition {
+        splashScreen.setKeepOnScreenCondition {
             // 앱 초기화 작업이 완료될 때까지 유지
             checkInitialization()
-        }*/
+        }
 
         setupHamburgerClickListener() // 카테고리 더보기 기능 추가
 
@@ -109,9 +106,10 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
 
             val displayHeight = resources.displayMetrics.heightPixels
-            rvBottomSheetCollapseStateHeight = displayHeight - 500.dpToPx(this@MainActivity)
             val peekHeight = rvBottomSheetCollapseStateHeight + 60.dpToPx(this@MainActivity)
 
+
+            rvBottomSheetCollapseStateHeight = displayHeight - 500.dpToPx(this@MainActivity)
             // BottomSheet 초기 상태 설정
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             bottomSheetBehavior.peekHeight = peekHeight
@@ -137,7 +135,6 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                         }
 
                         else -> {
-                            // 기타 상태 처리
                         }
                     }
                 }
@@ -251,6 +248,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     else -> hideBottomNavigation(false)
                 }
             }
+
         }
 
         fun initBack() {
@@ -368,7 +366,6 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.clItemBotSheet)
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
-
     override fun navigateToExpenseEntry() {
         // NavController를 이용해 지출 기입 페이지로 이동
         val navHostFragment =
@@ -378,6 +375,4 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         // 지출 기입 페이지로 이동
         navController.navigate(R.id.expenseEntryFragment)
     }
-
-
 }

@@ -51,7 +51,8 @@ class StoreFragment : Fragment() {
         }
 
 
-        binding.lyPurchaseButton.setOnClickListener {
+
+        binding.imgPurchaseIcon.setOnClickListener {
             selectedProduct?.let {
                 Log.d("StoreFragment", "Passing to Dialog: ${it.name}, ResId: ${it.imageResId}")
                 showPurchaseDialog(it)
@@ -180,15 +181,36 @@ class StoreFragment : Fragment() {
 
         binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
+                // 탭 커스텀 뷰 업데이트
                 tab?.customView?.let { updateTabView(it, isSelected = true) }
+
+                // 탭 위치에 따른 동작
                 tab?.position?.let { position ->
                     when (position) {
-                        0 -> updateProductList(getProductsByCategory(ProductCategory.SWING))
-                        1 -> updateProductList(getProductsByCategory(ProductCategory.TOY))
-                        2 -> updateProductList(getProductsByCategory(ProductCategory.BOWL))
-                        3 -> updateProductList(getProductsByCategory(ProductCategory.NEST))
-                        4 -> updateProductList(myProducts, isMyTab = true)
-                        else -> updateProductList(emptyList())
+                        0 -> {
+                            updateProductList(getProductsByCategory(ProductCategory.SWING))
+                            showPurchaseIconOnly()
+                        }
+                        1 -> {
+                            updateProductList(getProductsByCategory(ProductCategory.TOY))
+                            showPurchaseIconOnly()
+                        }
+                        2 -> {
+                            updateProductList(getProductsByCategory(ProductCategory.BOWL))
+                            showPurchaseIconOnly()
+                        }
+                        3 -> {
+                            updateProductList(getProductsByCategory(ProductCategory.NEST))
+                            showPurchaseIconOnly()
+                        }
+                        4 -> {
+                            updateProductList(myProducts, isMyTab = true)
+                            showSaveIconOnly()
+                        }
+                        else -> {
+                            updateProductList(emptyList())
+                            showPurchaseIconOnly()
+                        }
                     }
                 }
             }
@@ -197,8 +219,23 @@ class StoreFragment : Fragment() {
                 tab?.customView?.let { updateTabView(it, isSelected = false) }
             }
 
-            override fun onTabReselected(tab: TabLayout.Tab?) {}
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+                // 재선택 이벤트 처리 필요 시 여기에 추가
+            }
+
+            // Helper 함수: Purchase 아이콘 표시
+            private fun showPurchaseIconOnly() {
+                binding.imgSaveIcon.visibility = View.GONE
+                binding.imgPurchaseIcon.visibility = View.VISIBLE
+            }
+
+            // Helper 함수: Save 아이콘 표시
+            private fun showSaveIconOnly() {
+                binding.imgSaveIcon.visibility = View.VISIBLE
+                binding.imgPurchaseIcon.visibility = View.GONE
+            }
         })
+
     }
 
     private fun createCustomTabView(title: String, isSelected: Boolean): View {
