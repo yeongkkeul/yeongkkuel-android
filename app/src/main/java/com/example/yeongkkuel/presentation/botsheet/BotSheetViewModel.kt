@@ -2,20 +2,23 @@ package com.example.yeongkkuel.presentation.botsheet
 
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
-import com.example.yeongkkuel.R
-import com.example.yeongkkuel.presentation.home.category.Category
+import androidx.lifecycle.viewModelScope
+import com.example.yeongkkuel.presentation.network.RetrofitClient
+import com.example.yeongkkuel.presentation.util.Colors
 import com.example.yeongkkuel.presentation.util.SpendingCategory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import com.example.yeongkkuel.presentation.util.Colors
+import kotlinx.coroutines.launch
+import java.util.Calendar
 
 class BotSheetViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<BotSheetUiState>(BotSheetUiState.init())
     val uiState = _uiState.asStateFlow()
 
-    // 카테고리 이동 기능
-    fun moveCategory(fromPosition: Int, toPosition: Int) {
+    private val yeongkkuelService = RetrofitClient.yeongkkuelService
+
+    fun moveCategory(fromPosition: Int, toPosition:Int){
         val updateList = uiState.value.spendingList.toMutableList()
         val item = updateList.removeAt(fromPosition)
         updateList.add(toPosition, item)
@@ -24,7 +27,6 @@ class BotSheetViewModel : ViewModel() {
             prev.copy(spendingList = updateList)
         }
     }
-
     // 지출 내역 추가 기능
     fun addExpenseToCategory(category: SpendingCategory, history: BotSheetUiState.Spending.History) {
         _uiState.update { prev ->
@@ -62,5 +64,60 @@ class BotSheetViewModel : ViewModel() {
 
     private fun mapCategoryToIcon(color: Colors): Int {
         return R.drawable.ic_plus_default // 모든 아이콘은 동일한 XML을 사용
+    }
+    fun getDayTargetSpending() = viewModelScope.launch {
+        try {
+            yeongkkuelService.getExpendituresDay().run {
+                if(isSuccess){
+                    result.run {
+                        _uiState.update { prev->
+                            prev.copy(
+                                targetSpending = dayTargetExpenditure
+                            )
+                        }
+                    }
+                }
+            }
+        }catch (e:Exception){
+            e.printStackTrace()
+        }
+    }
+
+    fun getSpendingList() = viewModelScope.launch {
+        try {
+            val calendar = Calendar.getInstance()
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH) + 1
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            yeongkkuelService.getExpendituresMonthCategory(
+                year = year,
+                month = month,
+                day = day
+            ).run {
+                if(isSuccess){
+                    result.run{
+                        _uiState.update { prev->
+                            prev.copy(
+                                spendingList = categories.map {
+                                    BotSheetUiState.Spending(
+                                        kind = SpendingCategory.fromKor(it.categoryName),
+                                        color = Colors.fromCode(it.categoryColor),
+                                        history = it.expenses.map {
+                                            BotSheetUiState.Spending.History(
+                                                name = it.expenseName,
+                                                price = it.expenseAmount
+                                            )
+                                        }
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        }catch (e:Exception){
+            e.printStackTrace()
+        }
     }
 }
