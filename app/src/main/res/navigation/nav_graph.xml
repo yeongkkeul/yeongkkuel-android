@@ -151,8 +151,7 @@
         android:id="@+id/navigation_stat"
         android:name="com.example.yeongkkuel.presentation.stat.StatFragment"
         android:label="fragment_stat"
-        tools:layout="@layout/fragment_stat">
-    </fragment>
+        tools:layout="@layout/fragment_stat"></fragment>
 
     <fragment
         android:id="@+id/navigation_stat_setting"
@@ -175,7 +174,50 @@
         android:name="com.example.yeongkkuel.presentation.my.MyFragment"
         android:label="fragment_my"
         tools:layout="@layout/fragment_my">
+        <action
+            android:id="@+id/action_myFragment_to_navigation_my_edit"
+            app:destination="@id/navigation_my_edit" />
+        <action
+            android:id="@+id/action_myFragment_to_navigation_daily_expense_goal"
+            app:destination="@id/navigation_daily_expense_goal" />
+        <action
+            android:id="@+id/action_myPageFragment_to_notificationFragment"
+            app:destination="@id/navigation_notification" />
+        <action
+            android:id="@+id/action_myPageFragment_to_rewardFragment"
+            app:destination="@+id/navigation_reward"/>
     </fragment>
+
+
+
+<!--TODO 나의 챌린저 그룹, 지출/일간 화면으로 이동 -->
+    <fragment
+        android:id="@+id/navigation_notification"
+        android:name="com.example.yeongkkuel.presentation.my.NotificationFragment"
+        android:label="fragment_notification"
+        tools:layout="@layout/fragment_notification">
+        <action
+            android:id="@+id/action_notificationFragment_to_rewardFragment"
+            app:destination="@id/navigation_reward" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_reward"
+        android:name="com.example.yeongkkuel.presentation.my.reward.RewardFragment"
+        android:label="fragment_reward"
+        tools:layout="@layout/fragment_reward"></fragment>
+
+    <fragment
+        android:id="@+id/navigation_my_edit"
+        android:name="com.example.yeongkkuel.presentation.my.EditProfileFragment"
+        android:label="fragment_my_edit"
+        tools:layout="@layout/fragment_edit_profile"></fragment>
+
+    <fragment
+        android:id="@+id/navigation_daily_expense_goal"
+        android:name="com.example.yeongkkuel.presentation.my.DailyExpenseGoalFragment"
+        android:label="fragment_my_edit"
+        tools:layout="@layout/fragment_daily_expense_goal"></fragment>
 
 
 </navigation>
