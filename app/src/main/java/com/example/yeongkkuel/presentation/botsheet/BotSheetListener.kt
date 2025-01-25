@@ -4,4 +4,5 @@ interface BotSheetListener {
     fun setPeekHeight(peekHeight: Int)
     fun setBotSheetGone()
     fun setBotSheetVisible()
+    fun navigateToExpenseEntry()
 }

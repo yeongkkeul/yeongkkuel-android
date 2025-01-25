@@ -67,19 +67,19 @@ data class StatWeeklyUiState(
             ),
             pieChartList = listOf(
                 PieChartData(
-                    category = SpendingCategory.SNACK,
+                    category = SpendingCategory.CUSTOM("기타"),
                     expenditure = 15800,
-                    Colors.GREEN
+                    Colors.GREEN9
                 ),
                 PieChartData(
-                    category = SpendingCategory.SHOP,
+                    category = SpendingCategory.CUSTOM("기타"),
                     expenditure = 158000,
-                    Colors.PINK
+                    Colors.PINK3
                 ),
                 PieChartData(
-                    category = SpendingCategory.ETC,
+                    category = SpendingCategory.CUSTOM("기타"),
                     expenditure = 158000,
-                    Colors.BLUE
+                    Colors.BLUE6
                 ),
             ),
             totalSpending = 56700

@@ -1,5 +1,6 @@
 package com.example.yeongkkuel.presentation.botsheet
 
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yeongkkuel.presentation.network.RetrofitClient
@@ -11,7 +12,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
-class BotSheetViewModel:ViewModel() {
+class BotSheetViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<BotSheetUiState>(BotSheetUiState.init())
     val uiState = _uiState.asStateFlow()
 
@@ -22,13 +23,48 @@ class BotSheetViewModel:ViewModel() {
         val item = updateList.removeAt(fromPosition)
         updateList.add(toPosition, item)
 
-        _uiState.update {prev->
-            prev.copy(
-                spendingList = updateList
-            )
+        _uiState.update { prev ->
+            prev.copy(spendingList = updateList)
+        }
+    }
+    // 지출 내역 추가 기능
+    fun addExpenseToCategory(category: SpendingCategory, history: BotSheetUiState.Spending.History) {
+        _uiState.update { prev ->
+            val updatedList = prev.spendingList.map { spending ->
+                if (spending.kind == category) {
+                    spending.copy(history = spending.history + history) // 기존 내역에 새 내역 추가
+                } else {
+                    spending
+                }
+            }
+            prev.copy(spendingList = updatedList)
         }
     }
 
+    // 카테고리 추가 기능
+    fun addCategory(category: Category) {
+        val spendingCategory = SpendingCategory.CUSTOM(category.name)
+        val categoryColor = Colors.fromId(category.color) ?: Colors.RED1 // Enum으로 변환, 기본값 RED1
+        val plusIconResId = mapCategoryToIcon(categoryColor)  // 아이콘도 색상에 맞게 설정
+
+        _uiState.update { prev ->
+            val updatedList = prev.spendingList.toMutableList().apply {
+                add(
+                    BotSheetUiState.Spending(
+                        kind = spendingCategory,
+                        color = categoryColor,
+                        plusIconResId = plusIconResId,
+                        history = emptyList() // 초기값으로 빈 리스트
+                    )
+                )
+            }
+            prev.copy(spendingList = updatedList)
+        }
+    }
+
+    private fun mapCategoryToIcon(color: Colors): Int {
+        return R.drawable.ic_plus_default // 모든 아이콘은 동일한 XML을 사용
+    }
     fun getDayTargetSpending() = viewModelScope.launch {
         try {
             yeongkkuelService.getExpendituresDay().run {
