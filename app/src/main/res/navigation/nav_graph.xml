@@ -34,7 +34,42 @@
         android:id="@+id/navigation_home"
         android:name="com.example.yeongkkuel.presentation.home.HomeFragment"
         android:label="fragment_home"
-        tools:layout="@layout/fragment_home"></fragment>
+        tools:layout="@layout/fragment_home">
+
+        <action
+            android:id="@+id/action_homeFragment_to_storeFragment"
+            app:destination="@id/navigation_store" />
+        <action
+            android:id="@+id/action_navigation_home_to_categoryManageFragment"
+            app:destination="@id/categoryManageFragment" />
+
+        <action
+            android:id="@+id/action_navigation_home_to_categoryAddFragment"
+            app:destination="@id/categoryAddFragment" />
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/expenseEntryFragment"
+        android:name="com.example.yeongkkuel.presentation.home.entry.ExpenseEntryFragment"
+        android:label="지출 기입 화면"
+        tools:layout="@layout/fragment_expense_entry">
+
+        <action
+        android:id="@+id/action_expense_entry_to_homeFragment"
+        app:destination="@id/navigation_home" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_store"
+        android:name="com.example.yeongkkuel.presentation.home.store.StoreFragment"
+        android:label="fragment_store"
+        tools:layout="@layout/fragment_store" >
+        <action
+            android:id="@+id/action_storeFragment_to_homeFragment"
+            app:destination="@id/navigation_home" />
+    </fragment>
+
 
     <fragment
         android:id="@+id/navigation_signup"
@@ -59,11 +94,56 @@
             app:popUpToInclusive="true" />
     </fragment>
 
+
+    <fragment
+        android:id="@+id/categoryManageFragment"
+        android:name="com.example.yeongkkuel.presentation.home.category.CategoryManageFragment"
+        android:label="카테고리 관리"
+        tools:layout="@layout/fragment_category_manage">
+        <action
+            android:id="@+id/action_categoryManageFragment_to_categoryAddFragment"
+            app:destination="@id/categoryAddFragment" />
+        <action
+            android:id="@+id/action_categoryManageFragment_to_categoryDetailFragment"
+            app:destination="@id/categoryDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/categoryAddFragment"
+        android:name="com.example.yeongkkuel.presentation.home.category.CategoryAddFragment"
+        android:label="카테고리 추가"
+        tools:layout="@layout/fragment_category_add">
+        <action
+            android:id="@+id/action_categoryAddFragment_to_categoryManageFragment"
+            app:destination="@id/categoryManageFragment" />
+        <action
+            android:id="@+id/action_categoryAddFragment_to_navigation_home"
+            app:destination="@id/navigation_home" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/categoryDetailFragment"
+        android:name="com.example.yeongkkuel.presentation.home.category.CategoryDetailFragment"
+        android:label="카테고리 상세"
+        tools:layout="@layout/fragment_category_detail">
+        <action
+            android:id="@+id/action_categoryDetailFragment_to_categoryEditFragment"
+            app:destination="@id/categoryEditFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/categoryEditFragment"
+        android:name="com.example.yeongkkuel.presentation.home.category.CategoryEditFragment"
+        android:label="카테고리 수정"
+        tools:layout="@layout/fragment_category_edit" />
+
+
     <fragment
         android:id="@+id/navigation_chat"
         android:name="com.example.yeongkkuel.presentation.chat.ChatFragment"
         android:label="fragment_chat"
-        tools:layout="@layout/fragment_chat"></fragment>
+        tools:layout="@layout/fragment_chat" />
 
 
     <!-- stat -->
@@ -78,19 +158,24 @@
         android:id="@+id/navigation_stat_setting"
         android:name="com.example.yeongkkuel.presentation.statsettings.settings.StatSettingsFragment"
         android:label="fragment_stat_settings"
-        tools:layout="@layout/fragment_stat_settings"></fragment>
+        tools:layout="@layout/fragment_stat_settings">
+
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_stat_recommendation"
         android:name="com.example.yeongkkuel.presentation.statsettings.recommendation.StatRecommendationFragment"
         android:label="fragment_stat_recommendation"
-        tools:layout="@layout/fragment_stat_recommendation"></fragment>
+        tools:layout="@layout/fragment_stat_recommendation">
+
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_my"
         android:name="com.example.yeongkkuel.presentation.my.MyFragment"
         android:label="fragment_my"
-        tools:layout="@layout/fragment_my"></fragment>
+        tools:layout="@layout/fragment_my">
+    </fragment>
 
 
 </navigation>
