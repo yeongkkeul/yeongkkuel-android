@@ -7,12 +7,21 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
+import com.example.yeongkkuel.databinding.FragmentCategoryAddBinding
 
 class ColorPaletteAdapter(
     private val onColorSelected: (Int) -> Unit
 ) : RecyclerView.Adapter<ColorPaletteAdapter.ColorViewHolder>() {
 
+    private var _binding: FragmentCategoryAddBinding? = null
+    private val binding get() = _binding!!
+    private var selectedColor: Int? = null
     private val colorList = mutableListOf<Int>()
+    private val colorPaletteAdapter by lazy {
+        ColorPaletteAdapter(onColorSelected = { selectedColor ->
+            updateSelectedColor(selectedColor) // 선택된 색상을 처리하는 함수 호출
+        })
+    }
 
     fun submitList(colors: List<Int>) {
         colorList.clear()
@@ -48,5 +57,11 @@ class ColorPaletteAdapter(
             }
         }
 
+    }
+    private fun updateSelectedColor(color: Int) {
+        selectedColor = color
+        binding.ivSelectedColor.setBackgroundResource(R.drawable.bg_color_circle)
+        binding.ivSelectedColor.background?.mutate()?.setTint(color)
+        binding.rvColorPalette.visibility = View.GONE
     }
 }

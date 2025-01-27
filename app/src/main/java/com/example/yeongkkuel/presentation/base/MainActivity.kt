@@ -10,6 +10,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -31,7 +32,6 @@ import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import androidx.navigation.NavController
 
 class MainActivity : AppCompatActivity(), BotSheetListener {
     private lateinit var binding: ActivityMainBinding
@@ -44,6 +44,8 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     }
 
     private var rvBottomSheetCollapseStateHeight: Int = 0
+    private var selectedCategory: String? = null
+    private var categoryColor: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -67,7 +69,6 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
         // 스플래시 화면 종료 조건 설정 (예: 데이터 초기화 완료)
         splashScreen.setKeepOnScreenCondition {
             // 앱 초기화 작업이 완료될 때까지 유지
@@ -90,7 +91,6 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
 
         initView()
         initViewModel()
-        setupAddCategoryClickListener(navHostFragment.navController)
     }
 
     private fun setupAddCategoryClickListener(navController: NavController) {
@@ -135,6 +135,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                         }
 
                         else -> {
+                            // 기타 상태 처리 (예: 드래그 상태 등)
                         }
                     }
                 }
@@ -226,7 +227,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                 when (destination.id) {
                     R.id.navigation_home,
                     R.id.navigation_stat,
-                        -> setBotSheetVisible()
+                    -> setBotSheetVisible()
 
 
                     else -> setBotSheetGone()
@@ -240,12 +241,9 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     R.id.navigation_login,
                     R.id.navigation_signup,
                     R.id.navigation_stat_setting,
-                    R.id.navigation_stat_recommendation,
-                    R.id.navigation_terms_agree -> hideBottomNavigation(
-                        true
-                    )
+                    R.id.navigation_stat_recommendation -> hideBottomNavigation(false)
 
-                    else -> hideBottomNavigation(false)
+                    else -> hideBottomNavigation(true) // 추가 처리
                 }
             }
 
@@ -280,7 +278,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         initBack()
     }
 
-    private fun initViewModel() = with(botSheetViewModel) {
+    fun initViewModel() = with(botSheetViewModel) {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
 
@@ -315,6 +313,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     private fun checkInitialization(): Boolean {
         return false // false를 반환하면 스플래시 화면 종료
     }
+
     private fun setupHamburgerClickListener() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
@@ -366,13 +365,25 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.clItemBotSheet)
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
-    override fun navigateToExpenseEntry() {
+
+    override fun navigateToExpenseEntry(selectedCategory: String, categoryColor: Int) {
         // NavController를 이용해 지출 기입 페이지로 이동
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         val navController = navHostFragment.navController
 
-        // 지출 기입 페이지로 이동
-        navController.navigate(R.id.expenseEntryFragment)
+        // 선택된 카테고리 및 색상을 전달
+        val bundle = Bundle().apply {
+            putString("selectedCategory", selectedCategory)
+            putInt("categoryColor", categoryColor)
+        }
+        navController.navigate(R.id.expenseEntryFragment, bundle)
+    }
+    override fun navigateToCategoryAddFragment() {
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        navController.navigate(R.id.categoryAddFragment)
     }
 }

@@ -17,6 +17,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentCategoryAddBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
+import com.example.yeongkkuel.presentation.util.Colors
+
 
 class CategoryAddFragment : Fragment() {
 
@@ -32,7 +34,7 @@ class CategoryAddFragment : Fragment() {
             updateSelectedColor(selectedColor)
         })
     }
-    private var selectedColor: Int? = null
+    private var selectedColor: Colors? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -98,13 +100,20 @@ class CategoryAddFragment : Fragment() {
     }
 
     private fun updateSelectedColor(color: Int) {
-        selectedColor = color
-        binding.ivSelectedColor.setBackgroundResource(R.drawable.bg_color_circle)
-        binding.ivSelectedColor.background.setTint(color)
-        binding.rvColorPalette.visibility = View.GONE
-        binding.cardColorPalette.visibility = View.GONE
-        binding.ivDropdownIcon.setImageResource(R.drawable.ic_dropdown_arrow)
-        updateSaveButtonState() // 저장 버튼 상태 업데이트
+        val selectedEnumColor = Colors.fromId(color) // Int를 Colors enum으로 변환
+        if (selectedEnumColor != null) {
+            selectedColor = selectedEnumColor
+            val colorInt = ContextCompat.getColor(requireContext(), selectedEnumColor.id)
+            binding.ivSelectedColor.setBackgroundResource(R.drawable.bg_color_circle)
+            binding.ivSelectedColor.background.setTint(colorInt)
+            binding.rvColorPalette.visibility = View.GONE
+            binding.cardColorPalette.visibility = View.GONE
+            binding.ivDropdownIcon.setImageResource(R.drawable.ic_dropdown_arrow)
+            updateSaveButtonState() // 저장 버튼 상태 업데이트
+        } else {
+            // 잘못된 색상이 전달되었을 경우 처리
+            Toast.makeText(requireContext(), "Invalid color selected", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun saveCategory() {
@@ -161,17 +170,6 @@ class CategoryAddFragment : Fragment() {
     }
 
     private fun getColorList(): List<Int> {
-        return listOf(
-            R.color.red1, R.color.red2, R.color.pink3, R.color.purple4, R.color.purple5,
-            R.color.blue6, R.color.blue7, R.color.blue8, R.color.green9, R.color.green10,
-            R.color.green11, R.color.green12, R.color.yellow13, R.color.orange14, R.color.orange15
-        ).map { ContextCompat.getColor(requireContext(), it) }
-    }
-    private fun setupColorPalette() {
-        val adapter = ColorPaletteAdapter { color ->
-            selectedColor = color // 선택된 색상 저장
-        }
-        binding.rvColorPalette.adapter = adapter // XML ID와 일치하게 수정
-        adapter.submitList(getColorList()) // getColorList의 색상을 RecyclerView에 전달
+        return Colors.values().map { it.id }
     }
 }

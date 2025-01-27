@@ -4,19 +4,20 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.yeongkkuel.R
+import com.example.yeongkkuel.presentation.util.Colors
 
 class CategoryViewModel : ViewModel() {
 
     // 초기 카테고리 데이터
     private val _categories = MutableLiveData<List<Category>>(
         listOf(
-            Category("간식/음료", R.color.green9),
-            Category("밥/배달", R.color.purple5),
-            Category("화장품", R.color.green10),
-            Category("택시비", R.color.pink3)
+            Category("간식/음료", Colors.GREEN9),
+            Category("밥/배달", Colors.PURPLE5),
+            Category("화장품", Colors.GREEN10),
+            Category("택시비", Colors.PINK3)
         )
     )
+
     val categories: LiveData<List<Category>> get() = _categories
 
     // 최대 카테고리 개수

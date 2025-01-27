@@ -1,6 +1,5 @@
 package com.example.yeongkkuel.presentation.botsheet
 
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.presentation.home.category.Category
@@ -26,7 +25,10 @@ class BotSheetViewModel : ViewModel() {
     }
 
     // 지출 내역 추가 기능
-    fun addExpenseToCategory(category: SpendingCategory, history: BotSheetUiState.Spending.History) {
+    fun addExpenseToCategory(
+        category: SpendingCategory,
+        history: BotSheetUiState.Spending.History
+    ) {
         _uiState.update { prev ->
             val updatedList = prev.spendingList.map { spending ->
                 if (spending.kind == category) {
@@ -42,7 +44,7 @@ class BotSheetViewModel : ViewModel() {
     // 카테고리 추가 기능
     fun addCategory(category: Category) {
         val spendingCategory = SpendingCategory.CUSTOM(category.name)
-        val categoryColor = Colors.fromId(category.color) ?: Colors.RED1 // Enum으로 변환, 기본값 RED1
+        val categoryColor = category.color // 이미 Colors 타입이므로 변환 불필요
         val plusIconResId = mapCategoryToIcon(categoryColor)  // 아이콘도 색상에 맞게 설정
 
         _uiState.update { prev ->
@@ -50,7 +52,7 @@ class BotSheetViewModel : ViewModel() {
                 add(
                     BotSheetUiState.Spending(
                         kind = spendingCategory,
-                        color = categoryColor,
+                        color = categoryColor, // Colors 타입 직접 사용
                         plusIconResId = plusIconResId,
                         history = emptyList() // 초기값으로 빈 리스트
                     )

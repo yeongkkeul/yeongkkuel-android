@@ -5,5 +5,17 @@ sealed class SpendingCategory(val kor: String) {
     object SHOP : SpendingCategory("밥/배달")
     object BEAUTY : SpendingCategory("화장품")
     object IMPROVEMENT : SpendingCategory("개선")
-    data class CUSTOM(val name: String) : SpendingCategory(name)  // CUSTOM은 name을 동적으로 받는다.
+    data class CUSTOM(val name: String) : SpendingCategory(name)
+
+    companion object {
+        fun valueOf(name: String): SpendingCategory {
+            return when (name.uppercase()) {
+                "SNACK" -> SNACK
+                "SHOP" -> SHOP
+                "BEAUTY" -> BEAUTY
+                "IMPROVEMENT" -> IMPROVEMENT
+                else -> CUSTOM(name)
+            }
+        }
+    }
 }

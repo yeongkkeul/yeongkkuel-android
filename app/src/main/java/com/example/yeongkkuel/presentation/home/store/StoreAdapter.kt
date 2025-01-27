@@ -1,18 +1,21 @@
 package com.example.yeongkkuel.presentation.home.store
 
-import android.util.Log
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.databinding.ItemStoreProductBinding
+import kotlinx.android.parcel.Parcelize
 
+@Parcelize
 data class Product(
     val name: String,
     val price: Int,
     val imageResId: Int,
-    val category: ProductCategory
-)
+    val category: ProductCategory,
+    var area: String? = null
+) : Parcelable
 
 class StoreAdapter(
     private val products: List<Product>,

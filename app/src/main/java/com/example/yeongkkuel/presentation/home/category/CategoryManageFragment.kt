@@ -105,7 +105,7 @@ class CategoryManageFragment : Fragment() {
     private fun navigateToCategoryDetail(category: Category) {
         val bundle = Bundle().apply {
             putString("categoryName", category.name)
-            putInt("categoryColor", category.color)
+            putInt("categoryColor", category.color.id) // Colors의 id를 Int로 전달
         }
         findNavController().navigate(R.id.action_categoryManageFragment_to_categoryDetailFragment, bundle)
     }

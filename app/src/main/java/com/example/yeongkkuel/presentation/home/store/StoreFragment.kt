@@ -21,6 +21,7 @@ import com.google.android.material.tabs.TabLayout
 
 class StoreFragment : Fragment() {
     private lateinit var navController: NavController
+    private var products: MutableList<Product> = mutableListOf() // MutableList 사용
 
     private var _binding: FragmentStoreBinding? = null
     private val binding get() = _binding!!
@@ -230,6 +231,7 @@ class StoreFragment : Fragment() {
             }
 
             // Helper 함수: Save 아이콘 표시
+            //상품 저장
             private fun showSaveIconOnly() {
                 binding.imgSaveIcon.visibility = View.VISIBLE
                 binding.imgPurchaseIcon.visibility = View.GONE
@@ -275,8 +277,17 @@ class StoreFragment : Fragment() {
 
         btnConfirm.setOnClickListener {
             if (!myProducts.contains(product)) { // 중복 방지
-                myProducts.add(product)
-                Log.d("MY Tab", "Product added to MY: ${product.name}")
+                val updatedProduct = product.copy( // 기존 product를 기반으로 새 객체 생성
+                    area = when (product.category) {
+                        ProductCategory.SWING -> "Swing Area"
+                        ProductCategory.TOY -> "Toy Area"
+                        ProductCategory.BOWL -> "Bowl Area"
+                        ProductCategory.NEST -> "Nest Area"
+                    },
+                    imageResId = mapToHomeResource(product.imageResId)
+                )
+                myProducts.add(updatedProduct)
+                Log.d("MY Tab", "Product added to MY: ${updatedProduct.name}, Area: ${updatedProduct.area}")
             } else {
                 Log.d("MY Tab", "Product already exists in MY: ${product.name}")
             }
@@ -285,6 +296,10 @@ class StoreFragment : Fragment() {
             if (binding.tabLayout.selectedTabPosition == 4) {
                 updateProductList(myProducts, isMyTab = true)
             }
+            val bundle = Bundle().apply {
+                putParcelableArrayList("myProducts", ArrayList(myProducts)) // 상품 리스트 전달
+            }
+            navController.navigate(R.id.action_storeFragment_to_homeFragment, bundle)
 
             dialog.dismiss()
         }
@@ -342,4 +357,18 @@ class StoreFragment : Fragment() {
     fun Int.toPx(context: android.content.Context): Int {
         return (this * context.resources.displayMetrics.density).toInt()
     }
+    private fun mapToHomeResource(storeResourceId: Int): Int {
+        return when (storeResourceId) {
+            R.drawable.img_product_swing1 -> R.drawable.img_home_swing1
+            R.drawable.img_product_swing2 -> R.drawable.img_home_swing2
+            R.drawable.img_product_toy1 -> R.drawable.img_home_toy1
+            R.drawable.img_product_toy2 -> R.drawable.img_home_toy2
+            R.drawable.img_product_bowl1 -> R.drawable.img_home_bowl1
+            R.drawable.img_product_bowl2 -> R.drawable.img_home_bowl2
+            R.drawable.img_product_nest1 -> R.drawable.img_home_nest1
+            R.drawable.img_product_nest2 -> R.drawable.img_home_nest2
+            else -> storeResourceId // 기본적으로 동일한 ID 사용
+        }
+    }
+
 }

@@ -14,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentCategoryEditBinding
+import com.example.yeongkkuel.presentation.util.Colors
 
 class CategoryEditFragment : Fragment() {
 
@@ -130,11 +131,20 @@ class CategoryEditFragment : Fragment() {
         // 전달받은 원래 카테고리 이름 가져오기
         val originalCategoryName = arguments?.getString("categoryName") ?: return
 
-        // ViewModel을 통해 데이터 업데이트
+// Int 타입의 selectedColor를 Colors로 변환
+        val selectedColorsEnum = Colors.fromId(selectedColor!!)
+        if (selectedColorsEnum == null) {
+            // 잘못된 색상이 선택되었을 경우 처리
+            Toast.makeText(requireContext(), "Invalid color selected", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+// ViewModel을 통해 데이터 업데이트
         viewModel.updateCategory(
             originalCategoryName,
-            Category(name = updatedTitle, color = selectedColor!!)
+            Category(name = updatedTitle, color = selectedColorsEnum)
         )
+
         Toast.makeText(requireContext(), "카테고리가 수정되었습니다.", Toast.LENGTH_SHORT).show()
 
         // 수정 후 카테고리 관리 페이지로 이동

@@ -4,5 +4,6 @@ interface BotSheetListener {
     fun setPeekHeight(peekHeight: Int)
     fun setBotSheetGone()
     fun setBotSheetVisible()
-    fun navigateToExpenseEntry()
+    fun navigateToExpenseEntry(selectedCategory: String, categoryColor: Int)
+    fun navigateToCategoryAddFragment()
 }

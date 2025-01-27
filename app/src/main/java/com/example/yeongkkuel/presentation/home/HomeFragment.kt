@@ -20,7 +20,9 @@ import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentHomeBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
+import com.example.yeongkkuel.presentation.home.store.Product
 import kotlinx.coroutines.launch
+
 
 class HomeFragment : Fragment() {
     private lateinit var navController: NavController
@@ -47,6 +49,16 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val myProducts = arguments?.getParcelableArrayList<Product>("myProducts")
+        myProducts?.forEach { product ->
+            when (product.area) {
+                "Swing Area" -> binding.imgHomeSwing.setImageResource(product.imageResId)
+                "Toy Area" -> binding.imgHomeToy.setImageResource(product.imageResId)
+                "Bowl Area" -> binding.imgHomeBowl.setImageResource(product.imageResId)
+                "Nest Area" -> binding.imgHomeNest.setImageResource(product.imageResId)
+            }
+        }
 
         navController = Navigation.findNavController(view)
         val productIcons = arguments?.getIntArray("productIcons") ?: intArrayOf()
