@@ -56,35 +56,20 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabLayout"
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:tabMode="fixed"
-            app:tabGravity="fill"
-            app:tabStyle="@style/RankTabLayout"
+            android:orientation="vertical"
+            android:layout_marginTop="29dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/app_bar"
-            app:tabTextAppearance="@style/body_regula">
+            app:layout_constraintTop_toBottomOf="@+id/app_bar" >
 
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_chat_room_rank"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="오늘 지출 랭킹" />
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="일주일 누적 랭킹" />
-
-        </com.google.android.material.tabs.TabLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/record_fragment_Container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tabLayout"/>
+                android:layout_gravity="center_horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        </androidx.core.widget.NestedScrollView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
