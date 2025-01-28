@@ -24,9 +24,10 @@ class StatWeeklyPieChartCategoryListAdapter(
             tvSpendingMoney.text = item.expenditure.toMoneyString() + "원"
 
             when(item.color){
-                Colors.BLUE -> ivStartPoint.setBackgroundResource(R.drawable.bg_point_blue)
-                Colors.PINK -> ivStartPoint.setBackgroundResource(R.drawable.bg_point_pink)
-                Colors.GREEN -> ivStartPoint.setBackgroundResource(R.drawable.bg_point_green)
+                Colors.BLUE6 -> ivStartPoint.setBackgroundResource(R.drawable.bg_point_blue)
+                Colors.PINK3 -> ivStartPoint.setBackgroundResource(R.drawable.bg_point_pink)
+                Colors.GREEN9 -> ivStartPoint.setBackgroundResource(R.drawable.bg_point_green)
+                else -> ivStartPoint.setBackgroundResource(R.drawable.bg_point_green)
             }
         }
     }

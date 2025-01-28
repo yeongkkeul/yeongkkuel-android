@@ -31,14 +31,16 @@ import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.navigation.NavController
 
 class MainActivity : AppCompatActivity(), BotSheetListener {
     private lateinit var binding: ActivityMainBinding
+    private lateinit var navController: NavController
 
     private val botSheetViewModel: BotSheetViewModel by viewModels()
 
     private val botSheetCategoryListAdapter by lazy {
-        BotSheetCategoryListAdapter()
+        BotSheetCategoryListAdapter(this)
     }
 
     private var rvBottomSheetCollapseStateHeight: Int = 0
@@ -72,10 +74,13 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             checkInitialization()
         }
 
+        setupHamburgerClickListener() // 카테고리 더보기 기능 추가
+
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
 
-
+        val navController = navHostFragment.navController
+        setupAddCategoryClickListener(navController)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -85,6 +90,13 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
 
         initView()
         initViewModel()
+        setupAddCategoryClickListener(navHostFragment.navController)
+    }
+
+    private fun setupAddCategoryClickListener(navController: NavController) {
+        binding.tvAddCategory.setOnClickListener {
+            navController.navigate(R.id.categoryAddFragment)
+        }
     }
 
 
@@ -94,9 +106,10 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
 
             val displayHeight = resources.displayMetrics.heightPixels
-            rvBottomSheetCollapseStateHeight = displayHeight - 500.dpToPx(this@MainActivity)
             val peekHeight = rvBottomSheetCollapseStateHeight + 60.dpToPx(this@MainActivity)
 
+
+            rvBottomSheetCollapseStateHeight = displayHeight - 500.dpToPx(this@MainActivity)
             // BottomSheet 초기 상태 설정
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             bottomSheetBehavior.peekHeight = peekHeight
@@ -122,7 +135,6 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                         }
 
                         else -> {
-                            // 기타 상태 처리
                         }
                     }
                 }
@@ -236,6 +248,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     else -> hideBottomNavigation(false)
                 }
             }
+
         }
 
         fun initBack() {
@@ -278,6 +291,11 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                 .collectLatest { uiState ->
                     onBind(uiState)
                 }
+            botSheetViewModel.uiState
+                .flowWithLifecycle(lifecycle)
+                .collectLatest { uiState ->
+                    onBind(uiState)
+                }
         }
     }
 
@@ -297,13 +315,34 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     private fun checkInitialization(): Boolean {
         return false // false를 반환하면 스플래시 화면 종료
     }
+    private fun setupHamburgerClickListener() {
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        // iv_hamberger 클릭 리스너 추가
+        binding.ivHamberger.setOnClickListener {
+            navController.navigate(R.id.categoryManageFragment)
+            val bottomSheetBehavior = BottomSheetBehavior.from(binding.clItemBotSheet)
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED // BottomSheet 닫기
+        }
+    }
 
     private fun onBind(uiState: BotSheetUiState) = with(binding) {
-        fun initRvData() {
-            botSheetCategoryListAdapter.submitList(uiState.spendingList)
-        }
 
-        initRvData()
+        botSheetCategoryListAdapter.submitList(uiState.spendingList)
+
+        val isEmpty = uiState.spendingList.isEmpty()
+
+        // 데이터 존재 여부에 따라 RecyclerView visibility 변경
+        binding.rvBotSheetCategory.visibility = if (isEmpty) View.GONE else View.VISIBLE
+        binding.ivHamberger.visibility = if (isEmpty) View.GONE else View.VISIBLE
+
+        // 데이터가 없으면 빈 메시지와 이미지 보이기, 있으면 숨기기
+        binding.tvEmptyMessage1.visibility = if (isEmpty) View.VISIBLE else View.GONE
+        binding.tvEmptyMessage2.visibility = if (isEmpty) View.VISIBLE else View.GONE
+        binding.imgAddCategory.visibility = if (isEmpty) View.VISIBLE else View.GONE
+
     }
 
     override fun setPeekHeight(peekHeight: Int) {
@@ -327,6 +366,13 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.clItemBotSheet)
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
+    override fun navigateToExpenseEntry() {
+        // NavController를 이용해 지출 기입 페이지로 이동
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+        val navController = navHostFragment.navController
 
-
+        // 지출 기입 페이지로 이동
+        navController.navigate(R.id.expenseEntryFragment)
+    }
 }

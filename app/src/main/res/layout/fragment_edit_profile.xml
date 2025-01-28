@@ -1,0 +1,339 @@
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <!-- 상단 앱바 (기존 코드 유지) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_appBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/space_median"
+        android:layout_marginVertical="@dimen/space_median"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/iv_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_back"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_median"
+            style="@style/humm_medium"
+            android:text="프로필 수정"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/iv_back" />
+
+        <TextView
+            android:id="@+id/tv_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textColor="@color/main1"
+            style="@style/body_medium"
+            android:text="저장"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- 프로필 이미지 + "편집" -->
+    <FrameLayout
+        android:id="@+id/fl_profile_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="24dp"
+        app:layout_constraintTop_toBottomOf="@+id/cl_appBar"
+        android:layout_marginBottom="16dp">
+
+        <!-- 실제 프로필 이미지 -->
+        <ImageView
+            android:id="@+id/ivProfile"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:contentDescription="프로필"
+            android:scaleType="centerCrop"
+            android:background="@drawable/bg_whitecircle"
+            android:src="@drawable/ic_my_profile" />
+
+
+        <ImageView
+            android:id="@+id/ivProfileShadow"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:src="@drawable/bg_my_edit_shadow"
+            android:scaleType="fitXY"
+            />
+
+        <!-- 편집 텍스트 (오버레이 위에) -->
+        <TextView
+            android:id="@+id/tvProfileImageEdit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|bottom"
+            android:text="편집"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:clickable="true"
+            android:layout_marginBottom="2dp"
+            android:gravity="center"/>
+    </FrameLayout>
+
+
+
+
+
+    <!-- 1. 닉네임 -->
+    <TextView
+        android:id="@+id/tv_nickname_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1. 닉네임"
+        style="@style/body_semibo"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:layout_marginStart="@dimen/space_median"
+        android:layout_marginTop="45dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fl_profile_image"
+        />
+
+    <!-- 성별 선택 -->
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="184dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="44dp"
+        android:layout_marginRight="@dimen/space_median"
+        android:background="@drawable/bg_profile_edit"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.919"
+        app:layout_constraintStart_toEndOf="@id/tv_nickname_label"
+        app:layout_constraintTop_toBottomOf="@id/fl_profile_image">
+
+        <!-- 닉네임 글자수 표시 (ex: 7/10) -->
+        <EditText
+            android:id="@+id/etNickname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            style="@style/body_semibo"
+            android:background="@null"
+            android:hint=""
+            android:textColor="@color/main1"
+            android:maxLength="10"
+            android:padding="8dp"
+            android:singleLine="true"
+            android:textStyle="bold"
+             />
+
+        <TextView
+            android:id="@+id/tvNicknameCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="0/10"
+            android:textColor="@color/black2"
+            android:textSize="12sp" />
+
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_gender_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_median"
+        android:layout_marginTop="64dp"
+        android:text="2. 성별"
+        style="@style/body_semibo"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_nickname_label" />
+
+    <!-- 연령대 선택 -->
+
+    <GridLayout
+        android:id="@+id/gl_gender_group"
+        android:layout_width="181dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="56dp"
+        android:columnCount="2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.829"
+        app:layout_constraintStart_toEndOf="@+id/tv_gender_label"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:layout_constraintWidth_percent="0.9">
+
+        <TextView
+            android:id="@+id/tv_gender_male"
+            style="@style/body_regula"
+            android:layout_height="match_parent"
+            android:layout_columnWeight="1"
+            android:text="@string/signup_gender_female"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/tv_gender_female"
+            style="@style/body_regula"
+            android:layout_columnWeight="1"
+            android:text="@string/signup_gender_male"
+            android:textColor="@color/black" />
+    </GridLayout>
+
+    <TextView
+        android:id="@+id/tv_age_label"
+        style="@style/body_semibo"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_median"
+        android:layout_marginTop="52dp"
+        android:text="3. 연령대"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/gl_gender_group" />
+
+    <!-- 현재 하시는 일 -->
+
+    <GridLayout
+        android:id="@+id/gl_age_group"
+        android:layout_width="181dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="52dp"
+        android:columnCount="2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.794"
+        app:layout_constraintStart_toEndOf="@+id/tv_age_label"
+        app:layout_constraintTop_toBottomOf="@+id/gl_gender_group"
+        app:layout_constraintWidth_percent="0.9">
+
+        <TextView
+            android:id="@+id/tv_age_14_19"
+            style="@style/body_regula"
+            android:layout_columnWeight="1"
+            android:text="@string/signup_age_10s"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/tv_age_20"
+            style="@style/body_regula"
+            android:layout_columnWeight="1"
+            android:text="@string/signup_age_20s"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/tv_age_30"
+            style="@style/body_regula"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_marginTop="@dimen/space_large"
+            android:text="@string/signup_age_30s"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/tv_age_40"
+            style="@style/body_regula"
+            android:layout_columnWeight="1"
+            android:layout_marginTop="@dimen/space_large"
+            android:text="@string/signup_age_40s"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/tv_age_50"
+            style="@style/body_regula"
+            android:layout_columnWeight="1"
+            android:layout_marginTop="@dimen/space_large"
+            android:text="@string/signup_age_50s"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/tv_age_60_plus"
+            style="@style/body_regula"
+            android:layout_columnWeight="1"
+            android:layout_marginTop="@dimen/space_large"
+            android:text="@string/signup_age_over_60"
+            android:textColor="@color/black" />
+    </GridLayout>
+
+    <TextView
+        android:id="@+id/tv_job_label"
+        style="@style/body_semibo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_median"
+        android:text="4. 현재 하는 일"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:layout_marginTop="134dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_age_label" />
+
+    <!-- 완료 버튼 -->
+
+    <GridLayout
+        android:id="@+id/gl_job_group"
+        android:layout_width="181dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:columnCount="2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.76"
+        app:layout_constraintStart_toEndOf="@+id/tv_job_label"
+        app:layout_constraintTop_toBottomOf="@+id/gl_age_group"
+        app:layout_constraintWidth_percent="0.9">
+
+        <TextView
+            android:id="@+id/tv_job_student"
+            style="@style/body_regula"
+            android:layout_columnWeight="1"
+            android:text="@string/signup_job_student"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/tv_job_worker"
+            style="@style/body_regula"
+            android:layout_columnWeight="1"
+            android:text="@string/signup_job_worker"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/tv_job_housewife"
+            style="@style/body_regula"
+            android:layout_columnWeight="1"
+            android:layout_marginTop="@dimen/space_large"
+            android:text="@string/signup_job_housewife"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/tv_job_self_employed"
+            style="@style/body_regula"
+            android:layout_columnWeight="1"
+            android:layout_marginTop="@dimen/space_large"
+            android:text="@string/signup_job_business_owner"
+            android:textColor="@color/black" />
+    </GridLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -19,6 +19,28 @@
     <color name="black2">#999999</color>
     <color name="black3">#1E1E1E</color>
 
+    <!-- 색상 팔레트 컬러 -->
+    <color name="red1">#E3000B</color>
+    <color name="red2">#FE4040</color>
+    <color name="pink3">#FE40BF</color>
+    <color name="purple4">#BF40FE</color>
+    <color name="purple5">#7F40FE</color>
+    <color name="blue6">#235FB3</color>
+    <color name="blue7">#3FACDA</color>
+    <color name="blue8">#53CBFF</color>
+    <color name="green9">#00BFA6</color>
+    <color name="green10">#4B862E</color>
+    <color name="green11">#51BD1B</color>
+    <color name="green12">#C4E015</color>
+    <color name="yellow13">#FEE540</color>
+    <color name="orange14">#FB8809</color>
+    <color name="orange15">#FF6316</color>
+
+    <color name="button_enabled">#6200EE</color> <!-- 활성화 상태 색상 (보라색 예시) -->
+    <color name="button_disabled">#BDBDBD</color> <!-- 비활성화 상태 색상 (회색 예시) -->
+
+
+
     <color name="pink">#FF5CA3</color>
     <color name="blue">#4385F7</color>
     <color name="green">#77BF48</color>
