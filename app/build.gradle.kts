@@ -6,7 +6,6 @@ plugins {
     id("kotlin-kapt")
 }
 
-
 val localProperties = Properties()
 localProperties.load(project.rootProject.file("local.properties").inputStream())
 val kakaoApiKey = localProperties.getProperty("kakao_NATIVE_APP_KEY")?:""
@@ -21,6 +20,7 @@ android {
     defaultConfig {
         buildConfigField("String", "kakao_NATIVE_APP_KEY", "\"$kakaoApiKey\"")
         buildConfigField("String","google_CLIENT_ID","\"$googleApiKey\"")
+        buildConfigField("String", "OPENAI_API_KEY", "\"$openAIAPIKEY\"")
         manifestPlaceholders["NATIVE_APP_KEY"] = nativeAppKey
 
         applicationId = "com.example.yeongkkuel"
@@ -30,8 +30,6 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        buildConfigField("String", "OPENAI_API_KEY", "\"$openAIAPIKEY\"")
     }
     buildTypes {
         release {
@@ -57,9 +55,6 @@ android {
 }
 
 dependencies {
-
-    // Splash Screen API
-    implementation("androidx.core:core-splashscreen:1.0.1") // Splash Screen 라이브러리
 
     // Google Credential Manager
     implementation(libs.credentials)
@@ -97,8 +92,8 @@ dependencies {
     implementation(libs.androidx.gridlayout)
 
     // LiveData 및 ViewModel
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+    implementation(libs.livedata)
+    implementation(libs.viewmodel)
 
     // RecyclerView
     implementation (libs.recyclerview)
@@ -107,6 +102,6 @@ dependencies {
     implementation(libs.glide)
 
     // Retrofit2
-    implementation(libs.retrofit2)
-    implementation(libs.converter.gson)
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.converter.gson)
 }
