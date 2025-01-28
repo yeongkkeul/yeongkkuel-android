@@ -19,36 +19,36 @@ interface YeongkkuelService {
 
     //stat
     @GET("/api/expenditures/day")
-    fun getExpendituresDay(
+    suspend fun getExpendituresDay(
     ): Response<DayExpenditureResponse>
 
     @GET("/api/expenditures/week/expenses")
-    fun getExpendituresWeekExpenses(
+    suspend fun getExpendituresWeekExpenses(
     ): Response<WeekExpenditureExpensesResponse>
 
     @GET("/api/expenditures/week/average")
-    fun getExpendituresWeekAverage(
+    suspend fun getExpendituresWeekAverage(
     ): Response<WeekExpendituresAverage>
 
     @GET("/api/expenditures/month/{year}/{month}")
-    fun getExpendituresMonthCalendar(
+    suspend fun getExpendituresMonthCalendar(
         @Path("year") year: Int,
         @Path("month") month: Int
     ): Response<MonthExpendituresCalendar>
 
     @GET("/api/expenditures/{year}/{month}/{day}")
-    fun getExpendituresMonthCategory(
+    suspend fun getExpendituresMonthCategory(
         @Path("year") year: Int,
         @Path("month") month: Int,
         @Path("day") day: Int,
     ): Response<MonthExpendituresCategory>
 
     @POST("/api/expenditures/target")
-    fun postExpendituresTarget(
+    suspend fun postExpendituresTarget(
         @Body request: ExpenditureTargetRequest
     )
 
     @GET("/api/expenditures/target/recommendation")
-    fun getExpenditureAverageMonthly(
+    suspend fun getExpenditureAverageMonthly(
     ): Response<MonthlyAverageExpenditureResponse>
 }

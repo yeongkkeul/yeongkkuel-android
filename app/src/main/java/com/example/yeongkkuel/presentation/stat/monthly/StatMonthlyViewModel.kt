@@ -11,15 +11,71 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Calendar
+import java.util.Date
 
 class StatMonthlyViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(StatMonthlyUiState.init())
     val uiState = _uiState.asStateFlow()
 
     private val yeongkkuelService = RetrofitClient.yeongkkuelService
+    private val dayOfWeekList: List<StatMonthlyUiState.CalendarData> =
+        Week.getListItem().map { week ->
+            StatMonthlyUiState.CalendarData.CalendarDayOfWeek(week)
+        }
+
+    init {
+        val date = Date()
+        val year = date.year + 1900  // 현재 연도
+        val month = date.month + 1   // 현재 월 (0부터 시작하므로 +1)
+
+        getCalender(year = year, month = month)
+    }
 
     fun getCalender(year: Int, month: Int) = viewModelScope.launch {
-        fun getEmptyDayList(year: Int, month: Int): List<StatMonthlyUiState.CalendarData.CalendarDay> {
+        suspend fun List<StatMonthlyUiState.CalendarData.CalendarDay>.getData(): List<StatMonthlyUiState.CalendarData.CalendarDay> {
+            try {
+                yeongkkuelService.getExpendituresMonthCalendar(year = year, month = month).run {
+                    if (isSuccess) {
+                        val dataList = result.selectedMonthExpenses.map {
+                            StatMonthlyUiState.CalendarData.CalendarDay(
+                                day = it.expenseDate.getDay(),
+                                pieDataList = listOf(
+                                    PieEntry(
+                                        maxOf(
+                                            (result.dayTargetExpenditure - it.expenditure).toFloat(),
+                                            0f
+                                        ), "나머지"
+                                    ),
+                                    PieEntry(it.expenditure.toFloat(), "지출")
+                                )
+                            )
+                        }
+                        val mergedList = this@getData.toMutableList()
+                        dataList.forEach { data ->
+                            val existingIndex = mergedList.indexOfFirst { it.day == data.day }
+                            if (existingIndex != -1) {
+                                val existingDay = mergedList[existingIndex]
+                                mergedList[existingIndex] = existingDay.copy(
+                                    pieDataList = existingDay.pieDataList + data.pieDataList
+                                )
+                            } else {
+                                mergedList.add(data)
+                            }
+                        }
+                        return mergedList
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            return this
+        }
+
+
+        suspend fun getDayList(
+            year: Int,
+            month: Int
+        ): List<StatMonthlyUiState.CalendarData.CalendarDay> {
             val calendar = Calendar.getInstance().apply {
                 set(Calendar.YEAR, year)
                 set(Calendar.MONTH, month - 1)
@@ -56,50 +112,10 @@ class StatMonthlyViewModel : ViewModel() {
                     )
                 )
             }
-            return resultList
+            return resultList.getData()
         }
 
-        fun List<StatMonthlyUiState.CalendarData.CalendarDay>.getData(): List<StatMonthlyUiState.CalendarData.CalendarDay>{
-            try{
-                yeongkkuelService.getExpendituresMonthCalendar(year = year, month = month).run{
-                    if(isSuccess){
-                            val dataList = result.selectedMonthExpenses.map{
-                                StatMonthlyUiState.CalendarData.CalendarDay(
-                                    day = it.expenseDate.getDay(),
-                                    pieDataList = listOf(
-                                        PieEntry((result.dayTargetExpenditure - it.expenditure).toFloat(),"나머지" ),
-                                        PieEntry(it.expenditure.toFloat(), "지출")
-                                    )
-                                )
-                            }
-
-                        val mergedList = this@getData.toMutableList()
-                        dataList.forEach { data ->
-                            val existingIndex = mergedList.indexOfFirst { it.day == data.day }
-                            if (existingIndex != -1) {
-                                val existingDay = mergedList[existingIndex]
-                                mergedList[existingIndex] = existingDay.copy(
-                                    pieDataList = existingDay.pieDataList + data.pieDataList
-                                )
-                            } else {
-                                mergedList.add(data)
-                            }
-                        }
-                        return mergedList
-                    }
-                }
-            } catch (e:Exception){
-                e.printStackTrace()
-            }
-            return this
-        }
-
-        val dayOfWeekList: List<StatMonthlyUiState.CalendarData> =
-            Week.getListItem().map { week ->
-                StatMonthlyUiState.CalendarData.CalendarDayOfWeek(week)
-            }
-
-        val dayList = getEmptyDayList(year, month)
+        val dayList = getDayList(year, month)
 
         _uiState.update { prev ->
             prev.copy(
