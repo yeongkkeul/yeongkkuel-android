@@ -42,16 +42,14 @@ class CategoryAddFragment : Fragment() {
 
         setupRecyclerView()
         setupListeners()
-        setupTextWatcher() // 글자 수 업데이트 로직 호출
-        updateSaveButtonState() // 초기 저장 버튼 상태 업데이트
+        setupTextWatcher()
     }
 
     private fun setupRecyclerView() {
         binding.rvColorPalette.apply {
-            layoutManager = GridLayoutManager(requireContext(), 5) // 1줄에 5개의 컬러 동그라미로 변경
+            layoutManager = GridLayoutManager(requireContext(), 5)
             adapter = colorPaletteAdapter
 
-            // 아이템 간 간격 설정
             addItemDecoration(object : RecyclerView.ItemDecoration() {
                 override fun getItemOffsets(
                     outRect: Rect,
@@ -59,25 +57,22 @@ class CategoryAddFragment : Fragment() {
                     parent: RecyclerView,
                     state: RecyclerView.State
                 ) {
-                    outRect.set(0, 1, 0, 1) // 좌우/상하 8dp 간격 추가
+                    outRect.set(0, 1, 0, 1)
                 }
             })
         }
-        colorPaletteAdapter.submitList(getColorList()) // 색상 팔레트 데이터 설정
+        colorPaletteAdapter.submitList(getColorList())
     }
 
     private fun setupListeners() {
-        // 드롭다운 아이콘 클릭 이벤트
         binding.ivDropdownIcon.setOnClickListener {
             toggleColorPaletteVisibility()
         }
 
-        // 저장 버튼 클릭 이벤트
         binding.tvCategoryAdd.setOnClickListener {
             saveCategory()
         }
 
-        // 뒤로가기 버튼 클릭 이벤트
         binding.ivBack.setOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
@@ -99,19 +94,25 @@ class CategoryAddFragment : Fragment() {
         binding.rvColorPalette.visibility = View.GONE
         binding.cardColorPalette.visibility = View.GONE
         binding.ivDropdownIcon.setImageResource(R.drawable.ic_dropdown_arrow)
-        updateSaveButtonState() // 저장 버튼 상태 업데이트
     }
 
     private fun saveCategory() {
         val title = binding.etCategoryAddInput.text.toString()
-        val color = selectedColor ?: return
 
+        // 제목 검증
         if (title.isBlank()) {
-            Toast.makeText(requireContext(), "제목을 입력해주세요.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "제목을 입력하지 않았습니다", Toast.LENGTH_SHORT).show()
             return
         }
 
-        viewModel.addCategory(Category(name = title, color = color))
+        // 색상 검증
+        if (selectedColor == null) {
+            Toast.makeText(requireContext(), "색상을 선택하지 않았습니다", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // ViewModel에 저장
+        viewModel.addCategory(Category(name = title, color = selectedColor!!))
         Toast.makeText(requireContext(), "카테고리가 저장되었습니다.", Toast.LENGTH_SHORT).show()
         findNavController().navigate(R.id.action_categoryAddFragment_to_categoryManageFragment)
     }
@@ -121,25 +122,12 @@ class CategoryAddFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                // 입력된 텍스트 길이 계산
                 val length = s?.length ?: 0
                 binding.tvCharacterCount.text = "$length/16"
-
-                // 저장 버튼 활성화 여부 업데이트
-                updateSaveButtonState()
             }
 
             override fun afterTextChanged(s: Editable?) {}
         })
-    }
-
-
-    private fun updateSaveButtonState() {
-        val title = binding.etCategoryAddInput.text.toString()
-        val isEnabled = title.isNotBlank() && selectedColor != null
-        binding.tvCategoryAdd.isEnabled = isEnabled
-        val buttonColor = if (isEnabled) R.color.button_enabled else R.color.button_disabled
-        binding.tvCategoryAdd.setBackgroundColor(ContextCompat.getColor(requireContext(), buttonColor))
     }
 
     override fun onDestroyView() {
