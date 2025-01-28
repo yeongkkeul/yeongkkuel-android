@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="328dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_dialog_background"
+    android:padding="16dp"
+    android:elevation="10dp"
+    android:layout_gravity="center">
+
+    <TextView
+        style="@style/title_semib"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="정말 떠나실 건가요?"
+        android:layout_marginTop="29dp"
+        android:textColor="@color/main1"
+        android:textStyle="bold"
+        android:layout_marginBottom="4dp" />
+
+
+    <!-- Input Field -->
+
+    <!-- Button Container -->
+    <TextView
+        android:id="@+id/tv_recommend_code_error"
+        style="@style/body_medium"
+        android:layout_width="226dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_median"
+        android:layout_gravity="center"
+        android:layout_marginBottom="31dp"
+        android:textAlignment="center"
+        android:text="탈퇴  후 개인정보 데이터가 삭제되며
+복구할 수 없어요."
+        android:textColor="@color/black" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:weightSum="2">
+
+        <TextView
+            android:id="@+id/tv_cancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="10dp"
+            android:layout_marginRight="@dimen/space_x_small"
+            android:background="@drawable/bg_button_gray"
+            android:textColor="@color/black"
+            android:clickable="true"
+            android:focusable="true"
+            style="@style/body_medium"
+            android:text="취소"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/tv_withdraw"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="탈퇴"
+            android:gravity="center"
+            android:padding="10dp"
+            android:background="@drawable/selector_button"
+            android:textColor="@color/white"
+            android:clickable="true"
+            android:focusable="true"
+            style="@style/body_medium"
+
+            android:layout_weight="1" /> <!-- 동일 비율 -->
+
+    </LinearLayout>
+
+
+
+
+
+</LinearLayout>

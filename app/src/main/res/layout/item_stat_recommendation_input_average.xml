@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/tv_income"
+        style="@style/humm_semibo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/space_median"
+        android:text="월 평균 수입"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/et_income"
+        style="@style/body_medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/main1"
+        android:inputType="number"
+        android:maxWidth="180dp"
+        android:maxLines="1"
+        android:minWidth="60dp"
+        android:singleLine="true"
+        android:textColor="@color/main1"
+        app:layout_constraintBottom_toBottomOf="@id/tv_income"
+        app:layout_constraintEnd_toStartOf="@id/tv_incomeUnit"
+        app:layout_constraintTop_toTopOf="@id/tv_income" />
+
+
+    <TextView
+        android:id="@+id/tv_incomeUnit"
+        style="@style/body_medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/space_median"
+        android:text=" 원"
+        app:layout_constraintBottom_toBottomOf="@id/et_income"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/et_income" />
+
+    <TextView
+        android:id="@+id/tv_incomeError"
+        style="@style/small_semib"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="월 평균 수입을 입력해주세요."
+        android:textColor="@color/error"
+        app:layout_constraintEnd_toEndOf="@id/tv_incomeUnit"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@id/et_income" />
+
+    <TextView
+        android:id="@+id/tv_outcome"
+        style="@style/humm_semibo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_median"
+        android:layout_marginTop="@dimen/space_x_large"
+        android:text="월 평균 지출"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_income" />
+
+    <EditText
+        android:id="@+id/et_outcome"
+        style="@style/body_medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/main1"
+        android:inputType="number"
+        android:maxWidth="180dp"
+        android:maxLines="1"
+        android:minWidth="60dp"
+        android:textColor="@color/main1"
+        app:layout_constraintBottom_toBottomOf="@id/tv_outcome"
+        app:layout_constraintEnd_toStartOf="@id/tv_outcomeUnit"
+        app:layout_constraintTop_toTopOf="@id/tv_outcome" />
+
+    <TextView
+        android:id="@+id/tv_outcomeUnit"
+        style="@style/body_medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/space_median"
+        android:text=" 원"
+        app:layout_constraintBottom_toBottomOf="@id/et_outcome"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/et_outcome" />
+    <TextView
+        android:id="@+id/tv_outcomeError"
+        style="@style/small_semib"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="월 평균 지출을 입력해주세요."
+        android:textColor="@color/error"
+        app:layout_constraintEnd_toEndOf="@id/tv_outcomeUnit"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@id/et_outcome" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

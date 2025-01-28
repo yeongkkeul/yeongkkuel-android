@@ -2,6 +2,7 @@ package com.example.yeongkkuel.presentation.stat.monthly
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.yeongkkuel.presentation.network.RetrofitClient
 import com.example.yeongkkuel.presentation.util.Week
 import com.github.mikephil.charting.data.PieEntry
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,8 +15,9 @@ class StatMonthlyViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(StatMonthlyUiState.init())
     val uiState = _uiState.asStateFlow()
 
+    private val yeongkkuelService = RetrofitClient.yeongkkuelService
 
-    fun getCalender(year: Int, month:Int) = viewModelScope.launch {
+    fun getCalender(year: Int, month: Int) = viewModelScope.launch {
         fun getDayList(year: Int, month: Int): List<StatMonthlyUiState.CalendarData.CalendarDay> {
             val calendar = Calendar.getInstance().apply {
                 set(Calendar.YEAR, year)
@@ -41,7 +43,7 @@ class StatMonthlyViewModel : ViewModel() {
             val targetSpending = 20000
 
             val resultList = daysList.map { day ->
-                val daySpending = 1700
+                val daySpending = 0
 
                 val rest = if (targetSpending - daySpending > 0) targetSpending - daySpending else 0
 
@@ -53,7 +55,6 @@ class StatMonthlyViewModel : ViewModel() {
                     )
                 )
             }
-
             return resultList
         }
 
@@ -62,9 +63,9 @@ class StatMonthlyViewModel : ViewModel() {
                 StatMonthlyUiState.CalendarData.CalendarDayOfWeek(week)
             }
 
-        val dayList = getDayList(year,month)
+        val dayList = getDayList(year, month)
 
-        _uiState.update { prev->
+        _uiState.update { prev ->
             prev.copy(
                 targetMonth = Pair(year, month),
                 calendarList = dayOfWeekList + dayList

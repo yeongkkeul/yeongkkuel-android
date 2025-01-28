@@ -3,6 +3,15 @@
     <string name="app_name">yeongkkuel</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <!-- Home -->
+    <string name="expense_entry">지출 기입</string>
+    <string name="expense_history">지출 내역</string>
+    <string name="expense_history_edit">지출 내역 수정</string>
+
+    <string name="category_manage">카테고리 관리</string>
+    <string name="category_add">카테고리 추가</string>
+    <string name="category_edit">카테고리 수정</string>
+
     <!-- Login -->
     <string name="splash_logo_description">splash_logo</string>
     <string name="login_kakao">카카오로 시작하기</string>

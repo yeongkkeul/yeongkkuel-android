@@ -7,6 +7,7 @@ import com.github.mikephil.charting.data.Entry
 
 data class StatWeeklyUiState(
     val targetSpending: Int,
+    val totalSpending: Int,
     val weekList: List<DayData>,
     val compareList: List<CompareData>,
     val pieChartList: List<PieChartData>
@@ -55,32 +56,33 @@ data class StatWeeklyUiState(
                     target = "20대 직장인",
                     targetSpending = 15700,
                     mySpending = 8100,
-                    spendingUnit = SpendingUnit.DAY,
+                    spendingUnit = SpendingUnit.WEEK,
                     percentile = 10
                 ),
                 CompareData.PastCompare(
                     pastSpending = 122038,
                     currentSpending = 100383,
-                    spendingUnit = SpendingUnit.DAY
+                    spendingUnit = SpendingUnit.WEEK
                 )
             ),
             pieChartList = listOf(
                 PieChartData(
-                    category = SpendingCategory.SNACK,
+                    category = SpendingCategory.CUSTOM("기타"),
                     expenditure = 15800,
-                    Colors.GREEN
+                    Colors.GREEN9
                 ),
                 PieChartData(
-                    category = SpendingCategory.SHOP,
+                    category = SpendingCategory.CUSTOM("기타"),
                     expenditure = 158000,
-                    Colors.PINK
+                    Colors.PINK3
                 ),
                 PieChartData(
-                    category = SpendingCategory.ETC,
+                    category = SpendingCategory.CUSTOM("기타"),
                     expenditure = 158000,
-                    Colors.BLUE
+                    Colors.BLUE6
                 ),
-            )
+            ),
+            totalSpending = 56700
         )
     }
 }

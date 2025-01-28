@@ -1,6 +1,5 @@
 package com.example.yeongkkuel.presentation.stat.daily
 
-import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -13,7 +12,6 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentStatDailyBinding
-import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import com.example.yeongkkuel.presentation.util.toMoneyString
@@ -72,14 +70,13 @@ class StatDailyFragment : Fragment() {
     }
 
     private fun onBind(uiState: BotSheetUiState) = with(binding) {
-
         fun initPieChart() {
             uiState.spendingList.let {
                 val totalList = uiState.spendingList.map { spending ->
                     spending.history.sumOf { history -> history.price }
                 }
 
-                val othersTotal = uiState.total - totalList.sum()
+                val othersTotal = uiState.targetSpending - totalList.sum()
 
                 val otherTotalString = Math.abs(othersTotal).toMoneyString() + "원"
                 tvChartTarget.text = otherTotalString

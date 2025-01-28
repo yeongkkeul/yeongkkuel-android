@@ -22,7 +22,7 @@ class StatWeeklyWeekListAdapter(
 ) {
     private var targetSpending: Int? = null
 
-    fun setTargetSpending(targetSpending: Int){
+    fun setTargetSpending(targetSpending: Int) {
         this.targetSpending = targetSpending
     }
 
@@ -34,7 +34,7 @@ class StatWeeklyWeekListAdapter(
 
             // 요일에 맞춘 날짜를 계산하여 표시
             val today = Calendar.getInstance()
-            val dayOfWeekIndex = item.dayOfWeek.ordinal  // Calendar 요일은 1~7 (월~일)
+            val dayOfWeekIndex = item.dayOfWeek.ordinal + 1  // Calendar 요일은 1~7 (월~일)
             today.set(Calendar.DAY_OF_WEEK, dayOfWeekIndex)
 
             val dayOfMonth = today.get(Calendar.DAY_OF_MONTH)

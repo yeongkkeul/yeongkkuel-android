@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="328dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_dialog_background"
+    android:padding="16dp"
+    android:elevation="10dp"
+    android:layout_gravity="center">
+
+    <ImageView
+        android:id="@+id/et_recommend_code"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="12dp"
+        android:src="@drawable/ic_coin"
+        android:textSize="14sp" />
+
+        <TextView
+            style="@style/humm_semibo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="친구 초대하고 리워드 받기!"
+            android:layout_marginRight="@dimen/space_x_small"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:layout_marginHorizontal="32dp"
+            android:id="@+id/tv_recommend_code_error"
+            style="@style/small_regul"
+
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/space_large"
+            android:text="친구가 회원가입 시 내 추천인 코드를 입력하면
+나랑 친구 모두 30 리워드를 받을 수 있어요."
+            android:textColor="@color/black"
+            />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/bg_my_description"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content">
+
+    <TextView
+        style="@style/body_regula"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="나의 추천인 코드"
+        android:textColor="@color/black"
+        />
+    <TextView
+        android:id="@+id/tv_my_recommend_code"
+        style="@style/humm_semibo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="3adw8k"
+        android:layout_marginRight="@dimen/space_x_small"
+        android:textColor="@color/main1"
+        android:textStyle="bold"
+        android:layout_marginBottom="4dp" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/iv_copy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_copy"
+        android:layout_gravity="center"
+        android:layout_marginBottom="8dp"
+        />
+
+
+
+
+
+</LinearLayout>

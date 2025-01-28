@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:state_pressed="true"
+        android:drawable="@drawable/bg_my_withdraw_checked" />
+
+    <!-- 활성화 + 클릭 아님 (state_enabled=true) -->
+    <item
+        android:state_enabled="true"
+        android:drawable="@drawable/bg_my_withdraw_default" />
+
+    <!-- 비활성화 상태 (기본 나머지) -->
+    <item
+        android:drawable="@drawable/bg_my_withdraw_disabled" />
+
+</selector>

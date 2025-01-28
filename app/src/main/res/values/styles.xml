@@ -2,6 +2,7 @@
 <resources>
     <style name="CustomTabLayoutStyle" parent="Widget.Design.TabLayout">
         <item name="tabRippleColor">@null</item>
+        <item name="tabTextColor">@color/tab_stat_text</item>
     </style>
     <style name="RankTabLayout" parent="Widget.Design.TabLayout">
         <item name="tabIndicatorHeight">0dp</item>
