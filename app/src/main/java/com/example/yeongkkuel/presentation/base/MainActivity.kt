@@ -223,18 +223,18 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         initNav()
     }
 
-    fun initViewModel() = with(botSheetViewModel){
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
-
-        val navController = navHostFragment.navController
-
+    fun initViewModel() = with(botSheetViewModel) {
         lifecycleScope.launch {
             uiState.flowWithLifecycle(lifecycle)
                 .collectLatest { uiState ->
                     onBind(uiState)
                 }
         }
+
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+
+        val navController = navHostFragment.navController
 
         // 바텀네비게이션 뷰 숨김 처리 - 스플래시, 로그인
         navController.addOnDestinationChangedListener { _, destination, _ ->
@@ -245,6 +245,18 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         }
     }
 
+    private fun onBind(uiState: BotSheetUiState) = with(binding) {
+        rvBotSheetCategory.adapter?.let { adapter ->
+            if (adapter is BotSheetCategoryListAdapter) {
+                adapter.submitList(uiState.spendingList) {
+                    // RecyclerView 강제 갱신 (옵션)
+                    binding.rvBotSheetCategory.post {
+                        adapter.notifyDataSetChanged()
+                    }
+                }
+            }
+        }
+    }
 
     private fun hideBottomNavigation(state: Boolean) {
         if (state) binding.bottomNavi.visibility = View.GONE else binding.bottomNavi.visibility =
@@ -264,15 +276,6 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             navController.navigate(R.id.categoryManageFragment)
             val bottomSheetBehavior = BottomSheetBehavior.from(binding.clItemBotSheet)
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED // BottomSheet 닫기
-        }
-    }
-
-
-    private fun onBind(uiState: BotSheetUiState) = with(binding) {
-        rvBotSheetCategory.adapter?.let { adapter ->
-            if (adapter is BotSheetCategoryListAdapter) {
-                adapter.submitList(uiState.spendingList)
-            }
         }
     }
 
@@ -307,6 +310,4 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         }
         navController.navigate(R.id.expenseEntryFragment, bundle)
     }
-
-
 }

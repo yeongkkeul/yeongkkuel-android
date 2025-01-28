@@ -38,8 +38,6 @@ class ExpenseEntryFragment : Fragment() {
     private val PICK_IMAGE_REQUEST = 1
 
     private val botSheetViewModel: BotSheetViewModel by activityViewModels()
-    private val entryViewModel: ExpenseEntryViewModel by activityViewModels()
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,212 +53,238 @@ class ExpenseEntryFragment : Fragment() {
         navController = Navigation.findNavController(view)
         sharedPreferences = requireContext().getSharedPreferences("ExpensePrefs", Context.MODE_PRIVATE)
 
-        // Bundle에서 카테고리 이름과 색상 데이터를 받음
+        setupCategory(view)
+        initializeViews(view)
+        setupDatePicker(view)
+        setupDetailInput(view)
+        setupAmountInput(view)
+        setupExpenseCheckbox(view)
+        setupAutoSendCheckbox(view)
+        setupBackButton(view)
+        setupCompleteButton(view)
+        setupPhotoFrame(view)
+    }
+
+    // 카테고리 관련 초기화
+    private fun setupCategory(view: View) {
         val selectedCategory = arguments?.getString("selectedCategory") ?: "기본 카테고리"
         val categoryColor = arguments?.getInt("categoryColor") ?: R.color.black2
-
-        // 카테고리 이름 및 색상 설정
         val tvCategoryInput = view.findViewById<TextView>(R.id.tv_category_input)
         tvCategoryInput.text = selectedCategory
         tvCategoryInput.setTextColor(requireContext().getColor(categoryColor))
+    }
 
-        // View 요소 초기화
-        val tvDateInput = view.findViewById<TextView>(R.id.tv_date_input)
-        val etDetailInput = view.findViewById<EditText>(R.id.et_detail_input)
-        val etAmountInput = view.findViewById<EditText>(R.id.et_amount_input)
-        val tvCharacterCount = view.findViewById<TextView>(R.id.tv_character_count)
-        val flPhotoFrame = view.findViewById<FrameLayout>(R.id.fl_photo_frame)
-        val tvEntryComplete = view.findViewById<View>(R.id.tv_entry_complete)
-        val btnBack = view.findViewById<ImageView>(R.id.btn_back)
-
-        // 무지출 체크 버튼
-        val ivCircleExpenseUnchecked = view.findViewById<ImageView>(R.id.iv_circle_expense_unchecked)
-        val ivCircleExpenseChecked = view.findViewById<ImageView>(R.id.iv_circle_expense_checked)
-
-        // 채팅방 자동전송 체크 버튼
-        val ivCircleSendAutoChecked = view.findViewById<ImageView>(R.id.iv_circle_send_auto_checked)
-        val ivCircleSendAutoUnchecked = view.findViewById<ImageView>(R.id.iv_circle_send_auto_unchecked)
-
-
-        // 글자 수 제한 로직 추가
-        etDetailInput.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val length = s?.length ?: 0
-                tvCharacterCount.text = "$length/24" // 글자 수 업데이트
-                if (length > 24) {
-                    etDetailInput.error = "최대 24자까지 입력 가능합니다."
-                }
-            }
-            override fun afterTextChanged(s: Editable?) {}
-        })
-
-        // 지출액 입력란 포맷팅
-        etAmountInput.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                val input = s?.toString()?.replace(",", "")?.toLongOrNull() ?: return
-
-                // 최대값 제한
-                val limitedValue = if (input > 99_999_999) 99_999_999 else input
-
-                // 천 단위 콤마 추가
-                val formatted = String.format("%,d", limitedValue)
-                if (formatted != s.toString()) {
-                    etAmountInput.removeTextChangedListener(this) // 무한 루프 방지
-                    etAmountInput.setText(formatted)
-                    etAmountInput.setSelection(formatted.length) // 커서 위치 조정
-                    etAmountInput.addTextChangedListener(this)
-                }
-            }
-        })
-
-        // 무지출 체크박스 로직
-        ivCircleExpenseUnchecked.setOnClickListener {
-            ivCircleExpenseChecked.visibility = View.VISIBLE
-            ivCircleExpenseUnchecked.visibility = View.INVISIBLE
-            etAmountInput.setText("0") // 지출액 0원 설정
-            etAmountInput.isEnabled = false // 지출액 입력 비활성화
-        }
-
-        ivCircleExpenseChecked.setOnClickListener {
-            ivCircleExpenseChecked.visibility = View.INVISIBLE
-            ivCircleExpenseUnchecked.visibility = View.VISIBLE
-            etAmountInput.isEnabled = true // 지출액 입력 활성화
-            etAmountInput.text.clear() // 지출액 초기화
-        }
-
-        // 채팅방 자동 전송 체크박스 로직
-        // 초기 상태를 체크 상태로 설정
-        ivCircleSendAutoChecked.visibility = View.VISIBLE
-        ivCircleSendAutoUnchecked.visibility = View.INVISIBLE
-
-        // 클릭 이벤트로 상태 전환 로직 추가
-        ivCircleSendAutoUnchecked.setOnClickListener {
-            ivCircleSendAutoChecked.visibility = View.VISIBLE
-            ivCircleSendAutoUnchecked.visibility = View.INVISIBLE
-        }
-
-        ivCircleSendAutoChecked.setOnClickListener {
-            ivCircleSendAutoChecked.visibility = View.INVISIBLE
-            ivCircleSendAutoUnchecked.visibility = View.VISIBLE
-        }
-
-        // 뒤로가기 버튼 이벤트
-        btnBack.setOnClickListener {
-            navController.popBackStack()
-        }
-
-        // 날짜 초기화
+    // 뷰 초기화
+    private fun initializeViews(view: View) {
         val today = Calendar.getInstance()
         val year = today.get(Calendar.YEAR)
         val month = today.get(Calendar.MONTH) + 1 // 월은 0부터 시작하므로 +1
         val day = today.get(Calendar.DAY_OF_MONTH)
         val dayOfWeek = getDayOfWeek(year, today.get(Calendar.MONTH), day)
         val formattedDate = getString(R.string.date_format, year, month, day, dayOfWeek)
-        tvDateInput.text = formattedDate
+        view.findViewById<TextView>(R.id.tv_date_input).text = formattedDate
+    }
 
+    // 날짜 선택기 설정
+    private fun setupDatePicker(view: View) {
+        val tvDateInput = view.findViewById<TextView>(R.id.tv_date_input)
         tvDateInput.setOnClickListener {
             val calendar = Calendar.getInstance()
-            val year = calendar.get(Calendar.YEAR)
-            val month = calendar.get(Calendar.MONTH)
-            val day = calendar.get(Calendar.DAY_OF_MONTH)
-
             val datePickerDialog = DatePickerDialog(
                 requireContext(),
                 { _, selectedYear, selectedMonth, selectedDay ->
                     val dayOfWeek = getDayOfWeek(selectedYear, selectedMonth, selectedDay)
                     tvDateInput.text = "${selectedYear}년 ${selectedMonth + 1}월 ${selectedDay}일 $dayOfWeek"
                 },
-                year,
-                month,
-                day
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
             )
-
             datePickerDialog.show()
         }
+    }
 
-        // 완료 버튼 클릭 이벤트
+    // 상세 입력란 글자 수 제한 로직
+    private fun setupDetailInput(view: View) {
+        val etDetailInput = view.findViewById<EditText>(R.id.et_detail_input)
+        val tvCharacterCount = view.findViewById<TextView>(R.id.tv_character_count)
+
+        etDetailInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val length = s?.length ?: 0
+                tvCharacterCount.text = "$length/24"
+                if (length > 24) etDetailInput.error = "최대 24자까지 입력 가능합니다."
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+    }
+
+    // 지출액 입력란 포맷팅
+    private fun setupAmountInput(view: View) {
+        val etAmountInput = view.findViewById<EditText>(R.id.et_amount_input)
+
+        etAmountInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val input = s?.toString()?.replace(",", "")?.toLongOrNull() ?: return
+                val limitedValue = if (input > 99_999_999) 99_999_999 else input
+                val formatted = String.format("%,d", limitedValue)
+                if (formatted != s.toString()) {
+                    etAmountInput.removeTextChangedListener(this)
+                    etAmountInput.setText(formatted)
+                    etAmountInput.setSelection(formatted.length)
+                    etAmountInput.addTextChangedListener(this)
+                }
+            }
+        })
+    }
+
+    // 무지출 체크박스 로직
+    private fun setupExpenseCheckbox(view: View) {
+        val ivUnchecked = view.findViewById<ImageView>(R.id.iv_circle_expense_unchecked)
+        val ivChecked = view.findViewById<ImageView>(R.id.iv_circle_expense_checked)
+        val etAmountInput = view.findViewById<EditText>(R.id.et_amount_input)
+
+        ivUnchecked.setOnClickListener {
+            ivChecked.visibility = View.VISIBLE
+            ivUnchecked.visibility = View.INVISIBLE
+            etAmountInput.setText("0")
+            etAmountInput.isEnabled = false
+        }
+
+        ivChecked.setOnClickListener {
+            ivChecked.visibility = View.INVISIBLE
+            ivUnchecked.visibility = View.VISIBLE
+            etAmountInput.isEnabled = true
+            etAmountInput.text.clear()
+        }
+    }
+
+    // 채팅방 자동 전송 체크박스 로직
+    private fun setupAutoSendCheckbox(view: View) {
+        val ivUnchecked = view.findViewById<ImageView>(R.id.iv_circle_send_auto_unchecked)
+        val ivChecked = view.findViewById<ImageView>(R.id.iv_circle_send_auto_checked)
+
+        // 초기 상태를 체크 상태로 설정
+        ivChecked.visibility = View.VISIBLE
+        ivUnchecked.visibility = View.INVISIBLE
+
+        ivUnchecked.setOnClickListener {
+            ivChecked.visibility = View.VISIBLE
+            ivUnchecked.visibility = View.INVISIBLE
+        }
+
+        ivChecked.setOnClickListener {
+            ivChecked.visibility = View.INVISIBLE
+            ivUnchecked.visibility = View.VISIBLE
+        }
+    }
+
+    // 뒤로가기 버튼 로직
+    private fun setupBackButton(view: View) {
+        val btnBack = view.findViewById<ImageView>(R.id.btn_back)
+        btnBack.setOnClickListener {
+            navController.popBackStack()
+        }
+    }
+
+    // 완료 버튼 로직
+    private fun setupCompleteButton(view: View) {
+        val tvEntryComplete = view.findViewById<View>(R.id.tv_entry_complete)
         tvEntryComplete.setOnClickListener {
-            val detail = etDetailInput.text.toString().trim()
-            val amountString = etAmountInput.text.toString().replace(",", "").trim()
-            val amount = amountString.toIntOrNull() ?: 0
-            val isNoExpenseChecked = ivCircleExpenseChecked.visibility == View.VISIBLE
-
-            // 에러 테두리를 위한 리소스
-            val errorBackground = ContextCompat.getDrawable(requireContext(), R.drawable.bg_edit_text_error)
-            val normalBackground = ContextCompat.getDrawable(requireContext(), R.drawable.bg_edit_text)
-
-            var hasError = false
-
-            // 지출 내용 확인
-            if (detail.isBlank() && !isNoExpenseChecked) {
-                etDetailInput.background = errorBackground
-                hasError = true
-            } else {
-                etDetailInput.background = normalBackground
-            }
-
-            // 지출액 확인
-            if (amount <= 0 && !isNoExpenseChecked) {
-                etAmountInput.background = errorBackground
-                hasError = true
-            } else {
-                etAmountInput.background = normalBackground
-            }
-
-            // 무지출 상태에서 사진만 첨부한 경우 처리
-            val isPhotoAttached = sharedPreferences.getString("photoUri", null) != null
-            if (isNoExpenseChecked && detail.isBlank() && isPhotoAttached) {
-                etDetailInput.background = errorBackground
-                hasError = true
-            }
-
-            // 에러가 발생하면 저장 로직 중단
-            if (hasError) {
-                Toast.makeText(requireContext(), "필수 항목을 확인해주세요.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            // 무지출 처리
-            val expenseHistory = BotSheetUiState.Spending.History(
-                name = if (isNoExpenseChecked) "무지출" else detail,
-                price = if (isNoExpenseChecked) 0 else amount
-            )
-
-            // ViewModel에 저장
-            botSheetViewModel.addExpenseToCategory(
-                SpendingCategory.valueOf(selectedCategory.uppercase()),
-                expenseHistory
-            )
-
-            Toast.makeText(requireContext(), "지출 내역이 저장되었습니다.", Toast.LENGTH_SHORT).show()
-
-            // MainActivity의 바텀시트 RecyclerView 업데이트를 요청
-            (requireActivity() as? MainActivity)?.let { mainActivity ->
-                mainActivity.initViewModel() // ViewModel 데이터에 기반하여 바텀시트 갱신
-            }
-
-            // 날짜 비교 후 화면 이동 처리
-            val selectedDateText = tvDateInput.text.toString() // 선택된 날짜 텍스트 가져오기
-            val today = Calendar.getInstance() // 현재 날짜 가져오기
-            val dateFormat = SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREAN) // 날짜 형식 지정
-            val selectedDate = try {
-                dateFormat.parse(selectedDateText.substring(0, 13)) // 날짜 텍스트 파싱
-            } catch (e: Exception) {
-                null // 파싱 실패 시 null 반환
-            }
-
-            if (selectedDate != null && dateFormat.format(selectedDate) != dateFormat.format(today.time)) {
-                // 다른 날짜일 경우 지출탭(월간)으로 이동
-                navController.navigate(R.id.action_expenseEntryFragment_to_navigation_stat)
-            } else {
-                // 오늘 날짜일 경우 홈 화면으로 이동
-                navController.navigate(R.id.action_expenseEntryFragment_to_navigation_home)
+            // 데이터 검증 및 저장
+            if (validateAndSaveEntry(view)) {
+                // 데이터가 정상적으로 저장된 경우에만 화면 닫기
+                requireActivity().onBackPressedDispatcher.onBackPressed()
             }
         }
-        // 사진 첨부 버튼 클릭 이벤트
+    }
+
+    private fun validateAndSaveEntry(view: View): Boolean {
+        val etDetailInput = view.findViewById<EditText>(R.id.et_detail_input)
+        val etAmountInput = view.findViewById<EditText>(R.id.et_amount_input)
+        val ivCircleExpenseChecked = view.findViewById<ImageView>(R.id.iv_circle_expense_checked)
+
+        val detail = etDetailInput.text.toString().trim()
+        val amountString = etAmountInput.text.toString().replace(",", "").trim()
+        val amount = amountString.toIntOrNull() ?: 0
+        val isNoExpenseChecked = ivCircleExpenseChecked.visibility == View.VISIBLE
+
+        val errorBackground = ContextCompat.getDrawable(requireContext(), R.drawable.bg_edit_text_error)
+        val normalBackground = ContextCompat.getDrawable(requireContext(), R.drawable.bg_edit_text)
+
+        var hasError = false
+
+        // 지출 내용 확인
+        if (detail.isBlank() && !isNoExpenseChecked) {
+            etDetailInput.background = errorBackground
+            hasError = true
+            Toast.makeText(requireContext(), "지출 내용을 입력하세요.", Toast.LENGTH_SHORT).show()
+        } else {
+            etDetailInput.background = normalBackground
+        }
+
+        // 지출액 확인
+        if (amount <= 0 && !isNoExpenseChecked) {
+            etAmountInput.background = errorBackground
+            hasError = true
+            Toast.makeText(requireContext(), "지출액을 입력하세요.", Toast.LENGTH_SHORT).show()
+        } else {
+            etAmountInput.background = normalBackground
+        }
+
+        // 에러가 발생하면 저장 로직 중단
+        if (hasError) {
+            return false
+        }
+
+        // ViewModel에 저장
+        val selectedCategory = arguments?.getString("selectedCategory") ?: "기본 카테고리"
+        val expenseHistory = BotSheetUiState.Spending.History(
+            name = if (isNoExpenseChecked) "무지출" else detail,
+            price = if (isNoExpenseChecked) 0 else amount
+        )
+
+        botSheetViewModel.addExpenseToCategory(
+            SpendingCategory.valueOf(selectedCategory.uppercase()),
+            expenseHistory
+        )
+
+        Toast.makeText(requireContext(), "지출 내역이 저장되었습니다.", Toast.LENGTH_SHORT).show()
+
+        return true
+    }
+
+
+    private fun handleNavigationAfterSave(view: View) {
+        val tvDateInput = view.findViewById<TextView>(R.id.tv_date_input)
+
+        val selectedDateText = tvDateInput.text.toString()
+        val today = Calendar.getInstance()
+        val dateFormat = SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREAN)
+
+        val selectedDate = try {
+            dateFormat.parse(selectedDateText.substring(0, 13))
+        } catch (e: Exception) {
+            null
+        }
+
+        // 날짜 비교 로직 유지
+        if (selectedDate != null && dateFormat.format(selectedDate) != dateFormat.format(today.time)) {
+            Toast.makeText(requireContext(), "다른 날짜: 통계 화면으로 이동", Toast.LENGTH_SHORT).show()
+            navController.navigate(R.id.action_expenseEntryFragment_to_navigation_stat)
+        } else {
+            Toast.makeText(requireContext(), "오늘 날짜: 홈 화면으로 이동", Toast.LENGTH_SHORT).show()
+            requireActivity().onBackPressedDispatcher.onBackPressed() // 현재 화면 닫기
+        }
+    }
+
+
+    // 사진 첨부 버튼 로직
+    private fun setupPhotoFrame(view: View) {
+        val flPhotoFrame = view.findViewById<FrameLayout>(R.id.fl_photo_frame)
         flPhotoFrame.setOnClickListener {
             openGallery()
         }
