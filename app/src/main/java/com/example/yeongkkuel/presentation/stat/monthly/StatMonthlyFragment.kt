@@ -1,19 +1,15 @@
 package com.example.yeongkkuel.presentation.stat.monthly
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.example.yeongkkuel.databinding.FragmentStatMonthlyBinding
-import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
 import com.example.yeongkkuel.presentation.stat.monthly.adapter.viewpager.StatMonthlyCalenderViewPagerAdapter
 import com.example.yeongkkuel.presentation.util.toMoneyString
-import com.kakao.sdk.friend.view.NestedScrollableHost
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 

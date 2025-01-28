@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="black">#FF000000</color>
-
     <color name="white">#FFFFFFFF</color>
-
     <color name="main1">#5B3FE7</color>
     <color name="main2">#F8F7FF</color>
     <color name="main3">#3C19B0</color>
@@ -40,8 +38,6 @@
     <color name="button_enabled">#6200EE</color> <!-- 활성화 상태 색상 (보라색 예시) -->
     <color name="button_disabled">#BDBDBD</color> <!-- 비활성화 상태 색상 (회색 예시) -->
 
-
-
     <color name="pink">#FF5CA3</color>
     <color name="blue">#4385F7</color>
     <color name="green">#77BF48</color>
@@ -53,5 +49,4 @@
     <color name="tab_indicator">#00C9B2</color>
 
     <color name="transparent">#00000000</color>
-
 </resources>
