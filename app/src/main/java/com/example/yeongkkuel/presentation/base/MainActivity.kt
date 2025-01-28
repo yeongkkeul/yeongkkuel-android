@@ -11,6 +11,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -48,6 +49,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     private var categoryColor: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
 
         // 스플래시 화면 설정
         val splashScreen = this.installSplashScreen()
@@ -292,7 +294,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             botSheetViewModel.uiState
                 .flowWithLifecycle(lifecycle)
                 .collectLatest { uiState ->
-                    onBind(uiState)
+                    botSheetCategoryListAdapter.submitList(uiState.spendingList)
                 }
         }
     }
@@ -367,18 +369,17 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     }
 
     override fun navigateToExpenseEntry(selectedCategory: String, categoryColor: Int) {
-        // NavController를 이용해 지출 기입 페이지로 이동
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
-        val navController = navHostFragment.navController
-
-        // 선택된 카테고리 및 색상을 전달
+        // 선택된 카테고리 및 색상을 전달하기 위한 Bundle 생성
         val bundle = Bundle().apply {
             putString("selectedCategory", selectedCategory)
             putInt("categoryColor", categoryColor)
         }
+
+        val navController = findNavController(R.id.fragment_container) // 여기서 viewId인 R.id.fragment_container 사용
         navController.navigate(R.id.expenseEntryFragment, bundle)
     }
+
+
     override fun navigateToCategoryAddFragment() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment

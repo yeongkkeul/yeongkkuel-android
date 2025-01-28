@@ -25,9 +25,7 @@ class BotSheetViewModel : ViewModel() {
     }
 
     // 지출 내역 추가 기능
-    fun addExpenseToCategory(
-        category: SpendingCategory,
-        history: BotSheetUiState.Spending.History
+    fun addExpenseToCategory(category: SpendingCategory, history: BotSheetUiState.Spending.History
     ) {
         _uiState.update { prev ->
             val updatedList = prev.spendingList.map { spending ->

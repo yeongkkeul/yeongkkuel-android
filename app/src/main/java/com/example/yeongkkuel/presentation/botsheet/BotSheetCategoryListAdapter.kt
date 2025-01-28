@@ -42,11 +42,8 @@ class BotSheetCategoryListAdapter(
 
             // + 버튼 클릭 리스너 추가
             ivBtnAdd.setOnClickListener {
-                val selectedCategory = item.kind.kor // 선택된 카테고리 이름
-                val categoryColor = ContextCompat.getColor(context, item.color.id) // 카테고리 색상
-
-                // BotSheetListener의 메서드 호출
-                botSheetListener.navigateToExpenseEntry(selectedCategory, categoryColor)
+                // ViewModel을 통해 새로운 데이터 추가 로직
+                botSheetListener.navigateToExpenseEntry(item.kind.kor, item.color.id)
             }
         }
     }
@@ -67,13 +64,6 @@ class BotSheetCategoryListAdapter(
         holder.onBind(item)         // 아이템을 뷰홀더에 바인딩
     }
 
-    fun moveItem(fromPosition: Int, toPosition: Int) {
-        val currentList = currentList.toMutableList()
-        val item = currentList.removeAt(fromPosition)
-        currentList.add(toPosition, item)
-
-        submitList(currentList)
-    }
 }
 
 class SpendingCategoryListDiffUtil : DiffUtil.ItemCallback<BotSheetUiState.Spending>() {

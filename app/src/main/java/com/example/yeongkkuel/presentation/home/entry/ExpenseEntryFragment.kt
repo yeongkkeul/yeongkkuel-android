@@ -7,6 +7,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -58,7 +59,7 @@ class ExpenseEntryFragment : Fragment() {
         sharedPreferences =
             requireContext().getSharedPreferences("ExpensePrefs", Context.MODE_PRIVATE)
         val selectedCategory = arguments?.getString("selectedCategory") ?: "기본 카테고리"
-        val categoryColor = arguments?.getInt("categoryColor") ?: R.color.black2
+        val categoryColor = arguments?.getInt("categoryColor") ?: R.color.red1
         val tvDateInput = view.findViewById<TextView>(R.id.tv_date_input)
 
         tvCategoryInput.text = selectedCategory
@@ -132,7 +133,7 @@ class ExpenseEntryFragment : Fragment() {
         ivCircleSendAutoChecked.visibility = View.VISIBLE
         ivCircleSendAutoUnchecked.visibility = View.INVISIBLE
 
-        // 클릭 이벤트로 상태 전환 로직 추가
+        // 클릭 이벤트로 상태 전환 로직 f추가
         ivCircleSendAutoUnchecked.setOnClickListener {
             ivCircleSendAutoChecked.visibility = View.VISIBLE
             ivCircleSendAutoUnchecked.visibility = View.INVISIBLE
@@ -180,7 +181,7 @@ class ExpenseEntryFragment : Fragment() {
             val amountString = etAmountInput.text.toString().replace(",", "").trim()
             val amount = amountString.toIntOrNull() ?: 0
             val isNoExpenseChecked = ivCircleExpenseChecked.visibility == View.VISIBLE
-
+            val photoUri = sharedPreferences.getString("photoUri", null)
             // 에러 테두리를 위한 리소스
             val errorBackground = ContextCompat.getDrawable(requireContext(), R.drawable.bg_edit_text_error)
             val normalBackground = ContextCompat.getDrawable(requireContext(), R.drawable.bg_edit_text)
@@ -233,6 +234,7 @@ class ExpenseEntryFragment : Fragment() {
             // MainActivity의 바텀시트 RecyclerView 업데이트를 요청
             (requireActivity() as? MainActivity)?.let { mainActivity ->
                 mainActivity.initViewModel() // ViewModel 데이터에 기반하여 바텀시트 갱신
+
             }
 
             // 날짜 비교 후 화면 이동 처리
@@ -245,20 +247,19 @@ class ExpenseEntryFragment : Fragment() {
                 null // 파싱 실패 시 null 반환
             }
 
-            if (selectedDate != null && dateFormat.format(selectedDate) != dateFormat.format(today.time)) {
+            /*if (selectedDate != null && dateFormat.format(selectedDate) != dateFormat.format(today.time)) {
                 // 다른 날짜일 경우 지출탭(월간)으로 이동
                 navController.navigate(R.id.action_expenseEntryFragment_to_navigation_stat)
             } else {
                 // 오늘 날짜일 경우 홈 화면으로 이동
                 navController.navigate(R.id.action_expenseEntryFragment_to_navigation_home)
-            }
+            }*/
+            navController.navigate(R.id.action_expenseEntryFragment_to_navigation_home)
         }
         // 사진 첨부 버튼 클릭 이벤트
         flPhotoFrame.setOnClickListener {
             openGallery()
         }
-
-
 
         // et_detail_input 초기화
         etDetailInput.setText(sharedPreferences.getString("detailInput", ""))
@@ -340,7 +341,12 @@ class ExpenseEntryFragment : Fragment() {
                 val ivPhotoIcon = view?.findViewById<ImageView>(R.id.iv_photo_icon)
                 imgPhotoFrame?.setImageURI(uri)
                 ivPhotoIcon?.visibility = View.GONE
-                sharedPreferences.edit().putString("photoUri", uri.toString()).apply()
+                try {
+                    sharedPreferences.edit().putString("photoUri", uri.toString()).apply()
+                } catch (e: Exception) {
+                    Log.e("ExpenseEntryFragment", "Error while saving photo URI: ", e)
+                }
+
             }
         }
     }

@@ -50,6 +50,6 @@ private class SpendingHistoryListDiffUtil : DiffUtil.ItemCallback<BotSheetUiStat
         oldItem: BotSheetUiState.Spending.History,
         newItem: BotSheetUiState.Spending.History
     ): Boolean {
-        return oldItem.name == newItem.name
+        return oldItem.name == newItem.name && oldItem.price == newItem.price
     }
 }
