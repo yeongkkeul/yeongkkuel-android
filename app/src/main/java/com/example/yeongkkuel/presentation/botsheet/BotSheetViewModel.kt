@@ -3,6 +3,8 @@ package com.example.yeongkkuel.presentation.botsheet
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.yeongkkuel.R
+import com.example.yeongkkuel.presentation.home.category.Category
 import com.example.yeongkkuel.presentation.network.RetrofitClient
 import com.example.yeongkkuel.presentation.util.Colors
 import com.example.yeongkkuel.presentation.util.SpendingCategory
@@ -95,18 +97,19 @@ class BotSheetViewModel : ViewModel() {
                 month = month,
                 day = day
             ).run {
-                if(isSuccess){
-                    result.run{
-                        _uiState.update { prev->
+                if (isSuccess) {
+                    result.run {
+                        _uiState.update { prev ->
                             prev.copy(
                                 spendingList = categories.map {
                                     BotSheetUiState.Spending(
                                         kind = SpendingCategory.fromKor(it.categoryName),
-                                        color = Colors.fromCode(it.categoryColor),
-                                        history = it.expenses.map {
+                                        color = Colors.fromCode(it.categoryColor) ?: Colors.RED1, // 기본값 추가
+                                        plusIconResId = R.drawable.ic_plus_default,
+                                        history = it.expenses.map { expense ->
                                             BotSheetUiState.Spending.History(
-                                                name = it.expenseName,
-                                                price = it.expenseAmount
+                                                name = expense.expenseName,
+                                                price = expense.expenseAmount
                                             )
                                         }
                                     )
@@ -116,8 +119,9 @@ class BotSheetViewModel : ViewModel() {
                     }
                 }
             }
-        }catch (e:Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
+
 }
