@@ -22,6 +22,34 @@
             android:id="@+id/action_navigation_chat_to_navigation_chat_group"
             app:destination="@id/navigation_chat_group"
             app:popUpTo="@id/navigation_chat_group"/>
+        <action
+            android:id="@+id/action_navigation_chat_to_navigation_chat_room_register"
+            app:destination="@id/navigation_chat_room_register"
+            app:popUpTo="@id/navigation_chat_room_register"/>
+        <action
+            android:id="@+id/action_navigation_chat_to_navigation_chat_room_search"
+            app:destination="@id/navigation_chat_room_search"
+            app:popUpTo="@id/navigation_chat_room_search"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_chat_room_search"
+        android:name="com.example.yeongkkuel.presentation.chat.ChatRoomSearchFragment"
+        tools:layout="@layout/fragment_chat_room_search">
+        <action
+            android:id="@+id/action_navigation_chat_room_search_to_register"
+            app:destination="@id/navigation_chat_room_register"
+            app:popUpTo="@id/navigation_chat_room_register"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_chat_room_register"
+        android:name="com.example.yeongkkuel.presentation.chat.ChatRoomRegisterFragment"
+        tools:layout="@layout/fragment_chat_room_register">
+        <action
+            android:id="@+id/action_navigation_chat_room_register_to_chat_group"
+            app:destination="@id/navigation_chat_group"
+            app:popUpTo="@id/navigation_chat_group"/>
     </fragment>
 
     <fragment
@@ -38,36 +66,6 @@
         android:id="@+id/navigation_chat_room_rank"
         android:name="com.example.yeongkkuel.presentation.chat.ChatRoomRankFragment"
         tools:layout="@layout/fragment_chat_room_rank">
-        <action
-            android:id="@+id/action_navigation_chat_room_rank_to_daily"
-            app:destination="@id/navigation_chat_room_rank_daily_container"
-            app:popUpTo="@id/navigation_chat_room_rank_daily_container" />
-        <action
-            android:id="@+id/action_navigation_chat_room_rank_to_weekly"
-            app:destination="@id/navigation_chat_room_rank_weekly_container"
-            app:popUpTo="@id/navigation_chat_room_rank_weekly_container" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/navigation_chat_room_rank_daily_container"
-        android:name="com.example.yeongkkuel.presentation.chat.ChatRoomRankDailyFragment"
-        android:label="fragment_chat_room_rank_daily"
-        tools:layout="@layout/fragment_chat_room_rank_daily">
-        <action
-            android:id="@+id/action_navigation_daily_to_chat_room_rank_fragment"
-            app:destination="@id/navigation_chat_room_rank"
-            app:popUpTo="@id/navigation_chat_room_rank" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/navigation_chat_room_rank_weekly_container"
-        android:name="com.example.yeongkkuel.presentation.chat.ChatRoomRankWeeklyFragment"
-        android:label="fragment_chat_room_rank_weekly"
-        tools:layout="@layout/fragment_chat_room_rank_weekly">
-        <action
-            android:id="@+id/action_navigation_weekly_to_chat_room_rank_fragment"
-            app:destination="@id/navigation_chat_room_rank"
-            app:popUpTo="@id/navigation_chat_room_rank" />
     </fragment>
 
     <fragment
