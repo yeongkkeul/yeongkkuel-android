@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="165dp"
+    android:layout_height="92dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@drawable/bg_menu_fab">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_fab_menu_chat"
+        android:layout_width="165dp"
+        android:layout_height="46dp">
+
+        <ImageView
+            android:id="@+id/iv_fab_menu_chat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_fab_menu_chat"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="채팅방 만들기"
+            android:textColor="@color/black"
+            style="@style/body_medium"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="14dp"
+            app:layout_constraintStart_toEndOf="@+id/iv_fab_menu_chat"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_fab_menu_chat" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_fab_menu_compass"
+        android:layout_width="165dp"
+        android:layout_height="46dp">
+
+        <ImageView
+            android:id="@+id/iv_fab_menu_compass"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_fab_menu_compass"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="채팅방 둘러보기"
+            android:textColor="@color/black"
+            style="@style/body_medium"
+            android:layout_marginStart="12dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintStart_toEndOf="@+id/iv_fab_menu_compass"
+            app:layout_constraintBottom_toBottomOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>

@@ -36,7 +36,6 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
             fragment = this@StatFragment,
             weeklyViewModel = weeklyViewModel,
             monthlyViewModel = monthlyViewModel)
-
     }
 
     private var botSheetListener: BotSheetListener? = null

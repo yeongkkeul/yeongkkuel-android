@@ -12,7 +12,6 @@
     <string name="category_add">카테고리 추가</string>
     <string name="category_edit">카테고리 수정</string>
 
-
     <!-- Login -->
     <string name="splash_logo_description">splash_logo</string>
     <string name="login_kakao">카카오로 시작하기</string>
@@ -39,10 +38,10 @@
     <string name="signup_job_housewife">주부</string>
     <string name="signup_job_business_owner">자영업자</string>
 
-
     <!-- Stat -->
     <string name="stat_daily">일간</string>
     <string name="stat_weekly">주간</string>
     <string name="stat_monthly">월간</string>
 
+    <string name="chat_room_rank_info">지출 총액, 무지출 달성 카테고리 개수, 지출\n기입률의 가중치 합으로 지출 점수가 산출돼\n요. 지출 기입을 건너뛰면 챌린저 랭킹에 참\n여하지 못할 수 있어요. 지출이 없다면 무지\n출로 기입해주세요.랭킹은 매일 자정 업데이\n트 돼요. </string>
 </resources>

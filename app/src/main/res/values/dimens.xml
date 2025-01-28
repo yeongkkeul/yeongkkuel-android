@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="space_xx_small">4dp</dimen>
-    <dimen name="space_x_small">8dp</dimen>
+    <dimen name="space_x_small">4dp</dimen>
     <dimen name="space_small">12dp</dimen>
     <dimen name="space_median">16dp</dimen>
     <dimen name="space_s_large">18dp</dimen>
     <dimen name="space_large">20dp</dimen>
     <dimen name="space_x_large">24dp</dimen>
 
-<!--Sign up-->
+    <!--Sign up-->
     <dimen name="signup_gender_margin">56dp</dimen>
     <dimen name="signup_margin_top">64dp</dimen>
 
@@ -19,4 +19,14 @@
     <dimen name="sp_large">22sp</dimen>
     <dimen name="sp_standard">15sp</dimen>
     <dimen name="sp_small">12sp</dimen>
+
+    <!--Chat-->
+    <dimen name="design_fab_size_normal">48dp</dimen>
+    <dimen name="design_fab_image_size">48dp</dimen>
+    <dimen name="space_chat_room_rank">28dp</dimen>
+    <dimen name="dialog_chat_room_width">328dp</dimen>
+    <dimen name="dialog_chat_room_exit_height">256dp</dimen>
+    <dimen name="dialog_chat_room_pw_height">184dp</dimen>
+    <dimen name="dialog_chat_room_expense_auto_send_height">245dp</dimen>
+    <dimen name="dialog_chat_room_expel_height">188dp</dimen>
 </resources>

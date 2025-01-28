@@ -1,27 +1,15 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.Yeongkkuel" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
         <item name="android:windowBackground">@android:color/white</item>
     </style>
 
     <style name="Theme.Yeongkkuel" parent="Base.Theme.Yeongkkuel" />
 
-
-
-
-    <!-- 0.1 s 의 더미 splash screen -->
     <style name="Theme.Yeongkkuel.Splash" parent="Theme.SplashScreen">
-        <!-- 배경 설정 -->
         <item name="windowSplashScreenBackground">@color/main2</item>
-
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_dummy_splash</item>
-
-        <!-- 애니메이션 지속 시간 (ms) -->
         <item name="windowSplashScreenAnimationDuration">100</item>
-
-        <!-- 스플래시 종료 후 기본 테마 -->
         <item name="postSplashScreenTheme">@style/Theme.Yeongkkuel</item>
     </style>
 </resources>

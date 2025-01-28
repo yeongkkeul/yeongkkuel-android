@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
@@ -143,15 +144,64 @@
         android:id="@+id/navigation_chat"
         android:name="com.example.yeongkkuel.presentation.chat.ChatFragment"
         android:label="fragment_chat"
-        tools:layout="@layout/fragment_chat" />
+        tools:layout="@layout/fragment_chat">
+        <action
+            android:id="@+id/action_navigation_chat_to_navigation_chat_group"
+            app:destination="@id/navigation_chat_group"
+            app:popUpTo="@id/navigation_chat_group"/>
+        <action
+            android:id="@+id/action_navigation_chat_to_navigation_chat_room_register"
+            app:destination="@id/navigation_chat_room_register"
+            app:popUpTo="@id/navigation_chat_room_register"/>
+        <action
+            android:id="@+id/action_navigation_chat_to_navigation_chat_room_search"
+            app:destination="@id/navigation_chat_room_search"
+            app:popUpTo="@id/navigation_chat_room_search"/>
+    </fragment>
 
+    <fragment
+        android:id="@+id/navigation_chat_room_search"
+        android:name="com.example.yeongkkuel.presentation.chat.ChatRoomSearchFragment"
+        tools:layout="@layout/fragment_chat_room_search">
+        <action
+            android:id="@+id/action_navigation_chat_room_search_to_register"
+            app:destination="@id/navigation_chat_room_register"
+            app:popUpTo="@id/navigation_chat_room_register"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_chat_room_register"
+        android:name="com.example.yeongkkuel.presentation.chat.ChatRoomRegisterFragment"
+        tools:layout="@layout/fragment_chat_room_register">
+        <action
+            android:id="@+id/action_navigation_chat_room_register_to_chat_group"
+            app:destination="@id/navigation_chat_group"
+            app:popUpTo="@id/navigation_chat_group"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_chat_group"
+        android:name="com.example.yeongkkuel.presentation.chat.ChatGroupFragment"
+        tools:layout="@layout/fragment_chat_group">
+        <action
+            android:id="@+id/action_navigation_chat_room_group_to_rank"
+            app:destination="@id/navigation_chat_room_rank"
+            app:popUpTo="@id/navigation_chat_room_rank" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_chat_room_rank"
+        android:name="com.example.yeongkkuel.presentation.chat.ChatRoomRankFragment"
+        tools:layout="@layout/fragment_chat_room_rank">
+    </fragment>
 
     <!-- stat -->
     <fragment
         android:id="@+id/navigation_stat"
         android:name="com.example.yeongkkuel.presentation.stat.StatFragment"
         android:label="fragment_stat"
-        tools:layout="@layout/fragment_stat"></fragment>
+        tools:layout="@layout/fragment_stat">
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_stat_setting"
@@ -205,19 +255,25 @@
         android:id="@+id/navigation_reward"
         android:name="com.example.yeongkkuel.presentation.my.reward.RewardFragment"
         android:label="fragment_reward"
-        tools:layout="@layout/fragment_reward"></fragment>
+        tools:layout="@layout/fragment_reward">
+
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_my_edit"
         android:name="com.example.yeongkkuel.presentation.my.EditProfileFragment"
         android:label="fragment_my_edit"
-        tools:layout="@layout/fragment_edit_profile"></fragment>
+        tools:layout="@layout/fragment_edit_profile">
+
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_daily_expense_goal"
         android:name="com.example.yeongkkuel.presentation.my.DailyExpenseGoalFragment"
         android:label="fragment_my_edit"
-        tools:layout="@layout/fragment_daily_expense_goal"></fragment>
+        tools:layout="@layout/fragment_daily_expense_goal">
+
+    </fragment>
 
 
 </navigation>
