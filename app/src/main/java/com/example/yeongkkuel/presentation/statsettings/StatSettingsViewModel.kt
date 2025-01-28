@@ -59,28 +59,9 @@ class StatSettingsViewModel : ViewModel() {
         }
     }
 
-
     fun setTargetSpending(targetSpending: Int, isSuccess: () -> Unit) = viewModelScope.launch {
         try {
             isSuccess()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    fun getAverageMonthlyExpenditure() = viewModelScope.launch {
-        try {
-            yeongkkuelService.getExpenditureAverageMonthly().run {
-                if (isSuccess) {
-                    result.run {
-                        _uiState.update { prev ->
-                            prev.copy(
-                                averageOutcome = averageExpenditure
-                            )
-                        }
-                    }
-                }
-            }
         } catch (e: Exception) {
             e.printStackTrace()
         }

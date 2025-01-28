@@ -36,7 +36,7 @@ interface YeongkkuelService {
         @Path("month") month: Int
     ): Response<MonthExpendituresCalendar>
 
-    @GET("/api/expenditures/month/{year}/{month}/{day}")
+    @GET("/api/expenditures/{year}/{month}/{day}")
     fun getExpendituresMonthCategory(
         @Path("year") year: Int,
         @Path("month") month: Int,
