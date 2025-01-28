@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_fragment_chat"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -13,20 +16,6 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             app:layout_constraintGuide_percent="0.01" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_fab_h"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.9" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_fab_v"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.81" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_title_chat_v"
@@ -42,23 +31,10 @@
             android:orientation="vertical"
             app:layout_constraintGuide_percent="0.04" />
 
-        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-            android:id="@+id/floatingActionButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:elevation="8dp"
-            android:backgroundTint="@color/main1"
-            app:icon="@drawable/ic_fab_chat"
-            app:iconTint="@color/white"
-            app:layout_constraintStart_toStartOf="@+id/guideline_fab_v"
-            app:layout_constraintTop_toTopOf="@+id/guideline_fab_h" />
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/app_bar"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="60dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -100,11 +76,13 @@
             android:layout_height="wrap_content"
             android:text="나의 챌린지 그룹"
             android:textColor="@color/main3"
+            android:textStyle="bold"
             style="@style/title_semib"
             app:layout_constraintStart_toStartOf="@+id/guideline_title_chat_h"
             app:layout_constraintTop_toBottomOf="@+id/app_bar" />
 
         <androidx.core.widget.NestedScrollView
+            android:id="@+id/ns_rv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -119,6 +97,15 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
         </androidx.core.widget.NestedScrollView>
+
+        <View
+            android:id="@+id/dimView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#80000000"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layout_empty"
@@ -135,6 +122,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="가입한 무지출 챌린지 채팅방이 없어요."
+                android:textColor="@color/black"
+                android:textStyle="bold"
                 style="@style/body_semibo"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -149,10 +138,42 @@
                 android:textColor="@color/main1"
                 android:gravity="center"
                 style="@style/body_regula"
+                android:layout_marginTop="8dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_title_empty_view_1" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatingActionButton"
+        style="@style/FloatingButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:elevation="8dp"
+        android:src="@drawable/ic_fab_chat"
+        app:maxImageSize="30dp"
+        app:layout_anchor="@id/cl_fragment_chat"
+        app:layout_anchorGravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="14dp" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatingActionButtonCancel"
+        style="@style/FloatingButtonCancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:elevation="8dp"
+        android:src="@drawable/ic_fab_close"
+        app:maxImageSize="30dp"
+        app:layout_anchor="@id/cl_fragment_chat"
+        app:layout_anchorGravity="bottom|end"
+        android:visibility="invisible"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="14dp" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

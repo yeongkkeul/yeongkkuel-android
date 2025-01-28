@@ -8,12 +8,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.ItemChatRoomBinding
+import com.example.yeongkkuel.presentation.chat.ChatRoomExitDialog
 import com.example.yeongkkuel.presentation.chat.ChatRoom
 import com.example.yeongkkuel.presentation.chat.ChatRoomClickListener
+import com.example.yeongkkuel.utils.SwipeToDelete
 
 class ChatRoomAdapter(
     val chatRooms: ArrayList<ChatRoom>,
-    private val listener: ChatRoomClickListener
+    private val listener: ChatRoomClickListener,
+    private val recyclerView: RecyclerView,
+    private val swipeToDelete: SwipeToDelete
 ) : RecyclerView.Adapter<ChatRoomAdapter.ChatRoomViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatRoomViewHolder {
@@ -38,7 +42,7 @@ class ChatRoomAdapter(
         fun bind(chatRoom: ChatRoom) {
             binding.apply {
                 Glide.with(ivThumbnail.context)
-                    .load(chatRoom.thumbnailUrl) // URL에서 이미지 로드
+                    .load(chatRoom.thumbnailUrl)
                     .into(ivThumbnail)
                 tvTitleChatRoom.text = chatRoom.title
                 tvThumbnailMessage.text = chatRoom.recentMessage
@@ -50,10 +54,24 @@ class ChatRoomAdapter(
             }
 
             binding.layoutDelete.setOnClickListener {
-                removeItem(this.layoutPosition)
-                listener.onItemDeleted(chatRoom)
-                Toast.makeText(binding.root.context, "삭제되었습니다.", Toast.LENGTH_SHORT).show()
+                showDeleteDialog(chatRoom, this.layoutPosition)
             }
+        }
+
+        private fun showDeleteDialog(chatRoom: ChatRoom, position: Int) {
+            val context = binding.root.context
+            val dialog = ChatRoomExitDialog(
+                context,
+                recyclerView = recyclerView,
+                swipeToDelete = swipeToDelete,
+                onCancelClick = { },
+                onExitClick = {
+                    removeItem(position)
+                    listener.onItemDeleted(chatRoom)
+                    Toast.makeText(context, "삭제되었습니다.", Toast.LENGTH_SHORT).show()
+                }
+            )
+            dialog.show()
         }
     }
 
