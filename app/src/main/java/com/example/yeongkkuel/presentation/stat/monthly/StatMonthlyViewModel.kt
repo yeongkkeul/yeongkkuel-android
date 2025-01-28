@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yeongkkuel.presentation.network.RetrofitClient
 import com.example.yeongkkuel.presentation.util.Week
+import com.example.yeongkkuel.presentation.util.getDay
 import com.github.mikephil.charting.data.PieEntry
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +19,7 @@ class StatMonthlyViewModel : ViewModel() {
     private val yeongkkuelService = RetrofitClient.yeongkkuelService
 
     fun getCalender(year: Int, month: Int) = viewModelScope.launch {
-        fun getDayList(year: Int, month: Int): List<StatMonthlyUiState.CalendarData.CalendarDay> {
+        fun getEmptyDayList(year: Int, month: Int): List<StatMonthlyUiState.CalendarData.CalendarDay> {
             val calendar = Calendar.getInstance().apply {
                 set(Calendar.YEAR, year)
                 set(Calendar.MONTH, month - 1)
@@ -58,12 +59,47 @@ class StatMonthlyViewModel : ViewModel() {
             return resultList
         }
 
+        fun List<StatMonthlyUiState.CalendarData.CalendarDay>.getData(): List<StatMonthlyUiState.CalendarData.CalendarDay>{
+            try{
+                yeongkkuelService.getExpendituresMonthCalendar(year = year, month = month).run{
+                    if(isSuccess){
+                            val dataList = result.selectedMonthExpenses.map{
+                                StatMonthlyUiState.CalendarData.CalendarDay(
+                                    day = it.expenseDate.getDay(),
+                                    pieDataList = listOf(
+                                        PieEntry((result.dayTargetExpenditure - it.expenditure).toFloat(),"나머지" ),
+                                        PieEntry(it.expenditure.toFloat(), "지출")
+                                    )
+                                )
+                            }
+
+                        val mergedList = this@getData.toMutableList()
+                        dataList.forEach { data ->
+                            val existingIndex = mergedList.indexOfFirst { it.day == data.day }
+                            if (existingIndex != -1) {
+                                val existingDay = mergedList[existingIndex]
+                                mergedList[existingIndex] = existingDay.copy(
+                                    pieDataList = existingDay.pieDataList + data.pieDataList
+                                )
+                            } else {
+                                mergedList.add(data)
+                            }
+                        }
+                        return mergedList
+                    }
+                }
+            } catch (e:Exception){
+                e.printStackTrace()
+            }
+            return this
+        }
+
         val dayOfWeekList: List<StatMonthlyUiState.CalendarData> =
             Week.getListItem().map { week ->
                 StatMonthlyUiState.CalendarData.CalendarDayOfWeek(week)
             }
 
-        val dayList = getDayList(year, month)
+        val dayList = getEmptyDayList(year, month)
 
         _uiState.update { prev ->
             prev.copy(
