@@ -1,0 +1,55 @@
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="328dp"
+    android:layout_height="188dp"
+    android:orientation="vertical"
+    android:paddingTop="36dp"
+    android:paddingBottom="12dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:background="@drawable/bg_chat_room_dialog">
+
+    <TextView
+        android:id="@+id/tv_title_chat_room_expel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="잠깐!"
+        android:textColor="@color/main1"
+        android:textStyle="bold"
+        style="@style/title_semib"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_content_chat_room_expel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="해당 채팅방에 가입할 수 없어요."
+        android:textColor="@color/black"
+        style="@style/body_medium"
+        android:gravity="center"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_title_chat_room_expel" />
+
+    <TextView
+        android:id="@+id/btn_confirm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="확인"
+        android:textColor="@color/white"
+        style="@style/body_medium"
+        android:gravity="center"
+        android:paddingStart="130dp"
+        android:paddingEnd="130dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:background="@drawable/bg_btn_dialog_confirm"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

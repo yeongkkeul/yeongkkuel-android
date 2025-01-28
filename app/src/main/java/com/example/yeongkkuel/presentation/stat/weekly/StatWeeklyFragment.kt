@@ -11,16 +11,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentStatWeeklyBinding
-import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
-import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import com.example.yeongkkuel.presentation.stat.weekly.adapter.StatWeeklyCompareListAdapter
 import com.example.yeongkkuel.presentation.stat.weekly.adapter.StatWeeklyPieChartCategoryListAdapter
 import com.example.yeongkkuel.presentation.stat.weekly.adapter.StatWeeklyWeekListAdapter
@@ -214,9 +210,9 @@ class StatWeeklyFragment(
         fun setTargetSpending() {
             weekListAdapter.setTargetSpending(uiState.targetSpending)
 
-            val targetSpendingString = uiState.targetSpending.toMoneyString()
-            tvTargetSpending.text = "${targetSpendingString}원"
-            tvLineTargetSpending.text = "하루 목표 지출액 ${targetSpendingString}원"
+            val totalSepnding = uiState.totalSpending.toMoneyString()
+            tvTotalSpending.text = "${totalSepnding}원"
+            tvLineTargetSpending.text = "하루 목표 지출액 ${totalSepnding}원"
         }
 
         fun initPieChart(){

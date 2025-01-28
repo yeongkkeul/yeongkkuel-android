@@ -1,23 +1,16 @@
 package com.example.yeongkkuel.presentation.login
 
-
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.yeongkkuel.BuildConfig
-
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentLoginBinding
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
@@ -32,19 +25,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.logging.HttpLoggingInterceptor
 import timber.log.Timber
-import java.util.logging.Logger
-
-// local.properties 파일에 저장된 native_app_key를 가져옴
-
 
 class LoginFragment : Fragment() {
 
-
     private var _binding: FragmentLoginBinding? = null
     private val binding: FragmentLoginBinding
-
         get() = requireNotNull(_binding) { "FragmentLoginBinding -> null" }
 
     override fun onCreateView(
@@ -267,7 +253,6 @@ class LoginFragment : Fragment() {
             }
         }
     }
-
 
     private fun navigateToSignUp() {
         findNavController().navigate(R.id.action_loginFragment_to_signupFragment)

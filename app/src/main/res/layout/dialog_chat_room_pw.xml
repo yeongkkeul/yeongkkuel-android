@@ -1,0 +1,97 @@
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="328dp"
+    android:layout_height="184dp"
+    android:orientation="vertical"
+    android:paddingTop="28dp"
+    android:paddingBottom="12dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:background="@drawable/bg_chat_room_dialog">
+
+    <TextView
+        android:id="@+id/tv_title_chat_room_pw"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="채팅창 비밀번호"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        style="@style/humm_semibo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_warning_chat_room_pw"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="비밀번호가 일치하지 않습니다."
+        android:textColor="@color/error"
+        android:textStyle="bold"
+        style="@style/small_semib"
+        android:layout_marginStart="8dp"
+        android:visibility="invisible"
+        app:layout_constraintStart_toEndOf="@+id/tv_title_chat_room_pw"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_title_chat_room_pw" />
+
+    <EditText
+        android:id="@+id/et_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:inputType="numberPassword"
+        android:hint="숫자 4자리를 입력하세요."
+        style="@style/body_regula"
+        android:background="@drawable/bg_edittext_pw"
+        android:layout_marginTop="12dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_title_chat_room_pw" />
+
+    <ImageView
+        android:id="@+id/btn_show_off_pw"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/btn_eye_off"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="@+id/et_password"
+        app:layout_constraintTop_toTopOf="@+id/et_password"
+        app:layout_constraintBottom_toBottomOf="@+id/et_password" />
+
+    <TextView
+        android:id="@+id/btn_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="취소"
+        android:textColor="@color/black"
+        style="@style/body_medium"
+        android:gravity="center"
+        android:paddingStart="58dp"
+        android:paddingEnd="58dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:background="@drawable/bg_btn_dialog_cancel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/btn_confirm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="확인"
+        android:textColor="@color/white"
+        style="@style/body_medium"
+        android:gravity="center"
+        android:paddingStart="58dp"
+        android:paddingEnd="58dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:background="@drawable/bg_btn_dialog_confirm"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

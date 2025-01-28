@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- 위쪽에 표시할 구분선 (처음 헤더에는 숨기고, 중간 헤더부터 보임 등 제어) -->
+    <View
+        android:id="@+id/viewHeaderDivider"
+        android:layout_width="match_parent"
+        android:layout_height="12dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/black0"
+        android:visibility="gone" />
+
+    <!-- 섹션 타이틀 -->
+    <TextView
+        android:id="@+id/tvHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        style="@style/humm_semibo"
+        android:paddingHorizontal="16dp"
+        android:textColor="@android:color/black"
+        android:textStyle="bold" />
+</LinearLayout>

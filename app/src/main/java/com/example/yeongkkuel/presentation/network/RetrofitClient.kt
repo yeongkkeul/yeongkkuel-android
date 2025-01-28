@@ -6,7 +6,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    private const val BASE_URL = ""
+    private const val BASE_URL = "http://yeongkkeul-dev-env.eba-eyarkt4k.ap-northeast-2.elasticbeanstalk.com"
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -26,7 +26,7 @@ object RetrofitClient {
             .build()
     }
 
-    val search: YeongkkuelService by lazy {
+    val yeongkkuelService: YeongkkuelService by lazy {
         retrofit.create(YeongkkuelService::class.java)
     }
 }

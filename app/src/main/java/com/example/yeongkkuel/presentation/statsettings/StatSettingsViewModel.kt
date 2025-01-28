@@ -2,6 +2,8 @@ package com.example.yeongkkuel.presentation.statsettings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.yeongkkuel.presentation.network.RetrofitClient
+import com.example.yeongkkuel.presentation.network.request.expenditure.ExpenditureTargetRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -11,6 +13,8 @@ import timber.log.Timber
 class StatSettingsViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(StatSettingsUiState.init())
     val uiState = _uiState.asStateFlow()
+
+    private val yeongkkuelService = RetrofitClient.yeongkkuelService
 
     fun setAverage(income: Int, outcome: Int) {
         _uiState.update { prev ->
@@ -38,21 +42,22 @@ class StatSettingsViewModel : ViewModel() {
         }
     }
 
-    fun prevPage(isFirstPage: () -> Unit){
-        _uiState.update {prev->
-            when(prev.recommendStep){
+    fun prevPage(isFirstPage: () -> Unit) {
+        _uiState.update { prev ->
+            when (prev.recommendStep) {
                 RecommendStep.AVERAGE -> {
                     isFirstPage()
                     prev.copy(recommendStep = RecommendStep.AVERAGE)
                 }
+
                 RecommendStep.RATIO ->
                     prev.copy(recommendStep = RecommendStep.AVERAGE)
+
                 RecommendStep.SET ->
                     prev.copy(recommendStep = RecommendStep.RATIO)
             }
         }
     }
-
 
     fun setTargetSpending(targetSpending: Int, isSuccess: () -> Unit) = viewModelScope.launch {
         try {
@@ -61,4 +66,13 @@ class StatSettingsViewModel : ViewModel() {
             e.printStackTrace()
         }
     }
+
+    fun setDayTargetExpenditure(targetSpending: Int) = viewModelScope.launch {
+        try {
+            yeongkkuelService.postExpendituresTarget(ExpenditureTargetRequest(targetSpending))
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
 }
