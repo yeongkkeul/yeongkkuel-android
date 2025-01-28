@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_chat_room_detail_h"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.52" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/app_bar"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/btn_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/btn_back"
+                android:layout_marginStart="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        
+        <ImageView
+            android:id="@+id/iv_chat_room_thumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="440dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/app_bar" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@drawable/bg_chat_room_detail_sheet"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline_chat_room_detail_h"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/gl_chat_room_detail_sheet"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_begin="24dp" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/gl_chat_room_detail_data"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_begin="164dp" />
+
+            <TextView
+                android:id="@+id/tv_title_chat_room"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:text="채팅방 이름"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                style="@style/humm_semibo"
+                app:layout_constraintStart_toStartOf="@+id/gl_chat_room_detail_sheet"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_time_last_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
+                android:layout_marginTop="32dp"
+                android:text="30분 전 활동"
+                android:textColor="@color/sub1"
+                android:textStyle="bold"
+                style="@style/body_semibo"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_tag_age"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:text="연령대"
+                android:textColor="@color/black"
+                style="@style/body_regula"
+                android:background="@drawable/bg_chat_room_detail_tag"
+                app:layout_constraintStart_toStartOf="@+id/gl_chat_room_detail_sheet"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_chat_room" />
+
+            <TextView
+                android:id="@+id/tv_tag_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:text="신분"
+                android:textColor="@color/black"
+                style="@style/body_regula"
+                android:background="@drawable/bg_chat_room_detail_tag"
+                app:layout_constraintStart_toEndOf="@+id/tv_tag_age"
+                app:layout_constraintTop_toTopOf="@+id/tv_tag_age" />
+
+            <TextView
+                android:id="@+id/tv_tag_days"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:text="123 일째"
+                android:textColor="@color/black"
+                style="@style/body_regula"
+                android:background="@drawable/bg_chat_room_detail_tag"
+                app:layout_constraintStart_toEndOf="@+id/tv_tag_status"
+                app:layout_constraintTop_toTopOf="@+id/tv_tag_status" />
+
+            <TextView
+                android:id="@+id/tv_title_challenger"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="17dp"
+                android:text="챌린저"
+                android:textColor="@color/main1"
+                style="@style/body_regula"
+                app:layout_constraintStart_toStartOf="@+id/gl_chat_room_detail_sheet"
+                app:layout_constraintTop_toBottomOf="@+id/tv_tag_days" />
+
+            <TextView
+                android:id="@+id/tv_title_daily_expense"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="하루 목표 지출액"
+                android:textColor="@color/main1"
+                style="@style/body_regula"
+                app:layout_constraintStart_toStartOf="@+id/gl_chat_room_detail_sheet"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_challenger" />
+
+            <TextView
+                android:id="@+id/tv_title_daily_goal_expense"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="하루 목표 지출액"
+                android:textColor="@color/main1"
+                style="@style/body_regula"
+                app:layout_constraintStart_toStartOf="@+id/gl_chat_room_detail_sheet"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_challenger" />
+
+            <TextView
+                android:id="@+id/tv_title_goal_success_challenger"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="목표 달성 챌린저"
+                android:textColor="@color/main1"
+                style="@style/body_regula"
+                app:layout_constraintStart_toStartOf="@+id/gl_chat_room_detail_sheet"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_daily_goal_expense" />
+
+            <TextView
+                android:id="@+id/tv_title_expense_average"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="지출 평균"
+                android:textColor="@color/main1"
+                style="@style/body_regula"
+                app:layout_constraintStart_toStartOf="@+id/gl_chat_room_detail_sheet"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_goal_success_challenger" />
+
+            <TextView
+                android:id="@+id/tv_title_challenger_group_rank"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="챌린지 그룹 랭킹"
+                android:textColor="@color/main1"
+                style="@style/body_regula"
+                app:layout_constraintStart_toStartOf="@+id/gl_chat_room_detail_sheet"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_expense_average" />
+
+            <TextView
+                android:id="@+id/tv_data_challenger"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="12/30"
+                android:textColor="@color/black"
+                style="@style/body_regula"
+                app:layout_constraintStart_toStartOf="@+id/gl_chat_room_detail_data"
+                app:layout_constraintTop_toTopOf="@+id/tv_title_challenger" />
+
+            <TextView
+                android:id="@+id/tv_data_daily_expense"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10,000원"
+                android:textColor="@color/black"
+                style="@style/body_regula"
+                app:layout_constraintStart_toStartOf="@+id/gl_chat_room_detail_data"
+                app:layout_constraintTop_toTopOf="@+id/tv_title_daily_expense" />
+
+            <TextView
+                android:id="@+id/tv_data_goal_success_challenger"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="8/12"
+                android:textColor="@color/black"
+                style="@style/body_regula"
+                app:layout_constraintStart_toStartOf="@+id/gl_chat_room_detail_data"
+                app:layout_constraintTop_toTopOf="@+id/tv_title_goal_success_challenger" />
+
+            <TextView
+                android:id="@+id/tv_data_expense_average"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="11,020원"
+                android:textColor="@color/black"
+                style="@style/body_regula"
+                app:layout_constraintStart_toStartOf="@+id/gl_chat_room_detail_data"
+                app:layout_constraintTop_toTopOf="@+id/tv_title_expense_average" />
+
+            <TextView
+                android:id="@+id/tv_data_challenger_group_rank"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="30대 직장인 상위 3%"
+                android:textColor="@color/black"
+                style="@style/body_regula"
+                app:layout_constraintStart_toStartOf="@+id/gl_chat_room_detail_data"
+                app:layout_constraintTop_toTopOf="@+id/tv_title_challenger_group_rank" />
+
+            <TextView
+                android:id="@+id/btn_register"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="가입하기"
+                android:textColor="@color/white"
+                style="@style/body_semibo"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                android:background="@drawable/bg_chat_room_register_btn"
+                android:gravity="center"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="32dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_data_challenger_group_rank" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
