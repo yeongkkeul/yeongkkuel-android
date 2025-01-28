@@ -1,10 +1,12 @@
 package com.example.yeongkkuel.presentation.chat
 
 import android.os.Bundle
+import android.transition.AutoTransition
+import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
+import android.view.animation.DecelerateInterpolator
 import androidx.activity.addCallback
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
@@ -29,6 +31,8 @@ class ChatGroupFragment : Fragment() {
         get() = requireNotNull(_binding){"FragmentChatGroupBinding -> null"}
 
     private val chatGroupViewModel: ChatGroupViewModel by activityViewModels()
+
+    private var bannerOpen = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -96,6 +100,43 @@ class ChatGroupFragment : Fragment() {
             Timber.tag("ChatFragment").d("글자 변화 감지: %s", it.toString())
         }
 
+        binding.clChatGroupBanner.setOnClickListener {
+            if (bannerOpen) {
+                // 버튼 숨김
+                animateButtonVisibility(false)
+                binding.ivBannerArrow.setImageResource(R.drawable.ic_arrow_bottom)
+                bannerOpen = false
+            } else {
+                // 버튼 펼침
+                animateButtonVisibility(true)
+                binding.ivBannerArrow.setImageResource(R.drawable.ic_arrow_top)
+                bannerOpen = true
+            }
+        }
+
+        // 배너 삭제
+        binding.btnDeleteBanner.setOnClickListener {
+            binding.clChatGroupBanner.visibility = View.GONE
+        }
+
+        // 접어두기 버튼 클릭 처리
+        binding.btnFoldBanner.setOnClickListener {
+            animateButtonVisibility(false)
+            binding.ivBannerArrow.setImageResource(R.drawable.ic_arrow_bottom)
+            bannerOpen = false
+        }
+    }
+
+    private fun animateButtonVisibility(show: Boolean) {
+        val transition = AutoTransition().apply {
+            duration = 300
+            interpolator = DecelerateInterpolator()
+        }
+
+        TransitionManager.beginDelayedTransition(binding.clChatGroupBanner, transition)
+
+        binding.btnDeleteBanner.visibility = if (show) View.VISIBLE else View.GONE
+        binding.btnFoldBanner.visibility = if (show) View.VISIBLE else View.GONE
     }
 
 //    private fun setupKeyboardListener() {
