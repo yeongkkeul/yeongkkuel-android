@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/transparent"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <ImageView
+        android:id="@+id/iv_profile_sender"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:scaleType="centerCrop"
+        android:layout_marginStart="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/tv_nickname_sender"
+        android:text="사용자"
+        android:textColor="@color/black"
+        android:textSize="12sp"
+        style="@style/body_regula"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        app:layout_constraintStart_toEndOf="@+id/iv_profile_sender"
+        app:layout_constraintTop_toTopOf="@+id/iv_profile_sender" />
+
+    <TextView
+        android:id="@+id/tv_chat_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:textSize="15sp"
+        style="@style/body_regula"
+        android:maxWidth="230dp"
+        android:padding="8dp"
+        android:layout_marginTop="4dp"
+        android:lineSpacingExtra="5dp"
+        android:background="@drawable/bg_chat_message_other"
+        app:layout_constraintStart_toStartOf="@+id/tv_nickname_sender"
+        app:layout_constraintTop_toBottomOf="@+id/tv_nickname_sender"/>
+
+    <TextView
+        android:id="@+id/tv_amount_people_read"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/main1"
+        android:textSize="8sp"
+        style="@style/tiny_medium"
+        app:layout_constraintStart_toEndOf="@+id/tv_chat_message"
+        app:layout_constraintBottom_toTopOf="@+id/tv_time_message"/>
+
+    <TextView
+        android:id="@+id/tv_time_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="8sp"
+        style="@style/tiny_medium"
+        app:layout_constraintStart_toStartOf="@+id/tv_amount_people_read"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_chat_message"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

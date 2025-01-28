@@ -12,6 +12,7 @@ localProperties.load(project.rootProject.file("local.properties").inputStream())
 val kakaoApiKey = localProperties.getProperty("kakao_NATIVE_APP_KEY")?:""
 val nativeAppKey = localProperties.getProperty("kakao_NATIVE_APP_KEY_MANIFEST")?:""
 val googleApiKey = localProperties.getProperty("google_CLIENT_ID")?:""
+val openAIAPIKEY = localProperties.getProperty("openAIAPIKEY")?:""
 
 android {
     namespace = "com.example.yeongkkuel"
@@ -29,6 +30,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "OPENAI_API_KEY", "\"$openAIAPIKEY\"")
     }
     buildTypes {
         release {
@@ -96,4 +99,14 @@ dependencies {
     // LiveData 및 ViewModel
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+
+    // RecyclerView
+    implementation (libs.recyclerview)
+
+    // Glide
+    implementation(libs.glide)
+
+    // Retrofit2
+    implementation(libs.retrofit2)
+    implementation(libs.converter.gson)
 }

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_fragment_chat"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_app_bar_h"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.01" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/app_bar"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/btn_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/btn_back"
+                android:layout_marginStart="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <TextView
+                android:id="@+id/tv_title_chat_room_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="채팅방 둘러보기"
+                android:textColor="@color/black"
+                style="@style/humm_medium"
+                android:layout_marginStart="12dp"
+                app:layout_constraintStart_toEndOf="@+id/btn_back"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <EditText
+            android:id="@+id/et_search"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:hint="관심 키워드로 무지출 챌린지 방 검색"
+            android:textColorHint="@color/black2"
+            style="@style/body_regula"
+            android:paddingStart="16dp"
+            android:paddingEnd="5dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:background="@drawable/bg_edittext_chat_room_search"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/app_bar" />
+
+        <ImageView
+            android:id="@+id/btn_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/btn_search"
+            android:layout_marginEnd="12dp"
+            app:layout_constraintEnd_toEndOf="@+id/et_search"
+            app:layout_constraintTop_toTopOf="@+id/et_search"
+            app:layout_constraintBottom_toBottomOf="@+id/et_search" />
+
+        <TextView
+            android:id="@+id/tv_search_tag_age"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="연령대"
+            android:textColor="@color/black"
+            android:background="@drawable/bg_chat_room_search_tag"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="28dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/et_search" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/btn_chat_room_search_tag"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toEndOf="@+id/tv_search_tag_age"
+            app:layout_constraintTop_toTopOf="@+id/tv_search_tag_age"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_search_tag_age" />
+
+        <TextView
+            android:id="@+id/tv_search_tag_goal_expense"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="목표 지출액"
+            android:textColor="@color/black"
+            android:background="@drawable/bg_chat_room_search_tag"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="28dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="20dp"
+            app:layout_constraintStart_toEndOf="@+id/tv_search_tag_age"
+            app:layout_constraintTop_toBottomOf="@+id/et_search" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/btn_chat_room_search_tag"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toEndOf="@+id/tv_search_tag_goal_expense"
+            app:layout_constraintTop_toTopOf="@+id/tv_search_tag_goal_expense"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_search_tag_goal_expense" />
+
+        <TextView
+            android:id="@+id/tv_search_tag_job"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="직업"
+            android:textColor="@color/black"
+            android:background="@drawable/bg_chat_room_search_tag"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="28dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="20dp"
+            app:layout_constraintStart_toEndOf="@+id/tv_search_tag_goal_expense"
+            app:layout_constraintTop_toBottomOf="@+id/et_search" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/btn_chat_room_search_tag"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toEndOf="@+id/tv_search_tag_job"
+            app:layout_constraintTop_toTopOf="@+id/tv_search_tag_job"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_search_tag_job" />
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/ns_rv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_search_tag_age" >
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_chat_room"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        </androidx.core.widget.NestedScrollView>
+
+        <View
+            android:id="@+id/dimView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#80000000"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

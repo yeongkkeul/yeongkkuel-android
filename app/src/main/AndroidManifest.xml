@@ -17,6 +17,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_yeongkkuel_round"
         android:supportsRtl="true"
+        android:theme="@style/Theme.Yeongkkuel"
         tools:targetApi="31">
         <activity
             android:name=".presentation.base.MainActivity"
