@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -41,6 +40,7 @@ class CategoryEditFragment : Fragment() {
         binding.etCategoryEditInput.setText(categoryName)
         binding.ivSelectedColor.setBackgroundResource(R.drawable.bg_color_circle)
         binding.ivSelectedColor.background.setTint(categoryColor)
+        binding.etCategoryEditInput.setTextColor(categoryColor) // 제목 텍스트 색상 초기화
         selectedColor = categoryColor
 
         // 색상 팔레트 어댑터 설정
@@ -48,15 +48,13 @@ class CategoryEditFragment : Fragment() {
             updateSelectedColor(selectedColor)
         }
 
-        // RecyclerView 레이아웃 매니저 설정
         binding.rvColorPalette.layoutManager = GridLayoutManager(requireContext(), 5)
         binding.rvColorPalette.adapter = colorAdapter
-        colorAdapter.submitList(getColorList()) // 색상 리스트 설정
+        colorAdapter.submitList(getColorList())
 
         // 이벤트 설정
-        setupTextWatcher() // 텍스트 입력 감지 추가
+        setupTextWatcher()
         setupListeners()
-        updateSaveButtonState() // 초기 저장 버튼 상태 업데이트
     }
 
     private fun setupTextWatcher() {
@@ -67,9 +65,6 @@ class CategoryEditFragment : Fragment() {
                 // 입력된 텍스트 길이 계산
                 val length = s?.length ?: 0
                 binding.tvCharacterCount.text = "$length/16"
-
-                // 저장 버튼 상태 업데이트
-                updateSaveButtonState()
             }
 
             override fun afterTextChanged(s: Editable?) {}
@@ -106,10 +101,10 @@ class CategoryEditFragment : Fragment() {
         selectedColor = color
         binding.ivSelectedColor.setBackgroundResource(R.drawable.bg_color_circle)
         binding.ivSelectedColor.background.setTint(color)
+        binding.etCategoryEditInput.setTextColor(color) // 제목 텍스트 색상 업데이트
         binding.rvColorPalette.visibility = View.GONE
         binding.cardColorPalette.visibility = View.GONE
         binding.ivDropdownIcon.setImageResource(R.drawable.ic_dropdown_arrow)
-        updateSaveButtonState() // 저장 버튼 상태 업데이트
     }
 
     private fun getColorList(): List<Int> {
@@ -122,8 +117,14 @@ class CategoryEditFragment : Fragment() {
 
     private fun saveEditedCategory() {
         val updatedTitle = binding.etCategoryEditInput.text.toString()
-        if (updatedTitle.isBlank() || selectedColor == null) {
-            Toast.makeText(requireContext(), "제목과 색상을 입력해주세요.", Toast.LENGTH_SHORT).show()
+
+        // 제목 및 색상 확인
+        if (updatedTitle.isBlank()) {
+            Toast.makeText(requireContext(), "제목을 입력해주세요.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (selectedColor == null) {
+            Toast.makeText(requireContext(), "색상을 선택해주세요.", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -139,17 +140,6 @@ class CategoryEditFragment : Fragment() {
 
         // 수정 후 카테고리 관리 페이지로 이동
         findNavController().popBackStack(R.id.categoryManageFragment, false)
-    }
-
-    private fun updateSaveButtonState() {
-        val title = binding.etCategoryEditInput.text.toString()
-        val isEnabled = title.isNotBlank() && selectedColor != null
-        binding.tvCategoryEdit.isEnabled = isEnabled
-
-        val buttonColor = if (isEnabled) R.color.button_enabled else R.color.button_disabled
-        binding.tvCategoryEdit.setBackgroundColor(
-            ContextCompat.getColor(requireContext(), buttonColor)
-        )
     }
 
     override fun onDestroyView() {

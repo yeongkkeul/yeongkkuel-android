@@ -132,24 +132,24 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="40dp"
             android:background="@drawable/bg_color_circle"
             app:layout_constraintStart_toEndOf="@id/tv_color_label_title"
-            app:layout_constraintTop_toBottomOf="@id/tv_category_add_title" />
+            app:layout_constraintTop_toTopOf="@id/tv_color_label_title"
+            app:layout_constraintBottom_toBottomOf="@id/tv_color_label_title"/>
 
         <!-- 드롭다운 아이콘 -->
         <ImageView
             android:id="@+id/iv_dropdown_icon"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_marginTop="40dp"
             android:layout_marginStart="15dp"
             android:src="@drawable/ic_dropdown_arrow"
             app:layout_constraintStart_toEndOf="@id/iv_selected_color"
-            app:layout_constraintTop_toBottomOf="@id/tv_category_add_title"/>
+            app:layout_constraintTop_toTopOf="@id/iv_selected_color"
+            app:layout_constraintBottom_toBottomOf="@id/iv_selected_color"/>
 
         <!-- 색상 팔레트 (드롭다운) -->
-        <androidx.cardview.widget.CardView
+        <LinearLayout
             android:id="@+id/card_color_palette"
             android:layout_width="300dp"
             android:layout_height="200dp"
@@ -159,6 +159,8 @@
             app:cardBackgroundColor="@android:color/white"
             android:visibility="gone"
             android:layout_marginTop="20dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="10dp"
             app:layout_constraintTop_toBottomOf="@id/iv_dropdown_icon"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
@@ -167,9 +169,9 @@
                 android:id="@+id/rv_color_palette"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="8dp"
+                android:padding="15dp"
                 android:clipToPadding="false" />
-        </androidx.cardview.widget.CardView>
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
