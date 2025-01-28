@@ -9,4 +9,32 @@
         <item name="tabSelectedTextColor">@color/black</item>
         <item name="tabTextColor">#999999</item>
     </style>
+    <style name="CustomDialog" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+    <style name="CustomDialogDimmed" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
+    <style name="FloatingButton" parent="Widget.MaterialComponents.FloatingActionButton">
+        <item name="android:backgroundTint">@color/main1</item>
+        <item name="tint">@color/white</item>
+        <item name="shapeAppearanceOverlay">@style/RoundedShapeAppearanceOverlay</item>
+    </style>
+    <style name="RoundedShapeAppearanceOverlay" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+    <style name="FloatingButtonCancel" parent="Widget.MaterialComponents.FloatingActionButton">
+        <item name="android:backgroundTint">@color/white</item>
+        <item name="tint">@color/black2</item>
+        <item name="shapeAppearanceOverlay">@style/RoundedShapeAppearanceOverlay</item>
+    </style>
+    <style name="RoundedShapeAppearanceOverlayCancel" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
 </resources>

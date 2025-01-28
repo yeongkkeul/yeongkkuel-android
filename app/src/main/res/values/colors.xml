@@ -18,10 +18,15 @@
     <color name="black1">#EEEEEE</color>
     <color name="black2">#999999</color>
     <color name="black3">#1E1E1E</color>
+    <color name="black4">#6E6E6E</color>
 
     <color name="pink">#FF5CA3</color>
     <color name="blue">#4385F7</color>
     <color name="green">#77BF48</color>
+
+    <color name="gold">#FFC700</color>
+    <color name="silver">#959595</color>
+    <color name="bronze">#D3BD70</color>
 
     <color name="tab_indicator">#00C9B2</color>
 
