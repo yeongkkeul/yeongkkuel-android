@@ -57,7 +57,7 @@ class CategoryAddFragment : Fragment() {
                     parent: RecyclerView,
                     state: RecyclerView.State
                 ) {
-                    outRect.set(0, 1, 0, 1)
+                    outRect.set(10, 10, 10, 10)
                 }
             })
         }
@@ -68,11 +68,9 @@ class CategoryAddFragment : Fragment() {
         binding.ivDropdownIcon.setOnClickListener {
             toggleColorPaletteVisibility()
         }
-
         binding.tvCategoryAdd.setOnClickListener {
             saveCategory()
         }
-
         binding.ivBack.setOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
@@ -81,7 +79,7 @@ class CategoryAddFragment : Fragment() {
     private fun toggleColorPaletteVisibility() {
         val isVisible = binding.rvColorPalette.visibility == View.VISIBLE
         binding.rvColorPalette.visibility = if (isVisible) View.GONE else View.VISIBLE
-        binding.cardColorPalette.visibility = binding.rvColorPalette.visibility
+        binding.llColorPalette.visibility = binding.rvColorPalette.visibility
         binding.ivDropdownIcon.setImageResource(
             if (isVisible) R.drawable.ic_dropdown_arrow else R.drawable.ic_dropdown_arrow_up
         )
@@ -94,13 +92,12 @@ class CategoryAddFragment : Fragment() {
         binding.ivSelectedColor.setBackgroundResource(R.drawable.bg_color_circle)
         binding.ivSelectedColor.background.setTint(color)
         binding.rvColorPalette.visibility = View.GONE
-        binding.cardColorPalette.visibility = View.GONE
+        binding.llColorPalette.visibility = View.GONE
         binding.ivDropdownIcon.setImageResource(R.drawable.ic_dropdown_arrow)
 
         // 제목 EditText의 텍스트 색상 업데이트
         binding.etCategoryAddInput.setTextColor(color)
     }
-
 
     private fun saveCategory() {
         val title = binding.etCategoryAddInput.text.toString()

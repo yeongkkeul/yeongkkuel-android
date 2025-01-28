@@ -30,9 +30,6 @@ class ColorPaletteAdapter(
     override fun onBindViewHolder(holder: ColorViewHolder, position: Int) {
         val color = colorList[position]
         holder.bind(color)
-
-        // 로그 추가
-        Log.d("ColorPaletteAdapter", "Binding color at position $position: $color")
     }
 
     override fun getItemCount(): Int = colorList.size
