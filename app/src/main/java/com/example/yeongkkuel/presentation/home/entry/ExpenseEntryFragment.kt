@@ -196,8 +196,7 @@ class ExpenseEntryFragment : Fragment() {
         tvEntryComplete.setOnClickListener {
             // 데이터 검증 및 저장
             if (validateAndSaveEntry(view)) {
-                // 데이터가 정상적으로 저장된 경우에만 화면 닫기
-                requireActivity().onBackPressedDispatcher.onBackPressed()
+                handleNavigationAfterSave(view) // 데이터 저장 후 화면 이동 처리
             }
         }
     }
@@ -235,28 +234,32 @@ class ExpenseEntryFragment : Fragment() {
             etAmountInput.background = normalBackground
         }
 
-        // 에러가 발생하면 저장 로직 중단
+        // 에러 발생 시 저장 로직 중단
         if (hasError) {
             return false
         }
 
         // ViewModel에 저장
-        val selectedCategory = arguments?.getString("selectedCategory") ?: "기본 카테고리"
+        val selectedCategory = arguments?.getString("selectedCategory") ?: "기타"
         val expenseHistory = BotSheetUiState.Spending.History(
             name = if (isNoExpenseChecked) "무지출" else detail,
             price = if (isNoExpenseChecked) 0 else amount
         )
 
-        botSheetViewModel.addExpenseToCategory(
-            SpendingCategory.valueOf(selectedCategory.uppercase()),
-            expenseHistory
-        )
-
-        Toast.makeText(requireContext(), "지출 내역이 저장되었습니다.", Toast.LENGTH_SHORT).show()
-
-        return true
+        // SpendingCategory 처리
+        return try {
+            val categoryEnum = SpendingCategory.values().find { it.kor == selectedCategory }
+                ?: throw IllegalArgumentException("Invalid category")
+            botSheetViewModel.addExpenseToCategory(categoryEnum, expenseHistory)
+            Toast.makeText(requireContext(), "지출 내역이 저장되었습니다.", Toast.LENGTH_SHORT).show()
+            true
+        } catch (e: Exception) {
+            hasError = true
+            Toast.makeText(requireContext(), "카테고리가 유효하지 않습니다.", Toast.LENGTH_SHORT).show()
+            Log.e("ExpenseEntryFragment", "Error saving data: ${e.message}", e)
+            false
+        }
     }
-
 
     private fun handleNavigationAfterSave(view: View) {
         val tvDateInput = view.findViewById<TextView>(R.id.tv_date_input)
@@ -277,7 +280,7 @@ class ExpenseEntryFragment : Fragment() {
             navController.navigate(R.id.action_expenseEntryFragment_to_navigation_stat)
         } else {
             Toast.makeText(requireContext(), "오늘 날짜: 홈 화면으로 이동", Toast.LENGTH_SHORT).show()
-            requireActivity().onBackPressedDispatcher.onBackPressed() // 현재 화면 닫기
+            navController.navigate(R.id.navigation_home)
         }
     }
 
