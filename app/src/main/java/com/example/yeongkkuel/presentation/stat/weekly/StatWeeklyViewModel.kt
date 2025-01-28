@@ -69,7 +69,7 @@ class StatWeeklyViewModel : ViewModel() {
                                     StatWeeklyUiState.PieChartData(
                                         category = SpendingCategory.fromKor(it.categoryName),
                                         expenditure = it.totalExpenditure,
-                                        color = Colors.fromCode(it.categoryColor)
+                                        color = Colors.fromCode(it.categoryColor) ?: Colors.RED1
                                     )
                                 }
                             )
@@ -81,6 +81,7 @@ class StatWeeklyViewModel : ViewModel() {
             e.printStackTrace()
         }
     }
+
 
 
     private fun getDayOfWeek(date: String): Week {
