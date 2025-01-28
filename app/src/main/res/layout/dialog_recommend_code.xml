@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="328dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_dialog_background"
+    android:padding="20dp"
+    android:elevation="10dp"
+    android:layout_gravity="center">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+    <!-- Title -->
+    <TextView
+        style="@style/humm_semibo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="추천인 코드 입력"
+        android:layout_marginRight="@dimen/space_x_small"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:layout_marginBottom="@dimen/space_small" />
+
+        <TextView
+            android:id="@+id/tv_recommend_code_error"
+            style="@style/small_semib"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:text="존재하지 않는 코드 입니다."
+            android:textColor="@color/errorClicked"
+            />
+
+    </LinearLayout>
+
+    <!-- Input Field -->
+    <EditText
+        android:id="@+id/et_recommend_code"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="28dp"
+        android:background="@drawable/rounded_nickname_background"
+        android:hint="6자리 추천인 코드를 입력하세요."
+        android:inputType="text"
+        android:padding="12dp"
+        android:textSize="14sp" />
+
+    <!-- Button Container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:weightSum="2">
+
+        <TextView
+            android:id="@+id/tv_skip"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="10dp"
+            android:layout_marginRight="@dimen/space_x_small"
+            android:background="@drawable/bg_button_gray"
+            android:textColor="@color/black"
+            android:clickable="true"
+            android:focusable="true"
+            android:text="건너뛰기"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/tv_recommend_close"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="확인"
+            android:gravity="center"
+            android:padding="10dp"
+            android:background="@drawable/bg_button_purple"
+            android:textColor="@color/white"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_weight="1" /> <!-- 동일 비율 -->
+
+    </LinearLayout>
+
+
+</LinearLayout>

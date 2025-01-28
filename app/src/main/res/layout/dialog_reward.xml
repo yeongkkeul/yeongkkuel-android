@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="328dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_dialog_background"
+    android:padding="20dp"
+    android:elevation="10dp"
+    android:layout_gravity="center">
+
+
+        <TextView
+            style="@style/humm_semibo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="리워드 지급 완료!"
+            android:layout_marginRight="@dimen/space_x_small"
+            android:textColor="@color/main1"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/tv_recommend_code_error"
+            style="@style/body_medium"
+
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/space_large"
+            android:text="친구와 30 리워드를 받았어요"
+            android:textColor="@color/black"
+            />
+
+
+
+    <!-- Input Field -->
+    <ImageView
+        android:id="@+id/et_recommend_code"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="28dp"
+        android:src="@drawable/ic_coin"
+        android:textSize="14sp" />
+
+    <!-- Button Container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:weightSum="2">
+
+        <TextView
+            android:id="@+id/tv_close"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="10dp"
+            android:layout_marginRight="@dimen/space_x_small"
+            android:background="@drawable/bg_button_gray"
+            android:textColor="@color/black"
+            android:clickable="true"
+            android:focusable="true"
+            style="@style/body_medium"
+            android:text="닫기"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/tv_reward"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="보러가기"
+            android:gravity="center"
+            android:padding="10dp"
+            android:background="@drawable/bg_button_purple"
+            android:textColor="@color/white"
+            android:clickable="true"
+            android:focusable="true"
+            style="@style/body_medium"
+
+            android:layout_weight="1" /> <!-- 동일 비율 -->
+
+    </LinearLayout>
+
+
+
+
+
+</LinearLayout>

@@ -1,0 +1,114 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@color/main2"
+    android:padding="20dp">
+
+    <!-- 로고 -->
+    <ImageView
+        android:id="@+id/iv_logo"
+        android:layout_width="108dp"
+        android:layout_height="102dp"
+        android:layout_marginTop="218dp"
+        android:src="@drawable/ic_splash_logo"
+        android:contentDescription="@string/splash_logo_description"/>
+
+    <!-- 제목 -->
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_median"
+        android:text="@string/login_title"
+        android:textColor="@color/main1"
+        style="@style/body_semibo"
+        android:textFontWeight="600"
+        android:gravity="center"/>
+
+    <!-- 카카오 로그인 버튼 -->
+    <TextView
+        android:id="@+id/tv_subtitle"
+        style="@style/humm_semibo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textFontWeight="600"
+        android:text="@string/login_subtitle"
+        android:textColor="@color/main1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/btn_kakao_login"
+        android:layout_width="320dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="150dp"
+        android:background="@drawable/kakao_button_selector">
+
+        <!-- 카카오 로고 -->
+        <ImageView
+            android:id="@+id/iv_kakao"
+            android:layout_width="26dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="19dp"
+            android:src="@drawable/ic_kakao_logo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <!-- 텍스트 -->
+        <TextView
+            android:id="@+id/tv_kakao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/login_kakao"
+            style="@style/body_medium"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/iv_kakao"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <!-- 구글 로그인 버튼 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/btn_google_login"
+        android:layout_width="320dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="@dimen/space_median"
+        android:background="@drawable/google_button_selector">
+
+        <!-- 구글 로고 -->
+        <ImageView
+            android:id="@+id/iv_google"
+            android:layout_width="26dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="19dp"
+            android:src="@drawable/ic_google_logo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <!-- 텍스트 -->
+        <TextView
+            android:id="@+id/tv_google"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/login_gmail"
+            android:textColor="@color/black"
+            style="@style/body_regula"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/iv_google"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>
+

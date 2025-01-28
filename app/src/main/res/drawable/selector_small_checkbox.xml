@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- 체크 상태일 때(drawable: 보라색 원 + 흰색 체크) -->
+    <item android:state_selected="true"
+        android:drawable="@drawable/ic_small_checkbox_checked" />
+
+    <!-- 기본(체크 안 됨) 상태일 때(drawable: 보라색 테두리 원) -->
+    <item android:drawable="@drawable/ic_small_checkbox_unchecked" />
+</selector>

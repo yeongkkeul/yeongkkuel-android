@@ -6,8 +6,12 @@ plugins {
     id("kotlin-kapt")
 }
 
+
 val localProperties = Properties()
 localProperties.load(project.rootProject.file("local.properties").inputStream())
+val kakaoApiKey = localProperties.getProperty("kakao_NATIVE_APP_KEY")?:""
+val nativeAppKey = localProperties.getProperty("kakao_NATIVE_APP_KEY_MANIFEST")?:""
+val googleApiKey = localProperties.getProperty("google_CLIENT_ID")?:""
 val openAIAPIKEY = localProperties.getProperty("openAIAPIKEY")?:""
 
 android {
@@ -15,6 +19,10 @@ android {
     compileSdk = 35
 
     defaultConfig {
+        buildConfigField("String", "kakao_NATIVE_APP_KEY", "\"$kakaoApiKey\"")
+        buildConfigField("String","google_CLIENT_ID","\"$googleApiKey\"")
+        manifestPlaceholders["NATIVE_APP_KEY"] = nativeAppKey
+
         applicationId = "com.example.yeongkkuel"
         minSdk = 30
         targetSdk = 34
@@ -25,7 +33,6 @@ android {
 
         buildConfigField("String", "OPENAI_API_KEY", "\"$openAIAPIKEY\"")
     }
-
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -51,6 +58,17 @@ android {
 
 dependencies {
 
+    //Google Credential Manager
+    implementation(libs.credentials)
+
+    // optional - needed for credentials support from play services, for devices running
+    // Android 13 and below.
+    implementation(libs.credentials.play.services.auth)
+    implementation(libs.googleid)
+    implementation(libs.splashscreen) //splash Theme 적용
+    implementation(libs.kakao.all) // 전체 모듈 설치, 2.11.0 버전부터 지원
+    implementation(libs.kakao.user) // 카카오 로그인 API 모듈
+    implementation(libs.kakao.cert) // 카카오톡 인증 서비스 API 모듈
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
