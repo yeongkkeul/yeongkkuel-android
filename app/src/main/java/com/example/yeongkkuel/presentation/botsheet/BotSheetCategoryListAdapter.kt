@@ -1,6 +1,7 @@
 package com.example.yeongkkuel.presentation.botsheet
 
 import android.content.res.ColorStateList
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.ItemBotsheetCategoryBinding
 import android.util.Log
+import androidx.navigation.Navigation.findNavController
 
 
 class BotSheetCategoryListAdapter(
@@ -23,7 +25,10 @@ class BotSheetCategoryListAdapter(
         private val binding: ItemBotsheetCategoryBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        private val historyListAdapter = BotSheetHistoryListAdapter()
+        // 🔹 클릭 리스너를 Adapter에 직접 추가하지 않고, Fragment로 전달
+        private val historyListAdapter = BotSheetHistoryListAdapter { selectedHistory ->
+            botSheetListener.navigateToExpenseEdit(selectedHistory.name, selectedHistory.price)
+        }
 
         fun onBind(item: BotSheetUiState.Spending) = with(binding) {
             tvCategory.text = item.kind.kor
@@ -42,12 +47,10 @@ class BotSheetCategoryListAdapter(
                 layoutManager = LinearLayoutManager(binding.root.context)
             }
 
-            // + 버튼 클릭 리스너 추가
+            // 🔹 카테고리 추가 버튼 클릭 리스너
             ivBtnAdd.setOnClickListener {
-                botSheetListener?.navigateToExpenseEntry(item.kind.kor, item.color.id)
-                    ?: Log.e("BotSheetCategoryListAdapter", "botSheetListener is null")
+                botSheetListener.navigateToExpenseEntry(item.kind.kor, item.color.id)
             }
-
         }
     }
 
@@ -66,8 +69,8 @@ class BotSheetCategoryListAdapter(
         val item = getItem(position) // 리스트 아이템을 가져옴
         holder.onBind(item)         // 아이템을 뷰홀더에 바인딩
     }
-
 }
+
 
 class SpendingCategoryListDiffUtil : DiffUtil.ItemCallback<BotSheetUiState.Spending>() {
     override fun areItemsTheSame(

@@ -237,6 +237,16 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     else -> setBotSheetGone()
                 }
             }
+            navController.addOnDestinationChangedListener { _, destination, _ ->
+                when (destination.id) {
+                    R.id.categoryAddFragment -> {
+                        binding.tvAddCategory.visibility = View.GONE // 카테고리 추가 화면에서는 숨기기
+                    }
+                    else -> {
+                        binding.tvAddCategory.visibility = View.VISIBLE // 다른 화면에서는 다시 보이도록
+                    }
+                }
+            }
 
             // 바텀네비게이션 뷰 숨김 처리 - 스플래시, 로그인
             navController.addOnDestinationChangedListener { _, destination, _ ->
@@ -384,6 +394,20 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
 
         // 지출 기입 페이지로 이동하면서 데이터 전달
         navController.navigate(R.id.expenseEntryFragment, bundle)
+    }
+    override fun navigateToExpenseEdit(expenseName: String, expensePrice: Int) {
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        // 🔹 데이터 전달을 위한 번들 생성
+        val bundle = Bundle().apply {
+            putString("expenseName", expenseName)
+            putInt("expensePrice", expensePrice)
+        }
+
+        // 🔹 ExpenseEditFragment로 이동하면서 데이터 전달
+        navController.navigate(R.id.navigation_entry_view, bundle)
     }
 
 

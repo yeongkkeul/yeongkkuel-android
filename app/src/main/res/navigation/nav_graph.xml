@@ -63,6 +63,13 @@
             android:id="@+id/action_expenseEntryFragment_to_navigation_stat"
             app:destination="@id/navigation_stat" />
     </fragment>
+    <fragment
+        android:id="@+id/navigation_entry_view"
+        android:name="com.example.yeongkkuel.presentation.home.entry.ExpenseViewFragment"
+        android:label="fragment_entry_edit"
+        tools:layout="@layout/fragment_expense_entry">
+
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_store"

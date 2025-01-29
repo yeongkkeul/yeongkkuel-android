@@ -35,6 +35,8 @@ class ExpenseEntryFragment : Fragment() {
     private lateinit var navController: NavController
     private lateinit var sharedPreferences: SharedPreferences
     private val PICK_IMAGE_REQUEST = 1
+    private var expenseDate: String = ""
+    private var expensePhotoUrl: String = ""
 
     private val botSheetViewModel: BotSheetViewModel by activityViewModels()
 
@@ -93,7 +95,9 @@ class ExpenseEntryFragment : Fragment() {
                 requireContext(),
                 { _, selectedYear, selectedMonth, selectedDay ->
                     val dayOfWeek = getDayOfWeek(selectedYear, selectedMonth, selectedDay)
-                    tvDateInput.text = "${selectedYear}년 ${selectedMonth + 1}월 ${selectedDay}일 $dayOfWeek"
+                    expenseDate= "${selectedYear}년 ${selectedMonth + 1}월 ${selectedDay}일 $dayOfWeek"
+                    tvDateInput.text = expenseDate
+
                 },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
@@ -239,10 +243,16 @@ class ExpenseEntryFragment : Fragment() {
         }
 
         // ViewModel에 저장
+        val selectedCategoryColor: String? = null
         val selectedCategory = arguments?.getString("selectedCategory") ?: "기타"
         val expenseHistory = BotSheetUiState.Spending.History(
             name = if (isNoExpenseChecked) "무지출" else detail,
-            price = if (isNoExpenseChecked) 0 else amount
+            price = if (isNoExpenseChecked) 0 else amount,
+            date = expenseDate ?: "",
+            categoryName = selectedCategory ?: "기타",
+            categoryColor = selectedCategoryColor ?: "#000000", // ✅ 기본값 추가
+            content = if (isNoExpenseChecked) "무지출 기록" else detail,
+            photoUrl = expensePhotoUrl ?: ""
         )
 
         // SpendingCategory 처리
@@ -307,7 +317,7 @@ class ExpenseEntryFragment : Fragment() {
                 val ivPhotoIcon = view?.findViewById<ImageView>(R.id.iv_photo_icon)
                 imgPhotoFrame?.setImageURI(uri)
                 ivPhotoIcon?.visibility = View.GONE
-                sharedPreferences.edit().putString("photoUri", uri.toString()).apply()
+                expensePhotoUrl = uri.toString() // 🔹 사진 URL 저장
             }
         }
     }

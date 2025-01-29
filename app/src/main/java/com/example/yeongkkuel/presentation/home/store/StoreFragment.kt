@@ -62,10 +62,14 @@ class StoreFragment : Fragment() {
             selectedProductInMyTab?.let { product ->
                 Log.d("StoreFragment", "Saving selected MY Product: ${product.name}")
 
-                val bundle = Bundle().apply {
-                    putParcelable("selectedProduct", product)
-                }
-                navController.navigate(R.id.action_storeFragment_to_homeFragment, bundle)
+                // FragmentResult를 사용하여 HomeFragment에 데이터 전달
+                parentFragmentManager.setFragmentResult(
+                    "selectedProductKey",
+                    Bundle().apply { putParcelable("selectedProduct", product) }
+                )
+
+                // StoreFragment 종료 후 HomeFragment로 이동
+                navController.popBackStack()
             } ?: Log.d("StoreFragment", "No product selected in MY tab.")
         }
         setupRecyclerView()

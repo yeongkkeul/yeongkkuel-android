@@ -13,7 +13,10 @@ data class MonthExpendituresCategory(
     )
 
     data class Expense(
-        @SerializedName("expenseName") val expenseName: String,
-        @SerializedName("expenseAmount") val expenseAmount: Int
+        @SerializedName("expenseName") val expenseName: String,       // 🔹 지출 이름
+        @SerializedName("expenseAmount") val expenseAmount: Int,      // 🔹 금액
+        @SerializedName("expenseDate") val expenseDate: String,       // 🔹 지출 날짜 추가
+        @SerializedName("expenseContent") val expenseContent: String, // 🔹 지출 내용 추가
+        @SerializedName("expensePhotoUrl") val expensePhotoUrl: String // 🔹 사진 URL 추가
     )
 }

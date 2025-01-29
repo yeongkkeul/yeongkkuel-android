@@ -35,6 +35,18 @@
                 android:layout_height="wrap_content"
                 android:text="@string/expense_entry"
                 style="@style/pageTitle"
+                android:visibility="visible"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/btn_back"
+                android:layout_marginStart="12dp" />
+            <TextView
+                android:id="@+id/tv_expense_edit_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="지출 내역"
+                style="@style/pageTitle"
+                android:visibility="gone"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/btn_back"
@@ -48,6 +60,18 @@
                 android:textSize="15dp"
                 android:textColor="@color/main1"
                 android:layout_marginStart="185dp"
+                android:visibility="visible"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <ImageView
+                android:id="@+id/ic_more"
+                android:layout_width="20dp"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_more"
+                android:layout_marginStart="190dp"
+                android:visibility="gone"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>
@@ -232,7 +256,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 app:layout_constraintStart_toStartOf="@id/et_amount_input"
-                app:layout_constraintTop_toBottomOf="@id/et_amount_input">
+                app:layout_constraintTop_toBottomOf="@id/et_amount_input"
+                android:visibility="visible">
 
                 <ImageView
                     android:id="@+id/iv_circle_expense_unchecked"
@@ -325,7 +350,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/fl_photo_frame"
-                app:layout_constraintBottom_toBottomOf="parent">
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:visibility="visible">
 
                 <ImageView
                     android:id="@+id/iv_circle_send_auto_unchecked"

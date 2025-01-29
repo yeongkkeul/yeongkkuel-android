@@ -9,6 +9,7 @@ import com.example.yeongkkuel.databinding.ItemBotsheetHistoryBinding
 import com.example.yeongkkuel.presentation.util.toMoneyString
 
 class BotSheetHistoryListAdapter(
+    private val onItemClick: (BotSheetUiState.Spending.History) -> Unit // 🔹 클릭 리스너 추가
 ) : ListAdapter<BotSheetUiState.Spending.History, BotSheetHistoryListAdapter.ViewHolder>(
     SpendingHistoryListDiffUtil()
 ) {
@@ -18,6 +19,10 @@ class BotSheetHistoryListAdapter(
         fun onBind(item: BotSheetUiState.Spending.History) = with(binding) {
             tvName.text = item.name
             tvPrice.text = "-" + item.price.toMoneyString() + "원"
+
+            root.setOnClickListener {
+                onItemClick(item)
+            }
         }
     }
 
