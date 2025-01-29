@@ -19,7 +19,6 @@ import com.example.yeongkkuel.databinding.FragmentCategoryAddBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import com.example.yeongkkuel.presentation.util.Colors
 
-
 class CategoryAddFragment : Fragment() {
 
     private var _binding: FragmentCategoryAddBinding? = null
@@ -34,7 +33,7 @@ class CategoryAddFragment : Fragment() {
             updateSelectedColor(selectedColor)
         })
     }
-    private var selectedColor: Colors? = null
+    private var selectedColor: Int? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -93,39 +92,39 @@ class CategoryAddFragment : Fragment() {
     private fun toggleColorPaletteVisibility() {
         val isVisible = binding.rvColorPalette.visibility == View.VISIBLE
         binding.rvColorPalette.visibility = if (isVisible) View.GONE else View.VISIBLE
-        binding.cardColorPalette.visibility = binding.rvColorPalette.visibility
+        binding.llColorPalette.visibility = binding.rvColorPalette.visibility
         binding.ivDropdownIcon.setImageResource(
             if (isVisible) R.drawable.ic_dropdown_arrow else R.drawable.ic_dropdown_arrow_up
         )
     }
-
     private fun updateSelectedColor(color: Int) {
-        val selectedEnumColor = Colors.fromId(color) // Int를 Colors enum으로 변환
-        if (selectedEnumColor != null) {
-            selectedColor = selectedEnumColor
-            val colorInt = ContextCompat.getColor(requireContext(), selectedEnumColor.id)
-            binding.ivSelectedColor.setBackgroundResource(R.drawable.bg_color_circle)
-            binding.ivSelectedColor.background.setTint(colorInt)
-            binding.rvColorPalette.visibility = View.GONE
-            binding.cardColorPalette.visibility = View.GONE
-            binding.ivDropdownIcon.setImageResource(R.drawable.ic_dropdown_arrow)
-            updateSaveButtonState() // 저장 버튼 상태 업데이트
-        } else {
-            // 잘못된 색상이 전달되었을 경우 처리
-            Toast.makeText(requireContext(), "Invalid color selected", Toast.LENGTH_SHORT).show()
-        }
+        selectedColor = color
+        binding.ivSelectedColor.setBackgroundResource(R.drawable.bg_color_circle)
+        binding.ivSelectedColor.background.setTint(color)
+        binding.rvColorPalette.visibility = View.GONE
+        binding.llColorPalette.visibility = View.GONE
+        binding.ivDropdownIcon.setImageResource(R.drawable.ic_dropdown_arrow)
+        updateSaveButtonState() // 저장 버튼 상태 업데이트
     }
 
     private fun saveCategory() {
         val title = binding.etCategoryAddInput.text.toString()
-        val color = selectedColor ?: return
+        val color = selectedColor ?: return // 선택된 색상이 없으면 종료
 
         if (title.isBlank()) {
             Toast.makeText(requireContext(), "제목을 입력해주세요.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val newCategory = Category(name = title, color = color)
+        // getColorList()와 매칭되는 Colors 객체를 찾기
+        val categoryColor = Colors.values().find { colorValue ->
+            ContextCompat.getColor(requireContext(), colorValue.id) == color
+        } ?: run {
+            Toast.makeText(requireContext(), "유효하지 않은 색상이 선택되었습니다.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val newCategory = Category(name = title, color = categoryColor)
 
         // ViewModel에 카테고리 추가
         categoryViewModel.addCategory(newCategory)
@@ -170,6 +169,16 @@ class CategoryAddFragment : Fragment() {
     }
 
     private fun getColorList(): List<Int> {
-        return Colors.values().map { it.id }
+        return Colors.values().map { color ->
+            ContextCompat.getColor(requireContext(), color.id) // 열거형의 id를 사용해 색상 값 가져오기
+        }
+    }
+
+    private fun setupColorPalette() {
+        val adapter = ColorPaletteAdapter { color ->
+            selectedColor = color // 선택된 색상 저장
+        }
+        binding.rvColorPalette.adapter = adapter // XML ID와 일치하게 수정
+        adapter.submitList(getColorList()) // getColorList의 색상을 RecyclerView에 전달
     }
 }

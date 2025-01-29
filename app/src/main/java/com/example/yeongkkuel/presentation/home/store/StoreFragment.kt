@@ -34,6 +34,7 @@ class StoreFragment : Fragment() {
         val myProducts = mutableListOf<Product>()
     }
     private var selectedProduct: Product? = null
+    private var selectedProductInMyTab: Product? = null  // 🔹 MY 탭에서 선택한 상품 저장
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,13 +52,21 @@ class StoreFragment : Fragment() {
             navController.navigate(R.id.action_storeFragment_to_homeFragment)
         }
 
-
-
         binding.imgPurchaseIcon.setOnClickListener {
             selectedProduct?.let {
                 Log.d("StoreFragment", "Passing to Dialog: ${it.name}, ResId: ${it.imageResId}")
                 showPurchaseDialog(it)
             } ?: Log.d("StoreFragment", "No Product Selected")
+        }
+        binding.imgSaveIcon.setOnClickListener {
+            selectedProductInMyTab?.let { product ->
+                Log.d("StoreFragment", "Saving selected MY Product: ${product.name}")
+
+                val bundle = Bundle().apply {
+                    putParcelable("selectedProduct", product)
+                }
+                navController.navigate(R.id.action_storeFragment_to_homeFragment, bundle)
+            } ?: Log.d("StoreFragment", "No product selected in MY tab.")
         }
         setupRecyclerView()
         setupTabLayout()
@@ -65,8 +74,11 @@ class StoreFragment : Fragment() {
 
     private fun setupRecyclerView() {
         storeAdapter = StoreAdapter(productList) { product ->
-            selectedProduct = product
-            Log.d("StoreFragment", "Selected Product: ${product.name}, ResId: ${product.imageResId}")
+            if (binding.tabLayout.selectedTabPosition == 4) {  // 🔹 MY 탭에서 선택한 경우
+                selectedProductInMyTab = product
+            } else {
+                selectedProduct = product
+            }
             when (product.category) {
                 ProductCategory.SWING -> {
                     val imageResId = when (product.name) {
@@ -104,7 +116,10 @@ class StoreFragment : Fragment() {
                     updateImage(binding.imgStoreNest, imageResId)
                     Log.d("StoreFragment", "Nest Image Updated: $imageResId")
                 }
+
+
             }
+
         }
 
         binding.rvStoreItems.apply {
@@ -277,14 +292,14 @@ class StoreFragment : Fragment() {
 
         btnConfirm.setOnClickListener {
             if (!myProducts.contains(product)) { // 중복 방지
-                val updatedProduct = product.copy( // 기존 product를 기반으로 새 객체 생성
+                val updatedProduct = product.copy( // 기존 product를 그대로 사용
                     area = when (product.category) {
                         ProductCategory.SWING -> "Swing Area"
                         ProductCategory.TOY -> "Toy Area"
                         ProductCategory.BOWL -> "Bowl Area"
                         ProductCategory.NEST -> "Nest Area"
                     },
-                    imageResId = mapToHomeResource(product.imageResId)
+                    imageResId = product.imageResId // `mapToHomeResource`를 호출하지 않음
                 )
                 myProducts.add(updatedProduct)
                 Log.d("MY Tab", "Product added to MY: ${updatedProduct.name}, Area: ${updatedProduct.area}")
@@ -312,16 +327,13 @@ class StoreFragment : Fragment() {
         dialog.show()
     }
 
+
     private fun updateProductList(newList: List<Product>, isMyTab: Boolean = false) {
-        if (isMyTab) {
-            productList.clear() // MY 탭일 때, 현재 저장된 MY 상품만 보여줌
-            productList.addAll(myProducts)
-        } else {
-            productList.clear()
-            productList.addAll(newList)
-        }
+        productList.clear()
+        productList.addAll(if (isMyTab) myProducts else newList)
         storeAdapter.notifyDataSetChanged()
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

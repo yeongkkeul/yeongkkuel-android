@@ -1,7 +1,9 @@
 package com.example.yeongkkuel.presentation.base
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -369,13 +371,18 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     }
 
     override fun navigateToExpenseEntry(selectedCategory: String, categoryColor: Int) {
-        // 선택된 카테고리 및 색상을 전달하기 위한 Bundle 생성
+        // NavController를 이용해 지출 기입 페이지로 이동
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        // 번들에 데이터를 담아 지출 기입 페이지로 전달
         val bundle = Bundle().apply {
             putString("selectedCategory", selectedCategory)
             putInt("categoryColor", categoryColor)
         }
 
-        val navController = findNavController(R.id.fragment_container) // 여기서 viewId인 R.id.fragment_container 사용
+        // 지출 기입 페이지로 이동하면서 데이터 전달
         navController.navigate(R.id.expenseEntryFragment, bundle)
     }
 

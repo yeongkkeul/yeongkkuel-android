@@ -8,15 +8,8 @@ import com.example.yeongkkuel.presentation.util.Colors
 
 class CategoryViewModel : ViewModel() {
 
-    // 초기 카테고리 데이터
-    private val _categories = MutableLiveData<List<Category>>(
-        listOf(
-            Category("간식/음료", Colors.GREEN9),
-            Category("밥/배달", Colors.PURPLE5),
-            Category("화장품", Colors.GREEN10),
-            Category("택시비", Colors.PINK3)
-        )
-    )
+    // 초기 카테고리 데이터 없음
+    private val _categories = MutableLiveData<List<Category>>(emptyList())
 
     val categories: LiveData<List<Category>> get() = _categories
 
@@ -64,7 +57,6 @@ class CategoryViewModel : ViewModel() {
             Log.d("CategoryViewModel", "수정할 카테고리를 찾을 수 없습니다.")
         }
     }
-
 
     fun isCategoryListEmpty(): Boolean {
         return _categories.value.isNullOrEmpty()

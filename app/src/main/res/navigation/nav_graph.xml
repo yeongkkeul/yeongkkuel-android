@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/navigation_stat">
+    app:startDestination="@id/navigation_home">
 
     <fragment
         android:id="@+id/navigation_splash"
@@ -57,7 +57,7 @@
         tools:layout="@layout/fragment_expense_entry">
 
         <action
-        android:id="@+id/action_expense_entry_to_homeFragment"
+        android:id="@+id/action_expenseEntryFragment_to_navigation_home"
         app:destination="@id/navigation_home" />
         <action
             android:id="@+id/action_expenseEntryFragment_to_navigation_stat"

@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.ItemBotsheetCategoryBinding
+import android.util.Log
+
 
 class BotSheetCategoryListAdapter(
     private val botSheetListener: BotSheetListener
@@ -36,15 +38,16 @@ class BotSheetCategoryListAdapter(
 
             rvHistory.run {
                 adapter = historyListAdapter
-                historyListAdapter.submitList(item.history)
-                layoutManager = LinearLayoutManager(context)
+                historyListAdapter.submitList(item.history ?: emptyList())
+                layoutManager = LinearLayoutManager(binding.root.context)
             }
 
             // + 버튼 클릭 리스너 추가
             ivBtnAdd.setOnClickListener {
-                // ViewModel을 통해 새로운 데이터 추가 로직
-                botSheetListener.navigateToExpenseEntry(item.kind.kor, item.color.id)
+                botSheetListener?.navigateToExpenseEntry(item.kind.kor, item.color.id)
+                    ?: Log.e("BotSheetCategoryListAdapter", "botSheetListener is null")
             }
+
         }
     }
 
