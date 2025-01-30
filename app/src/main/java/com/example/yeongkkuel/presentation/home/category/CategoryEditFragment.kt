@@ -80,7 +80,11 @@ class CategoryEditFragment : Fragment() {
     private fun setupRecyclerView() {
         binding.rvColorPalette.apply {
             layoutManager = GridLayoutManager(requireContext(), 5)
-            adapter = colorPaletteAdapter
+            adapter = ColorPaletteAdapter { selectedColor ->
+                updateSelectedColor(selectedColor) // 선택한 색상 업데이트!
+            }.apply {
+                submitList(getColorList()) // Colors Enum에서 가져온 색상 리스트 적용
+            }
 
             // RecyclerView 간격 설정
             addItemDecoration(object : RecyclerView.ItemDecoration() {
@@ -94,8 +98,8 @@ class CategoryEditFragment : Fragment() {
                 }
             })
         }
-        colorPaletteAdapter.submitList(getColorList())
     }
+
 
     private fun getColorList(): List<Int> {
         return Colors.values().map { color ->
@@ -144,38 +148,47 @@ class CategoryEditFragment : Fragment() {
     }
 
     private fun updateSelectedColor(color: Int) {
+        // Colors Enum에서 ARGB 값으로 매칭된 Enum 가져오기
+        val selectedEnumColor = Colors.fromARGB(color) ?: return
+
+        // 선택한 색상 저장
         selectedColor = color
+
+        // View 업데이트
         binding.ivSelectedColor.setBackgroundResource(R.drawable.bg_color_circle)
         binding.ivSelectedColor.background.setTint(color)
         binding.etCategoryEditInput.setTextColor(color) // 제목 텍스트 색상 업데이트
+
+        // 필요하다면 Enum을 기반으로 추가 작업 가능
+        // 예: 로깅하거나 ViewModel에 Enum 값을 저장
+        println("Selected Color Enum: $selectedEnumColor")
+
         binding.rvColorPalette.visibility = View.GONE
         binding.llColorPalette.visibility = View.GONE
         binding.ivDropdownIcon.setImageResource(R.drawable.ic_dropdown_arrow)
     }
 
 
+
+
     private fun saveEditedCategory() {
         val updatedTitle = binding.etCategoryEditInput.text.toString()
 
-        // 제목 확인
+        // 🛠️ 제목 검증
         if (updatedTitle.isBlank()) {
             Toast.makeText(requireContext(), "제목을 입력해주세요.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // Colors Enum으로 선택된 색상 확인
-        val selectedColorEnum = Colors.fromId(selectedColor ?: return) ?: run {
+        // 🎨 Colors Enum으로 변환된 색상 값 가져오기
+        val selectedColorEnum = Colors.fromARGB(selectedColor ?: return) ?: run {
             Toast.makeText(requireContext(), "유효하지 않은 색상입니다.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // 원래 전달받은 카테고리 이름
-        val originalCategoryName = arguments?.getString("categoryName") ?: run {
-            Toast.makeText(requireContext(), "카테고리 데이터를 불러올 수 없습니다.", Toast.LENGTH_SHORT).show()
-            return
-        }
+        val originalCategoryName = arguments?.getString("categoryName") ?: return
 
-        // ViewModel 업데이트
+        // 🛠️ ViewModel 업데이트
         viewModel.updateCategory(
             originalCategoryName,
             Category(name = updatedTitle, color = selectedColorEnum)
@@ -184,6 +197,7 @@ class CategoryEditFragment : Fragment() {
         Toast.makeText(requireContext(), "카테고리가 수정되었습니다.", Toast.LENGTH_SHORT).show()
         findNavController().popBackStack(R.id.categoryManageFragment, false)
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
