@@ -1,10 +1,20 @@
 package com.example.yeongkkuel.presentation.home.entry
 
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.FrameLayout
+import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -12,6 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentExpenseEntryBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
@@ -26,8 +37,10 @@ class ExpenseEditFragment : Fragment() {
 
     private var _binding: FragmentExpenseEntryBinding? = null
     private val binding get() = _binding!!
-
+    private lateinit var sharedPreferences: SharedPreferences
     private lateinit var viewModel: BotSheetViewModel  // 🔹 ViewModel 추가
+    private val PICK_IMAGE_REQUEST = 1
+    private var selectedImageUri: Uri? = null // 🔹 선택한 이미지 URI 저장
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,14 +54,32 @@ class ExpenseEditFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 🔹 ViewModel 초기화
         viewModel = ViewModelProvider(requireActivity())[BotSheetViewModel::class.java]
-
-        // 🔹 BotSheet의 history 데이터를 감시하고 최신 내역 반영
         observeLatestHistory()
-
-        // 🔹 UI 초기 데이터 설정
         setupUi()
+        binding.tvEntryComplete.setOnClickListener {
+            saveEditedExpense()
+        }
+
+        sharedPreferences = requireContext().getSharedPreferences("ExpensePrefs", Context.MODE_PRIVATE)
+
+        setupDetailInput(view)
+        setupAmountInput(view)
+        setupPhotoFrame(view)
+
+    }
+    private fun setupPhotoFrame(view: View) {
+        val flPhotoFrame = view.findViewById<FrameLayout>(R.id.fl_photo_frame)
+        flPhotoFrame.setOnClickListener {
+            openGallery()
+        }
+    }
+
+    private fun openGallery() {
+        val intent = Intent(Intent.ACTION_PICK).apply {
+            type = "image/*" // 이미지 파일만 선택
+        }
+        startActivityForResult(intent, PICK_IMAGE_REQUEST)
     }
 
     private fun observeLatestHistory() {
@@ -116,7 +147,6 @@ class ExpenseEditFragment : Fragment() {
         binding.icMore.visibility = View.GONE
         binding.clExpenseAuto.visibility = View.GONE
         binding.clCheckNoExpense.visibility = View.GONE
-        binding.tvCharacterCount.visibility = View.GONE
         binding.tvEntryComplete.setOnClickListener {
             saveEditedExpense()
         }
@@ -129,8 +159,67 @@ class ExpenseEditFragment : Fragment() {
         return NumberFormat.getNumberInstance(Locale.KOREA).format(price)
     }
     private fun saveEditedExpense() {
-        // 🔹 수정된 데이터를 저장하는 로직 추가
+        val updatedExpense = BotSheetUiState.Spending.History(
+            date = binding.tvDateInput.text.toString(),
+            categoryName = binding.tvCategoryInput.text.toString(),
+            categoryColor = String.format("#%06X", (0xFFFFFF and binding.tvCategoryInput.currentTextColor)), // 색상 HEX 변환
+            name = binding.etDetailInput.text.toString(),
+            content =  binding.etDetailInput.text.toString(),
+            price = binding.etAmountInput.text.toString().replace(",", "").toIntOrNull() ?: 0,
+            photoUrl = selectedImageUri?.toString() ?: ""
+        )
+
+        // 🔹 ViewModel을 통해 지출 내역 업데이트
+        viewModel.updateExpense(updatedExpense)
+
+        // 🔹 수정 후 화면 종료
+        Toast.makeText(requireContext(), "지출 내역이 수정되었습니다.", Toast.LENGTH_SHORT).show()
+/*        val bundle = Bundle().apply {
+            putString("expenseDate", updatedExpense.date)
+            putString("categoryName", updatedExpense.categoryName)
+            putString("categoryColor", updatedExpense.categoryColor)
+            putString("expenseContent", updatedExpense.content)
+            putInt("expensePrice", updatedExpense.price)
+            putString("expensePhoto", updatedExpense.photoUrl)
+        }*/
+        findNavController().popBackStack()
     }
+
+    // 상세 입력란 글자 수 제한 로직
+    private fun setupDetailInput(view: View) {
+        val etDetailInput = view.findViewById<EditText>(R.id.et_detail_input)
+        val tvCharacterCount = view.findViewById<TextView>(R.id.tv_character_count)
+
+        etDetailInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val length = s?.length ?: 0
+                tvCharacterCount.text = "$length/24"
+                if (length > 24) etDetailInput.error = "최대 24자까지 입력 가능합니다."
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+    }
+    private fun setupAmountInput(view: View) {
+        val etAmountInput = view.findViewById<EditText>(R.id.et_amount_input)
+
+        etAmountInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val input = s?.toString()?.replace(",", "")?.toLongOrNull() ?: return
+                val limitedValue = if (input > 99_999_999) 99_999_999 else input
+                val formatted = String.format("%,d", limitedValue)
+                if (formatted != s.toString()) {
+                    etAmountInput.removeTextChangedListener(this)
+                    etAmountInput.setText(formatted)
+                    etAmountInput.setSelection(formatted.length)
+                    etAmountInput.addTextChangedListener(this)
+                }
+            }
+        })
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

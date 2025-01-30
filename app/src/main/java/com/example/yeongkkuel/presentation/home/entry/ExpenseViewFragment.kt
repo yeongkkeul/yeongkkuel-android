@@ -98,6 +98,31 @@ class ExpenseViewFragment : Fragment() {
         binding.btnBack.setOnClickListener {
             findNavController().popBackStack()
         }
+        lifecycleScope.launch {
+            viewModel.spendingHistoryList.collectLatest { historyList ->
+                if (historyList.isNotEmpty()) {
+                    val latestHistory = historyList.last()
+                    updateUiWithHistory(latestHistory)
+                }
+            }
+        }
+        arguments?.let {
+            binding.tvDateInput.text = it.getString("expenseDate", getCurrentDate())
+            binding.tvCategoryInput.text = it.getString("categoryName", "")
+            binding.tvCategoryInput.setTextColor(Color.parseColor(it.getString("categoryColor", "#000000")))
+            binding.etDetailInput.setText(it.getString("expenseContent", ""))
+            binding.etAmountInput.setText(formatPrice(it.getInt("expensePrice", 0)))
+
+            val expensePhotoUrl = it.getString("expensePhoto", "")
+            if (expensePhotoUrl.isNotEmpty()) {
+                Glide.with(this)
+                    .load(expensePhotoUrl)
+                    .into(binding.imgPhotoFrame)
+                binding.ivPhotoIcon.visibility = View.GONE
+            } else {
+                binding.ivPhotoIcon.visibility = View.VISIBLE
+            }
+        }
 
         // 🔹 기존 Bundle 데이터 처리
         val expenseDate = arguments?.getString("expenseDate") ?: getCurrentDate() // ✅ 오늘 날짜 기본값 설정

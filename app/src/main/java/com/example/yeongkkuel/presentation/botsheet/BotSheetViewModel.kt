@@ -144,6 +144,15 @@ class BotSheetViewModel : ViewModel() {
             e.printStackTrace()
         }
     }
+    fun updateExpense(updatedExpense: BotSheetUiState.Spending.History) {
+        _spendingHistoryList.value = _spendingHistoryList.value.map { expense ->
+            if (expense.date == updatedExpense.date && expense.name == updatedExpense.name) {
+                updatedExpense // 기존 항목을 수정된 값으로 변경
+            } else {
+                expense
+            }
+        }
+    }
 
     // ✅ 최신 지출 내역 업데이트 함수 추가
     private fun updateSpendingHistoryList() {
