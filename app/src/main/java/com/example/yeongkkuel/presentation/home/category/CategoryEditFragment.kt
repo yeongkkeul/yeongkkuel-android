@@ -175,16 +175,6 @@ class CategoryEditFragment : Fragment() {
         // 수정 후 카테고리 관리 페이지로 이동
         findNavController().popBackStack(R.id.categoryManageFragment, false)
     }
-    private fun updateSaveButtonState() {
-        val title = binding.etCategoryEditInput.text.toString()
-        val isEnabled = title.isNotBlank() && selectedColor != null
-        binding.tvCategoryEdit.isEnabled = isEnabled
-
-        val buttonColor = if (isEnabled) R.color.button_enabled else R.color.button_disabled
-        binding.tvCategoryEdit.setBackgroundColor(
-            ContextCompat.getColor(requireContext(), buttonColor)
-        )
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()

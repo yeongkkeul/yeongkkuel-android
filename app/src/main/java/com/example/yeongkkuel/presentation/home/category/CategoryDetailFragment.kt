@@ -7,12 +7,14 @@ import android.view.ViewGroup
 import android.widget.PopupWindow
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentCategoryDetailBinding
 import com.example.yeongkkuel.databinding.ItemMenuPopupBinding
+import com.example.yeongkkuel.presentation.util.Colors
 
 class CategoryDetailFragment : Fragment() {
 
@@ -33,13 +35,17 @@ class CategoryDetailFragment : Fragment() {
 
         // 전달받은 카테고리 데이터 가져오기 (Bundle 사용)
         val categoryName = arguments?.getString("categoryName")
-        val categoryColor = arguments?.getInt("categoryColor")
+        val categoryColorId = arguments?.getInt("categoryColor")
+
+        // Colors에서 id로 정확한 색상 값을 가져옴
+        val categoryColor = categoryColorId?.let { Colors.fromId(it)?.id }
+        val textColor = categoryColor?.let { ContextCompat.getColor(requireContext(), it) } ?: android.graphics.Color.BLACK
 
         // 데이터 화면에 표시
         binding.tvCategoryDetailInput.setText(categoryName)
-        binding.tvCategoryDetailInput.setTextColor(categoryColor ?: android.graphics.Color.BLACK)
+        binding.tvCategoryDetailInput.setTextColor(textColor)
         binding.ivSelectedColor.setBackgroundResource(R.drawable.bg_color_circle) // 원형 배경 설정
-        binding.ivSelectedColor.background.setTint(categoryColor ?: android.graphics.Color.TRANSPARENT) // 선택된 색상 적용
+        binding.ivSelectedColor.background.setTint(textColor) // 선택된 색상 적용
 
         // 뒤로가기 버튼 클릭 이벤트
         binding.ivBack.setOnClickListener {
@@ -48,7 +54,7 @@ class CategoryDetailFragment : Fragment() {
 
         // 더보기 버튼 클릭 이벤트
         binding.tvCategoryMore.setOnClickListener {
-            showCustomMenu(it, categoryName, categoryColor) // 수정/삭제 메뉴 표시
+            showCustomMenu(it, categoryName, categoryColorId) // 수정/삭제 메뉴 표시
         }
     }
 
