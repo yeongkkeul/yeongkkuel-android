@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentCategoryEditBinding
+import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import com.example.yeongkkuel.presentation.util.Colors
 
 
@@ -23,7 +24,8 @@ class CategoryEditFragment : Fragment() {
 
     private var _binding: FragmentCategoryEditBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: CategoryViewModel by activityViewModels()
+    private val botSheetViewModel: BotSheetViewModel by activityViewModels()
+    private val categoryViewModel: CategoryViewModel by activityViewModels()
     private var selectedColor: Int? = null
     private val colorPaletteAdapter by lazy {
         ColorPaletteAdapter(onColorSelected = { selectedColor ->
@@ -168,36 +170,36 @@ class CategoryEditFragment : Fragment() {
         binding.ivDropdownIcon.setImageResource(R.drawable.ic_dropdown_arrow)
     }
 
-
-
-
     private fun saveEditedCategory() {
         val updatedTitle = binding.etCategoryEditInput.text.toString()
+        val updatedColor = selectedColor ?: return
 
-        // 🛠️ 제목 검증
+        // 제목 검증
         if (updatedTitle.isBlank()) {
             Toast.makeText(requireContext(), "제목을 입력해주세요.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // 🎨 Colors Enum으로 변환된 색상 값 가져오기
-        val selectedColorEnum = Colors.fromARGB(selectedColor ?: return) ?: run {
+        // Colors Enum으로 변환된 색상 값 가져오기
+        val selectedColorEnum = Colors.fromARGB(updatedColor) ?: run {
             Toast.makeText(requireContext(), "유효하지 않은 색상입니다.", Toast.LENGTH_SHORT).show()
             return
         }
 
         val originalCategoryName = arguments?.getString("categoryName") ?: return
 
-        // 🛠️ ViewModel 업데이트
-        viewModel.updateCategory(
-            originalCategoryName,
-            Category(name = updatedTitle, color = selectedColorEnum)
-        )
+        // 업데이트된 카테고리 생성
+        val updatedCategory = Category(name = updatedTitle, color = selectedColorEnum)
+
+        // BotSheetViewModel 업데이트
+        botSheetViewModel.updateCategory(originalCategoryName, updatedCategory)
+
+        // CategoryViewModel 업데이트
+        categoryViewModel.updateCategory(originalCategoryName, updatedCategory)
 
         Toast.makeText(requireContext(), "카테고리가 수정되었습니다.", Toast.LENGTH_SHORT).show()
         findNavController().popBackStack(R.id.categoryManageFragment, false)
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()
