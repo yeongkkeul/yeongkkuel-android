@@ -43,30 +43,39 @@ class CategoryEditFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // 전달받은 데이터 가져오기
-        val categoryName = arguments?.getString("categoryName")
-        val categoryColor = arguments?.getInt("categoryColor") ?: android.graphics.Color.BLACK
+        val categoryName = arguments?.getString("categoryName") ?: ""
+        val categoryColorId = arguments?.getInt("categoryColor") ?: android.graphics.Color.BLACK
+
+        // 초기 텍스트 길이 반영!
+        val initialLength = categoryName.length
+        binding.tvCharacterCount.text = "$initialLength/16"
+
+        // Colors Enum 활용
+        val categoryColor = Colors.fromId(categoryColorId)
+        val textColor = categoryColor?.let { ContextCompat.getColor(requireContext(), it.id) }
+            ?: android.graphics.Color.BLACK
 
         // 데이터 화면에 표시
         binding.etCategoryEditInput.setText(categoryName)
+        binding.etCategoryEditInput.setTextColor(textColor)
         binding.ivSelectedColor.setBackgroundResource(R.drawable.bg_color_circle)
-        binding.ivSelectedColor.background.setTint(categoryColor)
-        binding.etCategoryEditInput.setTextColor(categoryColor) // 제목 텍스트 색상 초기화
-        selectedColor = categoryColor
+        binding.ivSelectedColor.background.setTint(textColor)
+        selectedColor = textColor
 
         // 색상 팔레트 어댑터 설정
-        val colorAdapter = ColorPaletteAdapter { selectedColor ->
+        binding.rvColorPalette.layoutManager = GridLayoutManager(requireContext(), 5)
+        binding.rvColorPalette.adapter = ColorPaletteAdapter { selectedColor ->
             updateSelectedColor(selectedColor)
+        }.apply {
+            submitList(getColorList())
         }
 
-        binding.rvColorPalette.layoutManager = GridLayoutManager(requireContext(), 5)
-        binding.rvColorPalette.adapter = colorAdapter
-        colorAdapter.submitList(getColorList())
-
-        // 이벤트 설정
-        setupTextWatcher()
-        setupListeners()
+        // RecyclerView, 리스너 설정
         setupRecyclerView()
+        setupListeners()
+        setupTextWatcher()
     }
+
 
     private fun setupRecyclerView() {
         binding.rvColorPalette.apply {
@@ -148,31 +157,31 @@ class CategoryEditFragment : Fragment() {
     private fun saveEditedCategory() {
         val updatedTitle = binding.etCategoryEditInput.text.toString()
 
-        // 제목 및 색상 확인
+        // 제목 확인
         if (updatedTitle.isBlank()) {
             Toast.makeText(requireContext(), "제목을 입력해주세요.", Toast.LENGTH_SHORT).show()
             return
         }
-        if (selectedColor == null) {
-            Toast.makeText(requireContext(), "색상을 선택해주세요.", Toast.LENGTH_SHORT).show()
+
+        // Colors Enum으로 선택된 색상 확인
+        val selectedColorEnum = Colors.fromId(selectedColor ?: return) ?: run {
+            Toast.makeText(requireContext(), "유효하지 않은 색상입니다.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // 전달받은 원래 카테고리 이름 가져오기
-        val originalCategoryName = arguments?.getString("categoryName") ?: return
+        // 원래 전달받은 카테고리 이름
+        val originalCategoryName = arguments?.getString("categoryName") ?: run {
+            Toast.makeText(requireContext(), "카테고리 데이터를 불러올 수 없습니다.", Toast.LENGTH_SHORT).show()
+            return
+        }
 
-        val safeSelectedColor = selectedColor // 로컬 변수로 저장
-        val categoryColor = safeSelectedColor?.let { Colors.fromId(it) } ?: Colors.RED1 // Null-safe 변환
+        // ViewModel 업데이트
         viewModel.updateCategory(
             originalCategoryName,
-            Category(name = updatedTitle, color = categoryColor)
+            Category(name = updatedTitle, color = selectedColorEnum)
         )
-        Toast.makeText(requireContext(), "카테고리가 수정되었습니다.", Toast.LENGTH_SHORT).show()
 
         Toast.makeText(requireContext(), "카테고리가 수정되었습니다.", Toast.LENGTH_SHORT).show()
-
-
-        // 수정 후 카테고리 관리 페이지로 이동
         findNavController().popBackStack(R.id.categoryManageFragment, false)
     }
 
