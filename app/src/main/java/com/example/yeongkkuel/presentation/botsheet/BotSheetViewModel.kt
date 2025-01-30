@@ -36,6 +36,13 @@ class BotSheetViewModel : ViewModel() {
         }
     }
 
+    //지출 내역 삭제
+    fun removeExpense(expenseName: String) {
+        viewModelScope.launch {
+            _spendingHistoryList.value = _spendingHistoryList.value.filterNot { it.name == expenseName }
+        }
+    }
+
     // 🔹 지출 내역 추가 기능
     fun addExpenseToCategory(category: SpendingCategory, history: BotSheetUiState.Spending.History) {
         _uiState.update { prev ->
@@ -154,6 +161,15 @@ class BotSheetViewModel : ViewModel() {
             }
         } catch (e: Exception) {
             e.printStackTrace()
+        }
+    }
+    fun updateExpense(updatedExpense: BotSheetUiState.Spending.History) {
+        _spendingHistoryList.value = _spendingHistoryList.value.map { expense ->
+            if (expense.date == updatedExpense.date && expense.name == updatedExpense.name) {
+                updatedExpense // 기존 항목을 수정된 값으로 변경
+            } else {
+                expense
+            }
         }
     }
 
