@@ -2,8 +2,11 @@ package com.example.yeongkkuel.presentation.home.category
 
 import android.graphics.Rect
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +14,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -49,7 +53,6 @@ class CategoryAddFragment : Fragment() {
         setupRecyclerView()
         setupListeners()
         setupTextWatcher()
-        updateSaveButtonState() // 초기 저장 버튼 상태 업데이트
     }
 
     private fun setupRecyclerView() {
@@ -65,7 +68,7 @@ class CategoryAddFragment : Fragment() {
                     parent: RecyclerView,
                     state: RecyclerView.State
                 ) {
-                    outRect.set(0, 1, 0, 1) // 좌우/상하 1dp 간격 추가
+                    outRect.set(10, 10, 10, 10)
                 }
             })
         }
@@ -87,6 +90,12 @@ class CategoryAddFragment : Fragment() {
         binding.ivBack.setOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
+
+        // 키보드 완료 버튼 누르면 포커스 제거
+        binding.etCategoryAddInput.setOnEditorActionListener { _, _, _ ->
+            binding.etCategoryAddInput.clearFocus()
+            false
+        }
     }
 
     private fun toggleColorPaletteVisibility() {
@@ -104,25 +113,51 @@ class CategoryAddFragment : Fragment() {
         binding.rvColorPalette.visibility = View.GONE
         binding.llColorPalette.visibility = View.GONE
         binding.ivDropdownIcon.setImageResource(R.drawable.ic_dropdown_arrow)
-        updateSaveButtonState() // 저장 버튼 상태 업데이트
+        binding.etCategoryAddInput.setTextColor(color) // EditText 텍스트 색상 변경
     }
 
     private fun saveCategory() {
-        val title = binding.etCategoryAddInput.text.toString()
-        val color = selectedColor ?: return // 선택된 색상이 없으면 종료
+        // ✅ 저장 버튼 누를 때 EditText 포커스 제거
+        binding.etCategoryAddInput.clearFocus()
 
-        if (title.isBlank()) {
-            Toast.makeText(requireContext(), "제목을 입력해주세요.", Toast.LENGTH_SHORT).show()
+        val title = binding.etCategoryAddInput.text.toString().trim()
+
+        // 🚨 토스트 메시지 순차 실행을 위한 핸들러
+        val handler = Handler(Looper.getMainLooper())
+
+        // 제목 & 색상 입력 여부 확인
+        val isTitleEmpty = title.isBlank()
+        val isColorEmpty = selectedColor == null
+
+        // 1️⃣ 제목 & 색상 모두 없을 때 (순차적으로 메시지 출력)
+        if (isTitleEmpty && isColorEmpty) {
+            Toast.makeText(requireContext(), "제목을 입력하세요.", Toast.LENGTH_SHORT).show()
+            handler.postDelayed({
+                Toast.makeText(requireContext(), "색상을 선택하세요.", Toast.LENGTH_SHORT).show()
+            }, 1000) // 1초(1000ms) 후 색상 선택 토스트 띄움
             return
         }
 
-        // getColorList()와 매칭되는 Colors 객체를 찾기
-        val categoryColor = Colors.values().find { colorValue ->
-            ContextCompat.getColor(requireContext(), colorValue.id) == color
-        } ?: run {
-            Toast.makeText(requireContext(), "유효하지 않은 색상이 선택되었습니다.", Toast.LENGTH_SHORT).show()
+        // 2️⃣ 제목은 있지만 색상이 없을 때
+        if (!isTitleEmpty && isColorEmpty) {
+            Toast.makeText(requireContext(), "색상을 선택하세요.", Toast.LENGTH_SHORT).show()
             return
         }
+
+        // 3️⃣ 제목 & 색상 입력 후 제목을 지웠을 때 (즉, 색상은 선택된 상태)
+        if (isTitleEmpty && !isColorEmpty) {
+            handler.post {
+                Toast.makeText(requireContext(), "제목을 입력하세요.", Toast.LENGTH_SHORT).show()
+            }
+            return
+        }
+
+        // ✅ 저장 로직 실행 (제목 & 색상 모두 입력됨)
+        val categoryColor = Colors.entries.find { colorValue ->
+            ContextCompat.getColor(requireContext(), colorValue.id) == selectedColor
+        } ?: return
+
+
 
         val newCategory = Category(name = title, color = categoryColor)
 
@@ -131,7 +166,13 @@ class CategoryAddFragment : Fragment() {
         botSheetViewModel.addCategory(newCategory)
 
         Toast.makeText(requireContext(), "카테고리가 저장되었습니다.", Toast.LENGTH_SHORT).show()
-        findNavController().navigate(R.id.action_categoryAddFragment_to_navigation_home)
+
+        // 뒤로 가기 시 CategoryAddFragment가 백스택에 남지 않도록 설정
+        val navOptions = NavOptions.Builder()
+            .setPopUpTo(R.id.categoryAddFragment, true) // categoryAddFragment를 백스택에서 제거
+            .build()
+
+        findNavController().navigate(R.id.action_categoryAddFragment_to_navigation_home, null, navOptions)
     }
 
     private fun setupTextWatcher() {
@@ -142,25 +183,16 @@ class CategoryAddFragment : Fragment() {
                 // 입력된 텍스트 길이 계산
                 val length = s?.length ?: 0
                 binding.tvCharacterCount.text = "$length/16"
-
-                // 저장 버튼 활성화 여부 업데이트
-                updateSaveButtonState()
             }
 
             override fun afterTextChanged(s: Editable?) {
                 // 텍스트 입력값 저장
                 val inputText = s?.toString() ?: ""
+
+                // ✅ 제목이 있을 때만 저장 버튼 활성화, 없으면 비활성화
                 binding.tvCategoryAdd.isEnabled = inputText.isNotBlank()
             }
         })
-    }
-
-    private fun updateSaveButtonState() {
-        val title = binding.etCategoryAddInput.text.toString()
-        val isEnabled = title.isNotBlank() && selectedColor != null
-        binding.tvCategoryAdd.isEnabled = isEnabled
-        val buttonColor = if (isEnabled) R.color.button_enabled else R.color.button_disabled
-        binding.tvCategoryAdd.setBackgroundColor(ContextCompat.getColor(requireContext(), buttonColor))
     }
 
     override fun onDestroyView() {
@@ -172,13 +204,5 @@ class CategoryAddFragment : Fragment() {
         return Colors.values().map { color ->
             ContextCompat.getColor(requireContext(), color.id) // 열거형의 id를 사용해 색상 값 가져오기
         }
-    }
-
-    private fun setupColorPalette() {
-        val adapter = ColorPaletteAdapter { color ->
-            selectedColor = color // 선택된 색상 저장
-        }
-        binding.rvColorPalette.adapter = adapter // XML ID와 일치하게 수정
-        adapter.submitList(getColorList()) // getColorList의 색상을 RecyclerView에 전달
     }
 }
