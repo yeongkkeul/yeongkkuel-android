@@ -259,9 +259,9 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     R.id.navigation_login,
                     R.id.navigation_signup,
                     R.id.navigation_stat_setting,
-                    R.id.navigation_stat_recommendation -> hideBottomNavigation(false)
+                    R.id.navigation_stat_recommendation -> hideBottomNavigation(true)
 
-                    else -> hideBottomNavigation(true) // 추가 처리
+                    else -> hideBottomNavigation(false) // 추가 처리
                 }
             }
 
