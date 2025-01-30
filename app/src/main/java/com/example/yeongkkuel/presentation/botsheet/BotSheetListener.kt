@@ -5,6 +5,6 @@ interface BotSheetListener {
     fun setBotSheetGone()
     fun setBotSheetVisible()
     fun navigateToExpenseEntry(selectedCategory: String, categoryColor: Int)
-    fun navigateToExpenseEdit(expenseName: String, expensePrice: Int) // 🔹 추가
+    fun navigateToExpenseView(expenseName: String, expensePrice: Int, categoryColor: String) // ✅ 추가 확인
     fun navigateToCategoryAddFragment()
 }

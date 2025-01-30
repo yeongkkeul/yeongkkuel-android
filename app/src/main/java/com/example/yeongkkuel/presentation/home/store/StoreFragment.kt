@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
@@ -67,7 +68,7 @@ class StoreFragment : Fragment() {
                     "selectedProductKey",
                     Bundle().apply { putParcelable("selectedProduct", product) }
                 )
-
+                Toast.makeText(requireContext(), "저장했어요!", Toast.LENGTH_SHORT).show()
                 // StoreFragment 종료 후 HomeFragment로 이동
                 navController.popBackStack()
             } ?: Log.d("StoreFragment", "No product selected in MY tab.")
@@ -327,6 +328,10 @@ class StoreFragment : Fragment() {
         btnCancel.setOnClickListener {
             dialog.dismiss()
         }
+        dialog.window?.apply {
+            setBackgroundDrawableResource(R.drawable.ic_store_topurchase) // VectorDrawable 설정
+            decorView.clipToOutline = true // 💡 둥근 모서리 적용
+        }
 
         dialog.show()
     }
@@ -372,19 +377,6 @@ class StoreFragment : Fragment() {
 
     fun Int.toPx(context: android.content.Context): Int {
         return (this * context.resources.displayMetrics.density).toInt()
-    }
-    private fun mapToHomeResource(storeResourceId: Int): Int {
-        return when (storeResourceId) {
-            R.drawable.img_product_swing1 -> R.drawable.img_home_swing1
-            R.drawable.img_product_swing2 -> R.drawable.img_home_swing2
-            R.drawable.img_product_toy1 -> R.drawable.img_home_toy1
-            R.drawable.img_product_toy2 -> R.drawable.img_home_toy2
-            R.drawable.img_product_bowl1 -> R.drawable.img_home_bowl1
-            R.drawable.img_product_bowl2 -> R.drawable.img_home_bowl2
-            R.drawable.img_product_nest1 -> R.drawable.img_home_nest1
-            R.drawable.img_product_nest2 -> R.drawable.img_home_nest2
-            else -> storeResourceId // 기본적으로 동일한 ID 사용
-        }
     }
 
 }

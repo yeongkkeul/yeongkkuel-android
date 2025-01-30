@@ -27,7 +27,11 @@ class BotSheetCategoryListAdapter(
 
         // 🔹 클릭 리스너를 Adapter에 직접 추가하지 않고, Fragment로 전달
         private val historyListAdapter = BotSheetHistoryListAdapter { selectedHistory ->
-            botSheetListener.navigateToExpenseEdit(selectedHistory.name, selectedHistory.price)
+            botSheetListener.navigateToExpenseView(
+                selectedHistory.name,
+                selectedHistory.price,
+                selectedHistory.categoryColor // ✅ categoryColor 추가
+            )
         }
 
         fun onBind(item: BotSheetUiState.Spending) = with(binding) {

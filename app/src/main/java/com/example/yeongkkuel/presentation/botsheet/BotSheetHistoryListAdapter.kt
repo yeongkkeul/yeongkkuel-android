@@ -1,5 +1,6 @@
 package com.example.yeongkkuel.presentation.botsheet
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -21,6 +22,7 @@ class BotSheetHistoryListAdapter(
             tvPrice.text = "-" + item.price.toMoneyString() + "원"
 
             root.setOnClickListener {
+                Log.d("BotSheetHistoryListAdapter", "Clicked history: ${item.name}, categoryColor: ${item.categoryColor}")
                 onItemClick(item)
             }
         }
