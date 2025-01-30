@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
@@ -27,6 +28,7 @@ import com.example.yeongkkuel.presentation.botsheet.BotSheetItemTouchHelper
 import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
+import com.example.yeongkkuel.presentation.home.category.CategoryViewModel
 import com.example.yeongkkuel.presentation.util.dpToPx
 import com.example.yeongkkuel.presentation.util.toNaviStat
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -42,6 +44,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     private lateinit var navController: NavController
 
     private val botSheetViewModel: BotSheetViewModel by viewModels()
+    private val categoryViewModel: CategoryViewModel by viewModels()
 
     private val botSheetCategoryListAdapter by lazy {
         BotSheetCategoryListAdapter(this)
@@ -246,11 +249,21 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     R.id.categoryAddFragment -> {
                         binding.tvAddCategory.visibility = View.GONE // 카테고리 추가 화면에서는 숨기기
                     }
+                    R.id.navigation_home -> {
+                        // 홈 화면 복귀 시 카테고리 개수 조건 확인
+                        val isCategoryEmpty = categoryViewModel.categories.value.orEmpty().size < 1
+                        if (isCategoryEmpty) {
+                            binding.tvAddCategory.visibility = View.VISIBLE // 카테고리 없을 때 보이기
+                        } else {
+                            binding.tvAddCategory.visibility = View.GONE // 카테고리 있을 때 숨기기
+                        }
+                    }
                     else -> {
-                        binding.tvAddCategory.visibility = View.GONE // 다른 화면에서는 다시 보이도록
+                        binding.tvAddCategory.visibility = View.GONE // 다른 화면에서는 숨기기
                     }
                 }
             }
+
 
             // 바텀네비게이션 뷰 숨김 처리 - 스플래시, 로그인
             navController.addOnDestinationChangedListener { _, destination, _ ->
