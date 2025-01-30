@@ -1,15 +1,10 @@
 package com.example.yeongkkuel.presentation.home.entry
 
-import android.app.AlertDialog
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.PopupMenu
-import android.widget.PopupWindow
-import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -17,9 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
-import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentExpenseEntryBinding
-import com.example.yeongkkuel.databinding.ItemMenuPopupBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -29,7 +22,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class ExpenseViewFragment : Fragment() {
+class ExpenseEditFragment : Fragment() {
 
     private var _binding: FragmentExpenseEntryBinding? = null
     private val binding get() = _binding!!
@@ -56,9 +49,6 @@ class ExpenseViewFragment : Fragment() {
 
         // 🔹 UI 초기 데이터 설정
         setupUi()
-        binding.icMore.setOnClickListener { view ->
-            showCustomMenu(view)
-        }
     }
 
     private fun observeLatestHistory() {
@@ -93,7 +83,7 @@ class ExpenseViewFragment : Fragment() {
 
     private fun setupUi() {
         // 🔹 제목 텍스트뷰 visibility 변경
-        binding.tvExpenseViewTitle.visibility = View.VISIBLE
+        binding.tvExpenseEditTitle.visibility = View.VISIBLE
         binding.tvExpenseTitle.visibility = View.GONE
         binding.btnBack.setOnClickListener {
             findNavController().popBackStack()
@@ -123,29 +113,13 @@ class ExpenseViewFragment : Fragment() {
             binding.ivPhotoIcon.visibility = View.VISIBLE
         }
 
-        binding.tvDateInput.isEnabled = false
-        binding.tvCategoryInput.isEnabled = false
-        binding.etDetailInput.isEnabled = false
-        binding.etAmountInput.isEnabled = false
-
-        binding.tvDateInput.isFocusable = false
-        binding.tvCategoryInput.isFocusable = false
-        binding.etDetailInput.isFocusable = false
-        binding.etAmountInput.isFocusable = false
-
-        binding.tvCharacterCount.visibility = View.GONE
-        binding.tvEntryComplete.visibility = View.GONE
+        binding.icMore.visibility = View.GONE
         binding.clExpenseAuto.visibility = View.GONE
         binding.clCheckNoExpense.visibility = View.GONE
-        binding.icMore.visibility = View.VISIBLE
+        binding.tvCharacterCount.visibility = View.GONE
         binding.tvEntryComplete.setOnClickListener {
             saveEditedExpense()
         }
-        binding.icMore.setOnClickListener { view ->
-            showCustomMenu(view)
-        }
-
-
     }
     private fun getCurrentDate(): String {
         val dateFormat = SimpleDateFormat("yyyy년 M월 d일 E요일", Locale.KOREA)
@@ -156,69 +130,6 @@ class ExpenseViewFragment : Fragment() {
     }
     private fun saveEditedExpense() {
         // 🔹 수정된 데이터를 저장하는 로직 추가
-    }
-    // 수정/삭제 커스텀 메뉴 표시
-    private fun showCustomMenu(anchor: View) {
-        val popupMenu = PopupMenu(requireContext(), anchor)
-        popupMenu.menuInflater.inflate(R.menu.menu_edit_delete, popupMenu.menu)
-
-        popupMenu.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.action_modify -> {
-                    val categoryColor = String.format("#%06X", (0xFFFFFF and binding.tvCategoryInput.currentTextColor))
-
-                    val bundle = Bundle().apply {
-                        putString("expenseDate", binding.tvDateInput.text.toString())
-                        putString("categoryName", binding.tvCategoryInput.text.toString())
-                        putString("categoryColor", categoryColor) // ✅ HEX 코드로 변환한 색상 값 전달
-                        putString("expenseContent", binding.etDetailInput.text.toString())
-                        putInt("expensePrice", binding.etAmountInput.text.toString().replace(",", "").toIntOrNull() ?: 0)
-                        putString("expensePhoto", "") // 필요하면 photo URL 추가
-                    }
-
-                    findNavController().navigate(R.id.navigation_expense_edit, bundle)
-                    true
-                }
-                R.id.action_delete -> {
-                    // ✅ 삭제 확인 다이얼로그 표시
-                    showDeleteConfirmationDialog()
-                    true
-                }
-                else -> false
-            }
-        }
-        popupMenu.show()
-    }
-    private fun showDeleteConfirmationDialog() {
-        // ✅ 다이얼로그 뷰 inflate
-        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_expense_delete, null)
-
-        val dialog = AlertDialog.Builder(requireContext())
-            .setView(dialogView)
-            .setCancelable(true)
-            .create()
-
-        // ✅ 다이얼로그 내 버튼 참조
-        val cancelBtn = dialogView.findViewById<TextView>(R.id.tv_cancel_btn)
-        val deleteBtn = dialogView.findViewById<TextView>(R.id.tv_delete_btn) // ✅ dialog_expense_delete의 deleteBtn
-
-        cancelBtn.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        deleteBtn.setOnClickListener {
-            // ✅ ViewModel을 통해 해당 내역 삭제
-            val expenseName = binding.etDetailInput.text.toString()
-            viewModel.removeExpense(expenseName)
-
-            Toast.makeText(requireContext(), "지출 내역이 삭제되었습니다.", Toast.LENGTH_SHORT).show()
-            dialog.dismiss()
-
-            // ✅ 삭제 후 이전 화면으로 이동
-            findNavController().popBackStack()
-        }
-
-        dialog.show()
     }
 
     override fun onDestroyView() {

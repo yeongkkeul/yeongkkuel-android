@@ -41,10 +41,22 @@
                 app:layout_constraintStart_toEndOf="@id/btn_back"
                 android:layout_marginStart="12dp" />
             <TextView
-                android:id="@+id/tv_expense_edit_title"
+                android:id="@+id/tv_expense_view_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="지출 내역"
+                style="@style/pageTitle"
+                android:visibility="gone"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/btn_back"
+                android:layout_marginStart="12dp" />
+
+            <TextView
+                android:id="@+id/tv_expense_edit_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="지출 내역 수정"
                 style="@style/pageTitle"
                 android:visibility="gone"
                 app:layout_constraintTop_toTopOf="parent"
