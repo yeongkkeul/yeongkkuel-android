@@ -16,7 +16,7 @@ import java.util.Calendar
 
 class BotSheetViewModel : ViewModel() {
 
-    private val _uiState = MutableStateFlow<BotSheetUiState>(BotSheetUiState.init())
+    private val _uiState = MutableStateFlow(BotSheetUiState.init())
     val uiState = _uiState.asStateFlow()
 
     private val yeongkkuelService = RetrofitClient.yeongkkuelService
@@ -74,6 +74,25 @@ class BotSheetViewModel : ViewModel() {
 
     private fun mapCategoryToIcon(color: Colors): Int {
         return R.drawable.ic_plus_default
+    }
+
+    // 카테고리 제목, 색상 수정 후 바텀시트 업로드
+    fun updateCategory(originalCategoryName: String, updatedCategory: Category) {
+        val updatedSpendingList = uiState.value.spendingList.map { spending ->
+            if (spending.kind.kor == originalCategoryName) { // 기존 카테고리 이름 비교
+                spending.copy(
+                    kind = SpendingCategory.fromName(updatedCategory.name), // 이름 업데이트
+                    color = updatedCategory.color // 색상 업데이트
+                )
+            } else {
+                spending // 다른 경우 그대로 반환
+            }
+        }
+
+        // 상태를 업데이트할 때 update 블록 사용
+        _uiState.update { prevState ->
+            prevState.copy(spendingList = updatedSpendingList)
+        }
     }
 
     // 🔹 일일 목표 지출 가져오기
