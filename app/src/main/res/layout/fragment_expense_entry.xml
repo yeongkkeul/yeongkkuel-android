@@ -118,7 +118,6 @@
                 android:id="@+id/tv_date_input"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="YYYY년 MM월 DD일 A요일"
                 android:layout_marginStart="50dp"
                 android:background="@drawable/bg_edit_text"
                 android:textColor="@color/main1"
@@ -145,13 +144,12 @@
 
             <TextView
                 android:id="@+id/tv_category_input"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_edit_text"
                 android:clickable="true"
                 android:focusable="true"
-                android:hint="카테고리 이름"
-                android:inputType="none"
+                android:inputType="text"
                 android:textColor="@color/black"
                 android:textSize="15sp"
                 android:paddingHorizontal="5dp"
