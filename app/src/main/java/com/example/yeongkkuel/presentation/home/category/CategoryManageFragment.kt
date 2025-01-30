@@ -112,7 +112,8 @@ class CategoryManageFragment : Fragment() {
 
     private fun observeViewModel() {
         viewModel.categories.observe(viewLifecycleOwner) { categories ->
-            categoryAdapter.submitList(categories) // RecyclerView에 새로운 데이터 반영
+            categoryAdapter.submitList(categories) // 데이터 갱신
+            categoryAdapter.notifyDataSetChanged() // 어댑터 새로고침
         }
     }
 
