@@ -13,6 +13,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
+import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
@@ -99,10 +100,13 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
 
     private fun setupAddCategoryClickListener(navController: NavController) {
         binding.tvAddCategory.setOnClickListener {
-            navController.navigate(R.id.categoryAddFragment)
+            navController.navigate(R.id.categoryAddFragment, null, NavOptions.Builder()
+                .setLaunchSingleTop(true) // 이미 존재하면 새로 생성하지 않음
+                .setRestoreState(true) // 상태 복원
+                .build()
+            )
         }
     }
-
 
     private fun initView() = with(binding) {
         fun initBottomSheet() {
@@ -243,7 +247,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                         binding.tvAddCategory.visibility = View.GONE // 카테고리 추가 화면에서는 숨기기
                     }
                     else -> {
-                        binding.tvAddCategory.visibility = View.VISIBLE // 다른 화면에서는 다시 보이도록
+                        binding.tvAddCategory.visibility = View.GONE // 다른 화면에서는 다시 보이도록
                     }
                 }
             }
@@ -352,6 +356,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         binding.ivHamberger.visibility = if (isEmpty) View.GONE else View.VISIBLE
 
         // 데이터가 없으면 빈 메시지와 이미지 보이기, 있으면 숨기기
+        binding.tvAddCategory.visibility = if (isEmpty) View.VISIBLE else View.GONE
         binding.tvEmptyMessage1.visibility = if (isEmpty) View.VISIBLE else View.GONE
         binding.tvEmptyMessage2.visibility = if (isEmpty) View.VISIBLE else View.GONE
         binding.imgAddCategory.visibility = if (isEmpty) View.VISIBLE else View.GONE
@@ -395,19 +400,22 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         // 지출 기입 페이지로 이동하면서 데이터 전달
         navController.navigate(R.id.expenseEntryFragment, bundle)
     }
-    override fun navigateToExpenseEdit(expenseName: String, expensePrice: Int) {
+
+    override fun navigateToExpenseView(expenseName: String, expensePrice: Int, categoryColor: String) {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         val navController = navHostFragment.navController
 
-        // 🔹 데이터 전달을 위한 번들 생성
+        // 🔹 번들에 데이터 추가하여 ExpenseViewFragment로 전달
         val bundle = Bundle().apply {
             putString("expenseName", expenseName)
             putInt("expensePrice", expensePrice)
+            putString("categoryColor", categoryColor) // ✅ categoryColor 추가
         }
 
-        // 🔹 ExpenseEditFragment로 이동하면서 데이터 전달
-        navController.navigate(R.id.navigation_entry_view, bundle)
+        Log.d("MainActivity", "navigateToExpenseView - name: $expenseName, price: $expensePrice, categoryColor: $categoryColor")
+
+        navController.navigate(R.id.navigation_expense_view, bundle)
     }
 
 

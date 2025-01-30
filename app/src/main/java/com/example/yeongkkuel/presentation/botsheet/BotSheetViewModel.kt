@@ -85,18 +85,28 @@ class BotSheetViewModel : ViewModel() {
 
     // 카테고리 제목, 색상 수정 후 바텀시트 업로드
     fun updateCategory(originalCategoryName: String, updatedCategory: Category) {
+        val updatedCategoryColor = updatedCategory.color // ✅ Colors 타입 유지
+
         val updatedSpendingList = uiState.value.spendingList.map { spending ->
-            if (spending.kind.kor == originalCategoryName) { // 기존 카테고리 이름 비교
+            if (spending.kind.kor == originalCategoryName) {
                 spending.copy(
-                    kind = SpendingCategory.fromName(updatedCategory.name), // 이름 업데이트
-                    color = updatedCategory.color // 색상 업데이트
+                    kind = SpendingCategory.fromName(updatedCategory.name),
+                    color = updatedCategoryColor // ✅ Colors 타입 유지
                 )
             } else {
-                spending // 다른 경우 그대로 반환
+                spending
             }
         }
 
-        // 상태를 업데이트할 때 update 블록 사용
+        // ✅ 기존 지출 내역의 categoryColor도 Colors 타입 유지
+        _spendingHistoryList.value = _spendingHistoryList.value.map { history ->
+            if (history.categoryName == originalCategoryName) {
+                history.copy(categoryColor = updatedCategoryColor.toString()) // ✅ String 변환
+            } else {
+                history
+            }
+        }
+
         _uiState.update { prevState ->
             prevState.copy(spendingList = updatedSpendingList)
         }

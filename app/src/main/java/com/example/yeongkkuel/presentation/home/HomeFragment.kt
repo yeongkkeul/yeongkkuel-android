@@ -223,7 +223,10 @@ class HomeFragment : Fragment() {
         btnClose.setOnClickListener {
             dialog.dismiss()
         }
-
+        dialog.window?.apply {
+            setBackgroundDrawableResource(R.drawable.ic_store_topurchase) // VectorDrawable 설정
+            decorView.clipToOutline = true // 💡 둥근 모서리 적용
+        }
         dialog.show()
     }
 

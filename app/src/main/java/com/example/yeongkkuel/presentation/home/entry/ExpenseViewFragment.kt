@@ -3,6 +3,7 @@ package com.example.yeongkkuel.presentation.home.entry
 import android.app.AlertDialog
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -48,19 +49,36 @@ class ExpenseViewFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 🔹 ViewModel 초기화
+        Log.d("ExpenseViewFragment", "onViewCreated - arguments: $arguments")
+
         viewModel = ViewModelProvider(requireActivity())[BotSheetViewModel::class.java]
 
-        // 🔹 BotSheet의 history 데이터를 감시하고 최신 내역 반영
+        // ✅ 최신 내역을 감시하여 UI 업데이트
         observeLatestHistory()
 
-        // 🔹 UI 초기 데이터 설정
+        // ✅ UI 초기 데이터 설정
         setupUi()
+        setupCategory()
+
         binding.icMore.setOnClickListener { view ->
             showCustomMenu(view)
         }
     }
 
+    private fun setupCategory() {
+        val selectedCategory = arguments?.getString("categoryName") ?: "기본 카테고리"
+        val categoryColor = arguments?.getString("categoryColor") ?: "#000000"
+
+        Log.d("ExpenseViewFragment", "setupCategory - categoryName: $selectedCategory, categoryColor: $categoryColor")
+
+        binding.tvCategoryInput.text = selectedCategory
+        try {
+            binding.tvCategoryInput.setTextColor(Color.parseColor(categoryColor)) // HEX 색상 적용
+        } catch (e: IllegalArgumentException) {
+            Log.e("ExpenseViewFragment", "Invalid categoryColor: $categoryColor", e)
+            binding.tvCategoryInput.setTextColor(Color.BLACK) // 기본값 검정색
+        }
+    }
     private fun observeLatestHistory() {
         lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -123,6 +141,7 @@ class ExpenseViewFragment : Fragment() {
                 binding.ivPhotoIcon.visibility = View.VISIBLE
             }
         }
+        setupCategory()
 
         // 🔹 기존 Bundle 데이터 처리
         val expenseDate = arguments?.getString("expenseDate") ?: getCurrentDate() // ✅ 오늘 날짜 기본값 설정
@@ -200,7 +219,7 @@ class ExpenseViewFragment : Fragment() {
                         putInt("expensePrice", binding.etAmountInput.text.toString().replace(",", "").toIntOrNull() ?: 0)
                         putString("expensePhoto", "") // 필요하면 photo URL 추가
                     }
-
+                    Log.d("ExpenseViewFragment", "showCustomMenu - categoryColor: $categoryColor")
                     findNavController().navigate(R.id.navigation_expense_edit, bundle)
                     true
                 }
@@ -242,7 +261,10 @@ class ExpenseViewFragment : Fragment() {
             // ✅ 삭제 후 이전 화면으로 이동
             findNavController().popBackStack()
         }
-
+        dialog.window?.apply {
+            setBackgroundDrawableResource(R.drawable.ic_store_topurchase) // VectorDrawable 설정
+            decorView.clipToOutline = true // 💡 둥근 모서리 적용
+        }
         dialog.show()
     }
 
