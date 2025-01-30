@@ -102,6 +102,14 @@ class BotSheetViewModel : ViewModel() {
         }
     }
 
+    // 카테고리 삭제 연동 기능
+    fun removeCategory(categoryName: String) {
+        _uiState.update { prev ->
+            val updatedSpendingList = prev.spendingList.filter { it.kind.kor != categoryName }
+            prev.copy(spendingList = updatedSpendingList)
+        }
+    }
+
     // 🔹 일일 목표 지출 가져오기
     fun getDayTargetSpending() = viewModelScope.launch {
         try {

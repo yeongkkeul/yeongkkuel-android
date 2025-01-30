@@ -162,6 +162,9 @@
         <action
             android:id="@+id/action_categoryDetailFragment_to_categoryEditFragment"
             app:destination="@id/categoryEditFragment" />
+        <action
+            android:id="@+id/action_categoryDetailFragment_to_navigation_home"
+            app:destination="@id/navigation_home" />
     </fragment>
 
     <fragment
@@ -169,7 +172,6 @@
         android:name="com.example.yeongkkuel.presentation.home.category.CategoryEditFragment"
         android:label="카테고리 수정"
         tools:layout="@layout/fragment_category_edit" />
-
 
     <fragment
         android:id="@+id/navigation_chat"

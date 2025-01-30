@@ -1,6 +1,5 @@
 package com.example.yeongkkuel.presentation.home.category
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -32,9 +31,13 @@ class CategoryViewModel : ViewModel() {
 
     // 카테고리 삭제 함수
     fun removeCategory(categoryName: String) {
+        // 기존 카테고리 리스트에서 해당 이름 삭제
         val updatedList = _categories.value.orEmpty().filterNot { it.name == categoryName }
+
+        // LiveData 갱신
         _categories.value = updatedList
     }
+
 
     // 카테고리 수정 함수
     fun updateCategory(originalName: String, updatedCategory: Category) {
