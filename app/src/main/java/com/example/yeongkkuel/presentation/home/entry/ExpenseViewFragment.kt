@@ -203,36 +203,35 @@ class ExpenseViewFragment : Fragment() {
     }
     // 수정/삭제 커스텀 메뉴 표시
     private fun showCustomMenu(anchor: View) {
-        val popupMenu = PopupMenu(requireContext(), anchor)
-        popupMenu.menuInflater.inflate(R.menu.menu_edit_delete, popupMenu.menu)
+        val categoryName = binding.tvCategoryInput.text.toString()
+        val categoryColor = binding.tvCategoryInput.currentTextColor // 현재 색상을 Int 값으로 가져옴
 
-        popupMenu.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.action_modify -> {
-                    val categoryColor = String.format("#%06X", (0xFFFFFF and binding.tvCategoryInput.currentTextColor))
+        val popupBinding = ItemMenuPopupBinding.inflate(layoutInflater)
+        val popupWindow = PopupWindow(popupBinding.root, 300, 300, true)
 
-                    val bundle = Bundle().apply {
-                        putString("expenseDate", binding.tvDateInput.text.toString())
-                        putString("categoryName", binding.tvCategoryInput.text.toString())
-                        putString("categoryColor", categoryColor) // ✅ HEX 코드로 변환한 색상 값 전달
-                        putString("expenseContent", binding.etDetailInput.text.toString())
-                        putInt("expensePrice", binding.etAmountInput.text.toString().replace(",", "").toIntOrNull() ?: 0)
-                        putString("expensePhoto", "") // 필요하면 photo URL 추가
-                    }
-                    Log.d("ExpenseViewFragment", "showCustomMenu - categoryColor: $categoryColor")
-                    findNavController().navigate(R.id.navigation_expense_edit, bundle)
-                    true
-                }
-                R.id.action_delete -> {
-                    // ✅ 삭제 확인 다이얼로그 표시
-                    showDeleteConfirmationDialog()
-                    true
-                }
-                else -> false
+        popupBinding.tvModify.setOnClickListener {
+            // 수정 화면으로 이동
+            val bundle = Bundle().apply {
+                putString("categoryName", categoryName)
+                putInt("categoryColor", categoryColor)
             }
+            findNavController().navigate(
+                R.id.action_ExpenseViewFragment_to_ExpenseEditFragment, // ✅ 수정 화면으로 이동
+                bundle
+            )
+            popupWindow.dismiss()
         }
-        popupMenu.show()
+
+        popupBinding.tvDelete.setOnClickListener {
+            // 삭제 확인 다이얼로그 표시
+            showDeleteConfirmationDialog() // ✅ 인자 없이 호출
+            popupWindow.dismiss()
+        }
+
+        popupWindow.elevation = 10f
+        popupWindow.showAsDropDown(anchor, 0, 0) // 앵커 기준으로 표시
     }
+
     private fun showDeleteConfirmationDialog() {
         // ✅ 다이얼로그 뷰 inflate
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_expense_delete, null)

@@ -247,7 +247,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                         binding.tvAddCategory.visibility = View.GONE // 카테고리 추가 화면에서는 숨기기
                     }
                     else -> {
-                        binding.tvAddCategory.visibility = View.GONE // 다른 화면에서는 다시 보이도록
+                        binding.tvAddCategory.visibility = View.VISIBLE // 다른 화면에서는 다시 보이도록
                     }
                 }
             }
