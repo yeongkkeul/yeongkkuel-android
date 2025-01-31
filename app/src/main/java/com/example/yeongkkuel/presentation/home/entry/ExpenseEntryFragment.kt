@@ -253,7 +253,7 @@ class ExpenseEntryFragment : Fragment() {
             categoryName = selectedCategory ?: "기타",
             categoryColor = selectedCategoryColor ?: "#000000", // ✅ 기본값 추가
             content = if (isNoExpenseChecked) "무지출 기록" else detail,
-            photoUrl = expensePhotoUrl ?: ""
+            photoUrl = expensePhotoUrl // 🔹 사진 URL 저장
         )
 
         // SpendingCategory 처리

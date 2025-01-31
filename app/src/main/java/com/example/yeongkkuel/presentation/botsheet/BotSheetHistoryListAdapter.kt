@@ -2,10 +2,13 @@ package com.example.yeongkkuel.presentation.botsheet
 
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.ItemBotsheetHistoryBinding
 import com.example.yeongkkuel.presentation.util.toMoneyString
 
@@ -18,8 +21,16 @@ class BotSheetHistoryListAdapter(
         private val binding: ItemBotsheetHistoryBinding
     ) : RecyclerView.ViewHolder(binding.root) {
         fun onBind(item: BotSheetUiState.Spending.History) = with(binding) {
+            // 이름과 가격 설정
             tvName.text = item.name
             tvPrice.text = "-" + item.price.toMoneyString() + "원"
+
+            // 사진 아이콘 visibility 설정
+            if (!item.photoUrl.isNullOrEmpty()) {
+                icPhotoIncluded.visibility = View.VISIBLE // 사진이 있을 경우 표시
+            } else {
+                icPhotoIncluded.visibility = View.GONE // 사진이 없을 경우 숨김
+            }
 
             root.setOnClickListener {
                 Log.d("BotSheetHistoryListAdapter", "Clicked history: ${item.name}, categoryColor: ${item.categoryColor}")
