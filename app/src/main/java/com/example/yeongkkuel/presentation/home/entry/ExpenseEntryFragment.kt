@@ -249,8 +249,6 @@ class ExpenseEntryFragment : Fragment() {
         // ViewModel에 저장
         val selectedCategoryColor: String? = null
         val selectedCategory = arguments?.getString("selectedCategory") ?: "기타"
-
-        // 기존에 선언된 isNoExpenseChecked 변수를 활용
         val expenseHistory = BotSheetUiState.Spending.History(
             name =  detail,
             price = if (isNoExpenseChecked) 0 else amount,
