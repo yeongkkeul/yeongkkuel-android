@@ -32,6 +32,7 @@ import java.util.Locale
 
 class ExpenseViewFragment : Fragment() {
 
+
     private var _binding: FragmentExpenseEntryBinding? = null
     private val binding get() = _binding!!
 
@@ -67,17 +68,12 @@ class ExpenseViewFragment : Fragment() {
 
     private fun setupCategory() {
         val selectedCategory = arguments?.getString("categoryName") ?: "기본 카테고리"
-        val categoryColor = arguments?.getString("categoryColor") ?: "#000000"
+        val categoryColor = arguments?.getInt("categoryColor") ?: R.color.black2
 
         Log.d("ExpenseViewFragment", "setupCategory - categoryName: $selectedCategory, categoryColor: $categoryColor")
 
         binding.tvCategoryInput.text = selectedCategory
-        try {
-            binding.tvCategoryInput.setTextColor(Color.parseColor(categoryColor)) // HEX 색상 적용
-        } catch (e: IllegalArgumentException) {
-            Log.e("ExpenseViewFragment", "Invalid categoryColor: $categoryColor", e)
-            binding.tvCategoryInput.setTextColor(Color.BLACK) // 기본값 검정색
-        }
+        binding.tvCategoryInput.setTextColor(categoryColor) // Int 값을 바로 사용
     }
     private fun observeLatestHistory() {
         lifecycleScope.launch {
@@ -116,6 +112,7 @@ class ExpenseViewFragment : Fragment() {
         binding.btnBack.setOnClickListener {
             findNavController().popBackStack()
         }
+
         lifecycleScope.launch {
             viewModel.spendingHistoryList.collectLatest { historyList ->
                 if (historyList.isNotEmpty()) {
@@ -124,14 +121,21 @@ class ExpenseViewFragment : Fragment() {
                 }
             }
         }
-        arguments?.let {
-            binding.tvDateInput.text = it.getString("expenseDate", getCurrentDate())
-            binding.tvCategoryInput.text = it.getString("categoryName", "")
-            binding.tvCategoryInput.setTextColor(Color.parseColor(it.getString("categoryColor", "#000000")))
-            binding.etDetailInput.setText(it.getString("expenseContent", ""))
-            binding.etAmountInput.setText(formatPrice(it.getInt("expensePrice", 0)))
 
+        arguments?.let {
+            val expenseDate = it.getString("expenseDate", getCurrentDate())
+            val categoryName = it.getString("categoryName", "")
+            val categoryColor = it.getInt("categoryColor", R.color.black2)
+            val expenseContent = it.getString("expenseContent", "")
+            val expensePrice = it.getInt("expensePrice", 0)
             val expensePhotoUrl = it.getString("expensePhoto", "")
+
+            binding.tvDateInput.text = expenseDate
+            binding.tvCategoryInput.text = categoryName
+            binding.tvCategoryInput.setTextColor(categoryColor) // Int 값을 바로 사용
+            binding.etDetailInput.setText(expenseContent)
+            binding.etAmountInput.setText(formatPrice(expensePrice))
+
             if (expensePhotoUrl.isNotEmpty()) {
                 Glide.with(this)
                     .load(expensePhotoUrl)
@@ -140,31 +144,6 @@ class ExpenseViewFragment : Fragment() {
             } else {
                 binding.ivPhotoIcon.visibility = View.VISIBLE
             }
-        }
-        setupCategory()
-
-        // 🔹 기존 Bundle 데이터 처리
-        val expenseDate = arguments?.getString("expenseDate") ?: getCurrentDate() // ✅ 오늘 날짜 기본값 설정
-        val categoryName = arguments?.getString("categoryName") ?: ""
-        val categoryColor = arguments?.getString("categoryColor") ?: "#000000" // ✅ 기본 색상 적용
-        val expenseContent = arguments?.getString("expenseContent") ?: ""
-        val expensePrice = arguments?.getInt("expensePrice") ?: 0
-        val expensePhotoUrl = arguments?.getString("expensePhoto") ?: ""
-
-        binding.tvDateInput.text = expenseDate
-        binding.tvCategoryInput.text = categoryName
-        binding.tvCategoryInput.setTextColor(Color.parseColor(categoryColor))
-        binding.etDetailInput.setText(expenseContent)
-        binding.etAmountInput.setText(formatPrice(expensePrice))
-
-        if (expensePhotoUrl.isNotEmpty()) {
-            Glide.with(this)
-                .load(expensePhotoUrl)
-                .into(binding.imgPhotoFrame)
-
-            binding.ivPhotoIcon.visibility = View.GONE
-        } else {
-            binding.ivPhotoIcon.visibility = View.VISIBLE
         }
 
         binding.tvDateInput.isEnabled = false
@@ -188,8 +167,6 @@ class ExpenseViewFragment : Fragment() {
         binding.icMore.setOnClickListener { view ->
             showCustomMenu(view)
         }
-
-
     }
     private fun getCurrentDate(): String {
         val dateFormat = SimpleDateFormat("yyyy년 M월 d일 E요일", Locale.KOREA)

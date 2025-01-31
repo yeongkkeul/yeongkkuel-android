@@ -72,6 +72,9 @@ class ExpenseEntryFragment : Fragment() {
         val categoryColor = arguments?.getInt("categoryColor") ?: R.color.black2
         val tvCategoryInput = view.findViewById<TextView>(R.id.tv_category_input)
         tvCategoryInput.text = selectedCategory
+
+        Log.d("ExpenseEntryFragment", "setupCategory - selectedCategory: $selectedCategory, categoryColor: $categoryColor")
+
         tvCategoryInput.setTextColor(requireContext().getColor(categoryColor))
     }
 

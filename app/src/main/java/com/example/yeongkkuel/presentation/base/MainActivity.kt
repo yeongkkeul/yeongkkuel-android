@@ -1,5 +1,6 @@
 package com.example.yeongkkuel.presentation.base
 
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -414,7 +415,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         navController.navigate(R.id.expenseEntryFragment, bundle)
     }
 
-    override fun navigateToExpenseView(expenseName: String, expensePrice: Int, categoryColor: String) {
+    override fun navigateToExpenseView(expenseName: String, expensePrice: Int, categoryColor: Int) {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         val navController = navHostFragment.navController
@@ -423,14 +424,13 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         val bundle = Bundle().apply {
             putString("expenseName", expenseName)
             putInt("expensePrice", expensePrice)
-            putString("categoryColor", categoryColor) // ✅ categoryColor 추가
+            putInt("categoryColor", categoryColor) // ✅ categoryColor를 Int로 전달
         }
 
         Log.d("MainActivity", "navigateToExpenseView - name: $expenseName, price: $expensePrice, categoryColor: $categoryColor")
 
-        navController.navigate(R.id.navigation_expense_view, bundle)
+        navController.navigate(R.id.navigation_entry_view, bundle)
     }
-
 
     override fun navigateToCategoryAddFragment() {
         val navHostFragment =
