@@ -29,15 +29,16 @@ class BotSheetCategoryListAdapter(
         // 🔹 클릭 리스너를 Adapter에 직접 추가하지 않고, Fragment로 전달
         private val historyListAdapter = BotSheetHistoryListAdapter { selectedHistory ->
             val colorInt = try {
-                Color.parseColor(selectedHistory.categoryColor) // String을 Int로 변환
+                Color.parseColor(selectedHistory.categoryColor) // ✅ String(HEX) → Int 변환
             } catch (e: IllegalArgumentException) {
                 Log.e("BotSheetHistoryListAdapter", "Invalid color format: ${selectedHistory.categoryColor}", e)
-                Color.BLACK // 기본값 검정색으로 설정
+                Color.RED // 기본값 검정색 적용
             }
+
             botSheetListener.navigateToExpenseView(
                 selectedHistory.name,
                 selectedHistory.price,
-                colorInt // 변환된 Int 값 전달
+                colorInt // ✅ Int 값으로 변환 후 전달
             )
         }
 

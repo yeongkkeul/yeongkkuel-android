@@ -68,5 +68,4 @@
             android:layout_weight="1" /> <!-- 동일 비율 -->
 
     </LinearLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

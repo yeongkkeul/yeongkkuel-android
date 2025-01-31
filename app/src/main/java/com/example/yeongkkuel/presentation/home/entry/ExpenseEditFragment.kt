@@ -1,6 +1,7 @@
 package com.example.yeongkkuel.presentation.home.entry
 
 import android.app.Activity
+import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -9,6 +10,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,12 +27,14 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentExpenseEntryBinding
+import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -39,9 +43,19 @@ class ExpenseEditFragment : Fragment() {
     private var _binding: FragmentExpenseEntryBinding? = null
     private val binding get() = _binding!!
     private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var botSheetListener: BotSheetListener
     private lateinit var viewModel: BotSheetViewModel  // 🔹 ViewModel 추가
     private val PICK_IMAGE_REQUEST = 1
     private var selectedImageUri: Uri? = null // 🔹 선택한 이미지 URI 저장
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is BotSheetListener) {
+            botSheetListener = context
+        } else {
+            throw RuntimeException("$context must implement BotSheetListener")
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -58,6 +72,8 @@ class ExpenseEditFragment : Fragment() {
         viewModel = ViewModelProvider(requireActivity())[BotSheetViewModel::class.java]
         observeLatestHistory()
         setupUi()
+        setupDatePicker() // ✅ 추가된 함수 호출 (날짜 선택 기능 활성화)
+
         binding.tvEntryComplete.setOnClickListener {
             saveEditedExpense()
         }
@@ -100,14 +116,16 @@ class ExpenseEditFragment : Fragment() {
         lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.spendingHistoryList.collectLatest { historyList ->
+                    Log.d("ExpenseViewFragment", "🔄 최신 내역 감지됨: $historyList") // ✅ 로그 추가
                     if (historyList.isNotEmpty()) {
-                        val latestHistory = historyList.last() // 🔹 가장 최근 지출 내역 가져오기
+                        val latestHistory = historyList.last()
                         updateUiWithHistory(latestHistory)
                     }
                 }
             }
         }
     }
+
 
     private fun updateUiWithHistory(history: BotSheetUiState.Spending.History) {
         binding.tvDateInput.text = history.date.ifEmpty { getCurrentDate() }
@@ -176,8 +194,9 @@ class ExpenseEditFragment : Fragment() {
     }
 
     private fun saveEditedExpense() {
+        val newDate = binding.tvDateInput.text.toString() // ✅ 사용자가 수정한 날짜
         val updatedExpense = BotSheetUiState.Spending.History(
-            date = binding.tvDateInput.text.toString(),
+            date = newDate, // ✅ 수정된 날짜 반영
             categoryName = binding.tvCategoryInput.text.toString(),
             categoryColor = String.format("#%06X", (0xFFFFFF and binding.tvCategoryInput.currentTextColor)), // 색상 HEX 변환
             name = binding.etDetailInput.text.toString(),
@@ -186,10 +205,14 @@ class ExpenseEditFragment : Fragment() {
             photoUrl = selectedImageUri?.toString() ?: ""
         )
 
-        // 🔹 ViewModel을 통해 지출 내역 업데이트
-        viewModel.updateExpense(updatedExpense)
-        viewModel.updateBotSheetHistory(updatedExpense)
+        Log.d("ExpenseEditFragment", "saveEditedExpense called with: $updatedExpense")
 
+        // ✅ ViewModel을 통해 업데이트 반영 (바텀시트에 즉시 반영됨)
+        lifecycleScope.launch {
+            viewModel.updateBotSheetHistory(updatedExpense)
+        }
+
+        // ✅ 저장된 데이터 전달
         val bundle = Bundle().apply {
             putString("expenseDate", updatedExpense.date)
             putString("categoryName", updatedExpense.categoryName)
@@ -198,12 +221,12 @@ class ExpenseEditFragment : Fragment() {
             putInt("expensePrice", updatedExpense.price)
             putString("expensePhoto", updatedExpense.photoUrl)
         }
-
         findNavController().previousBackStackEntry?.savedStateHandle?.set("editedExpense", bundle)
 
         Toast.makeText(requireContext(), "지출 내역이 수정되었습니다.", Toast.LENGTH_SHORT).show()
         findNavController().popBackStack()
     }
+
 
     private fun setupDetailInput(view: View) {
         val etDetailInput = view.findViewById<EditText>(R.id.et_detail_input)
@@ -238,6 +261,26 @@ class ExpenseEditFragment : Fragment() {
                 }
             }
         })
+    }
+    private fun setupDatePicker() {
+        binding.tvDateInput.setOnClickListener {
+            showDatePickerDialog()
+        }
+    }
+
+    private fun showDatePickerDialog() {
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+        val datePickerDialog = DatePickerDialog(requireContext(), { _, selectedYear, selectedMonth, selectedDay ->
+            val newDate = String.format(Locale.KOREA, "%04d년 %d월 %d일", selectedYear, selectedMonth + 1, selectedDay)
+            binding.tvDateInput.text = newDate // ✅ 선택한 날짜를 UI에 반영
+            Log.d("ExpenseEditFragment", "📌 선택한 날짜: $newDate")
+        }, year, month, day)
+
+        datePickerDialog.show()
     }
 
     override fun onDestroyView() {

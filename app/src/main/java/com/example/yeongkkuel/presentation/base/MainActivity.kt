@@ -1,22 +1,18 @@
 package com.example.yeongkkuel.presentation.base
 
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -42,7 +38,6 @@ import java.util.Locale
 
 class MainActivity : AppCompatActivity(), BotSheetListener {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var navController: NavController
 
     private val botSheetViewModel: BotSheetViewModel by viewModels()
     private val categoryViewModel: CategoryViewModel by viewModels()
@@ -52,8 +47,6 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     }
 
     private var rvBottomSheetCollapseStateHeight: Int = 0
-    private var selectedCategory: String? = null
-    private var categoryColor: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -261,6 +254,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     }
                     else -> {
                         binding.tvAddCategory.visibility = View.GONE // 다른 화면에서는 숨기기
+                        // TODO - * 지출 화면일 때 카테고리 추가 안 한 상태는 VISIBLE 상태로 만들기 *
                     }
                 }
             }
@@ -313,18 +307,13 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     fun initViewModel() = with(botSheetViewModel) {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
-
         val navController = navHostFragment.navController
 
         lifecycleScope.launch {
             uiState.flowWithLifecycle(lifecycle)
                 .collectLatest { uiState ->
-                    onBind(uiState)
-                }
-            botSheetViewModel.uiState
-                .flowWithLifecycle(lifecycle)
-                .collectLatest { uiState ->
-                    botSheetCategoryListAdapter.submitList(uiState.spendingList)
+                    onBind(uiState) // ✅ UI 데이터 바인딩
+                    botSheetCategoryListAdapter.submitList(uiState.spendingList) // ✅ 리스트 업데이트
                 }
         }
     }
@@ -370,7 +359,6 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         binding.ivHamberger.visibility = if (isEmpty) View.GONE else View.VISIBLE
 
         // 데이터가 없으면 빈 메시지와 이미지 보이기, 있으면 숨기기
-        binding.tvAddCategory.visibility = if (isEmpty) View.VISIBLE else View.GONE
         binding.tvEmptyMessage1.visibility = if (isEmpty) View.VISIBLE else View.GONE
         binding.tvEmptyMessage2.visibility = if (isEmpty) View.VISIBLE else View.GONE
         binding.imgAddCategory.visibility = if (isEmpty) View.VISIBLE else View.GONE
@@ -416,6 +404,9 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     }
 
     override fun navigateToExpenseView(expenseName: String, expensePrice: Int, categoryColor: Int) {
+        Log.d("MainActivity", "📌 navigateToExpenseView() 호출됨")
+        Log.d("MainActivity", "📌 전달된 데이터 - name: $expenseName, price: $expensePrice, categoryColor: $categoryColor")
+
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         val navController = navHostFragment.navController
@@ -427,10 +418,9 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             putInt("categoryColor", categoryColor) // ✅ categoryColor를 Int로 전달
         }
 
-        Log.d("MainActivity", "navigateToExpenseView - name: $expenseName, price: $expensePrice, categoryColor: $categoryColor")
-
         navController.navigate(R.id.navigation_expense_view, bundle)
     }
+
 
     override fun navigateToCategoryAddFragment() {
         val navHostFragment =
@@ -439,4 +429,5 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
 
         navController.navigate(R.id.categoryAddFragment)
     }
+
 }

@@ -1,7 +1,6 @@
 package com.example.yeongkkuel.presentation.botsheet
 
 import android.graphics.Color
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -24,6 +23,12 @@ class BotSheetHistoryListAdapter(
             tvName.text = item.name
             tvPrice.text = "-${item.price.toMoneyString()}원"
             tvName.setTextColor(Color.parseColor(item.categoryColor))
+
+            tvName.text = if (item.content.length > 9) {
+                "${item.content.take(9)}..."
+            } else {
+                item.content
+            }
 
             root.setOnClickListener {
                 onItemClick(item)
