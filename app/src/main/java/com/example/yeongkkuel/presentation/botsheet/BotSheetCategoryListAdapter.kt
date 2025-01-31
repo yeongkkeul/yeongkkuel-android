@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.ItemBotsheetCategoryBinding
 import android.util.Log
+import android.view.View
 import androidx.navigation.Navigation.findNavController
 
 
@@ -31,7 +32,11 @@ class BotSheetCategoryListAdapter(
             val colorInt = try {
                 Color.parseColor(selectedHistory.categoryColor) // ✅ String(HEX) → Int 변환
             } catch (e: IllegalArgumentException) {
-                Log.e("BotSheetHistoryListAdapter", "Invalid color format: ${selectedHistory.categoryColor}", e)
+                Log.e(
+                    "BotSheetHistoryListAdapter",
+                    "Invalid color format: ${selectedHistory.categoryColor}",
+                    e
+                )
                 Color.RED // 기본값 검정색 적용
             }
 
@@ -55,13 +60,22 @@ class BotSheetCategoryListAdapter(
 
             rvHistory.run {
                 adapter = historyListAdapter
-                historyListAdapter.submitList(item.history ?: emptyList())
+                historyListAdapter.submitList(item.history ?: emptyList()) {
+                    // ✅ 최신 데이터 반영 후 UI 업데이트
+                    updateNoSpendVisibility(item)
+                }
                 layoutManager = LinearLayoutManager(binding.root.context)
             }
-
             // 🔹 카테고리 추가 버튼 클릭 리스너
             ivBtnAdd.setOnClickListener {
                 botSheetListener.navigateToExpenseEntry(item.kind.kor, item.color.id)
+            }
+        }
+        private fun updateNoSpendVisibility(item: BotSheetUiState.Spending) {
+            when {
+                item.history.isEmpty() -> binding.tvNoSpend.visibility = View.GONE // ✅ history가 없으면 숨김
+                item.history.all { it.isNoExpense } -> binding.tvNoSpend.visibility = View.VISIBLE // ✅ 모든 항목이 무지출이면 보임
+                else -> binding.tvNoSpend.visibility = View.GONE // ✅ 일반 지출이 하나라도 있으면 숨김
             }
         }
     }

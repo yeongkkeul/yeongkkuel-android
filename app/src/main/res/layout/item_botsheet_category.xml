@@ -30,6 +30,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <TextView
+            android:id="@+id/tv_no_spend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="무지출!"
+            android:textColor="@color/black"
+            style="@style/body_semibo"
+            android:visibility="gone"
+            android:layout_marginEnd="10dp"
+            app:layout_constraintEnd_toStartOf="@id/iv_btnAdd"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <ImageView
             android:id="@+id/iv_btnAdd"
             android:layout_width="wrap_content"

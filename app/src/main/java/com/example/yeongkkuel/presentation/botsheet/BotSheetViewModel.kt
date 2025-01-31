@@ -262,4 +262,8 @@ class BotSheetViewModel : ViewModel() {
         return categoryList
     }
 
+    fun addExpenseHistory(history: BotSheetUiState.Spending.History) {
+        _spendingHistoryList.value = _spendingHistoryList.value + history
+    }
+
 }

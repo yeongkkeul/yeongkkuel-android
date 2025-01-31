@@ -2,6 +2,7 @@ package com.example.yeongkkuel.presentation.botsheet
 
 import android.graphics.Color
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -29,7 +30,11 @@ class BotSheetHistoryListAdapter(
             } else {
                 item.content
             }
-
+            if (item.isNoExpense) {
+                tvPrice.visibility = View.GONE
+            } else {
+                tvPrice.visibility = View.VISIBLE
+            }
             root.setOnClickListener {
                 onItemClick(item)
             }
@@ -58,11 +63,6 @@ class BotSheetHistoryListAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.onBind(getItem(position))
-    }
-
-    // ✅ 데이터 변경 시 리스트 업데이트
-    fun updateList(newList: List<BotSheetUiState.Spending.History>) {
-        submitList(newList)
     }
 
 }
