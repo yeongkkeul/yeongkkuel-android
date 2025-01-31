@@ -72,8 +72,6 @@ class ExpenseEditFragment : Fragment() {
         viewModel = ViewModelProvider(requireActivity())[BotSheetViewModel::class.java]
         observeLatestHistory()
         setupUi()
-        setupDatePicker() // ✅ 추가된 함수 호출 (날짜 선택 기능 활성화)
-
         binding.tvEntryComplete.setOnClickListener {
             saveEditedExpense()
         }
@@ -194,9 +192,8 @@ class ExpenseEditFragment : Fragment() {
     }
 
     private fun saveEditedExpense() {
-        val newDate = binding.tvDateInput.text.toString() // ✅ 사용자가 수정한 날짜
         val updatedExpense = BotSheetUiState.Spending.History(
-            date = newDate, // ✅ 수정된 날짜 반영
+            date = binding.tvDateInput.text.toString(),
             categoryName = binding.tvCategoryInput.text.toString(),
             categoryColor = String.format("#%06X", (0xFFFFFF and binding.tvCategoryInput.currentTextColor)), // 색상 HEX 변환
             name = binding.etDetailInput.text.toString(),
@@ -262,29 +259,10 @@ class ExpenseEditFragment : Fragment() {
             }
         })
     }
-    private fun setupDatePicker() {
-        binding.tvDateInput.setOnClickListener {
-            showDatePickerDialog()
-        }
-    }
-
-    private fun showDatePickerDialog() {
-        val calendar = Calendar.getInstance()
-        val year = calendar.get(Calendar.YEAR)
-        val month = calendar.get(Calendar.MONTH)
-        val day = calendar.get(Calendar.DAY_OF_MONTH)
-
-        val datePickerDialog = DatePickerDialog(requireContext(), { _, selectedYear, selectedMonth, selectedDay ->
-            val newDate = String.format(Locale.KOREA, "%04d년 %d월 %d일", selectedYear, selectedMonth + 1, selectedDay)
-            binding.tvDateInput.text = newDate // ✅ 선택한 날짜를 UI에 반영
-            Log.d("ExpenseEditFragment", "📌 선택한 날짜: $newDate")
-        }, year, month, day)
-
-        datePickerDialog.show()
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
 }
