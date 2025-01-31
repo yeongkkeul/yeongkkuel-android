@@ -72,6 +72,10 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
             vpStat.adapter = viewPagerAdapter
             vpStat.offscreenPageLimit = viewPagerAdapter.itemCount
 
+            // 전달된 Bundle로부터 선택된 탭 인덱스를 가져옴
+            val selectedTabIndex = arguments?.getInt("selected_tab_index") ?: 0
+            vpStat.setCurrentItem(selectedTabIndex, false) // 해당 탭 선택
+
             TabLayoutMediator(tlStat, vpStat) { tab, position ->
                 val tabView = TextView(context).apply {
                     setText(viewPagerAdapter.getTitle(position))

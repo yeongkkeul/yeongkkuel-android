@@ -72,9 +72,7 @@
 
         <action
             android:id="@+id/action_ExpenseViewFragment_to_ExpenseEditFragment"
-            app:destination="@id/navigation_expense_edit"
-            app:popUpToInclusive="false" />
-
+            app:destination="@id/navigation_expense_edit" />
     </fragment>
 
     <fragment

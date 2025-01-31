@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
@@ -286,15 +287,21 @@ class ExpenseEntryFragment : Fragment() {
             null
         }
 
-        // 날짜 비교 로직 유지
         if (selectedDate != null && dateFormat.format(selectedDate) != dateFormat.format(today.time)) {
-            Toast.makeText(requireContext(), "다른 날짜: 통계 화면으로 이동", Toast.LENGTH_SHORT).show()
-            navController.navigate(R.id.action_expenseEntryFragment_to_navigation_stat)
+            // Bundle 생성 및 데이터 추가
+            val bundle = Bundle().apply {
+                putInt("selected_tab_index", 2) // 월간 탭(인덱스 2) 지정
+            }
+
+            // StatFragment로 이동하며 Bundle 전달
+            navController.navigate(R.id.action_expenseEntryFragment_to_navigation_stat, bundle)
         } else {
             Toast.makeText(requireContext(), "오늘 날짜: 홈 화면으로 이동", Toast.LENGTH_SHORT).show()
             navController.navigate(R.id.navigation_home)
         }
     }
+
+
 
 
     // 사진 첨부 버튼 로직
