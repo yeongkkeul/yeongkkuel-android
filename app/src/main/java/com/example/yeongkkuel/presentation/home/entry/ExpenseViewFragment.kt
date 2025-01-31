@@ -126,9 +126,14 @@ class ExpenseViewFragment : Fragment() {
                         val latestHistory = historyList.last() // 🔹 가장 최근 지출 내역 가져오기
                         updateUiWithHistory(latestHistory)
                     }
+                    updateIcMoreVisibility(historyList) // ✅ `icMore` 가시성 업데이트
                 }
             }
         }
+    }
+    private fun updateIcMoreVisibility(historyList: List<BotSheetUiState.Spending.History>) {
+        val hasOnlyNoExpense = historyList.isNotEmpty() && historyList.all { it.isNoExpense } // ✅ 모든 항목이 무지출인지 확인
+        binding.icMore.visibility = if (hasOnlyNoExpense) View.GONE else View.VISIBLE // ✅ `isNoExpense` 값에 따라 표시 여부 조정
     }
 
     private fun updateUiWithHistory(history: BotSheetUiState.Spending.History) {

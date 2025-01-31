@@ -15,8 +15,6 @@ class BotSheetHistoryListAdapter(
 ) : ListAdapter<BotSheetUiState.Spending.History, BotSheetHistoryListAdapter.ViewHolder>(
     SpendingHistoryListDiffUtil()
 ) {
-
-
     inner class ViewHolder(
         private val binding: ItemBotsheetHistoryBinding
     ) : RecyclerView.ViewHolder(binding.root) {

@@ -420,6 +420,8 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
 
         navController.navigate(R.id.navigation_expense_view, bundle)
     }
+    override fun onNoExpenseChanged(isNoExpense: Boolean) {
+    }
 
 
     override fun navigateToCategoryAddFragment() {

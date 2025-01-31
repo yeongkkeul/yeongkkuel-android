@@ -252,7 +252,7 @@ class ExpenseEntryFragment : Fragment() {
 
         // 기존에 선언된 isNoExpenseChecked 변수를 활용
         val expenseHistory = BotSheetUiState.Spending.History(
-            name = if (isNoExpenseChecked) "무지출" else detail,
+            name =  detail,
             price = if (isNoExpenseChecked) 0 else amount,
             date = expenseDate ?: "",
             categoryName = selectedCategory,
