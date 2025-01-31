@@ -6,6 +6,7 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/navigation_home">
 
+    <!-- 스플래시 화면 -->
     <fragment
         android:id="@+id/navigation_splash"
         android:name="com.example.yeongkkuel.presentation.splash.SplashFragment"
@@ -18,6 +19,7 @@
             app:popUpToInclusive="true" />
     </fragment>
 
+    <!-- 로그인 화면 -->
     <fragment
         android:id="@+id/navigation_login"
         android:name="com.example.yeongkkuel.presentation.login.LoginFragment"
@@ -31,6 +33,30 @@
             app:destination="@id/navigation_signup" />
     </fragment>
 
+    <!-- 회원가입 화면 -->
+    <fragment
+        android:id="@+id/navigation_signup"
+        android:name="com.example.yeongkkuel.presentation.signup.SignupFragment"
+        android:label="fragment_signup"
+        tools:layout="@layout/fragment_signup">
+        <action
+            android:id="@+id/action_signupFragment_to_navigation_terms_agree"
+            app:destination="@id/navigation_terms_agree" />
+    </fragment>
+
+    <fragment
+        android:id= "@+id/navigation_terms_agree"
+        android:name= "com.example.yeongkkuel.presentation.signup.TermsAgreeFragment"
+        android:label= "fragment_terms_agree"
+        tools:layout="@layout/fragment_terms_agree">
+        <action
+            android:id="@+id/action_termsAgreeFragment_to_navigation_home"
+            app:destination="@id/navigation_home"
+            app:popUpTo="@id/navigation_login"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <!-- 홈 화면 -->
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.example.yeongkkuel.presentation.home.HomeFragment"
@@ -49,13 +75,12 @@
             app:destination="@id/categoryAddFragment" />
     </fragment>
 
-
+    <!-- 홈 - 지출 기입 화면 -->
     <fragment
         android:id="@+id/expenseEntryFragment"
         android:name="com.example.yeongkkuel.presentation.home.entry.ExpenseEntryFragment"
         android:label="지출 기입 화면"
         tools:layout="@layout/fragment_expense_entry">
-
         <action
         android:id="@+id/action_expenseEntryFragment_to_navigation_home"
         app:destination="@id/navigation_home" />
@@ -78,20 +103,18 @@
     <fragment
         android:id="@+id/navigation_expense_edit"
         android:name="com.example.yeongkkuel.presentation.home.entry.ExpenseEditFragment"
-        android:label="지출 내역 확인"
+        android:label="지출 내역 수정"
         tools:layout="@layout/fragment_expense_entry">
     </fragment>
-
-
 
     <fragment
         android:id="@+id/navigation_entry_view"
         android:name="com.example.yeongkkuel.presentation.home.entry.ExpenseViewFragment"
         android:label="fragment_entry_edit"
         tools:layout="@layout/fragment_expense_entry">
-
     </fragment>
 
+    <!-- 홈 - 상점 화면 -->
     <fragment
         android:id="@+id/navigation_store"
         android:name="com.example.yeongkkuel.presentation.home.store.StoreFragment"
@@ -102,31 +125,7 @@
             app:destination="@id/navigation_home" />
     </fragment>
 
-
-    <fragment
-        android:id="@+id/navigation_signup"
-        android:name="com.example.yeongkkuel.presentation.signup.SignupFragment"
-        android:label="fragment_signup"
-        tools:layout="@layout/fragment_signup">
-        <action
-            android:id="@+id/action_signupFragment_to_navigation_terms_agree"
-            app:destination="@id/navigation_terms_agree" />
-
-    </fragment>
-
-    <fragment
-        android:id= "@+id/navigation_terms_agree"
-        android:name= "com.example.yeongkkuel.presentation.signup.TermsAgreeFragment"
-        android:label= "fragment_terms_agree"
-        tools:layout="@layout/fragment_terms_agree">
-        <action
-            android:id="@+id/action_termsAgreeFragment_to_navigation_home"
-            app:destination="@id/navigation_home"
-            app:popUpTo="@id/navigation_login"
-            app:popUpToInclusive="true" />
-    </fragment>
-
-
+    <!-- 홈 - 카테고리 화면 -->
     <fragment
         android:id="@+id/categoryManageFragment"
         android:name="com.example.yeongkkuel.presentation.home.category.CategoryManageFragment"
@@ -173,6 +172,7 @@
         android:label="카테고리 수정"
         tools:layout="@layout/fragment_category_edit" />
 
+    <!-- 채팅 화면 -->
     <fragment
         android:id="@+id/navigation_chat"
         android:name="com.example.yeongkkuel.presentation.chat.ChatFragment"
@@ -228,7 +228,7 @@
         tools:layout="@layout/fragment_chat_room_rank">
     </fragment>
 
-    <!-- stat -->
+    <!-- 지출 화면 -->
     <fragment
         android:id="@+id/navigation_stat"
         android:name="com.example.yeongkkuel.presentation.stat.StatFragment"
@@ -253,6 +253,17 @@
     </fragment>
 
     <fragment
+        android:id="@+id/navigation_stat_monthly"
+        android:name="com.example.yeongkkuel.presentation.stat.monthly.StatMonthlyFragment"
+        android:label="fragment_stat_monthly"
+        tools:layout="@layout/fragment_stat_monthly">
+
+    </fragment>
+
+<!--TODO 나의 챌린저 그룹, 지출/일간 화면으로 이동 -->
+
+    <!-- 마이페이지 화면 -->
+    <fragment
         android:id="@+id/navigation_my"
         android:name="com.example.yeongkkuel.presentation.my.MyFragment"
         android:label="fragment_my"
@@ -271,9 +282,6 @@
             app:destination="@+id/navigation_reward"/>
     </fragment>
 
-
-
-<!--TODO 나의 챌린저 그룹, 지출/일간 화면으로 이동 -->
     <fragment
         android:id="@+id/navigation_notification"
         android:name="com.example.yeongkkuel.presentation.my.NotificationFragment"

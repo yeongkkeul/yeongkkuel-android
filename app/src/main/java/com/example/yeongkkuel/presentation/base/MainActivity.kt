@@ -260,6 +260,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     }
                     else -> {
                         binding.tvAddCategory.visibility = View.GONE // 다른 화면에서는 숨기기
+                        // TODO - * 지출 화면일 때 카테고리 추가 안 한 상태는 VISIBLE 상태로 만들기 *
                     }
                 }
             }
