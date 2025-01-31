@@ -1,5 +1,6 @@
 package com.example.yeongkkuel.presentation.botsheet
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yeongkkuel.R
@@ -195,5 +196,17 @@ class BotSheetViewModel : ViewModel() {
     private fun updateSpendingHistoryList() {
         val historyList = _uiState.value.spendingList.flatMap { it.history }
         _spendingHistoryList.value = historyList.sortedByDescending { it.date } // 최신순 정렬
+        Log.d("BotSheetViewModel", "updateSpendingHistoryList called: $historyList")
+    }
+
+    fun updateBotSheetHistory(updatedExpense: BotSheetUiState.Spending.History) {
+        _spendingHistoryList.value = _spendingHistoryList.value.map { history ->
+            if (history.name == updatedExpense.name && history.date == updatedExpense.date) {
+                updatedExpense // ✅ 기존 데이터와 일치하면 수정된 데이터로 교체
+            } else {
+                history // ✅ 기존 데이터 유지
+            }
+        }
+        updateSpendingHistoryList() // ✅ 업데이트 후 최신 내역 반영
     }
 }

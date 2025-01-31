@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.PopupMenu
 import android.widget.PopupWindow
 import android.widget.TextView
 import android.widget.Toast
@@ -16,6 +15,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.yeongkkuel.R
@@ -31,7 +31,6 @@ import java.util.Date
 import java.util.Locale
 
 class ExpenseViewFragment : Fragment() {
-
 
     private var _binding: FragmentExpenseEntryBinding? = null
     private val binding get() = _binding!!
@@ -50,17 +49,30 @@ class ExpenseViewFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        Log.d("ExpenseViewFragment", "onViewCreated - arguments: $arguments")
-
         viewModel = ViewModelProvider(requireActivity())[BotSheetViewModel::class.java]
 
         // ✅ 최신 내역을 감시하여 UI 업데이트
         observeLatestHistory()
 
-        // ✅ UI 초기 데이터 설정
+        // ✅ 수정된 데이터가 반영되도록 설정
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Bundle>("editedExpense")
+            ?.observe(viewLifecycleOwner) { bundle ->
+                bundle?.let {
+                    val updatedExpense = BotSheetUiState.Spending.History(
+                        date = it.getString("expenseDate", getCurrentDate()),
+                        categoryName = it.getString("categoryName", ""),
+                        categoryColor = it.getString("categoryColor", "#000000"),
+                        name = it.getString("expenseContent", ""),
+                        content = it.getString("expenseContent", ""),
+                        price = it.getInt("expensePrice", 0),
+                        photoUrl = it.getString("expensePhoto", "")
+                    )
+                    updateUiWithHistory(updatedExpense)
+                }
+            }
+
         setupUi()
         setupCategory()
-
         binding.icMore.setOnClickListener { view ->
             showCustomMenu(view)
         }
@@ -75,6 +87,7 @@ class ExpenseViewFragment : Fragment() {
         binding.tvCategoryInput.text = selectedCategory
         binding.tvCategoryInput.setTextColor(categoryColor) // Int 값을 바로 사용
     }
+
     private fun observeLatestHistory() {
         lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -110,6 +123,7 @@ class ExpenseViewFragment : Fragment() {
         binding.tvExpenseViewTitle.visibility = View.VISIBLE
         binding.tvExpenseTitle.visibility = View.GONE
         binding.btnBack.setOnClickListener {
+            saveHistoryToBotSheet() // 수정된 내용 저장
             findNavController().popBackStack()
         }
 
@@ -168,45 +182,65 @@ class ExpenseViewFragment : Fragment() {
             showCustomMenu(view)
         }
     }
+
     private fun getCurrentDate(): String {
         val dateFormat = SimpleDateFormat("yyyy년 M월 d일 E요일", Locale.KOREA)
         return dateFormat.format(Date())
     }
+
     private fun formatPrice(price: Int): String {
         return NumberFormat.getNumberInstance(Locale.KOREA).format(price)
     }
+
     private fun saveEditedExpense() {
         // 🔹 수정된 데이터를 저장하는 로직 추가
     }
+
     // 수정/삭제 커스텀 메뉴 표시
     private fun showCustomMenu(anchor: View) {
-        val categoryName = binding.tvCategoryInput.text.toString()
-        val categoryColor = binding.tvCategoryInput.currentTextColor // 현재 색상을 Int 값으로 가져옴
+        try {
+            val categoryName = binding.tvCategoryInput.text.toString()
+            val categoryColor = String.format("#%06X", (0xFFFFFF and binding.tvCategoryInput.currentTextColor)) // ✅ HEX 변환
 
-        val popupBinding = ItemMenuPopupBinding.inflate(layoutInflater)
-        val popupWindow = PopupWindow(popupBinding.root, 300, 300, true)
+            val popupBinding = ItemMenuPopupBinding.inflate(requireActivity().layoutInflater)
+            val popupWindow = PopupWindow(popupBinding.root, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true)
 
-        popupBinding.tvModify.setOnClickListener {
-            // 수정 화면으로 이동
-            val bundle = Bundle().apply {
-                putString("categoryName", categoryName)
-                putInt("categoryColor", categoryColor)
+            popupBinding.tvModify.setOnClickListener {
+                // ✅ 올바른 네비게이션 컨트롤러 확인 후 이동
+                val navController = findNavControllerSafely()
+                if (navController != null) {
+                    val bundle = Bundle().apply {
+                        putString("categoryName", categoryName)
+                        putString("categoryColor", categoryColor)
+                    }
+                    navController.navigate(R.id.action_ExpenseViewFragment_to_ExpenseEditFragment, bundle)
+                    Log.d("ExpenseViewFragment", "수정 버튼 클릭됨: categoryName=$categoryName, categoryColor=$categoryColor")
+                } else {
+                    Log.e("ExpenseViewFragment", "네비게이션 컨트롤러를 찾을 수 없음!")
+                }
+                popupWindow.dismiss()
             }
-            findNavController().navigate(
-                R.id.action_ExpenseViewFragment_to_ExpenseEditFragment, // ✅ 수정 화면으로 이동
-                bundle
-            )
-            popupWindow.dismiss()
-        }
 
-        popupBinding.tvDelete.setOnClickListener {
-            // 삭제 확인 다이얼로그 표시
-            showDeleteConfirmationDialog() // ✅ 인자 없이 호출
-            popupWindow.dismiss()
-        }
+            popupBinding.tvDelete.setOnClickListener {
+                showDeleteConfirmationDialog()
+                popupWindow.dismiss()
+            }
 
-        popupWindow.elevation = 10f
-        popupWindow.showAsDropDown(anchor, 0, 0) // 앵커 기준으로 표시
+            popupWindow.elevation = 10f
+            popupWindow.showAsDropDown(anchor, 0, 0)
+
+        } catch (e: Exception) {
+            Log.e("ExpenseViewFragment", "showCustomMenu 오류: ${e.message}")
+        }
+    }
+
+    private fun Fragment.findNavControllerSafely(): NavController? {
+        return try {
+            findNavController()
+        } catch (e: IllegalStateException) {
+            Log.e("NavigationError", "NavController를 찾을 수 없음: ${e.message}")
+            null
+        }
     }
 
     private fun showDeleteConfirmationDialog() {
@@ -242,6 +276,23 @@ class ExpenseViewFragment : Fragment() {
             decorView.clipToOutline = true // 💡 둥근 모서리 적용
         }
         dialog.show()
+    }
+
+    private fun saveHistoryToBotSheet() {
+        val updatedExpense = BotSheetUiState.Spending.History(
+            date = binding.tvDateInput.text.toString(),
+            categoryName = binding.tvCategoryInput.text.toString(),
+            categoryColor = String.format("#%06X", (0xFFFFFF and binding.tvCategoryInput.currentTextColor)), // 색상 HEX 변환
+            name = binding.etDetailInput.text.toString(),
+            content = binding.etDetailInput.text.toString(),
+            price = binding.etAmountInput.text.toString().replace(",", "").toIntOrNull() ?: 0,
+            photoUrl = "" // 📝 이미지 추가 필요시 업데이트
+        )
+
+        Log.d("ExpenseViewFragment", "saveHistoryToBotSheet called with: $updatedExpense")
+
+        // ✅ ViewModel을 통해 바텀시트에 반영
+        viewModel.updateBotSheetHistory(updatedExpense)
     }
 
     override fun onDestroyView() {

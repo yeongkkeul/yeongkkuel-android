@@ -72,7 +72,9 @@
 
         <action
             android:id="@+id/action_ExpenseViewFragment_to_ExpenseEditFragment"
-            app:destination="@id/navigation_expense_edit" />
+            app:destination="@id/navigation_expense_edit"
+            app:popUpToInclusive="false" />
+
     </fragment>
 
     <fragment
@@ -83,14 +85,6 @@
     </fragment>
 
 
-
-    <fragment
-        android:id="@+id/navigation_entry_view"
-        android:name="com.example.yeongkkuel.presentation.home.entry.ExpenseViewFragment"
-        android:label="fragment_entry_edit"
-        tools:layout="@layout/fragment_expense_entry">
-
-    </fragment>
 
     <fragment
         android:id="@+id/navigation_store"

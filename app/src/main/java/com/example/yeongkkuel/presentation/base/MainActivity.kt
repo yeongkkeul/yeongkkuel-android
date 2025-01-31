@@ -429,7 +429,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
 
         Log.d("MainActivity", "navigateToExpenseView - name: $expenseName, price: $expensePrice, categoryColor: $categoryColor")
 
-        navController.navigate(R.id.navigation_entry_view, bundle)
+        navController.navigate(R.id.navigation_expense_view, bundle)
     }
 
     override fun navigateToCategoryAddFragment() {
