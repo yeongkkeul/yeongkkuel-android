@@ -26,6 +26,7 @@ okhttp = "4.11.0"
 gson = "2.10.1"
 livedata = "2.6.1"
 viewmodel = "2.6.1"
+androidx-security = "1.1.0-alpha06"
 
 [libraries]
 credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
@@ -72,6 +73,9 @@ retrofit-core = { module = "com.squareup.retrofit2:retrofit", version.ref = "ret
 retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 okhttp-logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
+
+# CryptoSharedPreferences
+androidx-security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "androidx-security" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

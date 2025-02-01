@@ -59,6 +59,9 @@ dependencies {
     // Google Credential Manager
     implementation(libs.credentials)
 
+    // CryptoSharedPreferences
+    implementation(libs.androidx.security.crypto)
+
     // optional - needed for credentials support from play services, for devices running
     // Android 13 and below.
     implementation(libs.credentials.play.services.auth)
