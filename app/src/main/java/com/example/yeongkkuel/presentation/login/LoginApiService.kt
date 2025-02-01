@@ -1,7 +1,9 @@
 package com.example.yeongkkuel.presentation.login
 
+import com.example.yeongkkuel.presentation.login.request.ReferralRequest
 import com.example.yeongkkuel.presentation.login.request.UserInfoRequest
 import com.example.yeongkkuel.presentation.login.response.KakaoLoginResponse
+import com.example.yeongkkuel.presentation.login.response.ReferralResponse
 import com.example.yeongkkuel.presentation.login.response.UserInfoResponse
 import retrofit2.Call
 import retrofit2.http.Body
@@ -14,12 +16,17 @@ interface LoginApiService {
 
     @GET("/api/auth/kakao-login/")
     fun kakaoLogin(
-        @Query("code") code: String
+        @Query("accessToken") Token: String
     ) : Call<KakaoLoginResponse>
 
     @POST("/api/auth/user-info")
     suspend fun postUserInfo(
         @Body request: UserInfoRequest
     ): UserInfoResponse
+
+    @POST("/api/api/recommend-code")
+    fun validateRecommendCode(
+        @Body request: ReferralRequest
+    ): ReferralResponse
 
 }
