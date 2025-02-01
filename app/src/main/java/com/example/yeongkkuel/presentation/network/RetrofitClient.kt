@@ -1,5 +1,6 @@
 package com.example.yeongkkuel.presentation.network
 
+import android.content.Context
 import com.example.yeongkkuel.presentation.auth.ReissueApiService
 import com.example.yeongkkuel.presentation.auth.TokenManager
 import com.example.yeongkkuel.presentation.login.LoginApiService
@@ -12,45 +13,52 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitClient {
     private const val BASE_URL = "https://dev.yeongkkeul.store"
 
+    /**
+     * Interceptor 없는 Retrofit (재발급 전용)
+     */
+    private var baseRetrofit: Retrofit? = null
 
-    private val baseRetrofit: Retrofit by lazy {
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
+    /**
+     * AuthInterceptor가 적용된 Retrofit
+     */
+    private var authRetrofit: Retrofit? = null
 
-
-    private lateinit var retrofit: Retrofit
-
-    fun init(tokenManager: TokenManager) {
-        val loggingInterceptor = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
+    fun init(context: Context) {
+        if (baseRetrofit == null) {
+            baseRetrofit = Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
         }
-        val authInterceptor = AuthInterceptor(tokenManager, baseRetrofit)
 
-        val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor(loggingInterceptor)
-            .addInterceptor(authInterceptor)
-            .build()
+        if (authRetrofit == null) {
+            val logging = HttpLoggingInterceptor().apply {
+                level = HttpLoggingInterceptor.Level.BODY
+            }
 
-        retrofit = Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
+            val client = OkHttpClient.Builder()
+                .addInterceptor(AuthInterceptor(context))  // JWT 헤더 자동 추가
+                .addInterceptor(logging)
+                .build()
 
-    val yeongkkuelService: YeongkkuelService by lazy {
-        retrofit.create(YeongkkuelService::class.java)
+            authRetrofit = Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+        }
     }
 
     val reissueApiService: ReissueApiService by lazy {
-        retrofit.create(ReissueApiService::class.java)
+        baseRetrofit!!.create(ReissueApiService::class.java)
     }
 
     val loginApiService: LoginApiService by lazy {
-        retrofit.create(LoginApiService::class.java)
+        authRetrofit!!.create(LoginApiService::class.java)
+    }
+
+    val yeongkkuelService: YeongkkuelService by lazy {
+        authRetrofit!!.create(YeongkkuelService::class.java)
     }
 
 }

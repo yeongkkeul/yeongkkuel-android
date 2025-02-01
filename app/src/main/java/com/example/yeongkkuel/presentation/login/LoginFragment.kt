@@ -218,10 +218,10 @@ class LoginFragment : Fragment() {
                             val result = body.result
                             if (result != null) {
                                 // JWT 저장
-                                val tokenManager = TokenManager(requireContext())
-                                tokenManager.saveAccessToken(result.accessToken)
+                                TokenManager.saveTokens(requireContext(), result.accessToken, result.refreshToken)
+                                /*tokenManager.saveAccessToken(result.accessToken)
                                 tokenManager.saveRefreshToken(result.refreshToken)
-
+*/
                                 // redirectUrl에 따라 분기
                                 when (result.redirectUrl) {
                                     "/api/home" -> {

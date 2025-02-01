@@ -11,6 +11,7 @@ import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -21,13 +22,13 @@ interface LoginApiService {
         @Query("accessToken") Token: String
     ) : Call<KakaoLoginResponse>
 
-    @POST("/api/auth/user-info")
+    @PUT("/api/auth/user-info")
     suspend fun postUserInfo(
         @Body request: UserInfoRequest
     ): UserInfoResponse
 
     @POST("/api/api/recommend-code")
-    fun validateRecommendCode(
+    suspend fun validateRecommendCode(
         @Body request: ReferralRequest
     ): ReferralResponse
 

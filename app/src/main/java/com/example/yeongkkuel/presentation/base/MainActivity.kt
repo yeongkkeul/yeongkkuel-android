@@ -32,6 +32,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import androidx.navigation.NavController
+import com.example.yeongkkuel.YeongKkuelApplication
 import com.example.yeongkkuel.presentation.auth.TokenManager
 import com.example.yeongkkuel.presentation.network.RetrofitClient
 
@@ -48,10 +49,6 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     private var rvBottomSheetCollapseStateHeight: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
-        // Retrofit + interceptor 초기화
-        val tokenManager = TokenManager(this)
-        RetrofitClient.init(tokenManager)
 
         // 스플래시 화면 설정
         val splashScreen = this.installSplashScreen()

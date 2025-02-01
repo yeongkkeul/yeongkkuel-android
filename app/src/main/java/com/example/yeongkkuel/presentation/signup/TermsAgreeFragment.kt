@@ -13,6 +13,7 @@ import com.example.yeongkkuel.databinding.FragmentTermsAgreeBinding
 import com.example.yeongkkuel.presentation.login.request.TermsAgreeRequest
 import com.example.yeongkkuel.presentation.login.response.TermsAgreeResponse
 import com.example.yeongkkuel.presentation.network.RetrofitClient
+import com.example.yeongkkuel.presentation.network.RetrofitClient.loginApiService
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -22,7 +23,6 @@ class TermsAgreeFragment : Fragment() {
     private var _binding: FragmentTermsAgreeBinding? = null
     private val binding get() = _binding!!
 
-    private val loginApiService = RetrofitClient.loginApiService
 
     // 각 체크항목의 체크 상태(기본 false)
     private var isCheckedAll = false
@@ -93,7 +93,7 @@ class TermsAgreeFragment : Fragment() {
         updateSignUpState()
 
         binding.tvSignUp.setOnClickListener {
-            navigateToHomeScreen(showRewardModal)
+            agreeToTerms()
         }
     }
 
@@ -105,7 +105,7 @@ class TermsAgreeFragment : Fragment() {
             term4 = isCheckedThirdParty
         )
 
-        loginApiService.agreeTerms(request).enqueue(object : Callback<TermsAgreeResponse> {
+        RetrofitClient.loginApiService.agreeTerms(request).enqueue(object : Callback<TermsAgreeResponse> {
             override fun onResponse(call: Call<TermsAgreeResponse>, response: Response<TermsAgreeResponse>) {
                 if (response.isSuccessful) {
                     response.body()?.let{

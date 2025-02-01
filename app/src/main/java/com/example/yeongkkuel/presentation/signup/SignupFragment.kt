@@ -23,6 +23,7 @@ import com.example.yeongkkuel.presentation.login.request.ReferralRequest
 import com.example.yeongkkuel.presentation.login.request.UserInfoRequest
 import com.example.yeongkkuel.presentation.network.RetrofitClient
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class SignupFragment : Fragment() {
 
@@ -30,11 +31,11 @@ class SignupFragment : Fragment() {
     private var _binding: FragmentSignupBinding? = null
     private val binding get() = _binding!!
 
+
     private var selectedGender: View? = null
     private var selectedAge: View? = null
     private var selectedJob: View? = null
 
-    private val loginApiService = RetrofitClient.loginApiService
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -152,7 +153,6 @@ class SignupFragment : Fragment() {
     private fun sendSignupDataToBackend(nickname: String, gender: String, ageGroup: String, job: String) {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                // 예시 Request
                 val request = UserInfoRequest(
                     nickName = nickname,
                     gender = gender,
@@ -160,7 +160,7 @@ class SignupFragment : Fragment() {
                     job = job
                 )
                 // 통신
-                val response = loginApiService.postUserInfo(request)
+                val response = RetrofitClient.loginApiService.postUserInfo(request)
 
                 if (response.isSuccess) {
                     // 성공 시 추천인 코드 입력 다이얼로그
@@ -231,7 +231,9 @@ class SignupFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val request = ReferralRequest(referralCode)
-                val response = loginApiService.validateRecommendCode(request)
+                val response = RetrofitClient.loginApiService.validateRecommendCode(request)
+                //로그추가
+                Timber.d("Referral code validation response: $response")
 
                 if (!response.isSuccess) {
                     // 서버 응답 자체가 실패
@@ -241,13 +243,18 @@ class SignupFragment : Fragment() {
                         // 코드 유효 → 다음 화면 이동
                         dialog.dismiss()
                         navigateToTermsAgree(showRewardModal = true)
-
                 }
 
             } catch (e: Exception) {
                 // 네트워크 장애, 예외 발생 등
-                errorTextView.visibility = View.VISIBLE
-                errorTextView.text = "오류가 발생했습니다: ${e.message}"
+                // 만약 예외가 404 에러라면 "존재하지 않는 추천인 코드입니다." 메시지 출력
+                if(e.message?.contains("404") == true) {
+                    errorTextView.visibility = View.VISIBLE
+                    errorTextView.text = "존재하지 않는 추천인 코드입니다."
+                } else {
+                    errorTextView.visibility = View.VISIBLE
+                    errorTextView.text = "오류가 발생했습니다: ${e.message}"
+                }
             }
         }
     }
