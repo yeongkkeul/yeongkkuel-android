@@ -1,9 +1,11 @@
 package com.example.yeongkkuel.presentation.login
 
 import com.example.yeongkkuel.presentation.login.request.ReferralRequest
+import com.example.yeongkkuel.presentation.login.request.TermsAgreeRequest
 import com.example.yeongkkuel.presentation.login.request.UserInfoRequest
 import com.example.yeongkkuel.presentation.login.response.KakaoLoginResponse
 import com.example.yeongkkuel.presentation.login.response.ReferralResponse
+import com.example.yeongkkuel.presentation.login.response.TermsAgreeResponse
 import com.example.yeongkkuel.presentation.login.response.UserInfoResponse
 import retrofit2.Call
 import retrofit2.http.Body
@@ -28,5 +30,10 @@ interface LoginApiService {
     fun validateRecommendCode(
         @Body request: ReferralRequest
     ): ReferralResponse
+
+    @POST("/api/auth/term-agreement")
+    fun agreeTerms(
+        @Body request: TermsAgreeRequest
+    ): Call<TermsAgreeResponse>
 
 }

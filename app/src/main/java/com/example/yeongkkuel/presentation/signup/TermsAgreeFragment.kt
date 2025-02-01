@@ -4,15 +4,25 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.navigateUp
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentTermsAgreeBinding
+import com.example.yeongkkuel.presentation.login.request.TermsAgreeRequest
+import com.example.yeongkkuel.presentation.login.response.TermsAgreeResponse
+import com.example.yeongkkuel.presentation.network.RetrofitClient
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class TermsAgreeFragment : Fragment() {
 
     private var _binding: FragmentTermsAgreeBinding? = null
     private val binding get() = _binding!!
+
+    private val loginApiService = RetrofitClient.loginApiService
 
     // 각 체크항목의 체크 상태(기본 false)
     private var isCheckedAll = false
@@ -37,7 +47,7 @@ class TermsAgreeFragment : Fragment() {
 
         // 뒤로가기
         binding.ivBack.setOnClickListener {
-            parentFragmentManager.popBackStack()
+            findNavController().navigateUp()
         }
 
         // "전체 동의" 아이콘 클릭 -> 토글
@@ -85,6 +95,36 @@ class TermsAgreeFragment : Fragment() {
         binding.tvSignUp.setOnClickListener {
             navigateToHomeScreen(showRewardModal)
         }
+    }
+
+    private fun agreeToTerms() {
+        val request = TermsAgreeRequest(
+            term1 = isCheckedService,
+            term2 = isCheckedPrivacy,
+            term3 = isCheckedAge,
+            term4 = isCheckedThirdParty
+        )
+
+        loginApiService.agreeTerms(request).enqueue(object : Callback<TermsAgreeResponse> {
+            override fun onResponse(call: Call<TermsAgreeResponse>, response: Response<TermsAgreeResponse>) {
+                if (response.isSuccessful) {
+                    response.body()?.let{
+                        if(it.isSuccess){
+                            navigateToHomeScreen(arguments?.getBoolean("showRewardModal") ?: false)
+                        } else {
+                            Toast.makeText(requireContext(), it.message,Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } else {
+                    Toast.makeText(requireContext(), "서버 오류 발생", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<TermsAgreeResponse>, t: Throwable) {
+                // 실패 처리
+                Toast.makeText(requireContext(), "네트워크 오류 발생", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     override fun onDestroyView() {
