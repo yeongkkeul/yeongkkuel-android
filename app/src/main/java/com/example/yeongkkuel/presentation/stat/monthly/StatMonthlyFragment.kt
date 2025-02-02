@@ -5,9 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.example.yeongkkuel.databinding.FragmentStatMonthlyBinding
+import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import com.example.yeongkkuel.presentation.stat.monthly.adapter.viewpager.StatMonthlyCalenderViewPagerAdapter
 import com.example.yeongkkuel.presentation.util.toMoneyString
 import kotlinx.coroutines.flow.collectLatest
@@ -21,8 +23,10 @@ class StatMonthlyFragment(
         get() = requireNotNull(_binding) { "FragmentStatMonthlyBinding -> null" }
 
 
+    private val botViewModel: BotSheetViewModel by activityViewModels()
+
     private val calendarViewPagerAdapter by lazy {
-        StatMonthlyCalenderViewPagerAdapter(requireActivity(), viewModel)
+        StatMonthlyCalenderViewPagerAdapter(requireActivity(), viewModel = viewModel)
     }
 
     override fun onCreateView(

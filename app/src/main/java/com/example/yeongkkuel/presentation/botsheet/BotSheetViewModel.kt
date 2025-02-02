@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Calendar
+import java.util.Date
 
 class BotSheetViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<BotSheetUiState>(BotSheetUiState.init())
@@ -113,7 +114,48 @@ class BotSheetViewModel : ViewModel() {
                                             )
                                         }
                                     )
-                                }
+                                },
+                                date = Date()
+                            )
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+
+    fun getSpendingList(year: Int, month: Int, day: Int) = viewModelScope.launch {
+        try {
+            yeongkkuelService.getExpendituresMonthCategory(
+                year = year,
+                month = month,
+                day = day
+            ).run {
+                if (isSuccess) {
+                    result.run {
+                        _uiState.update { prev ->
+                            prev.copy(
+                                spendingList = categories.map {
+                                    BotSheetUiState.Spending(
+                                        kind = SpendingCategory.fromKor(it.categoryName),
+                                        color = Colors.fromCode(it.categoryColor) ?: Colors.RED1, // 기본값 추가
+                                        plusIconResId = R.drawable.ic_plus_default,
+                                        history = it.expenses.map { expense ->
+                                            BotSheetUiState.Spending.History(
+                                                name = expense.expenseName,
+                                                price = expense.expenseAmount
+                                            )
+                                        }
+                                    )
+                                },
+                                date = Calendar.getInstance().apply {
+                                    set(Calendar.YEAR, year)
+                                    set(Calendar.MONTH, month - 1)
+                                    set(Calendar.DAY_OF_MONTH, day)
+                                }.time
                             )
                         }
                     }
