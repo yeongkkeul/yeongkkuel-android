@@ -10,6 +10,7 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class Product(
+    val id: Int, // ✅ id 추가
     val name: String,
     val price: Int,
     val imageResId: Int,
@@ -20,7 +21,6 @@ data class Product(
 class StoreAdapter(
     private val products: List<Product>,
     private val onItemClick: (Product) -> Unit
-
 ) : RecyclerView.Adapter<StoreAdapter.StoreViewHolder>() {
     private var selectedPosition: Int = RecyclerView.NO_POSITION
 

@@ -1,5 +1,7 @@
 package com.example.yeongkkuel.presentation.network
 
+import com.example.yeongkkuel.presentation.home.HomeApiService
+import com.example.yeongkkuel.presentation.home.store.StoreApiService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -28,5 +30,13 @@ object RetrofitClient {
 
     val yeongkkuelService: YeongkkuelService by lazy {
         retrofit.create(YeongkkuelService::class.java)
+    }
+
+    val storeapiService: StoreApiService by lazy {
+        retrofit.create(StoreApiService::class.java)
+    }
+
+    val homeApiService: HomeApiService by lazy {
+        retrofit.create(HomeApiService::class.java)
     }
 }
