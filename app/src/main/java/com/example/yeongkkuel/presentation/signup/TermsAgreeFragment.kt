@@ -34,7 +34,24 @@ class TermsAgreeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val showRewardModal = arguments?.getBoolean("showRewardModal") ?: false
+        initListener()
 
+        binding.tvSignUp.setOnClickListener {
+            navigateToHomeScreen(showRewardModal)
+        }
+
+        // 초기 버튼 상태 갱신
+        updateSignUpState()
+
+
+
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+    private fun initListener() {
         // 뒤로가기
         binding.ivBack.setOnClickListener {
             parentFragmentManager.popBackStack()
@@ -79,17 +96,6 @@ class TermsAgreeFragment : Fragment() {
             updateSignUpState()
         }
 
-        // 초기 버튼 상태 갱신
-        updateSignUpState()
-
-        binding.tvSignUp.setOnClickListener {
-            navigateToHomeScreen(showRewardModal)
-        }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     /**
