@@ -9,11 +9,16 @@ import com.bumptech.glide.Glide
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.ItemChatOtherBinding
 import com.example.yeongkkuel.databinding.ItemChatUserBinding
+import com.example.yeongkkuel.presentation.chat.ChatMessageClickListener
 import com.example.yeongkkuel.presentation.chat.data.ChatItemModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class ChatGroupAdapter(
     private val messages: List<ChatItemModel>,
-    private val otherProfileImageUrl: String?
+    private val otherProfileImageUrl: String?,
+    private val chatMessageClickListener: ChatMessageClickListener
 ) : RecyclerView.Adapter<ChatGroupAdapter.ChatViewHolder>() {
 
     companion object {
@@ -49,19 +54,24 @@ class ChatGroupAdapter(
 
     override fun getItemCount(): Int = messages.size
 
+    val currentTime: String = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+
     inner class ChatViewHolder(private val binding: ViewBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(chatMessage: ChatItemModel, otherProfileImageUrl: String?) {
             when (binding) {
                 is ItemChatUserBinding -> {
                     binding.tvChatMessage.text = chatMessage.content
-                    binding.tvTimeMessage.text = chatMessage.sendTime
+                    binding.tvTimeMessage.text = currentTime
                     binding.tvAmountPeopleRead.text = chatMessage.amountPeopleRead.toString()
                 }
                 is ItemChatOtherBinding -> {
                     binding.tvNicknameSender.text = chatMessage.sender
-                    binding.tvTimeMessage.text = chatMessage.sendTime
+                    binding.tvTimeMessage.text = currentTime
                     binding.tvAmountPeopleRead.text = chatMessage.amountPeopleRead.toString()
                     binding.tvChatMessage.text = chatMessage.content
+                    binding.ivProfileSender.setOnClickListener {
+                        chatMessageClickListener.onMessageClicked()
+                    }
                     otherProfileImageUrl?.let {
                         Glide.with(binding.ivProfileSender.context)
                             .load(it)

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottomSheetLayout"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    android:background="@drawable/bg_chat_modal_bottom_sheet"
+    android:orientation="vertical"
+    android:paddingTop="34dp"
+    android:paddingBottom="38dp">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.25" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.75" />
+
+    <TextView
+        android:id="@+id/tv_title_filter_age"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="하루 목표 지출액"
+        android:textColor="@color/main1"
+        android:textStyle="bold"
+        style="@style/humm_semibo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <kr.co.prnd.slider.FlexibleStepRangeSlider
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="20dp"
+        android:valueFrom="0.0"
+        android:valueTo="100000.0"
+        app:values="@array/range_slider"
+        app:thumbColorActive="@color/white"
+        app:thumbColorInactive="@color/white"
+        app:thumbElevationActive="2dp"
+        app:thumbElevationInactive="4dp"
+        app:thumbRadiusActive="14dp"
+        app:thumbRadiusInactive="12dp"
+        app:thumbStrokeColorActive="@color/main1"
+        app:thumbStrokeColorInactive="@color/main2"
+        app:thumbStrokeWidthActive="2dp"
+        app:thumbStrokeWidthInactive="2dp"
+        app:tickColorActive="@color/main1"
+        app:tickColorInactive="@color/main1"
+        app:tickVisible="true"
+        app:trackColorActive="@color/main1"
+        app:trackColorInactive="@color/main1"
+        app:trackHeight="2dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_title_filter_age"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

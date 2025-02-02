@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import androidx.activity.addCallback
+import androidx.core.view.GravityCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -15,14 +16,19 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentChatGroupBinding
 import com.example.yeongkkuel.presentation.base.MainActivity
 import com.example.yeongkkuel.presentation.chat.adapter.ChatGroupAdapter
+import com.example.yeongkkuel.presentation.chat.adapter.ChatRoomDrawerAdapter
+import com.example.yeongkkuel.presentation.chat.data.ChatRoomRank
+import com.example.yeongkkuel.presentation.chat.dialog.ChatRoomGroupExitDialog
+import com.example.yeongkkuel.presentation.chat.dialog.ChatRoomProfilePartyDialog
 import com.example.yeongkkuel.utils.ChatItemDecoration
 import timber.log.Timber
 
-class ChatGroupFragment : Fragment() {
+class ChatGroupFragment : Fragment(), ChatMessageClickListener {
     private lateinit var navController: NavController
     private lateinit var chatGroupAdapter: ChatGroupAdapter
 
@@ -33,6 +39,8 @@ class ChatGroupFragment : Fragment() {
     private val chatGroupViewModel: ChatGroupViewModel by activityViewModels()
 
     private var bannerOpen = false
+
+    private lateinit var chatRoomDrawerAdapter: ChatRoomDrawerAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -66,11 +74,15 @@ class ChatGroupFragment : Fragment() {
             navController.navigate(R.id.action_navigation_chat_room_group_to_rank)
         }
 
+        binding.btnMenu.setOnClickListener {
+            binding.drawerLayout.openDrawer(GravityCompat.END)
+        }
+
 //        setupKeyboardListener()
 
         val otherProfileImageUrl = "https://helios-i.mashable.com/imagery/articles/04GeUVUQwZxpTYXdqbocKH2/hero-image.fill.size_1248x702.v1722586579.jpg"
 
-        chatGroupAdapter = ChatGroupAdapter(emptyList(), otherProfileImageUrl)
+        chatGroupAdapter = ChatGroupAdapter(emptyList(), otherProfileImageUrl, this)
         binding.rvChatGroup.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = chatGroupAdapter
@@ -81,7 +93,7 @@ class ChatGroupFragment : Fragment() {
 
         chatGroupViewModel.messages.observe(viewLifecycleOwner) { messages ->
             Timber.tag("ChatFragment").d("글자 업데이트 완료: %s", messages)
-            chatGroupAdapter = ChatGroupAdapter(messages, otherProfileImageUrl)
+            chatGroupAdapter = ChatGroupAdapter(messages, otherProfileImageUrl, this)
             binding.rvChatGroup.adapter = chatGroupAdapter
             binding.rvChatGroup.scrollToPosition(messages.size - 1)
         }
@@ -125,6 +137,55 @@ class ChatGroupFragment : Fragment() {
             binding.ivBannerArrow.setImageResource(R.drawable.ic_arrow_bottom)
             bannerOpen = false
         }
+
+        chatRoomDrawerAdapter = ChatRoomDrawerAdapter(arrayListOf())
+
+        binding.rvGroupChallenger.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = chatRoomDrawerAdapter
+        }
+
+        loadDummyData()
+
+        binding.apply {
+            Glide.with(ivPhoto1)
+                .load(otherProfileImageUrl)
+                .into(ivPhoto1)
+            Glide.with(ivPhoto2)
+                .load(otherProfileImageUrl)
+                .into(ivPhoto2)
+            Glide.with(ivPhoto3)
+                .load(otherProfileImageUrl)
+                .into(ivPhoto3)
+        }
+
+        binding.btnExit.setOnClickListener {
+            val dialog = ChatRoomGroupExitDialog(
+                context = requireContext(),
+                onCancelClick = {  },
+                onExitClick = {
+                    navController.navigateUp()
+                }
+            )
+            dialog.show()
+        }
+    }
+
+    private fun loadDummyData() {
+        val dummyData = generateDummyData(10)
+        chatRoomDrawerAdapter = ChatRoomDrawerAdapter(dummyData)
+        binding.rvGroupChallenger.adapter = chatRoomDrawerAdapter
+    }
+
+    private fun generateDummyData(count: Int): ArrayList<ChatRoomRank> {
+        return ArrayList(List(count) { index ->
+            ChatRoomRank(
+                nickname = "사용자 ${index + 1}",
+                profileImage = "https://helios-i.mashable.com/imagery/articles/04GeUVUQwZxpTYXdqbocKH2/hero-image.fill.size_1248x702.v1722586579.jpg",
+                rankScore = 100 - index,
+                rank = index +1
+            )
+        })
     }
 
     private fun animateButtonVisibility(show: Boolean) {
@@ -152,5 +213,13 @@ class ChatGroupFragment : Fragment() {
         super.onDestroyView()
 
         _binding = null
+    }
+
+    override fun onMessageClicked() {
+        val dialog = ChatRoomProfilePartyDialog(
+            context = requireContext(),
+            onCancelClick = {  }
+        )
+        dialog.show()
     }
 }

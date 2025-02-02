@@ -10,8 +10,10 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentChatRoomRankBinding
+import com.example.yeongkkuel.presentation.base.MainActivity
 import com.example.yeongkkuel.presentation.chat.adapter.ChatRoomRankAdapter
 import com.example.yeongkkuel.presentation.chat.data.ChatRoomRank
+import com.example.yeongkkuel.presentation.chat.dialog.ChatRoomRankPopup
 import com.example.yeongkkuel.utils.ChatItemDecoration
 
 class ChatRoomRankFragment : Fragment() {
@@ -38,6 +40,8 @@ class ChatRoomRankFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         navController = Navigation.findNavController(view)
+
+        (requireActivity() as MainActivity).hideBottomNavigation(true)
 
         binding.btnInfoRank.setOnClickListener {
             ChatRoomRankPopup(

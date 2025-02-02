@@ -16,11 +16,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.Calendar
-
+import java.util.Date
 
 class BotSheetViewModel : ViewModel() {
-
-    private val _uiState = MutableStateFlow(BotSheetUiState.init())
+    private val _uiState = MutableStateFlow<BotSheetUiState>(BotSheetUiState.init())
     val uiState = _uiState.asStateFlow()
 
     private val yeongkkuelService = RetrofitClient.yeongkkuelService
@@ -119,6 +118,7 @@ class BotSheetViewModel : ViewModel() {
         Log.d("BotSheetViewModel", "📌 삭제됨: $expenseName, 남은 지출 개수: ${_spendingHistoryList.value.size}")
     }
 
+    // 카테고리 추가 기능
     fun addCategory(category: Category) {
         val spendingCategory = SpendingCategory.CUSTOM(category.name)
         val categoryColor = category.color
@@ -142,9 +142,8 @@ class BotSheetViewModel : ViewModel() {
 
     }
 
-
     private fun mapCategoryToIcon(color: Colors): Int {
-        return R.drawable.ic_plus_default
+        return R.drawable.ic_plus_default // 모든 아이콘은 동일한 XML을 사용
     }
 
     // 카테고리 제목, 색상 수정 후 바텀시트 업로드
@@ -188,15 +187,17 @@ class BotSheetViewModel : ViewModel() {
     fun getDayTargetSpending() = viewModelScope.launch {
         try {
             yeongkkuelService.getExpendituresDay().run {
-                if (isSuccess) {
+                if(isSuccess){
                     result.run {
-                        _uiState.update { prev ->
-                            prev.copy(targetSpending = dayTargetExpenditure)
+                        _uiState.update { prev->
+                            prev.copy(
+                                targetSpending = dayTargetExpenditure
+                            )
                         }
                     }
                 }
             }
-        } catch (e: Exception) {
+        }catch (e:Exception){
             e.printStackTrace()
         }
     }

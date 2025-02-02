@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.presentation.chat
+package com.example.yeongkkuel.presentation.chat.dialog
 
 import android.content.Context
 import android.view.LayoutInflater
