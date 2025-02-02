@@ -117,7 +117,7 @@ class StatMonthlyViewModel : ViewModel() {
             return resultList.getData()
         }
 
-        val dayList = getDayList(year, month)
+        val dayList = getDayList(year, month).getData()
 
         _uiState.update { prev ->
             prev.copy(

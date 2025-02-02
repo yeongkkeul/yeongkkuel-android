@@ -63,8 +63,14 @@ class StatWeeklyFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        getData()
         initView()
         initViewModel()
+    }
+
+    private fun getData(){
+        viewModel.getWeekExpenditureList()
+        viewModel.getWeekExpenditureAverage()
     }
 
     private fun initView() = with(binding) {
