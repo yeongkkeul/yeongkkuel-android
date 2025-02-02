@@ -4,7 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingVertical="@dimen/space_xx_small">
+    android:paddingVertical="@dimen/space_xx_small"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
+    android:background="@drawable/bg_box_white">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -25,6 +28,18 @@
             android:textColor="@color/blue"
             style="@style/body_semibo"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_no_spend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="무지출!"
+            android:textColor="@color/black"
+            style="@style/body_semibo"
+            android:visibility="gone"
+            android:layout_marginEnd="10dp"
+            app:layout_constraintEnd_toStartOf="@id/iv_btnAdd"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView

@@ -1,6 +1,7 @@
 package com.example.yeongkkuel.presentation.botsheet
 
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.ItemBotsheetCategoryBinding
 import android.util.Log
+import android.view.View
 import androidx.navigation.Navigation.findNavController
 
 
@@ -27,10 +29,21 @@ class BotSheetCategoryListAdapter(
 
         // 🔹 클릭 리스너를 Adapter에 직접 추가하지 않고, Fragment로 전달
         private val historyListAdapter = BotSheetHistoryListAdapter { selectedHistory ->
+            val colorInt = try {
+                Color.parseColor(selectedHistory.categoryColor) // ✅ String(HEX) → Int 변환
+            } catch (e: IllegalArgumentException) {
+                Log.e(
+                    "BotSheetHistoryListAdapter",
+                    "Invalid color format: ${selectedHistory.categoryColor}",
+                    e
+                )
+                Color.RED // 기본값 검정색 적용
+            }
+
             botSheetListener.navigateToExpenseView(
                 selectedHistory.name,
                 selectedHistory.price,
-                selectedHistory.categoryColor // ✅ categoryColor 추가
+                colorInt // ✅ Int 값으로 변환 후 전달
             )
         }
 
@@ -47,17 +60,34 @@ class BotSheetCategoryListAdapter(
 
             rvHistory.run {
                 adapter = historyListAdapter
-                historyListAdapter.submitList(item.history ?: emptyList())
+                historyListAdapter.submitList(item.history ?: emptyList()) {
+                    // ✅ 최신 데이터 반영 후 UI 업데이트
+                    updateNoSpendAndMoreVisibility(item)
+                }
                 layoutManager = LinearLayoutManager(binding.root.context)
             }
-
             // 🔹 카테고리 추가 버튼 클릭 리스너
             ivBtnAdd.setOnClickListener {
                 botSheetListener.navigateToExpenseEntry(item.kind.kor, item.color.id)
             }
         }
-    }
 
+        private fun updateNoSpendAndMoreVisibility(item: BotSheetUiState.Spending) {
+            val hasNoExpenseEntry = item.history.all { it.isNoExpense } // 모든 항목이 무지출인지 확인
+            val isEmpty = item.history.isEmpty() // 리스트가 비어 있는지 확인
+
+            if (isEmpty) {
+                binding.tvNoSpend.visibility = View.GONE
+                botSheetListener.onNoExpenseChanged(false) // ✅ 일반 지출이 없으므로 icMore 보이도록
+            } else if (hasNoExpenseEntry) {
+                binding.tvNoSpend.visibility = View.VISIBLE
+                botSheetListener.onNoExpenseChanged(true) // ✅ 무지출 항목만 있으면 icMore 숨김
+            } else {
+                binding.tvNoSpend.visibility = View.GONE
+                botSheetListener.onNoExpenseChanged(false) // ✅ 일반 지출이 있으면 icMore 보이도록
+            }
+        }
+    }
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int

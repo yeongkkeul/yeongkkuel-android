@@ -68,9 +68,11 @@ class HomeFragment : Fragment() {
         val sharedPreferences = requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val lastHiddenDate = sharedPreferences.getString(KEY_LAST_HIDDEN_DATE, "")
         val todayDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+
         if (lastHiddenDate == todayDate) {
             binding.imgWarningStart.visibility = View.GONE
         }
+
         // FragmentResult API를 통해 StoreFragment에서 데이터 수신
         parentFragmentManager.setFragmentResultListener("selectedProductKey", this) { _, bundle ->
             val selectedProduct = bundle.getParcelable<Product>("selectedProduct")
@@ -78,15 +80,19 @@ class HomeFragment : Fragment() {
                 Log.d("HomeFragment", "Received selected product: ${it.name}")
                 applySelectedProductToHome(it)
             }
-            setupSwipeToDismiss(binding.imgWarningStart)
-
         }
 
-
-        // 기존 로직 유지
+        setupSwipeToDismiss(binding.imgWarningStart)
         renderMyProductsForHome()
 
-    // StoreFragment로 이동
+        // ✅ StateFlow를 collect 할 때 viewLifecycleOwner.lifecycleScope.launch 사용
+        viewLifecycleOwner.lifecycleScope.launch {
+            botSheetViewModel.uiState.collectLatest { uiState ->
+                updateWarningVisibility(uiState)
+            }
+        }
+
+        // StoreFragment로 이동
         binding.imgHomeStore.setOnClickListener {
             binding.bgHomeStore.visibility = View.GONE
             binding.bgHomeStoreClick.visibility = View.VISIBLE
@@ -99,16 +105,9 @@ class HomeFragment : Fragment() {
             navController.navigate(R.id.categoryManageFragment)
         }
 
-        // StateFlow를 collect로 관찰하기
-        lifecycleScope.launch {
-            botSheetViewModel.uiState.collectLatest { uiState ->
-                updateWarningVisibility(uiState)
-            }
-        }
-
-        // imgWarningStart 스와이프 동작 설정
         setupSwipeToDismiss(binding.imgWarningStart)
     }
+
 
 
     override fun onDestroyView() {
@@ -118,25 +117,34 @@ class HomeFragment : Fragment() {
 
     private fun updateWarningVisibility(uiState: BotSheetUiState) {
         val sharedPreferences = requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val lastHiddenDate = sharedPreferences.getString(KEY_LAST_HIDDEN_DATE, "")
+        val lastHiddenDate = sharedPreferences.getString(KEY_LAST_HIDDEN_DATE, null)
         val todayDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
 
-        val isEmpty = uiState.spendingList.isEmpty()
+        // 🔥 한 번 숨김 처리가 되었다면 다시 표시되지 않도록 설정
+        if (lastHiddenDate == null) {
+            sharedPreferences.edit().putString(KEY_LAST_HIDDEN_DATE, todayDate).apply()
+        }
+
+        val hasSpendingData = uiState.spendingList.isNotEmpty()
+        val categoryList = botSheetViewModel.getCategoryList()
+        val hasCategories = categoryList.isNotEmpty()
+
+        Log.d("HomeFragment", "📌 lastHiddenDate 확인: $lastHiddenDate, todayDate: $todayDate")
+        Log.d("HomeFragment", "📌 현재 카테고리 개수: ${categoryList.size}, 지출 내역 개수: ${uiState.spendingList.size}")
 
         binding.imgWarningStart.post {
             if (lastHiddenDate == todayDate) {
-                // 🔹 오늘 한 번이라도 숨긴 경우, spendingList 상태와 관계없이 계속 숨김 유지
+                // 🔹 오늘 한 번 숨긴 경우 -> 계속 숨김 유지
                 binding.imgWarningStart.visibility = View.GONE
-                Log.d("HomeFragment", "오늘 이미 숨김 처리됨")
+                Log.d("HomeFragment", "🚨 오늘 이미 숨김 처리됨 -> imgWarningStart 숨기기")
             } else {
-                // 🔹 spendingList가 비어 있다면 무조건 보이게 설정
-                if (isEmpty) {
-                    binding.imgWarningStart.visibility = View.VISIBLE
-                    Log.d("HomeFragment", "카테고리가 비어 있음 -> imgWarningStart 보이기")
-                } else {
-                    binding.imgWarningStart.visibility = View.GONE
-                    Log.d("HomeFragment", "카테고리가 있음 -> imgWarningStart 숨기기")
-                }
+                // 🔹 카테고리가 없거나 지출 내역이 없을 때만 보이도록 설정
+                binding.imgWarningStart.visibility = if (hasSpendingData || hasCategories) View.GONE else View.VISIBLE
+                Log.d(
+                    "HomeFragment",
+                    if (hasSpendingData || hasCategories) "✅ 지출 내역 또는 카테고리 있음 -> imgWarningStart 숨기기"
+                    else "❗ 지출 내역 및 카테고리 없음 -> imgWarningStart 보이기"
+                )
             }
         }
     }
@@ -266,6 +274,8 @@ class HomeFragment : Fragment() {
     private fun saveHiddenDate() {
         val sharedPreferences = requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val todayDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+
+        Log.d("HomeFragment", "🔹 saveHiddenDate() 실행됨, 저장 날짜: $todayDate") // ✅ 로그 추가
 
         sharedPreferences.edit()
             .putString(KEY_LAST_HIDDEN_DATE, todayDate)

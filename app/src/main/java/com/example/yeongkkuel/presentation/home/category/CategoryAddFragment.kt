@@ -157,8 +157,6 @@ class CategoryAddFragment : Fragment() {
             ContextCompat.getColor(requireContext(), colorValue.id) == selectedColor
         } ?: return
 
-
-
         val newCategory = Category(name = title, color = categoryColor)
 
         // ViewModel에 카테고리 추가

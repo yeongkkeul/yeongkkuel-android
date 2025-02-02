@@ -1,5 +1,7 @@
 package com.example.yeongkkuel.presentation.home.entry
 
+import android.app.Activity
+import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -8,6 +10,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,12 +27,14 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentExpenseEntryBinding
+import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -38,9 +43,19 @@ class ExpenseEditFragment : Fragment() {
     private var _binding: FragmentExpenseEntryBinding? = null
     private val binding get() = _binding!!
     private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var botSheetListener: BotSheetListener
     private lateinit var viewModel: BotSheetViewModel  // 🔹 ViewModel 추가
     private val PICK_IMAGE_REQUEST = 1
     private var selectedImageUri: Uri? = null // 🔹 선택한 이미지 URI 저장
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is BotSheetListener) {
+            botSheetListener = context
+        } else {
+            throw RuntimeException("$context must implement BotSheetListener")
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -66,8 +81,8 @@ class ExpenseEditFragment : Fragment() {
         setupDetailInput(view)
         setupAmountInput(view)
         setupPhotoFrame(view)
-
     }
+
     private fun setupPhotoFrame(view: View) {
         val flPhotoFrame = view.findViewById<FrameLayout>(R.id.fl_photo_frame)
         flPhotoFrame.setOnClickListener {
@@ -82,18 +97,33 @@ class ExpenseEditFragment : Fragment() {
         startActivityForResult(intent, PICK_IMAGE_REQUEST)
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
+            selectedImageUri = data?.data
+            selectedImageUri?.let {
+                Glide.with(this)
+                    .load(it)
+                    .into(binding.imgPhotoFrame)
+                binding.ivPhotoIcon.visibility = View.GONE
+            }
+        }
+    }
+
     private fun observeLatestHistory() {
         lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.spendingHistoryList.collectLatest { historyList ->
+                    Log.d("ExpenseViewFragment", "🔄 최신 내역 감지됨: $historyList") // ✅ 로그 추가
                     if (historyList.isNotEmpty()) {
-                        val latestHistory = historyList.last() // 🔹 가장 최근 지출 내역 가져오기
+                        val latestHistory = historyList.last()
                         updateUiWithHistory(latestHistory)
                     }
                 }
             }
         }
     }
+
 
     private fun updateUiWithHistory(history: BotSheetUiState.Spending.History) {
         binding.tvDateInput.text = history.date.ifEmpty { getCurrentDate() }
@@ -151,41 +181,50 @@ class ExpenseEditFragment : Fragment() {
             saveEditedExpense()
         }
     }
+
     private fun getCurrentDate(): String {
         val dateFormat = SimpleDateFormat("yyyy년 M월 d일 E요일", Locale.KOREA)
         return dateFormat.format(Date())
     }
+
     private fun formatPrice(price: Int): String {
         return NumberFormat.getNumberInstance(Locale.KOREA).format(price)
     }
+
     private fun saveEditedExpense() {
         val updatedExpense = BotSheetUiState.Spending.History(
             date = binding.tvDateInput.text.toString(),
             categoryName = binding.tvCategoryInput.text.toString(),
             categoryColor = String.format("#%06X", (0xFFFFFF and binding.tvCategoryInput.currentTextColor)), // 색상 HEX 변환
             name = binding.etDetailInput.text.toString(),
-            content =  binding.etDetailInput.text.toString(),
+            content = binding.etDetailInput.text.toString(),
             price = binding.etAmountInput.text.toString().replace(",", "").toIntOrNull() ?: 0,
             photoUrl = selectedImageUri?.toString() ?: ""
         )
 
-        // 🔹 ViewModel을 통해 지출 내역 업데이트
-        viewModel.updateExpense(updatedExpense)
+        Log.d("ExpenseEditFragment", "saveEditedExpense called with: $updatedExpense")
 
-        // 🔹 수정 후 화면 종료
-        Toast.makeText(requireContext(), "지출 내역이 수정되었습니다.", Toast.LENGTH_SHORT).show()
-/*        val bundle = Bundle().apply {
+        // ✅ ViewModel을 통해 업데이트 반영 (바텀시트에 즉시 반영됨)
+        lifecycleScope.launch {
+            viewModel.updateBotSheetHistory(updatedExpense)
+        }
+
+        // ✅ 저장된 데이터 전달
+        val bundle = Bundle().apply {
             putString("expenseDate", updatedExpense.date)
             putString("categoryName", updatedExpense.categoryName)
             putString("categoryColor", updatedExpense.categoryColor)
             putString("expenseContent", updatedExpense.content)
             putInt("expensePrice", updatedExpense.price)
             putString("expensePhoto", updatedExpense.photoUrl)
-        }*/
+        }
+        findNavController().previousBackStackEntry?.savedStateHandle?.set("editedExpense", bundle)
+
+        Toast.makeText(requireContext(), "지출 내역이 수정되었습니다.", Toast.LENGTH_SHORT).show()
         findNavController().popBackStack()
     }
 
-    // 상세 입력란 글자 수 제한 로직
+
     private fun setupDetailInput(view: View) {
         val etDetailInput = view.findViewById<EditText>(R.id.et_detail_input)
         val tvCharacterCount = view.findViewById<TextView>(R.id.tv_character_count)
@@ -200,6 +239,7 @@ class ExpenseEditFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) {}
         })
     }
+
     private fun setupAmountInput(view: View) {
         val etAmountInput = view.findViewById<EditText>(R.id.et_amount_input)
 
@@ -220,9 +260,9 @@ class ExpenseEditFragment : Fragment() {
         })
     }
 
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
 }
