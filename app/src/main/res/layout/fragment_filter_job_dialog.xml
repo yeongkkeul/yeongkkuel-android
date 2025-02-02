@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottomSheetLayout"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    android:background="@drawable/bg_chat_modal_bottom_sheet"
+    android:orientation="vertical"
+    android:paddingTop="34dp"
+    android:paddingBottom="38dp">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.25" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.75" />
+
+    <TextView
+        android:id="@+id/tv_title_filter_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="직업"
+        android:textColor="@color/main1"
+        android:textStyle="bold"
+        style="@style/humm_semibo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/btn_status_student"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="학생"
+        android:textColor="@color/black"
+        style="@style/body_regula"
+        android:layout_marginTop="28dp"
+        app:layout_constraintStart_toStartOf="@+id/gl_start"
+        app:layout_constraintEnd_toEndOf="@+id/gl_start"
+        app:layout_constraintTop_toBottomOf="@+id/tv_title_filter_status"/>
+
+    <TextView
+        android:id="@+id/btn_status_housewife"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="주부"
+        android:textColor="@color/black"
+        style="@style/body_regula"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toStartOf="@+id/gl_start"
+        app:layout_constraintEnd_toEndOf="@+id/gl_start"
+        app:layout_constraintTop_toBottomOf="@+id/btn_status_student"/>
+
+    <TextView
+        android:id="@+id/btn_status_worker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="직장인"
+        android:textColor="@color/black"
+        style="@style/body_regula"
+        android:layout_marginTop="28dp"
+        app:layout_constraintStart_toStartOf="@+id/gl_end"
+        app:layout_constraintEnd_toEndOf="@+id/gl_end"
+        app:layout_constraintTop_toBottomOf="@+id/tv_title_filter_status"/>
+
+    <TextView
+        android:id="@+id/btn_status_selfemployed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="자영업자"
+        android:textColor="@color/black"
+        style="@style/body_regula"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toStartOf="@+id/gl_end"
+        app:layout_constraintEnd_toEndOf="@+id/gl_end"
+        app:layout_constraintTop_toBottomOf="@+id/btn_status_worker"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
