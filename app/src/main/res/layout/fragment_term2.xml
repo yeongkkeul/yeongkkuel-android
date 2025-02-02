@@ -62,7 +62,7 @@
 
             <!-- 약관 동의 체크박스 및 버튼 -->
             <LinearLayout
-                android:id="@+id/checkServiceArea"
+                android:id="@+id/checkPrivacyArea"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:background="@drawable/bg_terms_agree"
@@ -82,7 +82,7 @@
 
                 <!-- 체크 아이콘 (Big) -->
                 <ImageView
-                    android:id="@+id/ivCheckService"
+                    android:id="@+id/ivCheckPrivacy"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="4dp"

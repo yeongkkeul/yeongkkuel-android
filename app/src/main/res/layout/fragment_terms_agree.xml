@@ -88,12 +88,14 @@
 
                 <TextView
                     android:id="@+id/tvCheckService"
-                    style="@style/body_regula"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="서비스 이용 약관 (필수)"
-                    android:textColor="@color/black3" />
+                    android:text="@string/service_term"
+                    android:lineSpacingExtra="2dp"
+                    android:clickable="true"
+
+                    android:textColor="@color/black3"/>
 
                 <ImageView
                     android:id="@+id/ivCheckService"
@@ -122,7 +124,9 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="개인정보 수집 및 이용 동의 (필수)"
+                    android:text="@string/privacy_term"
+                    android:clickable="true"
+
                     android:textColor="@color/black3" />
 
                 <ImageView
@@ -152,7 +156,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="만 14세 이상 확인 (필수)"
+                    android:text="@string/age_term"
+                    android:clickable="true"
                     android:textColor="@color/black3" />
 
                 <ImageView
@@ -182,7 +187,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="개인정보 제3자 제공 동의 (선택)"
+                    android:text="@string/third_party_term"
+                    android:clickable="true"
                     android:textColor="@color/black3" />
 
                 <ImageView

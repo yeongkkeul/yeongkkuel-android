@@ -82,7 +82,7 @@
 
                 <!-- 체크 아이콘 (Big) -->
                 <ImageView
-                    android:id="@+id/ivCheckService"
+                    android:id="@+id/ivCheckAge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="4dp"
