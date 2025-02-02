@@ -1,0 +1,93 @@
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="328dp"
+    android:layout_height="268dp"
+    android:orientation="vertical"
+    android:paddingTop="28dp"
+    android:paddingBottom="12dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:background="@drawable/bg_chat_room_dialog">
+
+    <ImageView
+        android:id="@+id/iv_profile_user"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_nickname_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="사용자 1"
+        android:textColor="@color/main1"
+        android:textStyle="bold"
+        style="@style/humm_semibo"
+        android:gravity="center"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/iv_profile_user" />
+
+    <TextView
+        android:id="@+id/tv_status_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="20대 직장인"
+        android:textColor="@color/black2"
+        style="@style/body_regula"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_nickname_user" />
+
+    <TextView
+        android:id="@+id/tv_title_expel_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="채팅방에서 내보낼까요?"
+        android:textColor="@color/black"
+        style="@style/body_regula"
+        android:gravity="center"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_status_user" />
+
+    <TextView
+        android:id="@+id/btn_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="취소"
+        android:textColor="@color/black"
+        style="@style/body_medium"
+        android:gravity="center"
+        android:paddingStart="58dp"
+        android:paddingEnd="58dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:background="@drawable/bg_btn_dialog_cancel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/btn_exit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="내보내기"
+        android:textColor="@color/white"
+        style="@style/body_medium"
+        android:gravity="center"
+        android:paddingStart="44dp"
+        android:paddingEnd="44dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:background="@drawable/bg_btn_dialog_exit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

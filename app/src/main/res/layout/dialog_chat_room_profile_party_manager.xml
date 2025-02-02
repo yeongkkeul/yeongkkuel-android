@@ -1,0 +1,138 @@
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="328dp"
+    android:layout_height="280dp"
+    android:orientation="vertical"
+    android:paddingTop="16dp"
+    android:paddingBottom="28dp"
+    android:paddingStart="21dp"
+    android:paddingEnd="16dp"
+    android:background="@drawable/bg_chat_room_dialog">
+
+    <ImageView
+        android:id="@+id/btn_expel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_expel_user"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/btn_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_cancel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/iv_profile_user"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:scaleType="centerCrop"
+        android:layout_marginTop="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_nickname_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="사용자 1"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        style="@style/humm_semibo"
+        android:gravity="center"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/iv_profile_user" />
+
+    <TextView
+        android:id="@+id/tv_status_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="20대 직장인"
+        android:textColor="@color/black2"
+        style="@style/body_regula"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_nickname_user" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:id="@+id/tv_rank_expense"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="어제 지출 랭킹"
+            android:textColor="@color/main1"
+            style="@style/body_regula"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_expense_today"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="오늘 지출액"
+            android:textColor="@color/main1"
+            style="@style/body_regula"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_rank_expense" />
+
+        <TextView
+            android:id="@+id/tv_date_register"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="가입일"
+            android:textColor="@color/main1"
+            style="@style/body_regula"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_expense_today" />
+
+        <TextView
+            android:id="@+id/tv_data_rank_expense"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3위"
+            android:textColor="@color/black"
+            style="@style/body_regula"
+            android:layout_marginStart="17dp"
+            app:layout_constraintStart_toEndOf="@+id/tv_rank_expense"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_data_expense_today"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3,200원"
+            android:textColor="@color/black"
+            style="@style/body_regula"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="@+id/tv_data_rank_expense"
+            app:layout_constraintTop_toBottomOf="@+id/tv_data_rank_expense" />
+
+        <TextView
+            android:id="@+id/tv_data_date_register"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2024년 12월 22일"
+            android:textColor="@color/black"
+            style="@style/body_regula"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="@+id/tv_data_rank_expense"
+            app:layout_constraintTop_toBottomOf="@+id/tv_data_expense_today" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

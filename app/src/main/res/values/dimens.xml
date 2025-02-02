@@ -26,6 +26,9 @@
     <dimen name="space_chat_room_rank">28dp</dimen>
     <dimen name="dialog_chat_room_width">328dp</dimen>
     <dimen name="dialog_chat_room_exit_height">256dp</dimen>
+    <dimen name="dialog_chat_room_expel_user_height">268dp</dimen>
+    <dimen name="dialog_chat_room_exit_party_manager_height">276dp</dimen>
+    <dimen name="dialog_chat_room_profile_party_height">280dp</dimen>
     <dimen name="dialog_chat_room_pw_height">184dp</dimen>
     <dimen name="dialog_chat_room_expense_auto_send_height">245dp</dimen>
     <dimen name="dialog_chat_room_expel_height">188dp</dimen>

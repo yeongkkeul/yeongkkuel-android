@@ -11,7 +11,7 @@ import com.example.yeongkkuel.presentation.chat.ChatRoomSearch
 import com.example.yeongkkuel.presentation.chat.ChatRoomSearchClickListener
 
 class ChatRoomSearchAdapter(
-    private val chatRoomsSearch: ArrayList<ChatRoomSearch>,
+    private var chatRoomsSearch: List<ChatRoomSearch>,
     private val listener: ChatRoomSearchClickListener,
 ) : RecyclerView.Adapter<ChatRoomSearchAdapter.ChatRoomSearchViewHolder>() {
 
@@ -42,7 +42,7 @@ class ChatRoomSearchAdapter(
                 tvTitleChatRoom.text = chatRoomSearch.chatRoomName
                 tvChatRoomTagAge.text = chatRoomSearch.chatRoomAgeRange
                 tvChatRoomTagStatus.text = chatRoomSearch.chatRoomJob
-                tvChatRoomTagDays.text = chatRoomSearch.chatRoomDDay.toString()
+                tvChatRoomTagDays.text = "${chatRoomSearch.chatRoomDDay}일째"
                 tvChatRoomGoalExpense.text = chatRoomSearch.chatRoomSpendingAmount.toString()
                 tvChatRoomAmountPeople.text = chatRoomSearch.chatRoomMaxUserCount
                 root.setOnClickListener {
@@ -50,5 +50,10 @@ class ChatRoomSearchAdapter(
                 }
             }
         }
+    }
+
+    fun updateList(newList: List<ChatRoomSearch>) {
+        chatRoomsSearch = newList
+        notifyDataSetChanged()
     }
 }
