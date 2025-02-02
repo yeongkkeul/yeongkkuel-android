@@ -91,6 +91,8 @@ class StatRecommendationSetFragment(
             }
 
         }
+
+
         initEtListener()
         setRecommendSpending()
     }

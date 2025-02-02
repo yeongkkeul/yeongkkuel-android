@@ -9,12 +9,15 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.example.yeongkkuel.databinding.FragmentStatRecommendationBinding
 import com.example.yeongkkuel.presentation.statsettings.RecommendStep
 import com.example.yeongkkuel.presentation.statsettings.StatSettingsUiState
 import com.example.yeongkkuel.presentation.statsettings.StatSettingsViewModel
 import com.example.yeongkkuel.presentation.statsettings.recommendation.adapter.StatRecommendationViewPagerAdapter
+import com.example.yeongkkuel.presentation.util.clearComma
+import com.example.yeongkkuel.presentation.util.errorUnderline
 import com.example.yeongkkuel.presentation.util.toNaviStat
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -95,7 +98,11 @@ class StatRecommendationFragment : Fragment() {
                     }
 
                     2 -> {
-                        viewPagerAdapter.setTargetSpending()
+                        viewModel.setTargetSpending(
+                            isSuccess = {
+                                findNavController().toNaviStat()
+                            }
+                        )
                     }
                 }
             }

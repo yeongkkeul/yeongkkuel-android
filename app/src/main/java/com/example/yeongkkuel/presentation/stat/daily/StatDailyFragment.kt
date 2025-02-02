@@ -50,6 +50,10 @@ class StatDailyFragment : Fragment() {
     }
 
     private fun initView() = with(binding) {
+        fun initBotSheet(){
+            viewModel.getSpendingList()
+        }
+
         fun initDate() {
             val currentDate = Date()
             val dateFormatChart = SimpleDateFormat("MM월 dd일 (E)", Locale.KOREAN)
@@ -57,6 +61,7 @@ class StatDailyFragment : Fragment() {
             tvChartDate.text = formattedDateChart
         }
 
+        initBotSheet()
         initDate()
     }
 
