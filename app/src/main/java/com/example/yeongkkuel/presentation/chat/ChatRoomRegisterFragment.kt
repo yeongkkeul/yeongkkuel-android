@@ -10,6 +10,9 @@ import androidx.navigation.Navigation
 import com.bumptech.glide.Glide
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentChatRoomRegisterBinding
+import com.example.yeongkkuel.presentation.chat.dialog.ChatRoomExpelDialog
+import com.example.yeongkkuel.presentation.chat.dialog.ChatRoomExpenseAutoSendDialog
+import com.example.yeongkkuel.presentation.chat.dialog.ChatRoomPwDialog
 
 class ChatRoomRegisterFragment : Fragment() {
 
