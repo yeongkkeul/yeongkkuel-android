@@ -241,7 +241,11 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     R.id.navigation_signup,
                     R.id.navigation_stat_setting,
                     R.id.navigation_stat_recommendation,
-                    R.id.navigation_terms_agree -> hideBottomNavigation(
+                    R.id.navigation_terms_agree,
+                    R.id.navigation_term_1,
+                    R.id.navigation_term_2,
+                    R.id.navigation_term_3,
+                    R.id.navigation_term_4 -> hideBottomNavigation(
                         true
                     )
 
