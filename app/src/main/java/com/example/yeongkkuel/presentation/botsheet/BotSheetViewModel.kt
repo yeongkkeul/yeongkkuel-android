@@ -202,14 +202,21 @@ class BotSheetViewModel : ViewModel() {
         }
     }
 
-    // 🔹 월별 지출 내역 가져오기
-    fun getSpendingList() = viewModelScope.launch {
-        try {
-            val calendar = Calendar.getInstance()
-            val year = calendar.get(Calendar.YEAR)
-            val month = calendar.get(Calendar.MONTH) + 1
-            val day = calendar.get(Calendar.DAY_OF_MONTH)
+    // 🔹 매개변수 없는 기본 함수
+    fun getSpendingList() {
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH) + 1
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
 
+        getSpendingList(year, month, day) // 기존 함수 호출
+    }
+
+    // 🔹 매개변수를 받는 기존 함수
+    // 🔹 월별 지출 내역 가져오기
+    fun getSpendingList(year: Int, month: Int, day: Int) = viewModelScope.launch {
+        try {
+            // yeongkkuelService를 통해 데이터 요청
             yeongkkuelService.getExpendituresMonthCategory(
                 year = year,
                 month = month,
@@ -239,13 +246,14 @@ class BotSheetViewModel : ViewModel() {
                             prev.copy(spendingList = updatedSpendingList)
                         }
                     }
-                    updateSpendingHistoryList()
+                    updateSpendingHistoryList() // 최신 데이터 반영
                 }
             }
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
+
     fun updateExpense(updatedExpense: BotSheetUiState.Spending.History) {
         _spendingHistoryList.value = _spendingHistoryList.value.map { expense ->
             if (expense.date == updatedExpense.date && expense.name == updatedExpense.name) {
