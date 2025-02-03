@@ -2,6 +2,7 @@ package com.example.yeongkkuel.presentation.home.category
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -16,13 +17,17 @@ class CategoryAdapter(
 
         fun bind(item: Category) = with(binding) {
             tvCategoryName.text = item.name
-            tvCategoryName.setTextColor(item.color)
+
+            // Colors Enum에서 색상 ID를 가져와 색상 설정
+            val colorInt = ContextCompat.getColor(root.context, item.color.id)
+            tvCategoryName.setTextColor(colorInt)
 
             // 클릭 이벤트 처리
             root.setOnClickListener {
                 onCategoryClick(item)
             }
         }
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
