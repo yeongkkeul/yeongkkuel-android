@@ -116,6 +116,18 @@
             app:destination="@id/navigation_home"
             app:popUpTo="@id/navigation_login"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_termsAgreeFragment_to_navigation_term_1"
+            app:destination="@id/navigation_term_1" />
+        <action
+            android:id="@+id/action_termsAgreeFragment_to_navigation_term_2"
+            app:destination="@id/navigation_term_2" />
+        <action
+            android:id="@+id/action_termsAgreeFragment_to_navigation_term_3"
+            app:destination="@id/navigation_term_3" />
+        <action
+            android:id="@+id/action_termsAgreeFragment_to_navigation_term_4"
+            app:destination="@id/navigation_term_4" />
     </fragment>
 
 
@@ -298,6 +310,34 @@
         android:label="fragment_my_edit"
         tools:layout="@layout/fragment_daily_expense_goal">
 
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_term_1"
+        android:name="com.example.yeongkkuel.presentation.signup.Term1Fragment"
+        android:label="fragment_term_1"
+        tools:layout="@layout/fragment_term1">
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_term_2"
+        android:name="com.example.yeongkkuel.presentation.signup.Term2Fragment"
+        android:label="fragment_term_2"
+        tools:layout="@layout/fragment_term2">
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_term_3"
+        android:name="com.example.yeongkkuel.presentation.signup.Term3Fragment"
+        android:label="fragment_term_3"
+        tools:layout="@layout/fragment_term3">
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_term_4"
+        android:name="com.example.yeongkkuel.presentation.signup.Term4Fragment"
+        android:label="fragment_term_4"
+        tools:layout="@layout/fragment_term4">
     </fragment>
 
 

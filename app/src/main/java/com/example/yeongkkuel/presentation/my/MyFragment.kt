@@ -40,9 +40,6 @@ class MyFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-
-
         observeViewModel()
         // 클릭 리스너들
         setupClickListeners()
