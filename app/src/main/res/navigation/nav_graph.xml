@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/navigation_stat">
+    app:startDestination="@id/navigation_home">
 
     <fragment
         android:id="@+id/navigation_splash"
@@ -57,9 +57,32 @@
         tools:layout="@layout/fragment_expense_entry">
 
         <action
-        android:id="@+id/action_expense_entry_to_homeFragment"
+        android:id="@+id/action_expenseEntryFragment_to_navigation_home"
         app:destination="@id/navigation_home" />
+        <action
+            android:id="@+id/action_expenseEntryFragment_to_navigation_stat"
+            app:destination="@id/navigation_stat" />
     </fragment>
+
+    <fragment
+        android:id="@+id/navigation_expense_view"
+        android:name="com.example.yeongkkuel.presentation.home.entry.ExpenseViewFragment"
+        android:label="지출 내역 확인"
+        tools:layout="@layout/fragment_expense_entry">
+
+        <action
+            android:id="@+id/action_ExpenseViewFragment_to_ExpenseEditFragment"
+            app:destination="@id/navigation_expense_edit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_expense_edit"
+        android:name="com.example.yeongkkuel.presentation.home.entry.ExpenseEditFragment"
+        android:label="지출 내역 확인"
+        tools:layout="@layout/fragment_expense_entry">
+    </fragment>
+
+
 
     <fragment
         android:id="@+id/navigation_store"
@@ -79,8 +102,8 @@
         tools:layout="@layout/fragment_signup">
         <action
             android:id="@+id/action_signupFragment_to_navigation_terms_agree"
-            app:destination="@id/navigation_terms_agree"
-            />
+            app:destination="@id/navigation_terms_agree" />
+
     </fragment>
 
     <fragment
@@ -131,6 +154,9 @@
         <action
             android:id="@+id/action_categoryDetailFragment_to_categoryEditFragment"
             app:destination="@id/categoryEditFragment" />
+        <action
+            android:id="@+id/action_categoryDetailFragment_to_navigation_home"
+            app:destination="@id/navigation_home" />
     </fragment>
 
     <fragment
@@ -138,7 +164,6 @@
         android:name="com.example.yeongkkuel.presentation.home.category.CategoryEditFragment"
         android:label="카테고리 수정"
         tools:layout="@layout/fragment_category_edit" />
-
 
     <fragment
         android:id="@+id/navigation_chat"
@@ -223,7 +248,7 @@
         android:id="@+id/navigation_my"
         android:name="com.example.yeongkkuel.presentation.my.MyFragment"
         android:label="fragment_my"
-        tools:layout="@layout/fragment_my">
+        tools:layout="@layout/fragment_my" >
         <action
             android:id="@+id/action_myFragment_to_navigation_my_edit"
             app:destination="@id/navigation_my_edit" />

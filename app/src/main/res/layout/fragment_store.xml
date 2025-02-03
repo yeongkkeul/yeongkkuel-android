@@ -44,10 +44,10 @@
         android:id="@+id/img_bird_background"
         android:layout_width="match_parent"
         android:layout_height="320dp"
-        android:layout_marginBottom="346dp"
         android:background="@drawable/bg_home"
+        android:layout_marginTop="47dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
 
         <!-- 상단 영역 -->
         <androidx.gridlayout.widget.GridLayout

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="CustomTabLayoutStyle" parent="Widget.Design.TabLayout">
-        <item name="tabRippleColor">@null</item>
-        <item name="tabTextColor">@color/tab_stat_text</item>
-    </style>
+        <style name="CustomTabLayoutStyle" parent="Widget.Design.TabLayout">
+            <item name="tabRippleColor">@null</item>
+            <item name="tabTextColor">@color/tab_stat_text</item>
+        </style>
     <style name="RankTabLayout" parent="Widget.Design.TabLayout">
         <item name="tabIndicatorHeight">0dp</item>
         <item name="tabBackground">@drawable/bg_tab</item>
@@ -38,4 +38,5 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
+    <string name="date_format">%1$d년 %2$d월 %3$d일 %4$s</string>
 </resources>
