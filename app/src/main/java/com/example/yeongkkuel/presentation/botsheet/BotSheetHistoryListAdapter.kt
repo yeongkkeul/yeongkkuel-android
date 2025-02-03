@@ -1,14 +1,19 @@
 package com.example.yeongkkuel.presentation.botsheet
 
+import android.graphics.Color
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.ItemBotsheetHistoryBinding
 import com.example.yeongkkuel.presentation.util.toMoneyString
 
 class BotSheetHistoryListAdapter(
+    private val onItemClick: (BotSheetUiState.Spending.History) -> Unit
 ) : ListAdapter<BotSheetUiState.Spending.History, BotSheetHistoryListAdapter.ViewHolder>(
     SpendingHistoryListDiffUtil()
 ) {
@@ -16,8 +21,44 @@ class BotSheetHistoryListAdapter(
         private val binding: ItemBotsheetHistoryBinding
     ) : RecyclerView.ViewHolder(binding.root) {
         fun onBind(item: BotSheetUiState.Spending.History) = with(binding) {
+            // 이름과 가격 설정
             tvName.text = item.name
-            tvPrice.text = "-" + item.price.toMoneyString() + "원"
+            tvPrice.text = "-${item.price.toMoneyString()}원"
+            tvName.setTextColor(Color.parseColor(item.categoryColor))
+
+            tvName.text = if (item.content.length > 9) {
+                "${item.content.take(9)}..."
+            } else {
+                item.content
+            }
+            if (item.isNoExpense) {
+                tvPrice.visibility = View.GONE
+            } else {
+                tvPrice.visibility = View.VISIBLE
+            }
+            if (!item.photoUrl.isNullOrEmpty()) {
+                icPhotoIncluded.visibility = View.VISIBLE // 사진이 있을 경우 표시
+            } else {
+                icPhotoIncluded.visibility = View.GONE // 사진이 없을 경우 숨김
+            }
+            root.setOnClickListener {
+                onItemClick(item)
+            }
+        }
+    }
+    private class SpendingHistoryListDiffUtil : DiffUtil.ItemCallback<BotSheetUiState.Spending.History>() {
+        override fun areItemsTheSame(
+            oldItem: BotSheetUiState.Spending.History,
+            newItem: BotSheetUiState.Spending.History
+        ): Boolean {
+            return oldItem.name == newItem.name && oldItem.date == newItem.date
+        }
+
+        override fun areContentsTheSame(
+            oldItem: BotSheetUiState.Spending.History,
+            newItem: BotSheetUiState.Spending.History
+        ): Boolean {
+            return oldItem == newItem
         }
     }
 
@@ -50,6 +91,6 @@ private class SpendingHistoryListDiffUtil : DiffUtil.ItemCallback<BotSheetUiStat
         oldItem: BotSheetUiState.Spending.History,
         newItem: BotSheetUiState.Spending.History
     ): Boolean {
-        return oldItem.name == newItem.name
+        return oldItem.name == newItem.name && oldItem.price == newItem.price
     }
 }
