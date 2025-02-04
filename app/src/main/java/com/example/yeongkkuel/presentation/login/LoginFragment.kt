@@ -250,7 +250,7 @@ class LoginFragment : Fragment() {
                     }
                 }
 
-                override fun onFailure(call: retrofit2.Call<KakaoLoginResponse>, t: Throwable) {
+                override fun onFailure(call: Call<KakaoLoginResponse>, t: Throwable) {
                     Timber.e("카카오 로그인 API 호출 실패: $t")
                     Toast.makeText(requireContext(), "카카오 로그인 API 호출 실패: ${t.message}", Toast.LENGTH_SHORT).show()
                 }
