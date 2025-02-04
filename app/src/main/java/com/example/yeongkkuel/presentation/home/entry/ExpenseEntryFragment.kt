@@ -300,13 +300,9 @@ class ExpenseEntryFragment : Fragment() {
             // StatFragment로 이동하며 Bundle 전달
             navController.navigate(R.id.action_expenseEntryFragment_to_navigation_stat, bundle)
         } else {
-            Toast.makeText(requireContext(), "오늘 날짜: 홈 화면으로 이동", Toast.LENGTH_SHORT).show()
             navController.navigate(R.id.navigation_home)
         }
     }
-
-
-
 
     // 사진 첨부 버튼 로직
     private fun setupPhotoFrame(view: View) {

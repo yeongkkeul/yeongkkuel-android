@@ -16,6 +16,7 @@ data class StatMonthlyUiState(
         ) : CalendarData
 
         data class CalendarDay(
+            val targetMonth: Pair<Int, Int>,// year, month
             val day: Int,
             val pieDataList: List<PieEntry>
         ) : CalendarData

@@ -14,6 +14,7 @@ import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentChatBinding
 import com.example.yeongkkuel.presentation.base.MainActivity
 import com.example.yeongkkuel.presentation.chat.adapter.ChatRoomAdapter
+import com.example.yeongkkuel.presentation.chat.dialog.FabMenuDialog
 import com.example.yeongkkuel.utils.SwipeToDelete
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import timber.log.Timber
