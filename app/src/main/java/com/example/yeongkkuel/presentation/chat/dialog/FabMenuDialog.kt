@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.presentation.chat
+package com.example.yeongkkuel.presentation.chat.dialog
 
 import android.app.Activity
 import android.app.Dialog

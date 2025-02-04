@@ -1,0 +1,97 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <!-- 앱바 -->
+    <!-- 상단 앱바 (기존 코드 유지) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_appBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/space_median"
+        android:layout_marginTop="@dimen/space_median"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/iv_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_back"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_median"
+            style="@style/humm_medium"
+            android:text="개인정보 제3자 제공 동의"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/iv_back" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- 스크롤 가능한 약관 뷰 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- 약관 텍스트 -->
+            <TextView
+                android:id="@+id/tv_terms_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/body_regula"
+                android:text="@string/third_party_privacy_policy"
+                android:lineSpacingExtra="4dp" />
+
+
+            <!-- 약관 동의 체크박스 및 버튼 -->
+            <LinearLayout
+                android:id="@+id/checkServiceArea"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/bg_terms_agree"
+                android:gravity="center_vertical"
+                android:paddingEnd="4dp">
+
+                <!-- 라벨 텍스트 -->
+                <TextView
+                    android:id="@+id/tvCheckService"
+                    style="@style/humm_medium"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="약간 동의하기"
+                    android:layout_marginLeft="16dp"
+                    android:textColor="@color/black3" />
+
+                <!-- 체크 아이콘 (Big) -->
+                <ImageView
+                    android:id="@+id/ivCheckThirdParty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:src="@drawable/selector_big_checkbox" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

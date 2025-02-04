@@ -17,41 +17,46 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- 상품 이름 -->
-    <TextView
-        android:id="@+id/tv_product_name"
+    <!-- 상품 정보 레이아웃 -->
+    <LinearLayout
+        android:id="@+id/ly_product_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="탱탱볼"
-        android:textSize="18sp"
-        android:textStyle="normal"
-        android:textColor="@color/main1"
-        android:layout_marginStart="108dp"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
         app:layout_constraintTop_toBottomOf="@id/img_product"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <ImageView
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:id="@+id/ic_coin"
-        android:src="@drawable/ic_coin"
-        android:layout_marginTop="4dp"
-        android:layout_marginStart="12dp"
-        app:layout_constraintStart_toEndOf="@id/tv_product_name"
-        app:layout_constraintTop_toBottomOf="@id/img_product"/>
+        <!-- 상품 이름 -->
+        <TextView
+            android:id="@+id/tv_product_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="탱탱볼"
+            android:textSize="18sp"
+            android:textStyle="normal"
+            android:textColor="@color/main1" />
 
-    <!-- 상품 가격 -->
-    <TextView
-        android:id="@+id/tv_product_price"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:text="128"
-        android:textSize="18sp"
-        android:textColor="@color/black"
-        app:layout_constraintTop_toBottomOf="@id/img_product"
-        app:layout_constraintStart_toEndOf="@id/ic_coin"
-/>
+        <!-- 코인 아이콘 -->
+        <ImageView
+            android:id="@+id/ic_coin"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_coin"
+            android:layout_marginStart="12dp" />
+
+        <!-- 상품 가격 -->
+        <TextView
+            android:id="@+id/tv_product_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="128"
+            android:textSize="18sp"
+            android:textColor="@color/black" />
+    </LinearLayout>
 
     <!-- 구매 질문 -->
     <TextView
@@ -62,7 +67,7 @@
         android:text="구매하시겠어요?"
         android:textSize="15sp"
         android:textColor="@color/black"
-        app:layout_constraintTop_toBottomOf="@id/tv_product_price"
+        app:layout_constraintTop_toBottomOf="@id/ly_product_info"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -73,11 +78,11 @@
         android:layout_height="40dp"
         android:layout_marginTop="28dp"
         android:layout_marginBottom="12dp"
+        android:orientation="horizontal"
+        android:gravity="center"
         app:layout_constraintTop_toBottomOf="@id/tv_purchase_question"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:orientation="horizontal"
-        android:gravity="center">
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <!-- 취소 버튼 -->
         <FrameLayout

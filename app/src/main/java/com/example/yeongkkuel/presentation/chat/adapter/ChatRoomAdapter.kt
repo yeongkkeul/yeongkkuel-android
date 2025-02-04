@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.ItemChatRoomBinding
-import com.example.yeongkkuel.presentation.chat.ChatRoomExitDialog
+import com.example.yeongkkuel.presentation.chat.dialog.ChatRoomExitDialog
 import com.example.yeongkkuel.presentation.chat.ChatRoom
 import com.example.yeongkkuel.presentation.chat.ChatRoomClickListener
 import com.example.yeongkkuel.utils.SwipeToDelete

@@ -1,5 +1,6 @@
 [versions]
 agp = "8.2.2"
+flexiblestepRangeslider = "1.0.0"
 kotlin = "1.9.22"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -31,6 +32,7 @@ androidx-security = "1.1.0-alpha06"
 [libraries]
 credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
 credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }
+flexiblestep-rangeslider = { module = "kr.co.prnd:flexiblestep-rangeslider", version.ref = "flexiblestepRangeslider" }
 googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
 splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreen" }
 kakao-all = { group = "com.kakao.sdk", name = "v2-all", version.ref = "kakao" }

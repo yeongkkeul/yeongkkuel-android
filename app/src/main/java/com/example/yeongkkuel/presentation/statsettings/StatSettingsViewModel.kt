@@ -32,7 +32,7 @@ class StatSettingsViewModel : ViewModel() {
             val recommendSpending =
                 ((prev.averageIncome!! * (1 - ratio / 100.0)) + prev.averageOutcome!!) / 2
 
-            val roundedSpending = (kotlin.math.ceil(recommendSpending / 100.0) * 100).toInt()
+            val roundedSpending = (kotlin.math.ceil(recommendSpending / 100.0 / 30) * 100).toInt()
 
             prev.copy(
                 targetRatio = ratio,
@@ -61,18 +61,19 @@ class StatSettingsViewModel : ViewModel() {
 
     fun setTargetSpending(targetSpending: Int, isSuccess: () -> Unit) = viewModelScope.launch {
         try {
+            yeongkkuelService.postExpendituresTarget(ExpenditureTargetRequest(targetSpending))
             isSuccess()
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    fun setDayTargetExpenditure(targetSpending: Int) = viewModelScope.launch {
+    fun setTargetSpending(isSuccess: () -> Unit) = viewModelScope.launch {
         try {
-            yeongkkuelService.postExpendituresTarget(ExpenditureTargetRequest(targetSpending))
+            yeongkkuelService.postExpendituresTarget(ExpenditureTargetRequest(uiState.value.targetSpending))
+            isSuccess()
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
-
 }

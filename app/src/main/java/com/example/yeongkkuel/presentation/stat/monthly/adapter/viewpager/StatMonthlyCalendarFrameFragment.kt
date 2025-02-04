@@ -5,10 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.yeongkkuel.databinding.ItemCalenderFrameBinding
+import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import com.example.yeongkkuel.presentation.stat.monthly.StatMonthlyUiState
 import com.example.yeongkkuel.presentation.stat.monthly.StatMonthlyViewModel
 import com.example.yeongkkuel.presentation.stat.monthly.adapter.StatMonthlyCalendarListAdapter
@@ -24,8 +26,10 @@ class StatMonthlyCalendarFrameFragment(
     private val binding: ItemCalenderFrameBinding
         get() = requireNotNull(_binding) { "StatMonthlyCalendarFrameFragment -> null" }
 
+    private val botViewModel: BotSheetViewModel by activityViewModels()
+
     private val listAdapter by lazy {
-        StatMonthlyCalendarListAdapter()
+        StatMonthlyCalendarListAdapter(botViewModel)
     }
 
     override fun onCreateView(

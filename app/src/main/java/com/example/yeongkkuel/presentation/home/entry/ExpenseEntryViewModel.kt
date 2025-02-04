@@ -6,13 +6,14 @@ import androidx.lifecycle.ViewModel
 
 class ExpenseEntryViewModel : ViewModel() {
 
-    private val _expenseEntries = MutableLiveData<MutableList<EntryData>>(mutableListOf())
-    val expenseEntries: LiveData<MutableList<EntryData>> get() = _expenseEntries
+    private val _entryData = MutableLiveData<EntryData>()
+    val entryData: LiveData<EntryData> get() = _entryData
 
-    // 새로운 지출 내역 추가
-    fun addExpenseEntry(entry: EntryData) {
-        val currentList = _expenseEntries.value ?: mutableListOf()
-        currentList.add(entry)
-        _expenseEntries.value = currentList
+    fun saveEntryData(data: EntryData) {
+        _entryData.value = data
+    }
+
+    fun getEntryData(): EntryData? {
+        return _entryData.value
     }
 }

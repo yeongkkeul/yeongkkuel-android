@@ -22,7 +22,8 @@
             android:layout_height="24dp"
             android:src="@drawable/ic_arrow_back"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
         <TextView
             android:id="@+id/tv_category_manage_title"
@@ -32,6 +33,7 @@
             style="@style/pageTitle"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toEndOf="@id/iv_back"
+            app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginStart="12dp"/>
 
         <TextView
@@ -41,7 +43,8 @@
             android:text="저장"
             style="@style/add_or_done"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- 콘텐츠 -->
@@ -129,33 +132,32 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="40dp"
             android:background="@drawable/bg_color_circle"
             app:layout_constraintStart_toEndOf="@id/tv_color_label_title"
-            app:layout_constraintTop_toBottomOf="@id/tv_category_add_title" />
+            app:layout_constraintTop_toTopOf="@id/tv_color_label_title"
+            app:layout_constraintBottom_toBottomOf="@id/tv_color_label_title"/>
 
         <!-- 드롭다운 아이콘 -->
         <ImageView
             android:id="@+id/iv_dropdown_icon"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_marginTop="40dp"
             android:layout_marginStart="15dp"
             android:src="@drawable/ic_dropdown_arrow"
             app:layout_constraintStart_toEndOf="@id/iv_selected_color"
-            app:layout_constraintTop_toBottomOf="@id/tv_category_add_title"/>
+            app:layout_constraintTop_toTopOf="@id/iv_selected_color"
+            app:layout_constraintBottom_toBottomOf="@id/iv_selected_color"/>
 
         <!-- 색상 팔레트 (드롭다운) -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/card_color_palette"
-            android:layout_width="300dp"
-            android:layout_height="200dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            android:background="@drawable/bg_palette_frame"
-            app:cardBackgroundColor="@android:color/white"
-            android:visibility="gone"
+        <LinearLayout
+            android:id="@+id/ll_color_palette"
+            android:layout_width="250dp"
+            android:layout_height="150dp"
             android:layout_marginTop="20dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="10dp"
+            android:visibility="gone"
+            android:background="@drawable/bg_palette_frame"
             app:layout_constraintTop_toBottomOf="@id/iv_dropdown_icon"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
@@ -163,10 +165,10 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_color_palette"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="8dp"
-                android:clipToPadding="false" />
-        </androidx.cardview.widget.CardView>
+                android:layout_height="wrap_content"
+                android:padding="10dp"/>
+
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

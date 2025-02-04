@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.navigateUp
 import com.example.yeongkkuel.R
@@ -23,19 +24,17 @@ class TermsAgreeFragment : Fragment() {
     private var _binding: FragmentTermsAgreeBinding? = null
     private val binding get() = _binding!!
 
-
-    // 각 체크항목의 체크 상태(기본 false)
+    // 전체 동의 상태는 Fragment 내에서만 간단히 관리
     private var isCheckedAll = false
-    private var isCheckedService = false
-    private var isCheckedPrivacy = false
-    private var isCheckedAge = false
-    private var isCheckedThirdParty = false
+
+    // ViewModel (Activity 범위로 공유)
+    private val viewModel: TermsViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentTermsAgreeBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -45,64 +44,103 @@ class TermsAgreeFragment : Fragment() {
 
         val showRewardModal = arguments?.getBoolean("showRewardModal") ?: false
 
-        // 뒤로가기
-        binding.ivBack.setOnClickListener {
-            findNavController().navigateUp()
+        initListener()
+        observeViewModel()
+
+        // 초기 버튼 상태 갱신
+        updateSignUpState()
+
+        // 회원가입 버튼 클릭
+        binding.tvSignUp.setOnClickListener {
+            navigateToHomeScreen(showRewardModal)
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    /**
+     * 클릭 리스너 등록
+     */
+    private fun initListener() {
+        // **Bundle로 Boolean 값을 넘기지 않고 단순 이동만 처리**
+        binding.tvCheckService.setOnClickListener {
+            findNavController().navigate(R.id.action_termsAgreeFragment_to_navigation_term_1)
+        }
+        binding.tvCheckPrivacy.setOnClickListener {
+            findNavController().navigate(R.id.action_termsAgreeFragment_to_navigation_term_2)
+        }
+        binding.tvCheckAge.setOnClickListener {
+            findNavController().navigate(R.id.action_termsAgreeFragment_to_navigation_term_3)
+        }
+        binding.tvCheckThirdParty.setOnClickListener {
+            findNavController().navigate(R.id.action_termsAgreeFragment_to_navigation_term_4)
         }
 
-        // "전체 동의" 아이콘 클릭 -> 토글
+        // 뒤로가기
+        binding.ivBack.setOnClickListener {
+            parentFragmentManager.popBackStack()
+        }
+
+        // \"전체 동의\" 아이콘 클릭 -> 토글
         binding.ivCheckAll.setOnClickListener {
             isCheckedAll = !isCheckedAll
             setCheckAll(isCheckedAll)
             updateSignUpState()
         }
 
-        // "서비스 이용 약관" 아이콘 클릭 -> 토글
+        // 각 항목 클릭 시 ViewModel 값만 변경
         binding.ivCheckService.setOnClickListener {
-            isCheckedService = !isCheckedService
-            binding.ivCheckService.isSelected = isCheckedService
-            updateCheckAllState()
-            updateSignUpState()
+            viewModel.isCheckedService.value = !(viewModel.isCheckedService.value ?: false)
         }
-
-        // "개인정보 수집" 아이콘 클릭 -> 토글
         binding.ivCheckPrivacy.setOnClickListener {
-            isCheckedPrivacy = !isCheckedPrivacy
-            binding.ivCheckPrivacy.isSelected = isCheckedPrivacy
-            updateCheckAllState()
-            updateSignUpState()
+            viewModel.isCheckedPrivacy.value = !(viewModel.isCheckedPrivacy.value ?: false)
         }
-
-        // "만 14세 이상" 아이콘 클릭 -> 토글
         binding.ivCheckAge.setOnClickListener {
-            isCheckedAge = !isCheckedAge
-            binding.ivCheckAge.isSelected = isCheckedAge
-            updateCheckAllState()
-            updateSignUpState()
+            viewModel.isCheckedAge.value = !(viewModel.isCheckedAge.value ?: false)
         }
-
-        // "개인정보 제3자 제공 동의" (선택)
         binding.ivCheckThirdParty.setOnClickListener {
-            isCheckedThirdParty = !isCheckedThirdParty
-            binding.ivCheckThirdParty.isSelected = isCheckedThirdParty
-            updateCheckAllState()
-            updateSignUpState()
-        }
-
-        // 초기 버튼 상태 갱신
-        updateSignUpState()
-
-        binding.tvSignUp.setOnClickListener {
-            agreeToTerms()
+            viewModel.isCheckedThirdParty.value = !(viewModel.isCheckedThirdParty.value ?: false)
         }
     }
 
-    private fun agreeToTerms() {
+    /**
+     * ViewModel을 관찰하여 UI 갱신
+     */
+    private fun observeViewModel() {
+        viewModel.isCheckedService.observe(viewLifecycleOwner) {
+            binding.ivCheckService.isSelected = it
+            updateCheckAllState()
+            updateSignUpState()
+        }
+
+        viewModel.isCheckedPrivacy.observe(viewLifecycleOwner) {
+            binding.ivCheckPrivacy.isSelected = it
+            updateCheckAllState()
+            updateSignUpState()
+        }
+
+        viewModel.isCheckedAge.observe(viewLifecycleOwner) {
+            binding.ivCheckAge.isSelected = it
+            updateCheckAllState()
+            updateSignUpState()
+        }
+
+        viewModel.isCheckedThirdParty.observe(viewLifecycleOwner) {
+            binding.ivCheckThirdParty.isSelected = it
+            updateCheckAllState()
+            updateSignUpState()
+        }
+    }
+
+    private fun agreeToTerms(viewModel: TermsViewModel) {
         val request = TermsAgreeRequest(
-            term1 = isCheckedService,
-            term2 = isCheckedPrivacy,
-            term3 = isCheckedAge,
-            term4 = isCheckedThirdParty
+            term1 = viewModel.isCheckedService.value?: false,
+            term2 = viewModel.isCheckedPrivacy.value?: false,
+            term3 = viewModel.isCheckedAge.value?: false,
+            term4 = viewModel.isCheckedThirdParty.value?: false
         )
 
         RetrofitClient.loginApiService.agreeTerms(request).enqueue(object : Callback<TermsAgreeResponse> {
@@ -127,40 +165,27 @@ class TermsAgreeFragment : Fragment() {
         })
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
     /**
-     * "전체 동의" 체크/해제 시,
-     * 모든 개별 항목에 적용 + 아이콘 반영
+     * \"전체 동의\" 체크/해제 시, ViewModel에 있는 개별 항목에 적용
      */
     private fun setCheckAll(checked: Boolean) {
-        // 전체동의 상태
-        isCheckedAll = checked
         binding.ivCheckAll.isSelected = checked
-
-        // 개별 항목
-        isCheckedService = checked
-        binding.ivCheckService.isSelected = checked
-
-        isCheckedPrivacy = checked
-        binding.ivCheckPrivacy.isSelected = checked
-
-        isCheckedAge = checked
-        binding.ivCheckAge.isSelected = checked
-
-        isCheckedThirdParty = checked
-        binding.ivCheckThirdParty.isSelected = checked
+        viewModel.isCheckedService.value = checked
+        viewModel.isCheckedPrivacy.value = checked
+        viewModel.isCheckedAge.value = checked
+        viewModel.isCheckedThirdParty.value = checked
     }
 
     /**
-     * 개별 항목 중 하나라도 false이면 전체동의 해제,
-     * 모두 true이면 전체동의 체크
+     * ViewModel 상태를 보고 전체 동의 여부 갱신
      */
     private fun updateCheckAllState() {
-        val allChecked = isCheckedService && isCheckedPrivacy && isCheckedAge && isCheckedThirdParty
+        val allChecked = (
+                (viewModel.isCheckedService.value == true) &&
+                        (viewModel.isCheckedPrivacy.value == true) &&
+                        (viewModel.isCheckedAge.value == true) &&
+                        (viewModel.isCheckedThirdParty.value == true)
+                )
         if (allChecked != isCheckedAll) {
             isCheckedAll = allChecked
             binding.ivCheckAll.isSelected = allChecked
@@ -171,7 +196,11 @@ class TermsAgreeFragment : Fragment() {
      * 필수 항목(서비스, 개인정보, 14세 이상)이 모두 true 여야 회원가입 버튼 활성화
      */
     private fun updateSignUpState() {
-        val requiredChecked = isCheckedService && isCheckedPrivacy && isCheckedAge
+        val requiredChecked = (
+                (viewModel.isCheckedService.value == true) &&
+                        (viewModel.isCheckedPrivacy.value == true) &&
+                        (viewModel.isCheckedAge.value == true)
+                )
         binding.tvSignUp.isEnabled = requiredChecked
     }
 
@@ -179,8 +208,9 @@ class TermsAgreeFragment : Fragment() {
      * 회원가입 후 Home 화면으로 이동
      */
     private fun navigateToHomeScreen(showRewardModal: Boolean) {
-        val bundle = Bundle()
-        bundle.putBoolean("showRewardModal", showRewardModal)
+        val bundle = Bundle().apply {
+            putBoolean("showRewardModal", showRewardModal)
+        }
         findNavController().navigate(R.id.action_termsAgreeFragment_to_navigation_home, bundle)
     }
 }

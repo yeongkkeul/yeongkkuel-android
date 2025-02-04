@@ -12,12 +12,14 @@ import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.ItemCalendarDayBinding
 import com.example.yeongkkuel.databinding.ItemCalendarDayofweekBinding
 import com.example.yeongkkuel.databinding.ItemUnknownBinding
+import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import com.example.yeongkkuel.presentation.stat.monthly.StatMonthlyUiState
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 
 class StatMonthlyCalendarListAdapter(
+    private val viewModel: BotSheetViewModel
 ) : ListAdapter<StatMonthlyUiState.CalendarData, StatMonthlyCalendarListAdapter.ViewHolder>(
     StatMonthlyCalendarDiffUtil()
 ) {
@@ -84,6 +86,15 @@ class StatMonthlyCalendarListAdapter(
                     initData()
                 }
 
+                binding.root.setOnClickListener {
+                    item.run {
+                        viewModel.getSpendingList(
+                            year = targetMonth.first,
+                            month = targetMonth.second,
+                            day = day
+                        )
+                    }
+                }
             }
         }
     }
