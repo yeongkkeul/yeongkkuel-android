@@ -1,6 +1,8 @@
 package com.example.yeongkkuel.presentation.network
 
+import com.example.yeongkkuel.presentation.home.category.data.CategoryRequest
 import com.example.yeongkkuel.presentation.network.request.expenditure.ExpenditureTargetRequest
+import com.example.yeongkkuel.presentation.home.category.data.CategoryResponse
 import com.example.yeongkkuel.presentation.network.response.Response
 import com.example.yeongkkuel.presentation.network.response.expenditure.DayExpenditureResponse
 import com.example.yeongkkuel.presentation.network.response.expenditure.MonthExpendituresCalendar
@@ -9,11 +11,11 @@ import com.example.yeongkkuel.presentation.network.response.expenditure.MonthlyA
 import com.example.yeongkkuel.presentation.network.response.expenditure.WeekExpenditureExpensesResponse
 import com.example.yeongkkuel.presentation.network.response.expenditure.WeekExpendituresAverage
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
-import java.util.Calendar
-import java.util.Date
 
 interface YeongkkuelService {
 
@@ -51,4 +53,31 @@ interface YeongkkuelService {
     @GET("/api/expenditures/target/recommendation")
     suspend fun getExpenditureAverageMonthly(
     ): Response<MonthlyAverageExpenditureResponse>
+
+
+    // Category
+    @GET("/api/category/categories")
+    suspend fun getCategories(): Response<List<CategoryResponse>>
+
+    @GET("/api/category/{category_id}")
+    suspend fun getCategoryDetail(
+        @Path("category_id") categoryId: Int
+    ): Response<CategoryResponse>
+
+    @POST("/api/category")
+    suspend fun addCategory(
+        @Body request: CategoryRequest
+    ): Response<Unit>
+
+    @PATCH("/api/category/{category_id}")
+    suspend fun updateCategory(
+        @Path("category_id") categoryId: Int,
+        @Body request: CategoryRequest
+    ): Response<Unit>
+
+    @DELETE("/api/category/{category_id}")
+    suspend fun deleteCategory(
+        @Path("category_id") categoryId: Int
+    ): Response<Unit>
+
 }

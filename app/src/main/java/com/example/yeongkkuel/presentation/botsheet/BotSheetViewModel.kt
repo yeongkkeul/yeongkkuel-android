@@ -4,19 +4,17 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yeongkkuel.R
-import com.example.yeongkkuel.presentation.home.category.Category
+import com.example.yeongkkuel.presentation.home.category.data.Category
 import com.example.yeongkkuel.presentation.network.RetrofitClient
 import com.example.yeongkkuel.presentation.util.Colors
 import com.example.yeongkkuel.presentation.util.SpendingCategory
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.Calendar
-import java.util.Date
 
 class BotSheetViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<BotSheetUiState>(BotSheetUiState.init())
@@ -265,11 +263,16 @@ class BotSheetViewModel : ViewModel() {
     }
     fun getCategoryList(): List<Category> {
         val categoryList = _uiState.value.spendingList.map { spending ->
-            Category(name = spending.kind.kor, color = spending.color)
+            Category(
+                id = spending.hashCode(), // 임시로 고유 id 생성
+                name = spending.kind.kor,
+                color = spending.color
+            )
         }
-        Log.d("BotSheetViewModel", "📌 getCategoryList() 반환: $categoryList") // 🔥 최신 카테고리 확인
+        Log.d("BotSheetViewModel", "getCategoryList() 반환: $categoryList")
         return categoryList
     }
+
 
     fun addExpenseHistory(history: BotSheetUiState.Spending.History) {
         _spendingHistoryList.value = _spendingHistoryList.value + history

@@ -78,12 +78,6 @@
                 app:layout_columnWeight="1"
                 app:layout_row="0">
 
-                <ImageView
-                    android:id="@+id/img_home_swing"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/img_home_swing1" />
             </FrameLayout>
 
             <FrameLayout
@@ -101,6 +95,15 @@
                     app:layout_column="1"
                     app:layout_row="0" />
             </FrameLayout>
+
+            <ImageView
+                android:id="@+id/img_home_swing"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitCenter"
+                android:src="@drawable/img_home_swing1"
+                app:layout_column="0"
+                app:layout_row="0" />
         </androidx.gridlayout.widget.GridLayout>
 
         <!-- 하단 영역 -->
