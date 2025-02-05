@@ -93,6 +93,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
 
         initView()
         initViewModel()
+        setupAddCategoryClickListener(navHostFragment.navController)
     }
 
     private fun setupAddCategoryClickListener(navController: NavController) {
