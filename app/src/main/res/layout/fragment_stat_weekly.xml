@@ -39,7 +39,7 @@
                 style="@style/body_medium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/space_x_small"
+                android:layout_marginStart="@dimen/space_small"
                 android:textColor="@color/white"
                 app:layout_constraintBottom_toBottomOf="@id/tv_totalSpending"
                 app:layout_constraintStart_toEndOf="@id/tv_totalSpending"
@@ -104,7 +104,8 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/space_median"
             android:background="@color/black0"
-            app:layout_constraintTop_toBottomOf="@id/cl_week" />
+            app:layout_constraintTop_toBottomOf="@id/cl_week"
+            android:layout_marginTop="@dimen/space_large"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_compare"

@@ -216,7 +216,7 @@ class StatWeeklyFragment(
         fun setTargetSpending() {
             weekListAdapter.setTargetSpending(uiState.targetSpending)
 
-            val totalSepnding = uiState.totalSpending.toMoneyString()
+            val totalSepnding = uiState.targetSpending.toMoneyString()
             tvTotalSpending.text = "${totalSepnding}원"
             tvLineTargetSpending.text = "하루 목표 지출액 ${totalSepnding}원"
         }

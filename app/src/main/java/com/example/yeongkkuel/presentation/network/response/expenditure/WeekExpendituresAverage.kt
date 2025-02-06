@@ -14,7 +14,9 @@ data class WeekExpendituresAverage(
 ) {
     data class Category(
         @SerializedName("categoryName") val categoryName: String,
-        @SerializedName("categoryColor") val categoryColor: String,
+        @SerializedName("red") val red: Int,
+        @SerializedName("green") val green: Int,
+        @SerializedName("blue") val blue: Int,
         @SerializedName("totalExpenditure") val totalExpenditure: Int
     )
 }

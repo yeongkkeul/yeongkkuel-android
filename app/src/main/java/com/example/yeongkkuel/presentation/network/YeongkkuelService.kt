@@ -12,15 +12,13 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
-import java.util.Calendar
-import java.util.Date
 
 interface YeongkkuelService {
 
     //stat
     @GET("/api/expenditures/day")
     suspend fun getExpendituresDay(
-    ): Response<DayExpenditureResponse>
+    ): retrofit2.Response<Response<DayExpenditureResponse>>
 
     @GET("/api/expenditures/week/expenses")
     suspend fun getExpendituresWeekExpenses(

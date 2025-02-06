@@ -34,5 +34,9 @@ enum class Colors(val id: Int, val rgb: Int) {
         fun fromCode(code: String): Colors? {
             return values().firstOrNull { it.name == code }
         }
+
+        fun getRGB(red:Int, blue:Int, green:Int): Colors{
+            return RED1
+        }
     }
 }
