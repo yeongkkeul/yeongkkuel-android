@@ -17,7 +17,8 @@ enum class Colors(val id: Int, val rgb: Int) {
     GREEN12(R.color.green12, 0xFFC4E015.toInt()), // #C4E015
     YELLOW13(R.color.yellow13, 0xFFFEE540.toInt()), // #FEE540
     ORANGE14(R.color.orange14, 0xFFFB8809.toInt()), // #FB8809
-    ORANGE15(R.color.orange15, 0xFFFF6316.toInt()); // #FF6316
+    ORANGE15(R.color.orange15, 0xFFFF6316.toInt()), // #FF6316,
+    BLACK1(R.color.black1, 0xFFEEEEEE.toInt()); //#EEEEEE
 
     companion object {
         // id로 Colors Enum 찾기
