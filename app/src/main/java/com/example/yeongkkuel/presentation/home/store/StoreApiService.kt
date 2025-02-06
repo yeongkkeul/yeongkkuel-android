@@ -19,6 +19,6 @@ interface StoreApiService {
     @POST("api") // 스킨 구매 API
     suspend fun purchaseSkin(@Body request: SkinPurchaseRequest): Response<SkinPurchaseResponse>
 
-    @GET("api/shop/") // 착용 스킨 + 보유 리워드 + 상점 뷰 API 추가
+    @GET("api/shop") // 착용 스킨 + 보유 리워드 + 상점 뷰 API 추가
     suspend fun getShopData(@Query("itemType") itemType: String): Response<ShopResponse>
 }

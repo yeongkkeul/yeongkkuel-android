@@ -104,23 +104,26 @@ class StoreFragment : Fragment() {
         }
 
         viewModel.fetchShopData("SWING")
+        Log.d("StoreFragment", "🔍 Fetching shop data for category: SWING")
+
         viewModel.shopResponse.observe(viewLifecycleOwner) { response ->
+            Log.d("StoreFragment", "API Response: $response")
+
             if (response?.isSuccess == true) {
                 binding.tvCoin.text = "보유 리워드: ${response.result.myReward}"
-
                 val shopItems = response.result.itemList.map { shopItem ->
                     Product(
                         id = shopItem.id,
                         name = shopItem.itemName,
                         price = shopItem.price,
-                        imageResId = getDrawableFromUrl(shopItem.itemImg), // 이미지 변환
+                        imageResId = getDrawableFromUrl(shopItem.itemImg),
                         category = ProductCategory.valueOf(response.result.itemType)
                     )
                 }
-
                 updateProductList(shopItems)
             } else {
-                Toast.makeText(requireContext(), "상점 데이터 불러오기 실패", Toast.LENGTH_SHORT).show()
+                Log.e("StoreFragment", "상점 데이터 불러오기 실패: ${response?.message ?: "오류 발생"}")
+                Toast.makeText(requireContext(), "상점 데이터 불러오기 실패: ${response?.message}", Toast.LENGTH_SHORT).show()
             }
         }
 
