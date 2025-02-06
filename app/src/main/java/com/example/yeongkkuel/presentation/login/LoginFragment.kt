@@ -13,6 +13,9 @@ import androidx.navigation.fragment.findNavController
 import com.example.yeongkkuel.BuildConfig
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentLoginBinding
+import com.example.yeongkkuel.presentation.auth.TokenManager
+import com.example.yeongkkuel.presentation.login.response.KakaoLoginResponse
+import com.example.yeongkkuel.presentation.network.RetrofitClient
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.kakao.sdk.auth.AuthApiClient
@@ -25,6 +28,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import timber.log.Timber
 
 class LoginFragment : Fragment() {
@@ -116,8 +122,8 @@ class LoginFragment : Fragment() {
             val success = postIdTokenToBackend(idToken) // ID 토큰을 서버로 전송하고 성공 여부 반환
             withContext(Dispatchers.Main) {
                 if (success) {
-                    // 성공 시 회원가입 페이지로 이동
-                    navigateToSignUp()
+                    // 성공 시 회원가입 페이지로 이동 - redirect Url 에 따라 분기
+                    findNavController().navigate(R.id.action_loginFragment_to_signupFragment)
                 } else {
                     // 실패 처리
                     Timber.e("Failed to verify ID Token with backend")
@@ -178,7 +184,7 @@ class LoginFragment : Fragment() {
                 handleLoginError(error)
             } else if (token != null) {
                 Timber.tag("KakaoLogin").i("카카오톡 로그인 성공. 토큰 정보: ${token.accessToken}")
-                fetchUserInfo(token.accessToken)
+                postKakaoTokenToBackend(token.accessToken)
             }
         }
     }
@@ -190,13 +196,68 @@ class LoginFragment : Fragment() {
                 handleLoginError(error)
             } else if (token != null) {
                 Timber.tag("KakaoLogin").i("카카오 계정 로그인 성공. 토큰 정보: ${token.accessToken}")
-
-                fetchUserInfo(token.accessToken)
+                postKakaoTokenToBackend(token.accessToken)
             }
         }
+
     }
 
-    // 사용자 정보 요청 - 사용자 요청 정보 전달.
+    private fun postKakaoTokenToBackend(kakaoAccessToken: String) {
+        // accesstoken 확인
+        Timber.tag("KakaoLogin").i("카카오 로그인 성공. 토큰 정보: $kakaoAccessToken")
+
+        RetrofitClient.loginApiService.kakaoLogin(kakaoAccessToken)
+            .enqueue(object : Callback<KakaoLoginResponse> {
+                override fun onResponse(
+                    call: Call<KakaoLoginResponse>,
+                    response: Response<KakaoLoginResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        val body = response.body()
+                        if (body?.isSuccess == true) {
+                            val result = body.result
+                            if (result != null) {
+                                // JWT 저장
+                                TokenManager.saveTokens(requireContext(), result.accessToken, result.refreshToken)
+                                /*tokenManager.saveAccessToken(result.accessToken)
+                                tokenManager.saveRefreshToken(result.refreshToken)
+*/
+                                // redirectUrl에 따라 분기
+                                when (result.redirectUrl) {
+                                    "/api/home" -> {
+                                        // 이미 회원 -> 홈으로 이동
+                                        findNavController().navigate(R.id.action_loginFragment_to_navigation_home)
+                                    }
+                                    "/api/auth/user-info" -> {
+                                        // 회원 기입 필요 -> 회원가입 flow로 이동
+                                        findNavController().navigate(R.id.action_loginFragment_to_signupFragment)
+                                    }
+                                    else -> {
+                                        // 기타 URL인 경우? 필요 시 처리
+                                        Toast.makeText(requireContext(), "알 수 없는 리디렉션", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            } else {
+                                Toast.makeText(requireContext(), "로그인 응답에 result가 없습니다.", Toast.LENGTH_SHORT).show()
+                            }
+                        } else {
+                            // isSuccess=false or 응답 코드가 다른 경우 => 실패 처리
+                            Toast.makeText(requireContext(), "카카오 로그인 실패", Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        // HTTP 4xx/5xx
+                        Toast.makeText(requireContext(), "카카오 로그인 API 실패: ${response.code()}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<KakaoLoginResponse>, t: Throwable) {
+                    Timber.e("카카오 로그인 API 호출 실패: $t")
+                    Toast.makeText(requireContext(), "카카오 로그인 API 호출 실패: ${t.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
+    }
+
+   /* // 사용자 정보 요청 - 사용자 요청 정보 전달.
     private fun fetchUserInfo(accessToken: String) {
         UserApiClient.instance.me { user, error ->
             if (error != null) {
@@ -221,7 +282,7 @@ class LoginFragment : Fragment() {
                 // 실패 시 - 실패 메시지 출력
             }
         }
-    }
+    }*/
 
     // 로그인 실패 시 에러 처리 - 로그인 실패 시 로그만 띄우기? - TODO: 실패 시 처리 방법 고민
     private fun handleLoginError(error: Throwable) {
@@ -252,9 +313,5 @@ class LoginFragment : Fragment() {
                 Toast.makeText(requireContext(), "로그인 실패: ${error.message}", Toast.LENGTH_SHORT).show()
             }
         }
-    }
-
-    private fun navigateToSignUp() {
-        findNavController().navigate(R.id.action_loginFragment_to_signupFragment)
     }
 }

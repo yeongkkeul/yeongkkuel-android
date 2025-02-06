@@ -4,11 +4,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.navigateUp
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentTermsAgreeBinding
+import com.example.yeongkkuel.presentation.login.request.TermsAgreeRequest
+import com.example.yeongkkuel.presentation.login.response.TermsAgreeResponse
+import com.example.yeongkkuel.presentation.network.RetrofitClient
+import com.example.yeongkkuel.presentation.network.RetrofitClient.loginApiService
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class TermsAgreeFragment : Fragment() {
 
@@ -33,6 +42,7 @@ class TermsAgreeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+//        TODO("showRewardModal을 받아서 처리할 때 약간동의 화면 전환하고 돌아오면 변수값이 false 가 될 수 도 있음.")
         val showRewardModal = arguments?.getBoolean("showRewardModal") ?: false
 
         initListener()
@@ -43,7 +53,7 @@ class TermsAgreeFragment : Fragment() {
 
         // 회원가입 버튼 클릭
         binding.tvSignUp.setOnClickListener {
-            navigateToHomeScreen(showRewardModal)
+            agreeToTerms(viewModel,RetrofitClient)
         }
     }
 
@@ -124,6 +134,39 @@ class TermsAgreeFragment : Fragment() {
             updateCheckAllState()
             updateSignUpState()
         }
+    }
+
+    // 서버에 동의 여부 전송
+    private fun agreeToTerms(viewModel: TermsViewModel,RetrofitClient: RetrofitClient) {
+        // request 담기
+        val request = TermsAgreeRequest(
+            term1 = viewModel.isCheckedService.value?: false,
+            term2 = viewModel.isCheckedPrivacy.value?: false,
+            term3 = viewModel.isCheckedAge.value?: false,
+            term4 = viewModel.isCheckedThirdParty.value?: false
+        )
+
+        RetrofitClient.loginApiService.agreeTerms(request).enqueue(object : Callback<TermsAgreeResponse> {
+            override fun onResponse(call: Call<TermsAgreeResponse>, response: Response<TermsAgreeResponse>) {
+                if (response.isSuccessful) {
+                    response.body()?.let{
+                        // 성공처리
+                        if(it.isSuccess){
+                            navigateToHomeScreen(arguments?.getBoolean("showRewardModal") ?: false)
+                        } else {
+                            Toast.makeText(requireContext(), it.message,Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } else {
+                    Toast.makeText(requireContext(), "서버 오류 발생 ${response.code()} ,오류 메시지 ${response.message()}", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<TermsAgreeResponse>, t: Throwable) {
+                // 실패 처리
+                Toast.makeText(requireContext(), "네트워크 오류 발생: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     /**
