@@ -17,6 +17,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentCategoryEditBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
+import com.example.yeongkkuel.presentation.home.category.adapter.ColorPaletteAdapter
+import com.example.yeongkkuel.presentation.home.category.data.Category
 import com.example.yeongkkuel.presentation.util.Colors
 
 
@@ -186,20 +188,33 @@ class CategoryEditFragment : Fragment() {
             return
         }
 
-        val originalCategoryName = arguments?.getString("categoryName") ?: return
+        // originalCategory 정의
+        val originalCategory = arguments?.let {
+            Category(
+                id = it.getInt("categoryId"),
+                name = it.getString("categoryName") ?: "",
+                color = Colors.fromId(it.getInt("categoryColor")) ?: Colors.RED1
+            )
+        } ?: run {
+            Toast.makeText(requireContext(), "카테고리 데이터를 불러올 수 없습니다.", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         // 업데이트된 카테고리 생성
-        val updatedCategory = Category(name = updatedTitle, color = selectedColorEnum)
+        val updatedCategory = Category(
+            id = originalCategory.id, // 기존 id 유지
+            name = updatedTitle,
+            color = selectedColorEnum
+        )
 
-        // BotSheetViewModel 업데이트
-        botSheetViewModel.updateCategory(originalCategoryName, updatedCategory)
-
-        // CategoryViewModel 업데이트
-        categoryViewModel.updateCategory(originalCategoryName, updatedCategory)
+        // ViewModel 업데이트
+        categoryViewModel.updateCategory(originalCategory.name, updatedCategory)
+        botSheetViewModel.updateCategory(originalCategory.name, updatedCategory)
 
         Toast.makeText(requireContext(), "카테고리가 수정되었습니다.", Toast.LENGTH_SHORT).show()
         findNavController().popBackStack(R.id.categoryManageFragment, false)
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

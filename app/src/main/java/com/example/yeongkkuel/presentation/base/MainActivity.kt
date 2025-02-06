@@ -111,10 +111,10 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
 
             val displayHeight = resources.displayMetrics.heightPixels
-            val peekHeight = rvBottomSheetCollapseStateHeight + 60.dpToPx(this@MainActivity)
-
 
             rvBottomSheetCollapseStateHeight = displayHeight - 500.dpToPx(this@MainActivity)
+            val peekHeight = rvBottomSheetCollapseStateHeight + 80.dpToPx(this@MainActivity)
+
             // BottomSheet 초기 상태 설정
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             bottomSheetBehavior.peekHeight = peekHeight
