@@ -284,19 +284,22 @@ class StatWeeklyFragment(
                 val mostSpendingKindKor = mostSpendingKind.kor
                 val message = "${mostSpendingKindKor}에 가장 많이 썼어요"
 
-                val spannable = SpannableString(message)
+                if(mostSpendingKindKor == "")
+                    tvMostSpending.text = "지출을 입력해주세요."
+                else {
+                    val spannable = SpannableString(message)
 
-                val start = message.indexOf(mostSpendingKindKor)
-                val end = start + mostSpendingKindKor.length
-                spannable.setSpan(
-                    StyleSpan(Typeface.BOLD),
-                    start,
-                    end,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
+                    val start = message.indexOf(mostSpendingKindKor)
+                    val end = start + mostSpendingKindKor.length
+                    spannable.setSpan(
+                        StyleSpan(Typeface.BOLD),
+                        start,
+                        end,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
 
-                tvMostSpending.text = spannable
-
+                    tvMostSpending.text = spannable
+                }
             } else{
                 tvMostSpending.text = "지출을 입력해주세요."
             }

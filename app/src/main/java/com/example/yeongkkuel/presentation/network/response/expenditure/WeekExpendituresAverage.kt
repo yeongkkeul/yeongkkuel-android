@@ -3,7 +3,7 @@ package com.example.yeongkkuel.presentation.network.response.expenditure
 import com.google.gson.annotations.SerializedName
 
 data class WeekExpendituresAverage(
-    @SerializedName("age") val age: Int,
+    @SerializedName("age") val age: String,
     @SerializedName("job") val job: String,
     @SerializedName("topPercent") val topPercent: Int,
     @SerializedName("averageExpenditure") val averageExpenditure: Int,
