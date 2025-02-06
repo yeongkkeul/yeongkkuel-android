@@ -255,17 +255,17 @@ class BotSheetViewModel : ViewModel() {
                             val updatedSpendingList = categories.map { category ->
                                 BotSheetUiState.Spending(
                                     kind = SpendingCategory.fromKor(category.categoryName),
-                                    color = Colors.fromCode(category.categoryColor) ?: Colors.RED1,
+                                    color = Colors.getRGB(red = category.red, blue = category.blue, green = category.green) ?: Colors.RED1,
                                     plusIconResId = R.drawable.ic_plus_default,
                                     history = category.expenses.map { expense ->
                                         BotSheetUiState.Spending.History(
                                             name = expense.expenseName,
                                             price = expense.expenseAmount,
-                                            date = expense.expenseDate,
+                                            date = "",
                                             categoryName = category.categoryName,
-                                            categoryColor = category.categoryColor,
-                                            content = expense.expenseContent,
-                                            photoUrl = expense.expensePhotoUrl
+                                            categoryColor = "",
+                                            content = "",
+                                            photoUrl = ""
                                         )
                                     }
                                 )

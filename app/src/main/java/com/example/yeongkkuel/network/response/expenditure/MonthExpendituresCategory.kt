@@ -8,15 +8,15 @@ data class MonthExpendituresCategory(
 ) {
     data class Category(
         @SerializedName("categoryName") val categoryName: String,
-        @SerializedName("categoryColor") val categoryColor: String,
+        @SerializedName("red") val red: Int,               // RGB 값
+        @SerializedName("green") val green: Int,           // RGB 값
+        @SerializedName("blue") val blue: Int,             // RGB 값
         @SerializedName("expenses") val expenses: List<Expense>
     )
 
     data class Expense(
-        @SerializedName("expenseName") val expenseName: String,       // 🔹 지출 이름
-        @SerializedName("expenseAmount") val expenseAmount: Int,      // 🔹 금액
-        @SerializedName("expenseDate") val expenseDate: String,       // 🔹 지출 날짜 추가
-        @SerializedName("expenseContent") val expenseContent: String, // 🔹 지출 내용 추가
-        @SerializedName("expensePhotoUrl") val expensePhotoUrl: String // 🔹 사진 URL 추가
+        @SerializedName("expenseId") val expenseId: Int,       // 지출 ID
+        @SerializedName("expenseName") val expenseName: String, // 지출 이름
+        @SerializedName("expenseAmount") val expenseAmount: Int // 금액
     )
 }
