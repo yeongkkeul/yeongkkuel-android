@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.presentation.home.category.Category
-import com.example.yeongkkuel.presentation.network.RetrofitClient
-import com.example.yeongkkuel.presentation.network.response.Response
-import com.example.yeongkkuel.presentation.network.response.expenditure.DayExpenditureResponse
+import com.example.yeongkkuel.network.RetrofitClient
+import com.example.yeongkkuel.network.response.Response
+import com.example.yeongkkuel.network.response.expenditure.DayExpenditureResponse
 import com.example.yeongkkuel.presentation.util.Colors
 import com.example.yeongkkuel.presentation.util.SpendingCategory
 import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.reflect.TypeToken

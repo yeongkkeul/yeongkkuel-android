@@ -3,7 +3,7 @@ package com.example.yeongkkuel
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.yeongkkuel.presentation.auth.TokenManager
-import com.example.yeongkkuel.presentation.network.RetrofitClient
+import com.example.yeongkkuel.network.RetrofitClient
 import com.kakao.sdk.common.KakaoSdk
 
 class YeongKkuelApplication : Application() {

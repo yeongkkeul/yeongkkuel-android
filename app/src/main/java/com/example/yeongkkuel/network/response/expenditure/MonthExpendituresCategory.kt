@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.presentation.network.response.expenditure
+package com.example.yeongkkuel.network.response.expenditure
 
 import com.google.gson.annotations.SerializedName
 

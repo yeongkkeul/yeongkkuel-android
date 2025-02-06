@@ -2,8 +2,8 @@ package com.example.yeongkkuel.presentation.statsettings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.yeongkkuel.presentation.network.RetrofitClient
-import com.example.yeongkkuel.presentation.network.request.expenditure.ExpenditureTargetRequest
+import com.example.yeongkkuel.network.RetrofitClient
+import com.example.yeongkkuel.network.request.expenditure.ExpenditureTargetRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

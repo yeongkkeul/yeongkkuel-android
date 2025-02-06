@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.presentation.network.data
+package com.example.yeongkkuel.network.data
 
 
 import android.content.Context
