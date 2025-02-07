@@ -60,17 +60,17 @@ class ExpenseViewFragment : Fragment() {
         findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Bundle>("editedExpense")
             ?.observe(viewLifecycleOwner) { bundle ->
                 bundle?.let {
-                    val updatedExpense = BotSheetUiState.Spending.History(
-                        date = it.getString("expenseDate", getCurrentDate()),
-                        categoryName = it.getString("categoryName", ""),
-                        categoryColor = it.getString("categoryColor", ""),
-                        name = it.getString("expenseContent", ""),
-                        content = it.getString("expenseContent", ""),
-                        price = it.getInt("expensePrice", 0),
-                        photoUrl = it.getString("expensePhoto", "")
-                    )
-                    Log.d("ExpenseViewFragment", "Received editedExpense: $updatedExpense")
-                    updateUiWithHistory(updatedExpense)
+//                    val updatedExpense = BotSheetUiState.Spending.History(
+//                        date = it.getString("expenseDate", getCurrentDate()),
+//                        categoryName = it.getString("categoryName", ""),
+//                        categoryColor = it.getString("categoryColor", ""),
+//                        name = it.getString("expenseContent", ""),
+//                        content = it.getString("expenseContent", ""),
+//                        price = it.getInt("expensePrice", 0),
+//                        photoUrl = it.getString("expensePhoto", "")
+//                    )
+//                    Log.d("ExpenseViewFragment", "Received editedExpense: $updatedExpense")
+//                    updateUiWithHistory(updatedExpense)
                 }
             }
 
@@ -132,34 +132,34 @@ class ExpenseViewFragment : Fragment() {
         }
     }
     private fun updateIcMoreVisibility(historyList: List<BotSheetUiState.Spending.History>) {
-        val hasOnlyNoExpense = historyList.isNotEmpty() && historyList.all { it.isNoExpense } // ✅ 모든 항목이 무지출인지 확인
+        val hasOnlyNoExpense = historyList.isNotEmpty() && historyList.isNotEmpty() // ✅ 모든 항목이 무지출인지 확인
         binding.icMore.visibility = if (hasOnlyNoExpense) View.GONE else View.VISIBLE // ✅ `isNoExpense` 값에 따라 표시 여부 조정
     }
 
     private fun updateUiWithHistory(history: BotSheetUiState.Spending.History) {
-        Log.d("ExpenseViewFragment", "updateUiWithHistory - content: '${history.content}'")
+        Log.d("ExpenseViewFragment", "updateUiWithHistory - content: '${history.name}'")
 
-        binding.tvDateInput.text = history.date.ifEmpty { getCurrentDate() }
-        binding.tvCategoryInput.text = history.categoryName
-        binding.tvCategoryInput.setTextColor(Color.parseColor(history.categoryColor))
-        binding.etDetailInput.setText(history.name)
-        binding.etAmountInput.setText(formatPrice(history.price))
+//        binding.tvDateInput.text = history.date.ifEmpty { getCurrentDate() }
+//        binding.tvCategoryInput.text = history.categoryName
+//        binding.tvCategoryInput.setTextColor(Color.parseColor(history.categoryColor))
+//        binding.etDetailInput.setText(history.name)
+//        binding.etAmountInput.setText(formatPrice(history.price))
 
-        if (history.photoUrl.isNotEmpty()) {
-            Glide.with(binding.root.context) // 🔹 올바른 Context 제공
-                .load(history.photoUrl)
-                .into(binding.imgPhotoFrame)
-            binding.ivPhotoIcon.visibility = View.GONE
-        } else {
-            binding.ivPhotoIcon.visibility = View.VISIBLE
-        }
-        if ((history.content ?: "").trim() == "무지출 기록") {
-            Log.d("ExpenseViewFragment", "ic_more 숨김 처리")
-            binding.icMore.visibility = View.GONE
-        } else {
-            Log.d("ExpenseViewFragment", "ic_more 표시 처리")
-            binding.icMore.visibility = View.VISIBLE
-        }
+//        if (history.photoUrl.isNotEmpty()) {
+//            Glide.with(binding.root.context) // 🔹 올바른 Context 제공
+//                .load(history.photoUrl)
+//                .into(binding.imgPhotoFrame)
+//            binding.ivPhotoIcon.visibility = View.GONE
+//        } else {
+//            binding.ivPhotoIcon.visibility = View.VISIBLE
+//        }
+//        if ((history.content ?: "").trim() == "무지출 기록") {
+//            Log.d("ExpenseViewFragment", "ic_more 숨김 처리")
+//            binding.icMore.visibility = View.GONE
+//        } else {
+//            Log.d("ExpenseViewFragment", "ic_more 표시 처리")
+//            binding.icMore.visibility = View.VISIBLE
+//        }
         adjustEditTextWidth(binding.etDetailInput)
 
     }
@@ -335,17 +335,17 @@ class ExpenseViewFragment : Fragment() {
 
 
     private fun saveHistoryToBotSheet() {
-        val updatedExpense = BotSheetUiState.Spending.History(
-            date = binding.tvDateInput.text.toString(),
-            categoryName = binding.tvCategoryInput.text.toString(),
-            categoryColor = String.format("#%06X", (0xFFFFFF and binding.tvCategoryInput.currentTextColor)), // 색상 HEX 변환
-            name = binding.etDetailInput.text.toString(),
-            content = binding.etDetailInput.text.toString(),
-            price = binding.etAmountInput.text.toString().replace(",", "").toIntOrNull() ?: 0,
-            photoUrl = "" // 📝 이미지 추가 필요시 업데이트
-        )
+//        val updatedExpense = BotSheetUiState.Spending.History(
+//            date = binding.tvDateInput.text.toString(),
+//            categoryName = binding.tvCategoryInput.text.toString(),
+//            categoryColor = String.format("#%06X", (0xFFFFFF and binding.tvCategoryInput.currentTextColor)), // 색상 HEX 변환
+//            name = binding.etDetailInput.text.toString(),
+//            content = binding.etDetailInput.text.toString(),
+//            price = binding.etAmountInput.text.toString().replace(",", "").toIntOrNull() ?: 0,
+//            photoUrl = "" // 📝 이미지 추가 필요시 업데이트
+//        )
 
-        Log.d("ExpenseViewFragment", "saveHistoryToBotSheet called with: $updatedExpense")
+//        Log.d("ExpenseViewFragment", "saveHistoryToBotSheet called with: $updatedExpense")
 
         // ✅ ViewModel을 통해 바텀시트에 반영
     }

@@ -29,21 +29,12 @@ class BotSheetCategoryListAdapter(
 
         // 🔹 클릭 리스너를 Adapter에 직접 추가하지 않고, Fragment로 전달
         private val historyListAdapter = BotSheetHistoryListAdapter { selectedHistory ->
-            val colorInt = try {
-                Color.parseColor(selectedHistory.categoryColor) // ✅ String(HEX) → Int 변환
-            } catch (e: IllegalArgumentException) {
-                Log.e(
-                    "BotSheetHistoryListAdapter",
-                    "Invalid color format: ${selectedHistory.categoryColor}",
-                    e
-                )
                 Color.RED // 기본값 검정색 적용
-            }
 
             botSheetListener.navigateToExpenseView(
                 selectedHistory.name,
                 selectedHistory.price,
-                colorInt // ✅ Int 값으로 변환 후 전달
+                1
             )
         }
 
@@ -73,7 +64,7 @@ class BotSheetCategoryListAdapter(
         }
 
         private fun updateNoSpendAndMoreVisibility(item: BotSheetUiState.Spending) {
-            val hasNoExpenseEntry = item.history.all { it.isNoExpense } // 모든 항목이 무지출인지 확인
+            val hasNoExpenseEntry = item.history.isEmpty() // 모든 항목이 무지출인지 확인
             val isEmpty = item.history.isEmpty() // 리스트가 비어 있는지 확인
 
             if (isEmpty) {

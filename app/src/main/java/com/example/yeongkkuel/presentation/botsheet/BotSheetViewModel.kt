@@ -10,6 +10,7 @@ import com.example.yeongkkuel.network.response.Response
 import com.example.yeongkkuel.network.response.expenditure.DayExpenditureResponse
 import com.example.yeongkkuel.presentation.util.Colors
 import com.example.yeongkkuel.presentation.util.SpendingCategory
+import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.reflect.TypeToken
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -60,7 +61,7 @@ class BotSheetViewModel : ViewModel() {
             _uiState.update { prevState ->
                 val updatedSpendingList = prevState.spendingList.map { spending ->
                     val historyMatch = spending.history.find {
-                        it.name == updatedExpense.name && it.date == updatedExpense.date
+                        it.name == updatedExpense.name
                     }
 
                     if (historyMatch != null) {
@@ -68,7 +69,7 @@ class BotSheetViewModel : ViewModel() {
 
                         spending.copy(
                             history = spending.history.map { history ->
-                                if (history.name == updatedExpense.name && history.date == updatedExpense.date) {
+                                if (history.name == updatedExpense.name) {
                                     updatedExpense // ✅ 기존 항목을 수정된 값으로 변경
                                 } else {
                                     history
@@ -97,7 +98,7 @@ class BotSheetViewModel : ViewModel() {
         Log.d("BotSheetViewModel", "📌 updateSpendingHistoryList() 실행됨")
         Log.d("BotSheetViewModel", "📌 최신 spendingHistoryList: $historyList") // ✅ 최신 리스트 확인
 
-        _spendingHistoryList.value = historyList.sortedByDescending { it.date }
+//        _spendingHistoryList.value = historyList.sortedByDescending { it.date }
     }
 
     // 🔹 카테고리 이동 기능
@@ -174,13 +175,13 @@ class BotSheetViewModel : ViewModel() {
         }
 
         // ✅ 기존 지출 내역의 categoryColor도 Colors 타입 유지
-        _spendingHistoryList.value = _spendingHistoryList.value.map { history ->
-            if (history.categoryName == originalCategoryName) {
-                history.copy(categoryColor = updatedCategoryColor.toString()) // ✅ String 변환
-            } else {
-                history
-            }
-        }
+//        _spendingHistoryList.value = _spendingHistoryList.value.map { history ->
+//            if (history.categoryName == originalCategoryName) {
+//                history.copy(categoryColor = updatedCategoryColor.toString()) // ✅ String 변환
+//            } else {
+//                history
+//            }
+//        }
 
         _uiState.update { prevState ->
             prevState.copy(spendingList = updatedSpendingList)
@@ -225,7 +226,7 @@ class BotSheetViewModel : ViewModel() {
                     }
                 }
             }
-        }catch (e:Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
@@ -261,13 +262,10 @@ class BotSheetViewModel : ViewModel() {
                                     plusIconResId = R.drawable.ic_plus_default,
                                     history = category.expenses.map { expense ->
                                         BotSheetUiState.Spending.History(
+                                            id = expense.expenseId,
                                             name = expense.expenseName,
                                             price = expense.expenseAmount,
-                                            date = "",
-                                            categoryName = category.categoryName,
-                                            categoryColor = "",
-                                            content = "",
-                                            photoUrl = ""
+                                            imgExist = expense.imgExist
                                         )
                                     }
                                 )
@@ -288,15 +286,16 @@ class BotSheetViewModel : ViewModel() {
         }
     }
 
-    fun updateExpense(updatedExpense: BotSheetUiState.Spending.History) {
-        _spendingHistoryList.value = _spendingHistoryList.value.map { expense ->
-            if (expense.date == updatedExpense.date && expense.name == updatedExpense.name) {
-                updatedExpense // 기존 항목을 수정된 값으로 변경
-            } else {
-                expense
-            }
-        }
-    }
+//    fun updateExpense(updatedExpense: BotSheetUiState.Spending.History) {
+//        _spendingHistoryList.value = _spendingHistoryList.value.map { expense ->
+//            if (expense.date == updatedExpense.date && expense.name == updatedExpense.name) {
+//                updatedExpense // 기존 항목을 수정된 값으로 변경
+//            } else {
+//                expense
+//            }
+//        }
+//    }
+
     fun getCategoryList(): List<Category> {
         val categoryList = _uiState.value.spendingList.map { spending ->
             Category(
