@@ -26,7 +26,6 @@ data class BotSheetUiState(
             val content: String,    // 🔹 지출 내용 추가
             val photoUrl: String,   // 🔹 사진 URL 추가
             val isNoExpense: Boolean = false // 무지출 여부 추가
-
         )
     }
 

@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentCategoryManageBinding
+import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import com.example.yeongkkuel.presentation.home.category.adapter.CategoryAdapter
 import com.example.yeongkkuel.presentation.home.category.data.Category
 
@@ -21,6 +22,7 @@ class CategoryManageFragment : Fragment() {
     private var _binding: FragmentCategoryManageBinding? = null
     private val binding get() = _binding!!
     private val viewModel: CategoryViewModel by activityViewModels() // ViewModel 연결
+    private val botSheetViewModel: BotSheetViewModel by activityViewModels()
     private val categoryAdapter by lazy {
         CategoryAdapter(onCategoryClick = { category ->
             navigateToCategoryDetail(category) // 클릭 시 상세 페이지로 이동
@@ -71,9 +73,16 @@ class CategoryManageFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        // 카테고리 데이터 관찰
+        // 카테고리 관리 페이지 업데이트
         viewModel.categories.observe(viewLifecycleOwner) { categories ->
-            categoryAdapter.submitList(categories) // 데이터를 어댑터에 반영
+            categoryAdapter.submitList(categories) // 데이터를 어댑터에 반영 - 즉시 UI 업데이트
+            categoryAdapter.notifyDataSetChanged() // 강제로 RecylcerView 갱신
+        }
+
+        // 바텀시트 데이터 관찰하여 삭제 후 즉시 반영
+        botSheetViewModel.categoryList.observe(viewLifecycleOwner) { categories ->
+            categoryAdapter.submitList(categories) // 바텀시트 리스트도 업데이트
+            categoryAdapter.notifyDataSetChanged() // RecyclerView 강제 갱신
         }
 
         // 에러 메시지 관찰

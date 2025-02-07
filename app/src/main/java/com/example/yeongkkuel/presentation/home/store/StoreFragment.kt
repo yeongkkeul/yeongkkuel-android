@@ -185,7 +185,6 @@ class StoreFragment : Fragment() {
                     Log.d("StoreFragment", "Nest Image Updated: $imageResId")
                 }
 
-
             }
 
         }

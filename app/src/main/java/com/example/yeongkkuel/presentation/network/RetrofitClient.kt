@@ -25,6 +25,13 @@ object RetrofitClient {
      */
     private var authRetrofit: Retrofit? = null
 
+    /**
+     * HttpLoggingInterceptor 추가! (네트워크 요청 및 응답 로그 출력)
+     */
+    private val loggingInterceptor = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.BODY // 요청과 응답 바디를 로그로 출력
+    }
+
     fun init(context: Context) {
         if (baseRetrofit == null) {
             baseRetrofit = Retrofit.Builder()
@@ -34,13 +41,9 @@ object RetrofitClient {
         }
 
         if (authRetrofit == null) {
-            val logging = HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
-            }
-
             val client = OkHttpClient.Builder()
                 .addInterceptor(AuthInterceptor(context))  // JWT 헤더 자동 추가
-                .addInterceptor(logging)
+                .addInterceptor(loggingInterceptor) // 📌 HttpLoggingInterceptor 추가!
                 .build()
 
             authRetrofit = Retrofit.Builder()

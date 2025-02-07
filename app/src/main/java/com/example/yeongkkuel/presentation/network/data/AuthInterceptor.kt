@@ -19,6 +19,9 @@ class AuthInterceptor(private val context: Context) : Interceptor {
         // 저장된 AccessToken 가져오기
         val accessToken = TokenManager.getAccessToken(context)
 
+        // ✅ Access Token 값 확인용 로그
+        println("Access Token in AuthInterceptor: $accessToken")
+
         // 토큰이 있다면 헤더에 추가
         val newRequest = if (!accessToken.isNullOrEmpty()) {
             originalRequest.newBuilder()

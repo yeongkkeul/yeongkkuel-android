@@ -1,5 +1,6 @@
 package com.example.yeongkkuel.presentation.network
 
+import com.example.yeongkkuel.presentation.home.category.data.CategoryListResponse
 import com.example.yeongkkuel.presentation.home.category.data.CategoryRequest
 import com.example.yeongkkuel.presentation.network.request.expenditure.ExpenditureTargetRequest
 import com.example.yeongkkuel.presentation.home.category.data.CategoryResponse
@@ -57,7 +58,7 @@ interface YeongkkuelService {
 
     // Category
     @GET("/api/category/categories")
-    suspend fun getCategories(): Response<List<CategoryResponse>>
+    suspend fun getCategories(): Response<CategoryListResponse>
 
     @GET("/api/category/{category_id}")
     suspend fun getCategoryDetail(
@@ -67,17 +68,17 @@ interface YeongkkuelService {
     @POST("/api/category")
     suspend fun addCategory(
         @Body request: CategoryRequest
-    ): Response<Unit>
+    ): Response<CategoryResponse>
 
     @PATCH("/api/category/{category_id}")
     suspend fun updateCategory(
         @Path("category_id") categoryId: Int,
         @Body request: CategoryRequest
-    ): Response<Unit>
+    ): Response<CategoryResponse>
 
     @DELETE("/api/category/{category_id}")
     suspend fun deleteCategory(
         @Path("category_id") categoryId: Int
-    ): Response<Unit>
+    ): Response<CategoryResponse>
 
 }

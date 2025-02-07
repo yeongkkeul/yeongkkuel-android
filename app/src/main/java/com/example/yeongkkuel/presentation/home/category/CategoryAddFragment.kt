@@ -123,7 +123,7 @@ class CategoryAddFragment : Fragment() {
 
         val title = binding.etCategoryAddInput.text.toString().trim()
 
-        // 🚨 토스트 메시지 순차 실행을 위한 핸들러
+        // 토스트 메시지 순차 실행을 위한 핸들러
         val handler = Handler(Looper.getMainLooper())
 
         // 제목 & 색상 입력 여부 확인
@@ -163,6 +163,9 @@ class CategoryAddFragment : Fragment() {
             name = title,
             color = categoryColor
         )
+
+        println("Category Name: ${newCategory.name}") // ✅ 제목 확인 로그 추가
+        println("Category Color: ${newCategory.color}") // ✅ 색상 확인 로그 추가
 
         // ViewModel에 카테고리 추가
         categoryViewModel.addCategory(newCategory)

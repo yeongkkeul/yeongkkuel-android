@@ -1,6 +1,10 @@
 package com.example.yeongkkuel.presentation.home.category.data
 
+import com.google.gson.annotations.SerializedName
+
 data class CategoryRequest(
-    val name: String, // 카테고리 이름
-    val color: String // 카테고리 색상 (String으로 서버에서 내려옴)
+    @SerializedName("categoryName") val name: String,  // 카테고리 이름
+    val red: Int,
+    val green: Int,
+    val blue: Int
 )

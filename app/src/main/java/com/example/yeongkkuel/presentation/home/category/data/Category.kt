@@ -22,6 +22,8 @@ fun CategoryResponse.toCategory(): Category {
 fun Category.toRequest(): CategoryRequest {
     return CategoryRequest(
         name = this.name,
-        color = this.color.name // Colors enum의 이름(String)을 서버로 보냄
+        red = this.color.red,
+        green = this.color.green,
+        blue = this.color.blue
     )
 }

@@ -5,3 +5,8 @@ data class CategoryResponse(
     val name: String, // 카테고리 이름
     val color: String // 카테고리 색상 (String으로 서버에서 내려옴)
 )
+
+data class CategoryListResponse(
+    val categoryList: List<CategoryResponse>, // 카테고리 배열
+    val totalElements: Int // 추가 정보
+)

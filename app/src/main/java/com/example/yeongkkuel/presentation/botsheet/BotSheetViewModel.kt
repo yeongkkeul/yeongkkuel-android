@@ -1,6 +1,8 @@
 package com.example.yeongkkuel.presentation.botsheet
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yeongkkuel.R
@@ -26,6 +28,9 @@ class BotSheetViewModel : ViewModel() {
     private val _spendingHistoryList = MutableStateFlow<List<BotSheetUiState.Spending.History>>(emptyList())
     val spendingHistoryList = _spendingHistoryList.asStateFlow()
 
+    private val _categoryList = MutableLiveData<List<Category>>(emptyList()) // ✅ MutableLiveData 선언 추가
+    val categoryList: LiveData<List<Category>> get() = _categoryList // ✅ LiveData로 접근
+
     // 🔹 지출 내역 추가 기능
     fun addExpenseToCategory(category: SpendingCategory, history: BotSheetUiState.Spending.History) {
         _uiState.update { prev ->
@@ -38,6 +43,7 @@ class BotSheetViewModel : ViewModel() {
             }
             prev.copy(spendingList = updatedList)
         }
+        updateSpendingHistoryList() // ✅ 추가된 내역 반영
         updateSpendingHistoryList() // ✅ 추가된 내역 반영
     }
     private val mutex = Mutex()
@@ -110,7 +116,7 @@ class BotSheetViewModel : ViewModel() {
             prev.copy(spendingList = updatedList)
         }
 
-        // ✅ 최신 내역 업데이트
+        // 최신 내역 업데이트
         updateSpendingHistoryList()
 
         Log.d("BotSheetViewModel", "📌 삭제됨: $expenseName, 남은 지출 개수: ${_spendingHistoryList.value.size}")
@@ -135,9 +141,10 @@ class BotSheetViewModel : ViewModel() {
             }
             prev.copy(spendingList = updatedList)
         }
+        // 추가된 카테고리를 _categoryList에 업데이트
+        _categoryList.value = _categoryList.value.orEmpty() + category
 
         Log.d("BotSheetViewModel", "✅ 카테고리 추가됨: ${category.name}")
-
     }
 
     private fun mapCategoryToIcon(color: Colors): Int {
@@ -159,7 +166,7 @@ class BotSheetViewModel : ViewModel() {
             }
         }
 
-        // ✅ 기존 지출 내역의 categoryColor도 Colors 타입 유지
+        // 기존 지출 내역의 categoryColor도 Colors 타입 유지
         _spendingHistoryList.value = _spendingHistoryList.value.map { history ->
             if (history.categoryName == originalCategoryName) {
                 history.copy(categoryColor = updatedCategoryColor.toString()) // ✅ String 변환
@@ -179,6 +186,8 @@ class BotSheetViewModel : ViewModel() {
             val updatedSpendingList = prev.spendingList.filter { it.kind.kor != categoryName }
             prev.copy(spendingList = updatedSpendingList)
         }
+        // 삭제된 카테고리를 _categoryList에서 제거
+        _categoryList.value = _categoryList.value.orEmpty().filter { it.name != categoryName }
     }
 
     // 🔹 일일 목표 지출 가져오기
