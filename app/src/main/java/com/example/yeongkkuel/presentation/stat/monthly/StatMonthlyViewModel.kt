@@ -36,6 +36,13 @@ class StatMonthlyViewModel : ViewModel() {
             try {
                 yeongkkuelService.getExpendituresMonthCalendar(year = year, month = month).run {
                     if (isSuccess) {
+                        _uiState.update { prev->
+                            prev.copy(
+                                achieveDay = result.achievedDays,
+                                rewardsAmount = result.rewards
+                            )
+                        }
+
                         val dataList = result.selectedMonthExpenses.map {
                             StatMonthlyUiState.CalendarData.CalendarDay(
                                 targetMonth = Pair(year, month),
