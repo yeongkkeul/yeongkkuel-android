@@ -24,7 +24,7 @@ class BotSheetViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<BotSheetUiState>(BotSheetUiState.init())
     val uiState = _uiState.asStateFlow()
 
-    private val yeongkkuelService = RetrofitClient.yeongkkuelService
+    private val yeongkkuelService = RetrofitClient.statService
 
     // ✅ LiveData → StateFlow로 일관된 상태 관리
     private val _spendingHistoryList =
