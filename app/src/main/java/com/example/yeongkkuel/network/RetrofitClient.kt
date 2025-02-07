@@ -2,7 +2,6 @@ package com.example.yeongkkuel.network
 
 import android.content.Context
 import com.example.yeongkkuel.presentation.auth.ReissueApiService
-import com.example.yeongkkuel.presentation.auth.TokenManager
 import com.example.yeongkkuel.presentation.login.LoginApiService
 import com.example.yeongkkuel.network.data.AuthInterceptor
 import okhttp3.OkHttpClient
@@ -57,8 +56,8 @@ object RetrofitClient {
         authRetrofit!!.create(LoginApiService::class.java)
     }
 
-    val yeongkkuelService: YeongkkuelService by lazy {
-        authRetrofit!!.create(YeongkkuelService::class.java)
+    val statService: StatService by lazy {
+        authRetrofit!!.create(StatService::class.java)
     }
 
 }

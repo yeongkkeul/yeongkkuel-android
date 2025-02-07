@@ -32,6 +32,7 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.Calendar
+import kotlin.math.exp
 
 class StatWeeklyFragment(
     private val viewModel: StatWeeklyViewModel
@@ -225,8 +226,14 @@ class StatWeeklyFragment(
             uiState.pieChartList.let { pieChartList ->
                 val list = pieChartList.sortedByDescending { it.expenditure }
                 val pieChartDataList = ArrayList<PieEntry>().apply {
-                    list.forEach { spending ->
-                        add(PieEntry(spending.expenditure.toFloat(), spending.category))
+                    if (list.all { it.expenditure == 0 }) {  // 모든 expenditure가 0이면
+                        list.forEach { spending ->
+                            add(PieEntry(1.0f, spending.category))  // 모든 값을 1로 변경
+                        }
+                    } else {
+                        list.forEach { spending ->
+                            add(PieEntry(spending.expenditure.toFloat(), spending.category))
+                        }
                     }
                 }
 

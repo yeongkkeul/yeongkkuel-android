@@ -8,13 +8,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class StatSettingsViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(StatSettingsUiState.init())
     val uiState = _uiState.asStateFlow()
 
-    private val yeongkkuelService = RetrofitClient.yeongkkuelService
+    private val yeongkkuelService = RetrofitClient.statService
 
     fun setAverage(income: Int, outcome: Int) {
         _uiState.update { prev ->

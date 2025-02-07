@@ -13,6 +13,7 @@ data class WeekExpendituresAverage(
     @SerializedName("categories") val categories: List<Category>
 ) {
     data class Category(
+        @SerializedName("categoryId") val categoryId: Int,
         @SerializedName("categoryName") val categoryName: String,
         @SerializedName("red") val red: Int,
         @SerializedName("green") val green: Int,

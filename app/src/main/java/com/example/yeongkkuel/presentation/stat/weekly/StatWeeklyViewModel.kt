@@ -1,6 +1,5 @@
 package com.example.yeongkkuel.presentation.stat.weekly
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yeongkkuel.network.RetrofitClient
@@ -19,7 +18,7 @@ class StatWeeklyViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<StatWeeklyUiState>(StatWeeklyUiState.init())
     val uiState = _uiState.asStateFlow()
 
-    private val yeongkkuelService = RetrofitClient.yeongkkuelService
+    private val yeongkkuelService = RetrofitClient.statService
 
     fun getWeekExpenditureList() = viewModelScope.launch {
         try {

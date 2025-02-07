@@ -122,7 +122,7 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
         }
 
         fun initMore() {
-            ivMore.setOnClickListener {
+            includeTopbar.ivMore.setOnClickListener {
                 if (clMore.visibility == View.GONE) clMore.visibility = View.VISIBLE
                 else clMore.visibility = View.GONE
             }
