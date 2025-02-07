@@ -1,9 +1,12 @@
 package com.example.yeongkkuel.presentation.stat.weekly
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yeongkkuel.network.RetrofitClient
+import com.example.yeongkkuel.presentation.util.Age
 import com.example.yeongkkuel.presentation.util.Colors
+import com.example.yeongkkuel.presentation.util.Job
 import com.example.yeongkkuel.presentation.util.SpendingCategory
 import com.example.yeongkkuel.presentation.util.Week
 import com.github.mikephil.charting.data.Entry
@@ -53,7 +56,7 @@ class StatWeeklyViewModel : ViewModel() {
                             prev.copy(
                                 compareList = listOf(
                                     StatWeeklyUiState.CompareData.OthersCompare(
-                                        target = "${age}대 ${job}",
+                                        target = "${Age.getEnToKor(age)} ${Job.getEnToKor(job)}",
                                         targetSpending = averageExpenditure,
                                         mySpending = myAverageExpenditure,
                                         spendingUnit = SpendingUnit.WEEK,
