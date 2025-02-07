@@ -4,10 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.yeongkkuel.network.RetrofitClient
 import com.example.yeongkkuel.presentation.home.category.data.Category
 import com.example.yeongkkuel.presentation.home.category.data.toCategory
 import com.example.yeongkkuel.presentation.home.category.data.toRequest
-import com.example.yeongkkuel.presentation.network.RetrofitClient
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 

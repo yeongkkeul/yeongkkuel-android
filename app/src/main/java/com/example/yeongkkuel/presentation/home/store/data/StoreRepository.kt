@@ -1,7 +1,7 @@
 package com.example.yeongkkuel.presentation.home.store.data
 
 import android.util.Log
-import com.example.yeongkkuel.presentation.network.RetrofitClient
+import com.example.yeongkkuel.network.RetrofitClient
 
 class StoreRepository {
     private val api = RetrofitClient.storeapiService
@@ -28,7 +28,14 @@ class StoreRepository {
         val request = SkinPurchaseRequest(itemId, itemType, itemName, reward)
         return try {
             val response = api.purchaseSkin(request)
-            if (response.isSuccessful) response.body() else null
+
+            if (response.isSuccessful) {
+                Log.d("StoreRepository", "스킨 구매 성공: ${response.body()}")
+                return response.body()
+            } else {
+                Log.e("StoreRepository", "스킨 구매 실패: 응답 코드 ${response.code()} - ${response.errorBody()?.string()}")
+                null
+            }
         } catch (e: Exception) {
             Log.e("StoreRepository", "스킨 구매 API 오류: ${e.message}")
             null
@@ -37,11 +44,20 @@ class StoreRepository {
 
     suspend fun getShopData(itemType: String): ShopResponse? {
         return try {
+            Log.d("StoreRepository", "🛒 API 요청: itemType = $itemType") // ✅ API 요청 로그 추가
             val response = api.getShopData(itemType)
-            if (response.isSuccessful) response.body() else null
+
+            if (response.isSuccessful) {
+                Log.d("StoreRepository", "✅ API 응답 성공: ${response.body()}") // ✅ 응답 성공 로그
+                response.body()
+            } else {
+                Log.e("StoreRepository", "❌ API 응답 실패: ${response.errorBody()?.string()}") // ✅ 응답 실패 로그
+                null
+            }
         } catch (e: Exception) {
-            Log.e("StoreRepository", "상점 데이터 조회 오류: ${e.message}")
+            Log.e("StoreRepository", "❌ API 요청 중 오류 발생: ${e.message}") // ✅ 예외 발생 로그
             null
         }
     }
+
 }

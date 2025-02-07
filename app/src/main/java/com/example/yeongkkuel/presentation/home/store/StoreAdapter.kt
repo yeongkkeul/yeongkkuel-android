@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.yeongkkuel.databinding.ItemStoreProductBinding
 import kotlinx.android.parcel.Parcelize
 
@@ -13,7 +14,7 @@ data class Product(
     val id: Int, // ✅ id 추가
     val name: String,
     val price: Int,
-    val imageResId: Int,
+    val imageUrl: String, // ✅ 변경
     val category: ProductCategory,
     var area: String? = null
 ) : Parcelable
@@ -57,11 +58,14 @@ class StoreAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(product: Product, isSelected: Boolean) {
-            binding.imgStoreProduct.setImageResource(product.imageResId)
+            // ✅ 서버에서 받은 이미지 URL을 Glide로 로드
+            Glide.with(binding.root.context)
+                .load(product.imageUrl) // ✅ 서버 이미지 URL 사용
+                .into(binding.imgStoreProduct) // ✅ 이미지 로드
+
             binding.tvStoreProductName.text = product.name
 
             binding.imgStoreCollect.visibility = if (isSelected) View.VISIBLE else View.GONE
-
         }
     }
 }

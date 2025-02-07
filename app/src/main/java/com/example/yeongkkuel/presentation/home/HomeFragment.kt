@@ -30,6 +30,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.bumptech.glide.Glide
 
 
 class HomeFragment : Fragment() {
@@ -235,28 +236,35 @@ class HomeFragment : Fragment() {
         }
     }
     private fun applySelectedProductToHome(product: Product) {
-        val homeImageResId = mapToHomeResource(product.imageResId)
+        val homeImageUrl = product.imageUrl // ✅ 서버에서 받은 URL 사용
 
         when (product.area) {
             "Swing Area" -> binding.imgHomeSwing.post {
-                binding.imgHomeSwing.setImageResource(homeImageResId)
-                Log.d("HomeFragment", "Swing Image Updated: $homeImageResId")
+                Glide.with(binding.imgHomeSwing.context)
+                    .load(homeImageUrl)
+                    .into(binding.imgHomeSwing) // ✅ 네트워크 이미지 로드
+                Log.d("HomeFragment", "Swing Image Updated: $homeImageUrl")
             }
             "Toy Area" -> binding.imgHomeToy.post {
-                binding.imgHomeToy.setImageResource(homeImageResId)
-                Log.d("HomeFragment", "Toy Image Updated: $homeImageResId")
+                Glide.with(binding.imgHomeToy.context)
+                    .load(homeImageUrl)
+                    .into(binding.imgHomeToy)
+                Log.d("HomeFragment", "Toy Image Updated: $homeImageUrl")
             }
             "Bowl Area" -> binding.imgHomeBowl.post {
-                binding.imgHomeBowl.setImageResource(homeImageResId)
-                Log.d("HomeFragment", "Bowl Image Updated: $homeImageResId")
+                Glide.with(binding.imgHomeBowl.context)
+                    .load(homeImageUrl)
+                    .into(binding.imgHomeBowl)
+                Log.d("HomeFragment", "Bowl Image Updated: $homeImageUrl")
             }
             "Nest Area" -> binding.imgHomeNest.post {
-                binding.imgHomeNest.setImageResource(homeImageResId)
-                Log.d("HomeFragment", "Nest Image Updated: $homeImageResId")
+                Glide.with(binding.imgHomeNest.context)
+                    .load(homeImageUrl)
+                    .into(binding.imgHomeNest)
+                Log.d("HomeFragment", "Nest Image Updated: $homeImageUrl")
             }
         }
     }
-
 
     private fun showRewardDialog() {
         val dialog = Dialog(requireContext())
@@ -289,18 +297,25 @@ class HomeFragment : Fragment() {
      * MY 상품을 Home 화면에 렌더링
      */
     private fun renderMyProductsForHome() {
-        val myProducts = StoreFragment.myProducts.map { product ->
-            product.copy(
-                imageResId = mapToHomeResource(product.imageResId) // Home 리소스로 변환
-            )
-        }
+        val myProducts = StoreFragment.myProducts // ✅ 리스트 복사 없이 직접 사용
 
         myProducts.forEach { product ->
             when (product.area) {
-                "Swing Area" -> binding.imgHomeSwing.setImageResource(product.imageResId)
-                "Toy Area" -> binding.imgHomeToy.setImageResource(product.imageResId)
-                "Bowl Area" -> binding.imgHomeBowl.setImageResource(product.imageResId)
-                "Nest Area" -> binding.imgHomeNest.setImageResource(product.imageResId)
+                "Swing Area" -> Glide.with(binding.imgHomeSwing.context)
+                    .load(product.imageUrl) // ✅ 서버에서 받은 이미지 URL 사용
+                    .into(binding.imgHomeSwing)
+
+                "Toy Area" -> Glide.with(binding.imgHomeToy.context)
+                    .load(product.imageUrl)
+                    .into(binding.imgHomeToy)
+
+                "Bowl Area" -> Glide.with(binding.imgHomeBowl.context)
+                    .load(product.imageUrl)
+                    .into(binding.imgHomeBowl)
+
+                "Nest Area" -> Glide.with(binding.imgHomeNest.context)
+                    .load(product.imageUrl)
+                    .into(binding.imgHomeNest)
             }
         }
     }

@@ -4,14 +4,14 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yeongkkuel.R
-import com.example.yeongkkuel.presentation.home.category.Category
+import com.example.yeongkkuel.presentation.home.category.data.Category
 import com.example.yeongkkuel.network.RetrofitClient
 import com.example.yeongkkuel.network.response.Response
 import com.example.yeongkkuel.network.response.expenditure.DayExpenditureResponse
 import com.example.yeongkkuel.presentation.util.Colors
 import com.example.yeongkkuel.presentation.util.SpendingCategory
-import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.reflect.TypeToken
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

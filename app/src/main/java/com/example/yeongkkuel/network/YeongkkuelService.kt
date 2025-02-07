@@ -8,6 +8,9 @@ import com.example.yeongkkuel.network.response.expenditure.MonthExpendituresCate
 import com.example.yeongkkuel.network.response.expenditure.MonthlyAverageExpenditureResponse
 import com.example.yeongkkuel.network.response.expenditure.WeekExpenditureExpensesResponse
 import com.example.yeongkkuel.network.response.expenditure.WeekExpendituresAverage
+import com.example.yeongkkuel.presentation.home.category.data.CategoryRequest
+import com.example.yeongkkuel.presentation.home.category.data.CategoryResponse
+
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET

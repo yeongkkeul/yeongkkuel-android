@@ -170,7 +170,7 @@
                 android:layout_width="26dp"
                 android:layout_height="20dp"
                 android:layout_marginStart="6dp"
-                android:text="124"
+                android:text=" "
                 android:textColor="@color/black"
                 android:textSize="15sp"
                 android:textStyle="normal" />

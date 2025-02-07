@@ -78,6 +78,12 @@
                 app:layout_columnWeight="1"
                 app:layout_row="0">
 
+                <ImageView
+                    android:id="@+id/img_home_swing"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/img_home_swing1" />
             </FrameLayout>
 
             <FrameLayout
@@ -95,15 +101,6 @@
                     app:layout_column="1"
                     app:layout_row="0" />
             </FrameLayout>
-
-            <ImageView
-                android:id="@+id/img_home_swing"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="fitCenter"
-                android:src="@drawable/img_home_swing1"
-                app:layout_column="0"
-                app:layout_row="0" />
         </androidx.gridlayout.widget.GridLayout>
 
         <!-- 하단 영역 -->
@@ -178,11 +175,11 @@
                 android:src="@drawable/ic_coin" />
 
             <TextView
-                android:id="@+id/tv_coin"
+                android:id="@+id/coin_text"
                 android:layout_width="26dp"
                 android:layout_height="20dp"
                 android:layout_marginStart="6dp"
-                android:text="124"
+                android:text=" "
                 android:textColor="@color/black"
                 android:textSize="15sp"
                 android:textStyle="normal" />

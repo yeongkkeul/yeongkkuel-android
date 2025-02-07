@@ -10,9 +10,12 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
@@ -20,6 +23,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentStoreBinding
 import com.google.android.material.tabs.TabLayout
+import com.bumptech.glide.Glide
+
 
 class StoreFragment : Fragment() {
     private lateinit var navController: NavController
@@ -38,6 +43,8 @@ class StoreFragment : Fragment() {
     }
     private var selectedProduct: Product? = null
     private var selectedProductInMyTab: Product? = null  // 🔹 MY 탭에서 선택한 상품 저장
+    private val _showFailureDialog = MutableLiveData<Boolean>()
+    val showFailureDialog: LiveData<Boolean> get() = _showFailureDialog
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,6 +57,14 @@ class StoreFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        viewModel.showFailureDialog.observe(viewLifecycleOwner) { shouldShow ->
+            if (shouldShow) {
+                showPurchaseFailureDialog()
+                viewModel.resetFailureDialog() // 다이얼로그 상태 초기화
+            }
+        }
+
         navController = Navigation.findNavController(view)
         binding.imgGoHome.setOnClickListener {
             navController.navigate(R.id.action_storeFragment_to_homeFragment)
@@ -57,7 +72,7 @@ class StoreFragment : Fragment() {
 
         binding.imgPurchaseIcon.setOnClickListener {
             selectedProduct?.let {
-                Log.d("StoreFragment", "Passing to Dialog: ${it.name}, ResId: ${it.imageResId}")
+                Log.d("StoreFragment", "Passing to Dialog: ${it.name}, ResId: ${it.imageUrl}")
                 showPurchaseDialog(it)
             } ?: Log.d("StoreFragment", "No Product Selected")
         }
@@ -68,6 +83,25 @@ class StoreFragment : Fragment() {
                 Toast.makeText(requireContext(), "스킨 착용을 저장 중...", Toast.LENGTH_SHORT).show()
             } ?: Log.d("StoreFragment", "No product selected in MY tab.")
         }
+        viewModel.productUiState.observe(viewLifecycleOwner) { uiState ->
+            if (uiState.productList.isNotEmpty()) {
+                val productList = uiState.productList.map { productUiState ->
+                    Product(
+                        id = productUiState.id,
+                        name = productUiState.name,
+                        price = productUiState.price,
+                        category = productUiState.category,
+                        imageUrl = productUiState.imageUrl // ✅ 변경
+                    )
+                }
+                updateProductList(productList) // ✅ 변환 후 호출
+            } else {
+                Log.d("StoreFragment", "❌ 상품 데이터가 없습니다.")
+            }
+        }
+
+
+
         viewModel.equipResponse.observe(viewLifecycleOwner) { response ->
             if (response?.isSuccess == true) {
                 Toast.makeText(requireContext(), "스킨 착용이 저장되었습니다!", Toast.LENGTH_SHORT).show()
@@ -89,43 +123,54 @@ class StoreFragment : Fragment() {
             } ?: Log.d("StoreFragment", "선택된 상품 없음")
         }
 
-        // ✅ 스킨 구매 응답 처리
         viewModel.purchaseResponse.observe(viewLifecycleOwner) { response ->
             if (response?.isSuccess == true) {
                 Toast.makeText(requireContext(), "스킨 구매 성공!", Toast.LENGTH_SHORT).show()
                 navController.popBackStack()
             } else {
-                Toast.makeText(
-                    requireContext(),
-                    "스킨 구매 실패: ${response?.message ?: "오류 발생"}",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Log.e("StoreFragment", "스킨 구매 실패: ${response?.message ?: "오류 발생"}")  // ✅ 실패 메시지 로그
+                Toast.makeText(requireContext(), "스킨 구매 실패: ${response?.message ?: "오류 발생"}", Toast.LENGTH_SHORT).show()
             }
         }
 
         viewModel.fetchShopData("SWING")
         Log.d("StoreFragment", "🔍 Fetching shop data for category: SWING")
-
         viewModel.shopResponse.observe(viewLifecycleOwner) { response ->
-            Log.d("StoreFragment", "API Response: $response")
+            Log.d("StoreFragment", "🛍 API Response: $response") // ✅ 응답 확인 로그 추가
 
             if (response?.isSuccess == true) {
                 binding.tvCoin.text = "보유 리워드: ${response.result.myReward}"
+
                 val shopItems = response.result.itemList.map { shopItem ->
                     Product(
                         id = shopItem.id,
                         name = shopItem.itemName,
                         price = shopItem.price,
-                        imageResId = getDrawableFromUrl(shopItem.itemImg),
+                        imageUrl = shopItem.itemImg, // ✅ 서버에서 받은 이미지 URL 사용
                         category = ProductCategory.valueOf(response.result.itemType)
                     )
                 }
-                updateProductList(shopItems)
+
+                val selectedCategory = when (binding.tabLayout.selectedTabPosition) {
+                    0 -> ProductCategory.SWING
+                    1 -> ProductCategory.TOY
+                    2 -> ProductCategory.BOWL
+                    3 -> ProductCategory.NEST
+                    else -> null
+                }
+
+                if (selectedCategory != null) {
+                    val filteredItems = shopItems.filter { it.category == selectedCategory }
+                    Log.d("StoreFragment", "🛒 Filtered items: $filteredItems") // ✅ 필터링된 상품 로그 추가
+                    updateProductList(filteredItems)
+                } else {
+                    updateProductList(myProducts, isMyTab = true)
+                }
             } else {
-                Log.e("StoreFragment", "상점 데이터 불러오기 실패: ${response?.message ?: "오류 발생"}")
-                Toast.makeText(requireContext(), "상점 데이터 불러오기 실패: ${response?.message}", Toast.LENGTH_SHORT).show()
+                Log.e("StoreFragment", "❌ 상점 데이터 불러오기 실패: ${response?.message ?: "오류 발생"}")
             }
         }
+        viewModel.fetchShopData("SWING") // ✅ 초기 데이터 로드
 
         setupRecyclerView()
         setupTabLayout()
@@ -149,45 +194,50 @@ class StoreFragment : Fragment() {
             }
             when (product.category) {
                 ProductCategory.SWING -> {
-                    val imageResId = when (product.name) {
-                        "그네 1" -> R.drawable.img_home_swing1
-                        "그네 2" -> R.drawable.img_home_swing2
-                        else -> product.imageResId
+                    val imageUrl = when (product.name) {
+                        "그네 1" -> "drawable/img_home_swing1" // ✅ 로컬 이미지
+                        "그네 2" -> "drawable/img_home_swing2"
+                        else -> product.imageUrl // ✅ 서버 이미지
                     }
-                    updateImage(binding.imgStoreSwing, imageResId)
-                    Log.d("StoreFragment", "Swing Image Updated: $imageResId")
+                    Glide.with(binding.root.context)
+                        .load(imageUrl)
+                        .into(binding.imgStoreSwing)
+                    Log.d("StoreFragment", "Swing Image Updated: $imageUrl")
                 }
                 ProductCategory.TOY -> {
-                    val imageResId = when (product.name) {
-                        "탱탱볼" -> R.drawable.img_home_toy1
-                        "스케이트 보드" -> R.drawable.img_home_toy2
-                        else -> product.imageResId
+                    val imageUrl = when (product.name) {
+                        "탱탱볼" -> "drawable/img_home_toy1"
+                        "스케이트 보드" -> "drawable/img_home_toy2"
+                        else -> product.imageUrl
                     }
-                    updateImage(binding.imgStoreToy, imageResId)
-                    Log.d("StoreFragment", "Toy Image Updated: $imageResId")
+                    Glide.with(binding.root.context)
+                        .load(imageUrl)
+                        .into(binding.imgStoreToy)
+                    Log.d("StoreFragment", "Toy Image Updated: $imageUrl")
                 }
                 ProductCategory.BOWL -> {
-                    val imageResId = when (product.name) {
-                        "밥그릇 1" -> R.drawable.img_home_bowl1
-                        "밥그릇 2" -> R.drawable.img_home_bowl2
-                        else -> product.imageResId
+                    val imageUrl = when (product.name) {
+                        "밥그릇 1" -> "drawable/img_home_bowl1"
+                        "밥그릇 2" -> "drawable/img_home_bowl2"
+                        else -> product.imageUrl
                     }
-                    updateImage(binding.imgStoreBowl, imageResId)
-                    Log.d("StoreFragment", "Bowl Image Updated: $imageResId")
+                    Glide.with(binding.root.context)
+                        .load(imageUrl)
+                        .into(binding.imgStoreBowl)
+                    Log.d("StoreFragment", "Bowl Image Updated: $imageUrl")
                 }
                 ProductCategory.NEST -> {
-                    val imageResId = when (product.name) {
-                        "둥지 1" -> R.drawable.img_home_nest1
-                        "둥지 2" -> R.drawable.img_home_nest2
-                        else -> product.imageResId
+                    val imageUrl = when (product.name) {
+                        "둥지 1" -> "drawable/img_home_nest1"
+                        "둥지 2" -> "drawable/img_home_nest2"
+                        else -> product.imageUrl
                     }
-                    updateImage(binding.imgStoreNest, imageResId)
-                    Log.d("StoreFragment", "Nest Image Updated: $imageResId")
+                    Glide.with(binding.root.context)
+                        .load(imageUrl)
+                        .into(binding.imgStoreNest)
+                    Log.d("StoreFragment", "Nest Image Updated: $imageUrl")
                 }
-
-
             }
-
         }
 
         binding.rvStoreItems.apply {
@@ -205,7 +255,7 @@ class StoreFragment : Fragment() {
                     id = productUiStateProduct.id,
                     name = productUiStateProduct.name,
                     price = productUiStateProduct.price,
-                    imageResId = adjustResourceId(productUiStateProduct.iconResId),
+                    imageUrl = productUiStateProduct.imageUrl, // ✅ imageResId 대신 imageUrl 사용
                     category = productUiStateProduct.category
                 )
             }
@@ -232,7 +282,7 @@ class StoreFragment : Fragment() {
                 id = productUiStateProduct.id,
                 name = productUiStateProduct.name,
                 price = productUiStateProduct.price,
-                imageResId = adjustResourceId(productUiStateProduct.iconResId),
+                imageUrl = productUiStateProduct.imageUrl, // ✅ imageResId 대신 imageUrl 사용
                 category = productUiStateProduct.category
             )
         }
@@ -267,36 +317,21 @@ class StoreFragment : Fragment() {
 
         binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                // 탭 커스텀 뷰 업데이트
-                tab?.customView?.let { updateTabView(it, isSelected = true) }
-
-                // 탭 위치에 따른 동작
+                tab?.customView?.let { updateTabView(it, isSelected = true) }                // 탭 커스텀 뷰 업데이트
                 tab?.position?.let { position ->
-                    when (position) {
-                        0 -> {
-                            updateProductList(getProductsByCategory(ProductCategory.SWING))
-                            showPurchaseIconOnly()
-                        }
-                        1 -> {
-                            updateProductList(getProductsByCategory(ProductCategory.TOY))
-                            showPurchaseIconOnly()
-                        }
-                        2 -> {
-                            updateProductList(getProductsByCategory(ProductCategory.BOWL))
-                            showPurchaseIconOnly()
-                        }
-                        3 -> {
-                            updateProductList(getProductsByCategory(ProductCategory.NEST))
-                            showPurchaseIconOnly()
-                        }
-                        4 -> {
-                            updateProductList(myProducts, isMyTab = true)
-                            showSaveIconOnly()
-                        }
-                        else -> {
-                            updateProductList(emptyList())
-                            showPurchaseIconOnly()
-                        }
+                    val selectedCategory = when (position) {
+                        0 -> ProductCategory.SWING
+                        1 -> ProductCategory.TOY
+                        2 -> ProductCategory.BOWL
+                        3 -> ProductCategory.NEST
+                        else -> null
+                    }
+
+                    if (selectedCategory != null) {
+                        Log.d("StoreFragment", "🔄 Fetching data for category: ${selectedCategory.name}") // ✅ 로그 추가
+                        viewModel.fetchShopData(selectedCategory.name) // ✅ API 다시 호출
+                    } else {
+                        updateProductList(myProducts, isMyTab = true)
                     }
                 }
             }
@@ -306,7 +341,21 @@ class StoreFragment : Fragment() {
             }
 
             override fun onTabReselected(tab: TabLayout.Tab?) {
-                // 재선택 이벤트 처리 필요 시 여기에 추가
+                // ✅ 같은 탭을 다시 눌렀을 때도 데이터를 다시 불러오도록 함
+                tab?.position?.let { position ->
+                    val selectedCategory = when (position) {
+                        0 -> ProductCategory.SWING
+                        1 -> ProductCategory.TOY
+                        2 -> ProductCategory.BOWL
+                        3 -> ProductCategory.NEST
+                        else -> null
+                    }
+
+                    if (selectedCategory != null) {
+                        Log.d("StoreFragment", "🔄 Re-fetching data for category: ${selectedCategory.name}")
+                        viewModel.fetchShopData(selectedCategory.name) // ✅ 같은 탭 다시 눌러도 데이터 로드
+                    }
+                }
             }
 
             // Helper 함수: Purchase 아이콘 표시
@@ -342,7 +391,6 @@ class StoreFragment : Fragment() {
     }
 
     private fun showPurchaseDialog(product: Product) {
-        Log.d("showPurchaseDialog", "Product: ${product.name}, ResId: ${product.imageResId}")
 
         val dialogView = LayoutInflater.from(requireContext())
             .inflate(R.layout.dialog_purchase_success, null)
@@ -357,7 +405,9 @@ class StoreFragment : Fragment() {
         val btnConfirm = dialogView.findViewById<TextView>(R.id.tv_purchase_confirm)
         val btnCancel = dialogView.findViewById<TextView>(R.id.tv_purchase_cancel)
 
-        imgProduct.setImageResource(product.imageResId)
+        Glide.with(imgProduct.context)
+            .load(product.imageUrl) // ✅ 서버에서 받은 이미지 URL 사용
+            .into(imgProduct) // ✅ 이미지뷰에 적용
         tvProductName.text = product.name
 
         btnConfirm.setOnClickListener {
@@ -369,7 +419,7 @@ class StoreFragment : Fragment() {
                         ProductCategory.BOWL -> "Bowl Area"
                         ProductCategory.NEST -> "Nest Area"
                     },
-                    imageResId = product.imageResId // `mapToHomeResource`를 호출하지 않음
+                    imageUrl = product.imageUrl // `mapToHomeResource`를 호출하지 않음
                 )
                 myProducts.add(updatedProduct)
                 Log.d("MY Tab", "Product added to MY: ${updatedProduct.name}, Area: ${updatedProduct.area}")
@@ -393,11 +443,6 @@ class StoreFragment : Fragment() {
         btnCancel.setOnClickListener {
             dialog.dismiss()
         }
-        dialog.window?.apply {
-            setBackgroundDrawableResource(R.drawable.ic_store_topurchase) // VectorDrawable 설정
-            decorView.clipToOutline = true // 💡 둥근 모서리 적용
-        }
-
         dialog.show()
     }
 
@@ -440,8 +485,30 @@ class StoreFragment : Fragment() {
         }
     }
 
+
     fun Int.toPx(context: android.content.Context): Int {
         return (this * context.resources.displayMetrics.density).toInt()
     }
+    private fun showPurchaseFailureDialog() {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_purchase_failure, null)
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .create()
+
+        val btnFailureCheck = dialogView.findViewById<TextView>(R.id.btn_failure_check)
+
+        btnFailureCheck.setOnClickListener {
+            dialog.dismiss() // 다이얼로그 닫기
+        }
+
+        dialog.window?.apply {
+            setBackgroundDrawableResource(R.drawable.ic_store_topurchase)
+            decorView.clipToOutline = true // 둥근 모서리 적용
+        }
+
+        dialog.show()
+    }
+
 
 }
