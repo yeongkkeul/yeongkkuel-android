@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.network
+package com.example.yeongkkuel.network.service
 
 import com.example.yeongkkuel.network.request.expenditure.ExpenditureTargetRequest
 import com.example.yeongkkuel.network.response.Response
@@ -14,8 +14,6 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface StatService {
-
-    //stat
     @GET("/api/expenditures/day")
     suspend fun getExpendituresDay(
     ): retrofit2.Response<Response<DayExpenditureResponse>>
