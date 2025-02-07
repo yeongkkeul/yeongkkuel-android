@@ -6,7 +6,7 @@ import com.example.yeongkkuel.presentation.util.SpendingCategory
 import java.util.Date
 
 data class BotSheetUiState(
-    val targetSpending: Int = 300000,
+    val targetSpending: Int = 0,
     val spendingList: List<Spending>,
     val date: Date
 

@@ -2,7 +2,7 @@ package com.example.yeongkkuel.presentation.stat.weekly
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.yeongkkuel.presentation.network.RetrofitClient
+import com.example.yeongkkuel.network.RetrofitClient
 import com.example.yeongkkuel.presentation.util.Colors
 import com.example.yeongkkuel.presentation.util.SpendingCategory
 import com.example.yeongkkuel.presentation.util.Week
@@ -28,7 +28,7 @@ class StatWeeklyViewModel : ViewModel() {
                                 weekList = expenses.map {
                                     StatWeeklyUiState.DayData(
                                         getDayOfWeek(date = it.expenseDate),
-                                        Entry(0f, it.expenditure.toFloat())
+                                        Entry(0f, it.expenditure?.toFloat() ?: 0.0f)
                                     )
                                 },
                                 totalSpending = weekExpenditure,
@@ -69,7 +69,7 @@ class StatWeeklyViewModel : ViewModel() {
                                     StatWeeklyUiState.PieChartData(
                                         category = SpendingCategory.fromKor(it.categoryName),
                                         expenditure = it.totalExpenditure,
-                                        color = Colors.fromCode(it.categoryColor) ?: Colors.RED1
+                                        color = Colors.getRGB(red= it.red, blue = it.blue, green = it.green)
                                     )
                                 }
                             )

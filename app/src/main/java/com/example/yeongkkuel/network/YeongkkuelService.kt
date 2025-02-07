@@ -1,26 +1,24 @@
-package com.example.yeongkkuel.presentation.network
+package com.example.yeongkkuel.network
 
-import com.example.yeongkkuel.presentation.network.request.expenditure.ExpenditureTargetRequest
-import com.example.yeongkkuel.presentation.network.response.Response
-import com.example.yeongkkuel.presentation.network.response.expenditure.DayExpenditureResponse
-import com.example.yeongkkuel.presentation.network.response.expenditure.MonthExpendituresCalendar
-import com.example.yeongkkuel.presentation.network.response.expenditure.MonthExpendituresCategory
-import com.example.yeongkkuel.presentation.network.response.expenditure.MonthlyAverageExpenditureResponse
-import com.example.yeongkkuel.presentation.network.response.expenditure.WeekExpenditureExpensesResponse
-import com.example.yeongkkuel.presentation.network.response.expenditure.WeekExpendituresAverage
+import com.example.yeongkkuel.network.request.expenditure.ExpenditureTargetRequest
+import com.example.yeongkkuel.network.response.Response
+import com.example.yeongkkuel.network.response.expenditure.DayExpenditureResponse
+import com.example.yeongkkuel.network.response.expenditure.MonthExpendituresCalendar
+import com.example.yeongkkuel.network.response.expenditure.MonthExpendituresCategory
+import com.example.yeongkkuel.network.response.expenditure.MonthlyAverageExpenditureResponse
+import com.example.yeongkkuel.network.response.expenditure.WeekExpenditureExpensesResponse
+import com.example.yeongkkuel.network.response.expenditure.WeekExpendituresAverage
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
-import java.util.Calendar
-import java.util.Date
 
 interface YeongkkuelService {
 
     //stat
     @GET("/api/expenditures/day")
     suspend fun getExpendituresDay(
-    ): Response<DayExpenditureResponse>
+    ): retrofit2.Response<Response<DayExpenditureResponse>>
 
     @GET("/api/expenditures/week/expenses")
     suspend fun getExpendituresWeekExpenses(

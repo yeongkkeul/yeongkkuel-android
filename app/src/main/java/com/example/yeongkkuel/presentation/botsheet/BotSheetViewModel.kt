@@ -5,18 +5,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.presentation.home.category.Category
-import com.example.yeongkkuel.presentation.network.RetrofitClient
+import com.example.yeongkkuel.network.RetrofitClient
+import com.example.yeongkkuel.network.response.Response
+import com.example.yeongkkuel.network.response.expenditure.DayExpenditureResponse
 import com.example.yeongkkuel.presentation.util.Colors
 import com.example.yeongkkuel.presentation.util.SpendingCategory
+import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.reflect.TypeToken
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.Calendar
-import java.util.Date
 
 class BotSheetViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<BotSheetUiState>(BotSheetUiState.init())
@@ -25,11 +27,15 @@ class BotSheetViewModel : ViewModel() {
     private val yeongkkuelService = RetrofitClient.yeongkkuelService
 
     // ✅ LiveData → StateFlow로 일관된 상태 관리
-    private val _spendingHistoryList = MutableStateFlow<List<BotSheetUiState.Spending.History>>(emptyList())
+    private val _spendingHistoryList =
+        MutableStateFlow<List<BotSheetUiState.Spending.History>>(emptyList())
     val spendingHistoryList = _spendingHistoryList.asStateFlow()
 
     // 🔹 지출 내역 추가 기능
-    fun addExpenseToCategory(category: SpendingCategory, history: BotSheetUiState.Spending.History) {
+    fun addExpenseToCategory(
+        category: SpendingCategory,
+        history: BotSheetUiState.Spending.History
+    ) {
         _uiState.update { prev ->
             val updatedList = prev.spendingList.map { spending ->
                 if (spending.kind == category) {
@@ -42,6 +48,7 @@ class BotSheetViewModel : ViewModel() {
         }
         updateSpendingHistoryList() // ✅ 추가된 내역 반영
     }
+
     private val mutex = Mutex()
 
     suspend fun updateBotSheetHistory(updatedExpense: BotSheetUiState.Spending.History) {
@@ -115,7 +122,10 @@ class BotSheetViewModel : ViewModel() {
         // ✅ 최신 내역 업데이트
         updateSpendingHistoryList()
 
-        Log.d("BotSheetViewModel", "📌 삭제됨: $expenseName, 남은 지출 개수: ${_spendingHistoryList.value.size}")
+        Log.d(
+            "BotSheetViewModel",
+            "📌 삭제됨: $expenseName, 남은 지출 개수: ${_spendingHistoryList.value.size}"
+        )
     }
 
     // 카테고리 추가 기능
@@ -186,18 +196,34 @@ class BotSheetViewModel : ViewModel() {
     // 🔹 일일 목표 지출 가져오기
     fun getDayTargetSpending() = viewModelScope.launch {
         try {
-            yeongkkuelService.getExpendituresDay().run {
-                if(isSuccess){
-                    result.run {
-                        _uiState.update { prev->
-                            prev.copy(
-                                targetSpending = dayTargetExpenditure
-                            )
+            val response = yeongkkuelService.getExpendituresDay()
+
+            if (response.isSuccessful) { // HTTP 상태 코드 200~299
+                response.body()?.let { body -> // body가 직접 만든 Response<T> 구조를 따름
+                    if (body.isSuccess) {
+                        _uiState.update { prev ->
+                            prev.copy(targetSpending = body.result.dayTargetExpenditure)
+                        }
+                    } else if (body.code == "EXPENSE4005") { // 목표 지출액이 없을 경우
+                        _uiState.update { prev ->
+                            prev.copy(targetSpending = -1)
                         }
                     }
                 }
+            } else {
+                // HTTP 400 에러 응답을 직접 처리
+                val errorBody = response.errorBody()?.string() ?: "{}"
+                val errorResponseType = object : TypeToken<Response<DayExpenditureResponse>>() {}.type
+                val errorResponse = Gson().fromJson<Response<DayExpenditureResponse>>(errorBody, errorResponseType)
+
+
+                if (errorResponse.code == "EXPENSE4005") { // 목표 지출액이 없을 경우
+                    _uiState.update { prev ->
+                        prev.copy(targetSpending = -1)
+                    }
+                }
             }
-        }catch (e:Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
@@ -210,6 +236,7 @@ class BotSheetViewModel : ViewModel() {
         val day = calendar.get(Calendar.DAY_OF_MONTH)
 
         getSpendingList(year, month, day) // 기존 함수 호출
+        getDayTargetSpending()
     }
 
     // 🔹 매개변수를 받는 기존 함수
@@ -228,22 +255,27 @@ class BotSheetViewModel : ViewModel() {
                             val updatedSpendingList = categories.map { category ->
                                 BotSheetUiState.Spending(
                                     kind = SpendingCategory.fromKor(category.categoryName),
-                                    color = Colors.fromCode(category.categoryColor) ?: Colors.RED1,
+                                    color = Colors.getRGB(red = category.red, blue = category.blue, green = category.green) ?: Colors.RED1,
                                     plusIconResId = R.drawable.ic_plus_default,
                                     history = category.expenses.map { expense ->
                                         BotSheetUiState.Spending.History(
                                             name = expense.expenseName,
                                             price = expense.expenseAmount,
-                                            date = expense.expenseDate,
+                                            date = "",
                                             categoryName = category.categoryName,
-                                            categoryColor = category.categoryColor,
-                                            content = expense.expenseContent,
-                                            photoUrl = expense.expensePhotoUrl
+                                            categoryColor = "",
+                                            content = "",
+                                            photoUrl = ""
                                         )
                                     }
                                 )
                             }
-                            prev.copy(spendingList = updatedSpendingList)
+                            prev.copy(
+                                spendingList = updatedSpendingList,
+                                date = Calendar.getInstance().apply {
+                                    set(year, month - 1, day)
+                                }.time
+                            )
                         }
                     }
                     updateSpendingHistoryList() // 최신 데이터 반영
@@ -263,6 +295,7 @@ class BotSheetViewModel : ViewModel() {
             }
         }
     }
+
     fun getCategoryList(): List<Category> {
         val categoryList = _uiState.value.spendingList.map { spending ->
             Category(name = spending.kind.kor, color = spending.color)

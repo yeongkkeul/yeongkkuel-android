@@ -2,7 +2,7 @@ package com.example.yeongkkuel.presentation.stat.monthly
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.yeongkkuel.presentation.network.RetrofitClient
+import com.example.yeongkkuel.network.RetrofitClient
 import com.example.yeongkkuel.presentation.util.Week
 import com.example.yeongkkuel.presentation.util.getDay
 import com.github.mikephil.charting.data.PieEntry
