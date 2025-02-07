@@ -250,14 +250,10 @@ class ExpenseEntryFragment : Fragment() {
         val selectedCategoryColor: String? = null
         val selectedCategory = arguments?.getString("selectedCategory") ?: "기타"
         val expenseHistory = BotSheetUiState.Spending.History(
+            id = 1,
             name =  detail,
             price = if (isNoExpenseChecked) 0 else amount,
-            date = expenseDate ?: "",
-            categoryName = selectedCategory,
-            categoryColor = selectedCategoryColor ?: "#000000",
-            content =  detail,
-            photoUrl = expensePhotoUrl ?: "",
-            isNoExpense = isNoExpenseChecked // ✅ 무지출 여부 추가
+            imgExist = false
         )
 
         botSheetViewModel.addExpenseHistory(expenseHistory)

@@ -24,19 +24,14 @@ class BotSheetHistoryListAdapter(
             // 이름과 가격 설정
             tvName.text = item.name
             tvPrice.text = "-${item.price.toMoneyString()}원"
-            tvName.setTextColor(Color.parseColor(item.categoryColor))
 
-            tvName.text = if (item.content.length > 9) {
-                "${item.content.take(9)}..."
+            tvName.text = if (item.name.length > 9) {
+                "${item.name.take(9)}..."
             } else {
-                item.content
+                item.name
             }
-            if (item.isNoExpense) {
-                tvPrice.visibility = View.GONE
-            } else {
-                tvPrice.visibility = View.VISIBLE
-            }
-            if (!item.photoUrl.isNullOrEmpty()) {
+
+            if (!item.imgExist) {
                 icPhotoIncluded.visibility = View.VISIBLE // 사진이 있을 경우 표시
             } else {
                 icPhotoIncluded.visibility = View.GONE // 사진이 없을 경우 숨김
@@ -51,7 +46,7 @@ class BotSheetHistoryListAdapter(
             oldItem: BotSheetUiState.Spending.History,
             newItem: BotSheetUiState.Spending.History
         ): Boolean {
-            return oldItem.name == newItem.name && oldItem.date == newItem.date
+            return oldItem.name == newItem.name && oldItem.id == newItem.id
         }
 
         override fun areContentsTheSame(
