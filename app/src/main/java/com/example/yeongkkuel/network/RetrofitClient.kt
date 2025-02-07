@@ -1,9 +1,6 @@
 package com.example.yeongkkuel.network
 
 import android.content.Context
-import com.example.yeongkkuel.presentation.auth.ReissueApiService
-import com.example.yeongkkuel.presentation.auth.TokenManager
-import com.example.yeongkkuel.presentation.login.LoginApiService
 import com.example.yeongkkuel.network.data.AuthInterceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -50,7 +47,7 @@ object RetrofitClient {
     }
 
     val reissueApiService: ReissueApiService by lazy {
-        baseRetrofit!!.create(ReissueApiService::class.java)
+        authRetrofit!!.create(ReissueApiService::class.java)
     }
 
     val loginApiService: LoginApiService by lazy {

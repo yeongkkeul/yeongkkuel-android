@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.presentation.my.data
+package com.example.yeongkkuel.network.request.my
 
 data class UserProfileRequest(
     val nickname: String,

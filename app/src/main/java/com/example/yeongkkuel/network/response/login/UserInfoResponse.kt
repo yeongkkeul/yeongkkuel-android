@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.presentation.login.response
+package com.example.yeongkkuel.network.response.login
 
 data class UserInfoResponse(
     val isSuccess: Boolean,

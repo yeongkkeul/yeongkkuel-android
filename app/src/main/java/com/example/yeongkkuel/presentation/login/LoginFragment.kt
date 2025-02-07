@@ -14,7 +14,7 @@ import com.example.yeongkkuel.BuildConfig
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentLoginBinding
 import com.example.yeongkkuel.presentation.auth.TokenManager
-import com.example.yeongkkuel.presentation.login.response.KakaoLoginResponse
+import com.example.yeongkkuel.network.response.login.KakaoLoginResponse
 import com.example.yeongkkuel.network.RetrofitClient
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
