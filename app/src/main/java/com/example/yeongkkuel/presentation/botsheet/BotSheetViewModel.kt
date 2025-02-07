@@ -19,12 +19,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.Calendar
+import java.util.UUID
 
 class BotSheetViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<BotSheetUiState>(BotSheetUiState.init())
     val uiState = _uiState.asStateFlow()
 
-    private val yeongkkuelService = RetrofitClient.yeongkkuelService
+    private val yeongkkuelService = RetrofitClient.statService
 
     // ✅ LiveData → StateFlow로 일관된 상태 관리
     private val _spendingHistoryList =
@@ -138,6 +139,7 @@ class BotSheetViewModel : ViewModel() {
             val updatedList = prev.spendingList.toMutableList().apply {
                 add(
                     BotSheetUiState.Spending(
+                        categoryId = 0,
                         kind = spendingCategory,
                         color = categoryColor,
                         plusIconResId = plusIconResId,
@@ -254,6 +256,7 @@ class BotSheetViewModel : ViewModel() {
                         _uiState.update { prev ->
                             val updatedSpendingList = categories.map { category ->
                                 BotSheetUiState.Spending(
+                                    categoryId = 1,
                                     kind = SpendingCategory.fromKor(category.categoryName),
                                     color = Colors.getRGB(red = category.red, blue = category.blue, green = category.green) ?: Colors.RED1,
                                     plusIconResId = R.drawable.ic_plus_default,

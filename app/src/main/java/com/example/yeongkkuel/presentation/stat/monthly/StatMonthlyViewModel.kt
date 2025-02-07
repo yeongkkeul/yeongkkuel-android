@@ -17,7 +17,7 @@ class StatMonthlyViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(StatMonthlyUiState.init())
     val uiState = _uiState.asStateFlow()
 
-    private val yeongkkuelService = RetrofitClient.yeongkkuelService
+    private val yeongkkuelService = RetrofitClient.statService
     private val dayOfWeekList: List<StatMonthlyUiState.CalendarData> =
         Week.getListItem().map { week ->
             StatMonthlyUiState.CalendarData.CalendarDayOfWeek(week)
@@ -36,6 +36,13 @@ class StatMonthlyViewModel : ViewModel() {
             try {
                 yeongkkuelService.getExpendituresMonthCalendar(year = year, month = month).run {
                     if (isSuccess) {
+                        _uiState.update { prev->
+                            prev.copy(
+                                achieveDay = result.achievedDays,
+                                rewardsAmount = result.rewards
+                            )
+                        }
+
                         val dataList = result.selectedMonthExpenses.map {
                             StatMonthlyUiState.CalendarData.CalendarDay(
                                 targetMonth = Pair(year, month),

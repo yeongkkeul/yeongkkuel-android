@@ -54,8 +54,8 @@ object RetrofitClient {
         authRetrofit!!.create(LoginApiService::class.java)
     }
 
-    val yeongkkuelService: YeongkkuelService by lazy {
-        authRetrofit!!.create(YeongkkuelService::class.java)
+    val statService: StatService by lazy {
+        authRetrofit!!.create(StatService::class.java)
     }
 
 }

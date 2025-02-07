@@ -7,6 +7,7 @@ data class MonthExpendituresCategory(
     val categories: List<Category>
 ) {
     data class Category(
+        @SerializedName("categoryId") val categoryId: Int,
         @SerializedName("categoryName") val categoryName: String,
         @SerializedName("red") val red: Int,               // RGB 값
         @SerializedName("green") val green: Int,           // RGB 값
