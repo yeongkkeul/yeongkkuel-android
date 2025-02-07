@@ -21,7 +21,7 @@ import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentSignupBinding // 자동 생성된 바인딩 클래스
 import com.example.yeongkkuel.presentation.login.request.ReferralRequest
 import com.example.yeongkkuel.presentation.login.request.UserInfoRequest
-import com.example.yeongkkuel.presentation.network.RetrofitClient
+import com.example.yeongkkuel.network.RetrofitClient
 import kotlinx.coroutines.launch
 import timber.log.Timber
 

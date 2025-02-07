@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.presentation.network
+package com.example.yeongkkuel.network
 
 import android.content.Context
 import com.example.yeongkkuel.presentation.auth.ReissueApiService
@@ -7,6 +7,7 @@ import com.example.yeongkkuel.presentation.login.LoginApiService
 import com.example.yeongkkuel.presentation.network.data.AuthInterceptor
 import com.example.yeongkkuel.presentation.home.HomeApiService
 import com.example.yeongkkuel.presentation.home.store.StoreApiService
+import com.example.yeongkkuel.network.data.AuthInterceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
