@@ -71,10 +71,18 @@ class StoreFragment : Fragment() {
         }
 
         binding.imgPurchaseIcon.setOnClickListener {
-            selectedProduct?.let {
-                Log.d("StoreFragment", "Passing to Dialog: ${it.name}, ResId: ${it.imageUrl}")
-                showPurchaseDialog(it)
-            } ?: Log.d("StoreFragment", "No Product Selected")
+            selectedProduct?.let { product ->
+                if (viewModel.currentReward < product.price) { // ✅ 보유 리워드 체크
+                    showPurchaseFailureDialog() // 리워드 부족 시 다이얼로그 표시
+                } else {
+                    viewModel.purchaseSkin(
+                        itemId = product.id,
+                        itemType = product.category.name,
+                        itemName = product.name,
+                        reward = product.price
+                    )
+                }
+            } ?: Log.d("StoreFragment", "선택된 상품 없음")
         }
         binding.imgSaveIcon.setOnClickListener {
             selectedProductInMyTab?.let { product ->
@@ -111,28 +119,23 @@ class StoreFragment : Fragment() {
             }
         }
 
-        binding.imgPurchaseIcon.setOnClickListener {
-            selectedProduct?.let { product ->
-                viewModel.purchaseSkin(
-                    itemId = product.id,
-                    itemType = product.category.name, // 예: "SWING"
-                    itemName = product.name,
-                    reward = product.price
-                )
-                Toast.makeText(requireContext(), "스킨 구매 중...", Toast.LENGTH_SHORT).show()
-            } ?: Log.d("StoreFragment", "선택된 상품 없음")
-        }
-
         viewModel.purchaseResponse.observe(viewLifecycleOwner) { response ->
+            Log.d("StoreFragment", "🔍 스킨 구매 API 응답: $response")
+
             if (response?.isSuccess == true) {
                 Toast.makeText(requireContext(), "스킨 구매 성공!", Toast.LENGTH_SHORT).show()
                 navController.popBackStack()
             } else {
-                Log.e("StoreFragment", "스킨 구매 실패: ${response?.message ?: "오류 발생"}")  // ✅ 실패 메시지 로그
-                Toast.makeText(requireContext(), "스킨 구매 실패: ${response?.message ?: "오류 발생"}", Toast.LENGTH_SHORT).show()
+                Log.e("StoreFragment", "❌ 스킨 구매 실패: ${response?.message ?: "서버 응답 없음"}")
+
+                // ✅ 리워드 부족 에러 감지 (예: 서버에서 리워드 부족 시 특정 코드 반환)
+                if (response?.code == "REWARD_NOT_ENOUGH") {
+                    showPurchaseFailureDialog()
+                } else {
+                    Toast.makeText(requireContext(), "스킨 구매 실패: ${response?.message ?: "서버 오류"}", Toast.LENGTH_SHORT).show()
+                }
             }
         }
-
         viewModel.fetchShopData("SWING")
         Log.d("StoreFragment", "🔍 Fetching shop data for category: SWING")
         viewModel.shopResponse.observe(viewLifecycleOwner) { response ->
@@ -496,7 +499,13 @@ class StoreFragment : Fragment() {
             .setView(dialogView)
             .create()
 
-        val btnFailureCheck = dialogView.findViewById<TextView>(R.id.btn_failure_check)
+        // ✅ 수정된 코드 (정확한 ID인지 확인)
+        val btnFailureCheck = dialogView.findViewById<View>(R.id.btn_failure_check) as? TextView
+
+        if (btnFailureCheck == null) {
+            Log.e("StoreFragment", "❌ btnFailureCheck 찾을 수 없음. XML 레이아웃 ID 확인 필요!")
+            return
+        }
 
         btnFailureCheck.setOnClickListener {
             dialog.dismiss() // 다이얼로그 닫기

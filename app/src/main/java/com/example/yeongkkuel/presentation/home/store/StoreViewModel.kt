@@ -27,8 +27,11 @@ class StoreViewModel : ViewModel() {
 
     private val _productUiState = MutableLiveData<ProductUiState>()
     val productUiState: LiveData<ProductUiState> = _productUiState
+
     private val _showFailureDialog = MutableLiveData<Boolean>()
     val showFailureDialog: LiveData<Boolean> = _showFailureDialog
+
+    var currentReward: Int = 0 // ✅ 보유 리워드 저장 변수 추가
 
     init {
         _productUiState.value = ProductUiState()
@@ -54,9 +57,10 @@ class StoreViewModel : ViewModel() {
                 if (response != null) {
                     Log.d("StoreViewModel", "스킨 구매 응답 코드: ${response.code}, 메시지: ${response.message}")
 
-                    // REWARD4001 응답 코드일 경우, 다이얼로그 띄우기 위해 true로 설정
                     if (response.code == "REWARD4001") {
-                        _showFailureDialog.postValue(true)
+                        _showFailureDialog.postValue(true) // ✅ 리워드 부족 시 다이얼로그 활성화
+                    } else if (response.isSuccess) {
+                        currentReward -= reward // ✅ 리워드 차감
                     }
 
                     _purchaseResponse.postValue(response)
@@ -69,28 +73,27 @@ class StoreViewModel : ViewModel() {
             }
         }
     }
+
     fun resetFailureDialog() {
         _showFailureDialog.postValue(false)
     }
 
-
     fun fetchShopData(itemType: String) {
         viewModelScope.launch {
             try {
-                Log.d("StoreViewModel", "🛒 Fetching shop data for itemType: $itemType") // ✅ 요청 로그 추가
+                Log.d("StoreViewModel", "🛒 Fetching shop data for itemType: $itemType")
 
                 val response = repository.getShopData(itemType)
 
-                if (response != null) {
-                    Log.d("StoreViewModel", "✅ API 응답: $response") // ✅ 전체 응답 로그 추가
-                } else {
-                    Log.e("StoreViewModel", "❌ API 응답이 null입니다!")
-                }
-
                 if (response?.isSuccess == true) {
-                    Log.d("StoreViewModel", "✅ 상점 데이터 조회 성공: ${response.result.itemList}") // ✅ 성공한 데이터 로그 추가
+                    Log.d("StoreViewModel", "✅ 상점 데이터 조회 성공: ${response.result.itemList}")
 
                     _shopResponse.postValue(response)
+
+                    // ✅ 보유 리워드 업데이트
+                    response.result.myReward?.let {
+                        currentReward = it
+                    }
 
                     val shopItems = response.result.itemList.map { shopItem ->
                         ProductUiState.Product(
@@ -98,7 +101,7 @@ class StoreViewModel : ViewModel() {
                             name = shopItem.itemName,
                             price = shopItem.price,
                             category = ProductCategory.valueOf(response.result.itemType),
-                            imageUrl = shopItem.itemImg // ✅ 서버에서 제공하는 이미지 URL 그대로 사용
+                            imageUrl = shopItem.itemImg
                         )
                     }
 
@@ -113,20 +116,10 @@ class StoreViewModel : ViewModel() {
                     _shopResponse.postValue(null)
                 }
             } catch (e: Exception) {
-                Log.e("StoreViewModel", "❌ 상점 데이터 조회 오류: ${e.message}")
+            Log.e("StoreViewModel", "❌ 상점 데이터 조회 오류: ${e.message}")
                 _shopResponse.postValue(null)
             }
         }
     }
-
-
-    private fun getDrawableFromUrl(url: String): Int {
-        return when (url) {
-            "swing_1.png" -> R.drawable.img_home_swing1
-            "toy_1.png" -> R.drawable.img_home_toy1
-            "bowl_1.png" -> R.drawable.img_home_bowl1
-            "nest_1.png" -> R.drawable.img_home_nest1
-            else -> R.drawable.img_home_swing1
-        }
-    }
 }
+
