@@ -169,7 +169,7 @@ class BotSheetViewModel : ViewModel() {
         val updatedCategoryColor = updatedCategory.color // ✅ Colors 타입 유지
 
         val updatedSpendingList = uiState.value.spendingList.map { spending ->
-            if (spending.kind.kor == originalCategoryName) {
+            if (spending.kind.name == originalCategoryName) {
                 spending.copy(
                     kind = SpendingCategory.fromName(updatedCategory.name),
                     color = updatedCategoryColor // ✅ Colors 타입 유지
@@ -196,7 +196,7 @@ class BotSheetViewModel : ViewModel() {
     // 카테고리 삭제 연동 기능
     fun removeCategory(categoryName: String) {
         _uiState.update { prev ->
-            val updatedSpendingList = prev.spendingList.filter { it.kind.kor != categoryName }
+            val updatedSpendingList = prev.spendingList.filter { it.kind.name != categoryName }
             prev.copy(spendingList = updatedSpendingList)
         }
     }
@@ -263,7 +263,7 @@ class BotSheetViewModel : ViewModel() {
                             val updatedSpendingList = categories.map { category ->
                                 BotSheetUiState.Spending(
                                     categoryId = 1,
-                                    kind = SpendingCategory.fromKor(category.categoryName),
+                                    kind = SpendingCategory.fromName(category.categoryName),
                                     color = Colors.fromRGB(red = category.red, blue = category.blue, green = category.green) ?: Colors.RED1,
                                     plusIconResId = R.drawable.ic_plus_default,
                                     history = category.expenses.map { expense ->
@@ -306,7 +306,7 @@ class BotSheetViewModel : ViewModel() {
         val categoryList = _uiState.value.spendingList.map { spending ->
             Category(
                 id = spending.hashCode(), // 임시로 고유 id 생성
-                name = spending.kind.kor,
+                name = spending.kind.name,
                 color = spending.color
             )
         }

@@ -39,7 +39,7 @@ class BotSheetCategoryListAdapter(
         }
 
         fun onBind(item: BotSheetUiState.Spending) = with(binding) {
-            tvCategory.text = item.kind.kor
+            tvCategory.text = item.kind.name
             val context = binding.root.context
             val color = item.color.id // Colors Enum의 id 사용
             tvCategory.setTextColor(ContextCompat.getColor(context, color))
@@ -59,7 +59,7 @@ class BotSheetCategoryListAdapter(
             }
             // 🔹 카테고리 추가 버튼 클릭 리스너
             ivBtnAdd.setOnClickListener {
-                botSheetListener.navigateToExpenseEntry(item.kind.kor, item.color.id)
+                botSheetListener.navigateToExpenseEntry(item.kind.name, item.color.id)
             }
         }
 
