@@ -12,6 +12,9 @@ import retrofit2.http.GET
 import retrofit2.http.PATCH
 
 interface MyPageService {
+    //하루 목표 지출액 설정은 statService에서 사용되어 프론트에서 지출설정 기능까지 구현되어 있습니다.
+    // swagger에는 mypage 범주로 되어있기에 확인하면서 혼동되지 않도록 주석을 답니다. 읽었으면 지워주세요.
+
     // 마이페이지 프로필 조회
     @GET("/api/mypage")
     suspend fun getMyPage(): Response<MyPageResult>
