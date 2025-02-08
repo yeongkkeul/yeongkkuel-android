@@ -2,6 +2,8 @@ package com.example.yeongkkuel.presentation.home.category
 
 import android.graphics.Rect
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,6 +38,16 @@ class CategoryManageFragment : Fragment() {
         _binding = FragmentCategoryManageBinding.inflate(inflater, container, false)
         return binding.root
     }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.fetchCategories() // ✅ 프래그먼트가 다시 활성화될 때 최신 데이터 불러오기
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            viewModel.fetchCategories() // ✅ 한 번 더 호출하여 UI 강제 갱신
+        }, 500) // 0.5초 후 한 번 더 호출
+    }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

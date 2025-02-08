@@ -35,12 +35,15 @@ class CategoryViewModel : ViewModel() {
             try {
                 val response = RetrofitClient.yeongkkuelService.getCategories()
 
-                println("Response Body: ${response.result}") // ✅ 여기 추가 (Response Body 확인 로그)
+                println("Response Body: ${response.result}") // Response Body 확인 로그
 
                 if (response.isSuccess) { // 커스텀 Response의 isSuccess 확인
                     // TODO - 방어 로직 추가
                     val categoryListResponse = response.result
                     _categories.value = categoryListResponse.categoryList.map { it.toCategory() } // result를 로컬 데이터로 변환
+
+                    // ✅ UI 강제 갱신 (값이 동일해도 LiveData가 변경되도록)
+                    _categories.value = _categories.value
                 } else {
                     _errorMessage.value = "Failed to fetch categories: ${response.message}" // 서버 메시지 활용
                 }
@@ -119,23 +122,10 @@ class CategoryViewModel : ViewModel() {
             viewModelScope.launch {
                 try {
                     val request = updatedCategory.toRequest() // 로컬 데이터를 요청 데이터로 변환
-
-                    // 수정 요청 데이터 확인
-                    println("Update Category Request: $request")
-
                     val response = RetrofitClient.yeongkkuelService.updateCategory(categoryToUpdate.id, request)
 
-                    // 서버 응답 확인
-                    println("Update Category Response: $response")
-
-                    if (response.isSuccess) { // 커스텀 Response의 isSuccess 확인
-                        val updatedList = _categories.value?.toMutableList() ?: mutableListOf()
-                        val index = updatedList.indexOfFirst { it.name == originalName }
-                        if (index != -1) {
-                            updatedList[index] = updatedCategory
-                            _categories.value = updatedList
-                        }
-                        fetchCategories() // 수정 후 최신 데이터 다시 불러오기
+                    if (response.isSuccess) {
+                        fetchCategories() // ✅ 수정 후 최신 데이터 다시 불러오기 (이것만 남기기)
                     } else {
                         _errorMessage.value = "Failed to update category: ${response.message}"
                     }
@@ -145,6 +135,35 @@ class CategoryViewModel : ViewModel() {
             }
         }
     }
+
+
+//    // 카테고리 수정 (서버와 동기화)
+//    fun updateCategory(originalName: String, updatedCategory: Category) {
+//        val categoryToUpdate = _categories.value.orEmpty().find { it.name == originalName }
+//        if (categoryToUpdate != null) {
+//            viewModelScope.launch {
+//                try {
+//                    val request = updatedCategory.toRequest() // 로컬 데이터를 요청 데이터로 변환
+//                    val response = RetrofitClient.yeongkkuelService.updateCategory(categoryToUpdate.id, request)
+//
+//                    if (response.isSuccess) { // 커스텀 Response의 isSuccess 확인
+//                        fetchCategories() // 수정 후 최신 데이터 다시 불러오기
+//
+//                        val updatedList = _categories.value?.toMutableList() ?: mutableListOf()
+//                        val index = updatedList.indexOfFirst { it.name == originalName }
+//                        if (index != -1) {
+//                            updatedList[index] = updatedCategory
+//                            _categories.value = updatedList
+//                        }
+//                    } else {
+//                        _errorMessage.value = "Failed to update category: ${response.message}"
+//                    }
+//                } catch (e: Exception) {
+//                    _errorMessage.value = "Error: ${e.message}"
+//                }
+//            }
+//        }
+//    }
 
     // 카테고리 목록 비어 있는지 확인
     fun isCategoryListEmpty(): Boolean {

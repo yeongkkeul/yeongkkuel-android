@@ -166,18 +166,19 @@ class BotSheetViewModel : ViewModel() {
             }
         }
 
-        // 기존 지출 내역의 categoryColor도 Colors 타입 유지
-        _spendingHistoryList.value = _spendingHistoryList.value.map { history ->
-            if (history.categoryName == originalCategoryName) {
-                history.copy(categoryColor = updatedCategoryColor.toString()) // ✅ String 변환
+        // 기존 카테고리 리스트 업데이트
+        _categoryList.value = _categoryList.value?.map { category ->
+            if (category.name == originalCategoryName) {
+                updatedCategory // 수정된 카테고리 반영
             } else {
-                history
+                category
             }
         }
 
         _uiState.update { prevState ->
             prevState.copy(spendingList = updatedSpendingList)
         }
+        Log.d("BotSheetViewModel", "✅ 카테고리 업데이트 완료: $updatedCategory")
     }
 
     // 카테고리 삭제 연동 기능

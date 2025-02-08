@@ -212,7 +212,9 @@ class CategoryEditFragment : Fragment() {
         botSheetViewModel.updateCategory(originalCategory.name, updatedCategory)
 
         Toast.makeText(requireContext(), "카테고리가 수정되었습니다.", Toast.LENGTH_SHORT).show()
-        findNavController().popBackStack(R.id.categoryManageFragment, false)
+
+        // ✅ popBackStack() 대신 navigate() 사용하여 강제 새로고침
+        findNavController().navigate(R.id.action_categoryEditFragment_to_categoryManageFragment)
     }
 
 
