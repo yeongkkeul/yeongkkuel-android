@@ -1,7 +1,7 @@
-package com.example.yeongkkuel.presentation.auth
+package com.example.yeongkkuel.network
 
-import com.example.yeongkkuel.presentation.login.request.ReissueRequest
-import com.example.yeongkkuel.presentation.login.response.ReissueResponse
+import com.example.yeongkkuel.network.request.login.ReissueRequest
+import com.example.yeongkkuel.network.response.login.ReissueResponse
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST

@@ -1,18 +1,17 @@
-package com.example.yeongkkuel.presentation.login
+package com.example.yeongkkuel.network
 
-import com.example.yeongkkuel.presentation.login.request.ReferralRequest
-import com.example.yeongkkuel.presentation.login.request.TermsAgreeRequest
-import com.example.yeongkkuel.presentation.login.request.UserInfoRequest
-import com.example.yeongkkuel.presentation.login.response.KakaoLoginResponse
-import com.example.yeongkkuel.presentation.login.response.ReferralResponse
-import com.example.yeongkkuel.presentation.login.response.TermsAgreeResponse
-import com.example.yeongkkuel.presentation.login.response.UserInfoResponse
+import com.example.yeongkkuel.network.request.login.ReferralRequest
+import com.example.yeongkkuel.network.request.login.TermsAgreeRequest
+import com.example.yeongkkuel.network.request.login.UserInfoRequest
+import com.example.yeongkkuel.network.response.login.KakaoLoginResponse
+import com.example.yeongkkuel.network.response.login.ReferralResponse
+import com.example.yeongkkuel.network.response.login.TermsAgreeResponse
+import com.example.yeongkkuel.network.response.login.UserInfoResponse
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
-import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface LoginApiService {

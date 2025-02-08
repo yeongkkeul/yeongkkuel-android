@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
@@ -21,7 +22,10 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentMyBinding
+import com.example.yeongkkuel.presentation.auth.TokenManager
+import com.example.yeongkkuel.presentation.base.MainActivity
 import com.kakao.sdk.user.UserApiClient
+import timber.log.Timber
 
 class MyFragment : Fragment() {
 
@@ -388,11 +392,10 @@ class MyFragment : Fragment() {
     }
 
     private fun clearLocalToken() {
-        // 예: SharedPreferences 또는 EncryptedSharedPreferences로 저장된 JWT 제거
-        val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
-        prefs.edit().clear().apply()
-
-        // 추가로 loginProvider 등도 초기화
+        //tokenmanager 사용
+        TokenManager.clearTokens(requireContext())
+        //토큰이 잘 없어졌는지 로깅
+        Timber.d("TokenManager: ${TokenManager.getAccessToken(requireContext())}")
     }
 
     private fun getLoginProvider(): String {
@@ -414,12 +417,11 @@ class MyFragment : Fragment() {
 
     private fun navigateToLogin() {
         //TODO : 로그인 화면으로 이동
-        /*// 예: Navigation Graph 사용 시
-//        findNavController().navigate(R.id.action_global_to_loginFragment)
-        // 또는 액티비티 새로 시작
+
+        // 로그인 화면으로 이동
         val intent = Intent(requireContext(), MainActivity::class.java)
         startActivity(intent)
-        requireActivity().finish()*/
+        requireActivity().finish()
     }
 
 

@@ -8,13 +8,11 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.navigateUp
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentTermsAgreeBinding
-import com.example.yeongkkuel.presentation.login.request.TermsAgreeRequest
-import com.example.yeongkkuel.presentation.login.response.TermsAgreeResponse
+import com.example.yeongkkuel.network.request.login.TermsAgreeRequest
+import com.example.yeongkkuel.network.response.login.TermsAgreeResponse
 import com.example.yeongkkuel.network.RetrofitClient
-import com.example.yeongkkuel.network.RetrofitClient.loginApiService
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

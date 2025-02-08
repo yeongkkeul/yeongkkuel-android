@@ -1,7 +1,7 @@
-package com.example.yeongkkuel.presentation.my
+package com.example.yeongkkuel.network
 
-import com.example.yeongkkuel.presentation.my.data.UserProfileRequest
-import com.example.yeongkkuel.presentation.my.data.UserProfileResponse
+import com.example.yeongkkuel.network.request.my.UserProfileRequest
+import com.example.yeongkkuel.network.response.my.UserProfileResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST

@@ -1,6 +1,6 @@
-package com.example.yeongkkuel.presentation.login.response
+package com.example.yeongkkuel.network.response.login
 
-data class ReferralResponse(
+data class TermsAgreeResponse(
     val isSuccess: Boolean,
     val code: String,
     val message: String,

@@ -111,4 +111,7 @@ dependencies {
     implementation(libs.retrofit.converter.gson)
 
     implementation(libs.flexiblestep.rangeslider)
+
+    // JwtDecode
+    implementation(libs.jwtdecode)
 }
