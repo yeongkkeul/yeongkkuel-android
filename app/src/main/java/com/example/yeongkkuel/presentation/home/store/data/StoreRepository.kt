@@ -1,7 +1,7 @@
 package com.example.yeongkkuel.presentation.home.store.data
 
 import android.util.Log
-import com.example.yeongkkuel.presentation.network.RetrofitClient
+import com.example.yeongkkuel.network.RetrofitClient
 
 class StoreRepository {
     private val api = RetrofitClient.storeapiService

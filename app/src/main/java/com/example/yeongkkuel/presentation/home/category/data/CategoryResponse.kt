@@ -1,9 +1,13 @@
 package com.example.yeongkkuel.presentation.home.category.data
 
+import com.google.gson.annotations.SerializedName
+
 data class CategoryResponse(
-    val id: Int,     // 카테고리 ID (서버에서 사용)
-    val name: String, // 카테고리 이름
-    val color: String // 카테고리 색상 (String으로 서버에서 내려옴)
+    @SerializedName("categoryId") val id: Int,
+    @SerializedName("categoryName") val name: String,
+    @SerializedName("red") val red: Int,               // RGB 값
+    @SerializedName("green") val green: Int,           // RGB 값
+    @SerializedName("blue") val blue: Int,             // RGB 값
 )
 
 data class CategoryListResponse(

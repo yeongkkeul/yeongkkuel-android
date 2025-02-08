@@ -2,12 +2,15 @@ package com.example.yeongkkuel.network
 
 import android.content.Context
 import com.example.yeongkkuel.network.data.AuthInterceptor
+import com.example.yeongkkuel.presentation.home.HomeApiService
+import com.example.yeongkkuel.presentation.home.store.StoreApiService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
+
     private const val BASE_URL = "https://dev.yeongkkeul.store"
 
     /**
@@ -60,5 +63,20 @@ object RetrofitClient {
     val statService: StatService by lazy {
         authRetrofit!!.create(StatService::class.java)
     }
+
+    val categoryApiService: CategoryApiService by lazy {
+        authRetrofit!!.create(CategoryApiService::class.java)
+    }
+
+    val homeApiService: HomeApiService by lazy {
+        authRetrofit!!.create(HomeApiService::class.java)
+    }
+
+    val storeapiService: StoreApiService by lazy {
+        authRetrofit!!.create(StoreApiService::class.java)
+    }
+
+
+
 
 }

@@ -4,11 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.yeongkkuel.network.RetrofitClient
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import com.example.yeongkkuel.presentation.home.category.data.Category
 import com.example.yeongkkuel.presentation.home.category.data.toCategory
 import com.example.yeongkkuel.presentation.home.category.data.toRequest
-import com.example.yeongkkuel.presentation.network.RetrofitClient
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
@@ -33,7 +33,7 @@ class CategoryViewModel : ViewModel() {
     fun fetchCategories() {
         viewModelScope.launch {
             try {
-                val response = RetrofitClient.yeongkkuelService.getCategories()
+                val response = RetrofitClient.categoryApiService.getCategories()
 
                 println("Response Body: ${response.result}") // Response Body 확인 로그
 
@@ -70,7 +70,7 @@ class CategoryViewModel : ViewModel() {
                 // Request Body 강제 출력
                 println("Request Body: $request")
 
-                val response = RetrofitClient.yeongkkuelService.addCategory(request)
+                val response = RetrofitClient.categoryApiService.addCategory(request)
 
                 if (response.isSuccess) { // 커스텀 Response의 isSuccess 확인
                     val updatedList = currentList.toMutableList().apply { add(category) }
@@ -94,7 +94,7 @@ class CategoryViewModel : ViewModel() {
                     // 삭제하려는 카테고리 ID 로그 출력
                     println("Deleting Category ID: ${categoryToDelete.id}")
 
-                    val response = RetrofitClient.yeongkkuelService.deleteCategory(categoryToDelete.id)
+                    val response = RetrofitClient.categoryApiService.deleteCategory(categoryToDelete.id)
 
                     // 서버 응답 확인
                     println("Delete Category Response: $response")
@@ -122,7 +122,7 @@ class CategoryViewModel : ViewModel() {
             viewModelScope.launch {
                 try {
                     val request = updatedCategory.toRequest() // 로컬 데이터를 요청 데이터로 변환
-                    val response = RetrofitClient.yeongkkuelService.updateCategory(categoryToUpdate.id, request)
+                    val response = RetrofitClient.categoryApiService.updateCategory(categoryToUpdate.id, request)
 
                     if (response.isSuccess) {
                         fetchCategories() // ✅ 수정 후 최신 데이터 다시 불러오기 (이것만 남기기)

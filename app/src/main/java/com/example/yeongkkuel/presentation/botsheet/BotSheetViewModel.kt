@@ -6,13 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yeongkkuel.R
-import com.example.yeongkkuel.presentation.home.category.Category
 import com.example.yeongkkuel.network.RetrofitClient
 import com.example.yeongkkuel.network.response.Response
 import com.example.yeongkkuel.network.response.expenditure.DayExpenditureResponse
-import com.example.yeongkkuel.network.response.expenditure.MonthExpendituresCategory
 import com.example.yeongkkuel.presentation.home.category.data.Category
-import com.example.yeongkkuel.presentation.network.RetrofitClient
 import com.example.yeongkkuel.presentation.util.Colors
 import com.example.yeongkkuel.presentation.util.SpendingCategory
 import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.reflect.TypeToken
@@ -24,7 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.Calendar
-import java.util.UUID
+
 
 class BotSheetViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<BotSheetUiState>(BotSheetUiState.init())
@@ -137,16 +134,17 @@ class BotSheetViewModel : ViewModel() {
     }
 
     // 카테고리 추가 기능
-    fun addCategory(category: MonthExpendituresCategory.Category) {
+    fun addCategory(category: Category) {
         val spendingCategory = SpendingCategory.CUSTOM(category.name)
         val categoryColor = category.color
+
         val plusIconResId = mapCategoryToIcon(categoryColor)
 
         _uiState.update { prev ->
             val updatedList = prev.spendingList.toMutableList().apply {
                 add(
                     BotSheetUiState.Spending(
-                        categoryId = 0,
+                        categoryId = category.id,
                         kind = spendingCategory,
                         color = categoryColor,
                         plusIconResId = plusIconResId,
@@ -266,7 +264,7 @@ class BotSheetViewModel : ViewModel() {
                                 BotSheetUiState.Spending(
                                     categoryId = 1,
                                     kind = SpendingCategory.fromKor(category.categoryName),
-                                    color = Colors.getRGB(red = category.red, blue = category.blue, green = category.green) ?: Colors.RED1,
+                                    color = Colors.fromRGB(red = category.red, blue = category.blue, green = category.green) ?: Colors.RED1,
                                     plusIconResId = R.drawable.ic_plus_default,
                                     history = category.expenses.map { expense ->
                                         BotSheetUiState.Spending.History(

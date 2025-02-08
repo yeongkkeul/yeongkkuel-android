@@ -12,9 +12,9 @@ data class Category(
 // 서버 응답을 로컬 데이터로 변환
 fun CategoryResponse.toCategory(): Category {
     return Category(
-        id = this.id, // 서버 응답의 ID를 로컬 데이터에 매핑
+        id = this.id,
         name = this.name,
-        color = Colors.valueOf(this.color) // 서버에서 받은 색상을 Colors enum으로 변환
+        color = Colors.fromRGB(this.red, this.green, this.blue) ?: Colors.BLACK1 // ✅ RGB 값을 기반으로 Colors 변환
     )
 }
 
