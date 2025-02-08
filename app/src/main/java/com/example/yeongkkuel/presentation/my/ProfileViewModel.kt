@@ -3,9 +3,9 @@ package com.example.yeongkkuel.presentation.my
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.yeongkkuel.presentation.my.data.UserProfileRequest
-import com.example.yeongkkuel.presentation.my.data.UserProfileResponse
-import com.example.yeongkkuel.presentation.my.data.UserProfileResult
+import com.example.yeongkkuel.network.request.my.UserProfileRequest
+import com.example.yeongkkuel.network.response.my.UserProfileResponse
+import com.example.yeongkkuel.network.response.my.UserProfileResult
 
 class ProfileViewModel : ViewModel()  {
 

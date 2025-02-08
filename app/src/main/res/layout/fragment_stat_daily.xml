@@ -49,7 +49,7 @@
         android:layout_height="wrap_content"
         android:text="25,000원"
         android:textColor="@color/main1"
-
+        android:gravity="center"
         app:layout_constraintBottom_toTopOf="@id/tv_chartDescription"
         app:layout_constraintEnd_toEndOf="@id/iv_chartCenter"
         app:layout_constraintStart_toStartOf="@id/iv_chartCenter"

@@ -6,26 +6,23 @@ import com.example.yeongkkuel.presentation.util.SpendingCategory
 import java.util.Date
 
 data class BotSheetUiState(
-    val targetSpending: Int = 300000,
+    val targetSpending: Int = 0,
     val spendingList: List<Spending>,
     val date: Date
 
 ) {
     data class Spending(
+        val categoryId: Int,
         val kind: SpendingCategory,
         val color: Colors,
         val plusIconResId: Int,
         val history: List<History>
     ) {
         data class History(
+            val id: Int,
             val name: String,       // 🔹 지출 이름
             val price: Int,         // 🔹 금액
-            val date: String,       // 🔹 지출 날짜 추가
-            val categoryName: String,
-            val categoryColor: String,
-            val content: String,    // 🔹 지출 내용 추가
-            val photoUrl: String,   // 🔹 사진 URL 추가
-            val isNoExpense: Boolean = false // 무지출 여부 추가
+            val imgExist: Boolean,   // 🔹 사진 URL 추가
         )
     }
 

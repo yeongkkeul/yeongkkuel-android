@@ -28,8 +28,12 @@ gson = "2.10.1"
 livedata = "2.6.1"
 viewmodel = "2.6.1"
 androidx-security = "1.1.0-alpha06"
+firebaseCrashlyticsBuildtools = "3.0.2"
+jwtdecode = "2.0.1"
+
 
 [libraries]
+jwtdecode = { group = "com.auth0.android", name = "jwtdecode", version.ref = "jwtdecode" }
 credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
 credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }
 flexiblestep-rangeslider = { module = "kr.co.prnd:flexiblestep-rangeslider", version.ref = "flexiblestepRangeslider" }
@@ -78,6 +82,9 @@ okhttp-logging-interceptor = { module = "com.squareup.okhttp3:logging-intercepto
 
 # CryptoSharedPreferences
 androidx-security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "androidx-security" }
+firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "firebase-crashlytics-buildtools", version.ref = "firebaseCrashlyticsBuildtools" }
+
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

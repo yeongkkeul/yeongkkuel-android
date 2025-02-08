@@ -126,20 +126,20 @@ class ExpenseEditFragment : Fragment() {
 
 
     private fun updateUiWithHistory(history: BotSheetUiState.Spending.History) {
-        binding.tvDateInput.text = history.date.ifEmpty { getCurrentDate() }
-        binding.tvCategoryInput.text = history.categoryName
-        binding.tvCategoryInput.setTextColor(Color.parseColor(history.categoryColor))
-        binding.etDetailInput.setText(history.name)
-        binding.etAmountInput.setText(formatPrice(history.price))
-
-        if (history.photoUrl.isNotEmpty()) {
-            Glide.with(binding.root.context) // 🔹 올바른 Context 제공
-                .load(history.photoUrl)
-                .into(binding.imgPhotoFrame)
-            binding.ivPhotoIcon.visibility = View.GONE
-        } else {
-            binding.ivPhotoIcon.visibility = View.VISIBLE
-        }
+//        binding.tvDateInput.text = history.date.ifEmpty { getCurrentDate() }
+//        binding.tvCategoryInput.text = history.categoryName
+//        binding.tvCategoryInput.setTextColor(Color.parseColor(history.categoryColor))
+//        binding.etDetailInput.setText(history.name)
+//        binding.etAmountInput.setText(formatPrice(history.price))
+//
+//        if (history.photoUrl.isNotEmpty()) {
+//            Glide.with(binding.root.context) // 🔹 올바른 Context 제공
+//                .load(history.photoUrl)
+//                .into(binding.imgPhotoFrame)
+//            binding.ivPhotoIcon.visibility = View.GONE
+//        } else {
+//            binding.ivPhotoIcon.visibility = View.VISIBLE
+//        }
     }
 
     private fun setupUi() {
@@ -192,33 +192,33 @@ class ExpenseEditFragment : Fragment() {
     }
 
     private fun saveEditedExpense() {
-        val updatedExpense = BotSheetUiState.Spending.History(
-            date = binding.tvDateInput.text.toString(),
-            categoryName = binding.tvCategoryInput.text.toString(),
-            categoryColor = String.format("#%06X", (0xFFFFFF and binding.tvCategoryInput.currentTextColor)), // 색상 HEX 변환
-            name = binding.etDetailInput.text.toString(),
-            content = binding.etDetailInput.text.toString(),
-            price = binding.etAmountInput.text.toString().replace(",", "").toIntOrNull() ?: 0,
-            photoUrl = selectedImageUri?.toString() ?: ""
-        )
-
-        Log.d("ExpenseEditFragment", "saveEditedExpense called with: $updatedExpense")
-
-        // ✅ ViewModel을 통해 업데이트 반영 (바텀시트에 즉시 반영됨)
-        lifecycleScope.launch {
-            viewModel.updateBotSheetHistory(updatedExpense)
-        }
-
-        // ✅ 저장된 데이터 전달
-        val bundle = Bundle().apply {
-            putString("expenseDate", updatedExpense.date)
-            putString("categoryName", updatedExpense.categoryName)
-            putString("categoryColor", updatedExpense.categoryColor)
-            putString("expenseContent", updatedExpense.content)
-            putInt("expensePrice", updatedExpense.price)
-            putString("expensePhoto", updatedExpense.photoUrl)
-        }
-        findNavController().previousBackStackEntry?.savedStateHandle?.set("editedExpense", bundle)
+//        val updatedExpense = BotSheetUiState.Spending.History(
+//            date = binding.tvDateInput.text.toString(),
+//            categoryName = binding.tvCategoryInput.text.toString(),
+//            categoryColor = String.format("#%06X", (0xFFFFFF and binding.tvCategoryInput.currentTextColor)), // 색상 HEX 변환
+//            name = binding.etDetailInput.text.toString(),
+//            content = binding.etDetailInput.text.toString(),
+//            price = binding.etAmountInput.text.toString().replace(",", "").toIntOrNull() ?: 0,
+//            photoUrl = selectedImageUri?.toString() ?: ""
+//        )
+//
+//        Log.d("ExpenseEditFragment", "saveEditedExpense called with: $updatedExpense")
+//
+//        // ✅ ViewModel을 통해 업데이트 반영 (바텀시트에 즉시 반영됨)
+//        lifecycleScope.launch {
+//            viewModel.updateBotSheetHistory(updatedExpense)
+//        }
+//
+//        // ✅ 저장된 데이터 전달
+//        val bundle = Bundle().apply {
+//            putString("expenseDate", updatedExpense.date)
+//            putString("categoryName", updatedExpense.categoryName)
+//            putString("categoryColor", updatedExpense.categoryColor)
+//            putString("expenseContent", updatedExpense.content)
+//            putInt("expensePrice", updatedExpense.price)
+//            putString("expensePhoto", updatedExpense.photoUrl)
+//        }
+//        findNavController().previousBackStackEntry?.savedStateHandle?.set("editedExpense", bundle)
 
         Toast.makeText(requireContext(), "지출 내역이 수정되었습니다.", Toast.LENGTH_SHORT).show()
         findNavController().popBackStack()

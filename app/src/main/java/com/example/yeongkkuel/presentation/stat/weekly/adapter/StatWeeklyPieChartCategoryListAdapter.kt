@@ -1,6 +1,7 @@
 package com.example.yeongkkuel.presentation.stat.weekly.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -19,15 +20,13 @@ class StatWeeklyPieChartCategoryListAdapter(
         private val binding: ItemStatWeeklyPiechartcategoryBinding
     ) : RecyclerView.ViewHolder(binding.root) {
         fun onBind(item: StatWeeklyUiState.PieChartData) = with(binding){
+            if(item.category.kor == "") binding.root.visibility = View.GONE
+            else {
+                tvSpendingCategory.text = item.category.kor
+                tvSpendingMoney.text = item.expenditure.toMoneyString() + "원"
 
-            tvSpendingCategory.text = item.category.kor
-            tvSpendingMoney.text = item.expenditure.toMoneyString() + "원"
-
-            when(item.color){
-                Colors.BLUE6 -> ivStartPoint.setBackgroundResource(R.drawable.bg_point_blue)
-                Colors.PINK3 -> ivStartPoint.setBackgroundResource(R.drawable.bg_point_pink)
-                Colors.GREEN9 -> ivStartPoint.setBackgroundResource(R.drawable.bg_point_green)
-                else -> ivStartPoint.setBackgroundResource(R.drawable.bg_point_green)
+                tvSpendingMoney.setTextColor(item.color.rgb)
+                ivStartPoint.setColorFilter(item.color.rgb)
             }
         }
     }

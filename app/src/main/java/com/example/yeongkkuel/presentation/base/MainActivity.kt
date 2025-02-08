@@ -322,7 +322,6 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             uiState.flowWithLifecycle(lifecycle)
                 .collectLatest { uiState ->
                     onBind(uiState) // ✅ UI 데이터 바인딩
-                    botSheetCategoryListAdapter.submitList(uiState.spendingList) // ✅ 리스트 업데이트
                 }
         }
     }
@@ -364,13 +363,16 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         val isEmpty = uiState.spendingList.isEmpty()
 
         // 데이터 존재 여부에 따라 RecyclerView visibility 변경
-        binding.rvBotSheetCategory.visibility = if (isEmpty) View.GONE else View.VISIBLE
-        binding.ivHamberger.visibility = if (isEmpty) View.GONE else View.VISIBLE
+        rvBotSheetCategory.visibility = if (isEmpty) View.GONE else View.VISIBLE
+        ivHamberger.visibility = if (isEmpty) View.GONE else View.VISIBLE
 
         // 데이터가 없으면 빈 메시지와 이미지 보이기, 있으면 숨기기
-        binding.tvEmptyMessage1.visibility = if (isEmpty) View.VISIBLE else View.GONE
-        binding.tvEmptyMessage2.visibility = if (isEmpty) View.VISIBLE else View.GONE
-        binding.imgAddCategory.visibility = if (isEmpty) View.VISIBLE else View.GONE
+        tvEmptyMessage1.visibility = if (isEmpty) View.VISIBLE else View.GONE
+        tvEmptyMessage2.visibility = if (isEmpty) View.VISIBLE else View.GONE
+        imgAddCategory.visibility = if (isEmpty) View.VISIBLE else View.GONE
+
+        val format = SimpleDateFormat("M월 d일 E요일", Locale.KOREAN)
+        tvBottomSheetDate.text = format.format(uiState.date)
 
     }
 

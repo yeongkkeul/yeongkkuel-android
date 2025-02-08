@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/navigation_login">
+    app:startDestination="@id/navigation_splash">
 
     <fragment
         android:id="@+id/navigation_splash"
@@ -16,6 +16,11 @@
             app:destination="@id/navigation_login"
             app:popUpTo="@id/navigation_splash"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_splashFragment_to_homeFragment"
+            app:destination="@id/navigation_home"
+            app:popUpTo="@id/navigation_splash"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -25,7 +30,9 @@
         tools:layout="@layout/fragment_login">
         <action
             android:id="@+id/action_loginFragment_to_navigation_home"
-            app:destination="@id/navigation_home" />
+            app:destination="@id/navigation_home"
+            app:popUpTo="@id/navigation_login"
+            app:popUpToInclusive="true"/>
         <action
             android:id="@+id/action_loginFragment_to_signupFragment"
             app:destination="@id/navigation_signup" />
@@ -278,6 +285,11 @@
         <action
             android:id="@+id/action_myPageFragment_to_rewardFragment"
             app:destination="@+id/navigation_reward"/>
+        <action
+            android:id="@+id/action_myPageFragment_to_loginFragment"
+            app:destination="@id/navigation_login"
+            app:popUpTo="@id/navigation_my"
+            app:popUpToInclusive="true" />
     </fragment>
 
 
@@ -319,28 +331,28 @@
 
     <fragment
         android:id="@+id/navigation_term_1"
-        android:name="com.example.yeongkkuel.presentation.signup.Term1Fragment"
+        android:name="com.example.yeongkkuel.presentation.signup.term.Term1Fragment"
         android:label="fragment_term_1"
         tools:layout="@layout/fragment_term1">
     </fragment>
 
     <fragment
         android:id="@+id/navigation_term_2"
-        android:name="com.example.yeongkkuel.presentation.signup.Term2Fragment"
+        android:name="com.example.yeongkkuel.presentation.signup.term.Term2Fragment"
         android:label="fragment_term_2"
         tools:layout="@layout/fragment_term2">
     </fragment>
 
     <fragment
         android:id="@+id/navigation_term_3"
-        android:name="com.example.yeongkkuel.presentation.signup.Term3Fragment"
+        android:name="com.example.yeongkkuel.presentation.signup.term.Term3Fragment"
         android:label="fragment_term_3"
         tools:layout="@layout/fragment_term3">
     </fragment>
 
     <fragment
         android:id="@+id/navigation_term_4"
-        android:name="com.example.yeongkkuel.presentation.signup.Term4Fragment"
+        android:name="com.example.yeongkkuel.presentation.signup.term.Term4Fragment"
         android:label="fragment_term_4"
         tools:layout="@layout/fragment_term4">
     </fragment>

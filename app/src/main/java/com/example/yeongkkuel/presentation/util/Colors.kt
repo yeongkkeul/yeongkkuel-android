@@ -17,7 +17,8 @@ enum class Colors(val id: Int, val rgb: Int, val red: Int, val green: Int, val b
     GREEN12(R.color.green12, 0xFFC4E015.toInt(), 196, 224, 21), // #C4E015
     YELLOW13(R.color.yellow13, 0xFFFEE540.toInt(), 254, 229, 64), // #FEE540
     ORANGE14(R.color.orange14, 0xFFFB8809.toInt(), 251, 136, 9), // #FB8809
-    ORANGE15(R.color.orange15, 0xFFFF6316.toInt(), 255, 99, 22); // #FF6316
+    ORANGE15(R.color.orange15, 0xFFFF6316.toInt(), 255, 99, 22), // #FF6316
+    BLACK1(R.color.black1, 0xFFEEEEEE.toInt()); //#EEEEEE
 
     companion object {
         // id로 Colors Enum 찾기
@@ -33,6 +34,10 @@ enum class Colors(val id: Int, val rgb: Int, val red: Int, val green: Int, val b
         // 서버에서 사용하는 Code로 Colors Enum 찾기
         fun fromCode(code: String): Colors? {
             return values().firstOrNull { it.name == code }
+        }
+
+        fun getRGB(red:Int, blue:Int, green:Int): Colors{
+            return RED1
         }
     }
 }
