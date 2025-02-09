@@ -2,6 +2,8 @@ package com.example.yeongkkuel.network
 
 import android.content.Context
 import com.example.yeongkkuel.network.data.AuthInterceptor
+import com.example.yeongkkuel.network.service.MyPageService
+import com.example.yeongkkuel.network.service.StatService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -58,4 +60,7 @@ object RetrofitClient {
         authRetrofit!!.create(StatService::class.java)
     }
 
+    val myPageService: MyPageService by lazy {
+        authRetrofit!!.create(MyPageService::class.java)
+    }
 }
