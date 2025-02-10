@@ -28,6 +28,9 @@ class ProfileViewModel : ViewModel() {
     private val _profileResponse = MutableLiveData<Response<MyPageResult>>()
     val profileResponse: LiveData<Response<MyPageResult>> get() = _profileResponse
 
+    private val _updateStatus = MutableLiveData<Result<Unit>>()
+    val updateStatus: LiveData<Result<Unit>> get() = _updateStatus
+
 
     private val _nickname = MutableLiveData<String>()
     val nickname: LiveData<String> get() = _nickname
@@ -64,27 +67,61 @@ class ProfileViewModel : ViewModel() {
                     _ageGroup.value = result.ageGroup
                     _job.value = result.job
                     _profileImageUrl.value = result.profileImageUrl
+
+                    _profileResponse.value = it
                 }
             }
         }
     }
 
-    fun saveUserProfile() {
+    fun saveUserProfile(selectedImageFile: File? = null) {
         val patchRequest = PatchMyPageRequest(
             nickname = nickname.value ?: "",
             gender = gender.value ?: "",
             ageGroup = ageGroup.value ?: "",
             job = job.value ?: ""
         )
-        val file = profileImageUrl.value?.let { File(it) }
-        updateProfile(patchRequest, file)
+
+        updateProfile(patchRequest, selectedImageFile)
     }
+
+    private fun convertAgeGroup(apiAge: String): String {
+        return when(apiAge.uppercase()) {
+            "TEENAGER" -> "10대"
+            "TWENTIES" -> "20대"
+            "THIRTIES" -> "30대"
+            "FORTIES" -> "40대"
+            "FIFTIES" -> "50대"
+            "SIXTIES_AND_ABOVE" -> "60대"
+            else -> " 대"  // 알 수 없는 경우 원본 문자열 그대로 사용
+        }
+    }
+
+    private fun convertJob(apiJob: String): String {
+        return when(apiJob.uppercase()) {
+            "STUDENT" -> "학생"
+            "EMPLOYEE" -> "직장인"
+            "SELF_EMPLOYED" -> "자영업자"
+            "HOMEMAKER" -> "주부"
+            "UNDECIDED" -> "무직"
+            else -> "무직"  // 알 수 없는 경우 원본 문자열 그대로 사용
+        }
+    }
+
+
 
 
     fun updateProfile(info: PatchMyPageRequest, profileImageFile: File? = null ) {
         viewModelScope.launch {
-            repository.updateProfile(info, profileImageFile).let {
-                _profileResponse.value = it
+            val patchResult = repository.updateProfile(info, profileImageFile)
+            if (patchResult != null && patchResult.isSuccess) {
+                // 수정 성공
+                // profileResponse도 갱신할 수 있음
+                _profileResponse.value = patchResult as Response<MyPageResult>
+                _updateStatus.value = Result.success(Unit)
+            } else {
+                // 수정 실패
+                _updateStatus.value = Result.failure(Exception("프로필 수정 실패"))
             }
         }
     }

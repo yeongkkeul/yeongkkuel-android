@@ -257,33 +257,6 @@ class LoginFragment : Fragment() {
             })
     }
 
-   /* // 사용자 정보 요청 - 사용자 요청 정보 전달.
-    private fun fetchUserInfo(accessToken: String) {
-        UserApiClient.instance.me { user, error ->
-            if (error != null) {
-                Timber.tag("KakaoLogin").e(error, "사용자 정보 요청 실패")
-                Toast.makeText(requireContext(), "사용자 정보를 가져오지 못했습니다.", Toast.LENGTH_SHORT).show()
-            } else if (user != null) {
-                Timber.tag("KakaoLogin").i("사용자 정보 요청 성공: ${user}")
-                val nickname = user.kakaoAccount?.profile?.nickname
-                Toast.makeText(
-                    requireContext(),
-                    "환영합니다, ${nickname}님!",
-                    Toast.LENGTH_SHORT
-                ).show()
-
-                // 백엔드에 인가 코드 전달하기 -TODO: 백엔드에 인가 코드 전달하는 방법 고민
-
-                // 응답으로 성공 or 실패를 받음.
-                //실패로직과 성공로직으로 나눔. -TODO: 실패로직과 성공로직 구현
-
-                // 성공 시 - 다음 화면으로 이동
-                navigateToSignUp()
-                // 실패 시 - 실패 메시지 출력
-            }
-        }
-    }*/
-
     // 로그인 실패 시 에러 처리 - 로그인 실패 시 로그만 띄우기? - TODO: 실패 시 처리 방법 고민
     private fun handleLoginError(error: Throwable) {
         when (error) {

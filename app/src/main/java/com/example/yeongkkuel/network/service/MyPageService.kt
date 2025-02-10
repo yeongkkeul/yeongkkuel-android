@@ -7,6 +7,7 @@ import com.example.yeongkkuel.network.response.mypage.MyPageResult
 import com.example.yeongkkuel.network.response.mypage.RewardsResult
 import com.example.yeongkkuel.network.response.mypage.UserReferralCodeResult
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -26,7 +27,8 @@ interface MyPageService {
     @Multipart
     @PATCH("/api/mypage")
     suspend fun patchMyPage(
-        @Part("myPageInfoRequestDto") request: PatchMyPageRequest,
+        @Part("myPageInfoRequestDto") request: RequestBody,
+
         @Part profileImage: MultipartBody.Part?
     ): Response<MyPageResult>
 

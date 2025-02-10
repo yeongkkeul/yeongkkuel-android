@@ -20,6 +20,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentMyBinding
 import com.example.yeongkkuel.presentation.auth.TokenManager
@@ -33,6 +34,7 @@ class MyFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: ProfileViewModel by viewModels({ requireActivity() })
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -44,8 +46,11 @@ class MyFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
         observeViewModel()
         // 클릭 리스너들
+        viewModel.fetchUserProfile()
+
         setupClickListeners()
     }
 
@@ -53,12 +58,23 @@ class MyFragment : Fragment() {
         viewModel.profileResponse.observe(viewLifecycleOwner) { response ->
             response.result?.let { result ->
                 binding.tvNickname.text = result.nickname
-                binding.tvAge.text = result.ageGroup + "대"
-                binding.tvJob.text = result.job
-                binding.ivProfile.setImageURI(Uri.parse(result.profileImageUrl))
+                binding.tvAge.text = convertAgeGroup(result.ageGroup)
+
+                binding.tvJob.text = convertJob(result.job)
+                result.profileImageUrl?.takeIf { it.isNotEmpty() }?.let { url ->
+                    val imageUrl = result.profileImageUrl
+                    Glide.with(this)
+                        .load(imageUrl)
+                        .placeholder(R.drawable.ic_my_profile)  // 로딩 중 표시
+                        .error(R.drawable.ic_my_profile)        // 에러 시 표시
+                        .into(binding.ivProfile)
+                } ?: run {
+                    // 기본 이미지 설정 또는 아무 작업도 하지 않음
+                    binding.ivProfile.setImageResource(R.drawable.ic_my_profile)
+                }
                 binding.tvEmail.text = result.email
-                binding.tvDailyLimit.text = result.dayTargetExpenditure.toString() + "원"
-                binding.tvDailyPercent.text = result.weeklyAchievementRate.toString() + "%"
+                binding.tvDailyLimit.text = result.dayTargetExpenditure.toString() + " 원"
+                binding.tvDailyPercent.text = result.weeklyAchievementRate.toString() + " %"
             }
         }
     }
@@ -422,6 +438,29 @@ class MyFragment : Fragment() {
         val intent = Intent(requireContext(), MainActivity::class.java)
         startActivity(intent)
         requireActivity().finish()
+    }
+
+    private fun convertJob(apiJob: String): String {
+        return when(apiJob.uppercase()) {
+            "STUDENT" -> "학생"
+            "EMPLOYEE" -> "직장인"
+            "SELF_EMPLOYED" -> "자영업자"
+            "HOMEMAKER" -> "주부"
+            "UNDECIDED" -> "무직"
+            else -> "무직"  // 알 수 없는 경우 원본 문자열 그대로 사용
+        }
+    }
+
+    private fun convertAgeGroup(apiAge: String): String {
+        return when(apiAge.uppercase()) {
+            "TEENAGER" -> "10대"
+            "TWENTIES" -> "20대"
+            "THIRTIES" -> "30대"
+            "FORTIES" -> "40대"
+            "FIFTIES" -> "50대"
+            "SIXTIES_AND_ABOVE" -> "60대"
+            else -> " 대"  // 알 수 없는 경우 원본 문자열 그대로 사용
+        }
     }
 
 
