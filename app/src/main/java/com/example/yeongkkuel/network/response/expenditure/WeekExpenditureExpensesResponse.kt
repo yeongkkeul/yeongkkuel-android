@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class WeekExpenditureExpensesResponse(
     @SerializedName("weekExpenditure") val weekExpenditure: Int,
-    @SerializedName("dayTargetExpenditure") val dayTargetExpenditure: Int,
+    @SerializedName("dayTargetExpenditure") val dayTargetExpenditure: Int?,
     @SerializedName("expenses") val expenses: List<Expense>
 ) {
     data class Expense(

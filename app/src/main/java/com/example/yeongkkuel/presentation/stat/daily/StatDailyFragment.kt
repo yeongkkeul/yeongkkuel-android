@@ -114,7 +114,6 @@ class StatDailyFragment : Fragment() {
                     }
                 }
 
-
                 val colorList = uiState.spendingList.map {
                     ContextCompat.getColor(requireContext(), it.color.id)
                 }.toMutableList()

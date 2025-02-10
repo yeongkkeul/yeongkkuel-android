@@ -59,6 +59,18 @@ class StatWeeklyWeekListAdapter(
                 ivTodayPoint.visibility = View.VISIBLE
             }
 
+            // 오늘 요일보다 앞의 요일을 처리하는 조건 추가
+            var todayWeek = currentDay.get(Calendar.DAY_OF_WEEK)  // 오늘의 요일 (1 = 일요일, 2 = 월요일, ...)
+            var targetWeek = today.get(Calendar.DAY_OF_WEEK)  // 타겟 요일 (1 = 일요일, 2 = 월요일, ...)
+
+            if(todayWeek == 1) todayWeek = 8
+            if(targetWeek == 1) targetWeek = 8
+
+            if (targetWeek > todayWeek) {
+                tvSpending.text = "-"
+            }
+
+
             targetSpending?.let { target ->
                 item.entry?.let { entry ->
                     if (target.toFloat() <= entry.y) {

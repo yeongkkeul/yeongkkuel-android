@@ -183,7 +183,6 @@ class StatWeeklyFragment(
                         granularity = 1f
                         axisMinimum = 0f
                         axisMaximum = 6f
-
                     }
 
                     val maxValue = entries.maxOf { it.y }
