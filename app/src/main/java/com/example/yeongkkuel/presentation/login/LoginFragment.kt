@@ -219,6 +219,8 @@ class LoginFragment : Fragment() {
                             if (result != null) {
                                 // JWT 저장
                                 TokenManager.saveTokens(requireContext(), result.accessToken, result.refreshToken)
+                                TokenManager.saveSocialType(requireContext(), TokenManager.SocialType.KAKAO)
+                                TokenManager.saveKakaoToken(requireContext(), kakaoAccessToken)
                                 /*tokenManager.saveAccessToken(result.accessToken)
                                 tokenManager.saveRefreshToken(result.refreshToken)
 */

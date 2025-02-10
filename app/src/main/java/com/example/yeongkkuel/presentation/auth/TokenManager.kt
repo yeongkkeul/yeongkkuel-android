@@ -12,6 +12,16 @@ object TokenManager {
     private const val KEY_ACCESS_TOKEN = "access_token"
     private const val KEY_REFRESH_TOKEN = "refresh_token"
 
+    private const val KEY_SOCIAL_TYPE = "social_type"
+    private const val KEY_KAKAO_TOKEN = "kakao_token"
+    private const val KEY_GOOGLE_ID_TOKEN = "google_id_token"
+
+    enum class SocialType {
+        KAKAO, GOOGLE, NONE
+    }
+
+
+
     fun saveTokens(context: Context, accessToken: String, refreshToken: String) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit()
@@ -36,6 +46,71 @@ object TokenManager {
             .remove(KEY_ACCESS_TOKEN)
             .remove(KEY_REFRESH_TOKEN)
             .apply()
+    }
+
+    // 소셜 타입 저장/조회
+    fun saveSocialType(context: Context, socialType: SocialType) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit()
+            .putString(KEY_SOCIAL_TYPE, socialType.name)
+            .apply()
+    }
+
+    fun getSocialType(context: Context): SocialType {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val typeName = prefs.getString(KEY_SOCIAL_TYPE, SocialType.NONE.name)
+        return runCatching {
+            SocialType.valueOf(typeName ?: SocialType.NONE.name)
+        }.getOrDefault(SocialType.NONE)
+    }
+
+    // 카카오 토큰 저장/조회
+
+    fun saveKakaoToken(context: Context, kakaoToken: String) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit()
+            .putString(KEY_KAKAO_TOKEN, kakaoToken)
+            .apply()
+    }
+
+    fun getKakaoToken(context: Context): String? {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.getString(KEY_KAKAO_TOKEN, null)
+    }
+
+    fun clearKaKaoToken(context: Context) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit()
+            .remove(KEY_KAKAO_TOKEN)
+            .apply()
+    }
+
+    // 구글 토큰 저장/조회
+    fun saveGoogleIdToken(context: Context, googleIdToken: String) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit()
+            .putString(KEY_GOOGLE_ID_TOKEN, googleIdToken)
+            .apply()
+    }
+
+    fun getGoogleIdToken(context: Context): String? {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.getString(KEY_GOOGLE_ID_TOKEN, null)
+    }
+
+    fun clearGoogleIdToken(context: Context) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit()
+            .remove(KEY_GOOGLE_ID_TOKEN)
+            .apply()
+    }
+
+
+    // 모든 소셜 토큰 제거
+    fun clearAllTokens(context: Context) {
+        clearKaKaoToken(context)
+        clearGoogleIdToken(context)
+        clearTokens(context)
     }
 }
 

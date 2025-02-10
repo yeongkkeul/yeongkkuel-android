@@ -384,6 +384,7 @@ class MyFragment : Fragment() {
      * 카카오는 unlink, 구글은 revokeAccess
      */
     private fun unlinkSocialIfNeeded() {
+
         val loginProvider = getLoginProvider()
         when (loginProvider) {
             "kakao" -> {
