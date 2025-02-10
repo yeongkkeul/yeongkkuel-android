@@ -45,6 +45,7 @@ class StatMonthlyViewModel : ViewModel() {
 
                         val dataList = result.selectedMonthExpenses.map {
                             StatMonthlyUiState.CalendarData.CalendarDay(
+                                targetExpenditure = result.dayTargetExpenditure,
                                 targetMonth = Pair(year, month),
                                 day = it.expenseDate.getDay(),
                                 pieDataList = listOf(
@@ -113,6 +114,7 @@ class StatMonthlyViewModel : ViewModel() {
                 val rest = if (targetSpending - daySpending > 0) targetSpending - daySpending else 0
 
                 StatMonthlyUiState.CalendarData.CalendarDay(
+                    targetExpenditure = null,
                     targetMonth = Pair(year, month),
                     day = day,
                     pieDataList = listOf(
@@ -124,7 +126,7 @@ class StatMonthlyViewModel : ViewModel() {
             return resultList.getData()
         }
 
-        val dayList = getDayList(year, month).getData()
+        val dayList = getDayList(year, month)
 
         _uiState.update { prev ->
             prev.copy(

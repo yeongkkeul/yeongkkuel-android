@@ -73,7 +73,7 @@ class StatMonthlyFragment(
 
         tvTotalSpending.text = uiState.totalSpending.toMoneyString() + "원"
 
-        tvAchievementDay.text = uiState.achieveDay.toString() + "일"
+        tvAchievementDay.text = (uiState.achieveDay?.toString() ?: "-") + "일"
         tvRewardAmount.text = "+" + uiState.rewardsAmount.toString()
     }
 

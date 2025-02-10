@@ -50,50 +50,53 @@ class StatMonthlyCalendarListAdapter(
         override fun bind(item: StatMonthlyUiState.CalendarData): Unit = with(binding) {
             (item as StatMonthlyUiState.CalendarData.CalendarDay).let { dayItem ->
                 fun initData() {
-                    tvDay.text = dayItem.day.toString()
+//                    if(dayItem.targetExpenditure == null){
+//                        pieChart.visibility = View.GONE
+//                    } else {
+                        tvDay.text = dayItem.day.toString()
 
-                    val colorList = listOf(
-                        ContextCompat.getColor(binding.root.context, R.color.main4),
-                        ContextCompat.getColor(binding.root.context, R.color.black0),
-                    )
+                        val colorList = listOf(
+                            ContextCompat.getColor(binding.root.context, R.color.main4),
+                            ContextCompat.getColor(binding.root.context, R.color.black0),
+                        )
 
-                    val dataSet = PieDataSet(dayItem.pieDataList, "").apply {
-                        colors = colorList // 색상 리스트 적용
-                    }
+                        val dataSet = PieDataSet(dayItem.pieDataList, "").apply {
+                            colors = colorList // 색상 리스트 적용
+                        }
 
-                    dataSet.setDrawValues(false)
+                        dataSet.setDrawValues(false)
 
-                    val pieData = PieData(dataSet)
+                        val pieData = PieData(dataSet)
 
-                    pieChart.apply {
-                        data = pieData
-                        description.isEnabled = false // 차트 설명 비활성화
-                        legend.isEnabled = false // 하단 설명 비활성화
-                        isRotationEnabled = true // 차트 회전 활성화
-                        setDrawEntryLabels(false) // 엔트리 라벨 비활성화
-                        setEntryLabelColor(Color.BLACK) // label 색상
-                        animateY(1400, Easing.EaseInOutQuad) // 1.4초 동안 애니메이션 설정
-                        setTouchEnabled(false)  // 차트 터치 비활성화
-                        setOnChartValueSelectedListener(null)  // 클릭 이벤트 리스너 제거
+                        pieChart.apply {
+                            data = pieData
+                            description.isEnabled = false // 차트 설명 비활성화
+                            legend.isEnabled = false // 하단 설명 비활성화
+                            isRotationEnabled = true // 차트 회전 활성화
+                            setDrawEntryLabels(false) // 엔트리 라벨 비활성화
+                            setEntryLabelColor(Color.BLACK) // label 색상
+                            animateY(1400, Easing.EaseInOutQuad) // 1.4초 동안 애니메이션 설정
+                            setTouchEnabled(false)  // 차트 터치 비활성화
+                            setOnChartValueSelectedListener(null)  // 클릭 이벤트 리스너 제거
 //                        animate()
-                    }
+                        }
+//                    }
                 }
 
                 if(dayItem.day == 0){
                     binding.root.visibility = View.INVISIBLE
                 } else {
                     binding.root.visibility = View.VISIBLE
-                    initData()
-                }
-
-                binding.root.setOnClickListener {
-                    item.run {
-                        viewModel.getSpendingList(
-                            year = targetMonth.first,
-                            month = targetMonth.second,
-                            day = day
-                        )
+                    binding.root.setOnClickListener {
+                        item.run {
+                            viewModel.getSpendingList(
+                                year = targetMonth.first,
+                                month = targetMonth.second,
+                                day = day
+                            )
+                        }
                     }
+                    initData()
                 }
             }
         }

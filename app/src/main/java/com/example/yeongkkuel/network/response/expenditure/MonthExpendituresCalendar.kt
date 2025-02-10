@@ -6,7 +6,7 @@ data class MonthExpendituresCalendar(
     @SerializedName("dayTargetExpenditure") val dayTargetExpenditure: Int,
     @SerializedName("selectedMonthExpenses") val selectedMonthExpenses: List<Expense>,
     @SerializedName("previousMonthExpenses") val previousMonthExpenses: List<Expense>,
-    @SerializedName("achievedDays") val achievedDays: Int,
+    @SerializedName("achievedDays") val achievedDays: Int?,
     @SerializedName("rewards") val rewards: Int
 ) {
     data class Expense(

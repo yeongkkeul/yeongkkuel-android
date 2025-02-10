@@ -7,7 +7,7 @@ data class StatMonthlyUiState(
     val targetMonth: Pair<Int, Int>,// year, month
     val totalSpending: Int,
     val rewardsAmount: Int,
-    val achieveDay: Int,
+    val achieveDay: Int?,
     val calendarList: List<CalendarData>,
 ) {
     sealed interface CalendarData {
@@ -16,6 +16,7 @@ data class StatMonthlyUiState(
         ) : CalendarData
 
         data class CalendarDay(
+            val targetExpenditure: Int? = null,
             val targetMonth: Pair<Int, Int>,// year, month
             val day: Int,
             val pieDataList: List<PieEntry>
