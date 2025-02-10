@@ -29,7 +29,7 @@ class StatMonthlyViewModel : ViewModel() {
             try {
                 yeongkkuelService.getExpendituresMonthCalendar(year = year, month = month).run {
                     if (isSuccess) {
-                        _uiState.update { prev->
+                        _uiState.update { prev ->
                             prev.copy(
                                 targetExpenditure = result.dayTargetExpenditure,
                                 achieveDay = result.achieveDays,
@@ -38,33 +38,38 @@ class StatMonthlyViewModel : ViewModel() {
                             )
                         }
 
-                        val dataList = result.selectedMonthExpenses.map {
+                        val dataList = result.selectedMonthExpenses.map { expense ->
+                            val pieDataList = result.dayTargetExpenditure?.let { targetExpenditure ->
+                                val rest = targetExpenditure - expense.expenditure
+                                mutableListOf<PieEntry>().apply {
+                                    add(PieEntry(expense.expenditure.toFloat(), "지출"))
+                                    if (rest > 0) {
+                                        add(PieEntry(rest.toFloat(), "나머지"))
+                                    }
+                                }
+                            } ?: emptyList()
+
                             StatMonthlyUiState.CalendarData.CalendarDay(
                                 targetMonth = Pair(year, month),
-                                day = it.expenseDate.getDay(),
-                                pieDataList = if(result.dayTargetExpenditure != null)listOf(
-                                    PieEntry(
-                                        maxOf(
-                                            (result.dayTargetExpenditure - it.expenditure).toFloat(),
-                                            0f
-                                        ), "나머지"
-                                    ),
-                                    PieEntry(it.expenditure.toFloat(), "지출")
-                                ) else emptyList()
+                                day = expense.expenseDate.getDay(),
+                                pieDataList = pieDataList
                             )
                         }
+
                         val mergedList = this@getData.toMutableList()
-                        dataList.forEach { data ->
-                            val existingIndex = mergedList.indexOfFirst { it.day == data.day }
+
+                        dataList.forEach { newData ->
+                            val existingIndex = mergedList.indexOfFirst { it.day == newData.day }
                             if (existingIndex != -1) {
                                 val existingDay = mergedList[existingIndex]
                                 mergedList[existingIndex] = existingDay.copy(
-                                    pieDataList = existingDay.pieDataList + data.pieDataList
+                                    pieDataList = newData.pieDataList
                                 )
                             } else {
-                                mergedList.add(data)
+                                mergedList.add(newData)
                             }
                         }
+
                         return mergedList
                     }
                 }

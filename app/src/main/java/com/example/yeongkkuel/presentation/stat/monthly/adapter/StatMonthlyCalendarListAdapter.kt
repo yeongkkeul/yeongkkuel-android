@@ -17,6 +17,7 @@ import com.example.yeongkkuel.presentation.stat.monthly.StatMonthlyUiState
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
+import timber.log.Timber
 
 class StatMonthlyCalendarListAdapter(
     private val viewModel: BotSheetViewModel
@@ -60,6 +61,7 @@ class StatMonthlyCalendarListAdapter(
                     if(targetExpenditure == null){
                         pieChart.visibility = View.INVISIBLE
                     } else {
+                        if(item.day == 10) Timber.d("timber: ${item}")
                         val colorList = listOf(
                             ContextCompat.getColor(binding.root.context, R.color.main4),
                             ContextCompat.getColor(binding.root.context, R.color.black0),
@@ -83,7 +85,6 @@ class StatMonthlyCalendarListAdapter(
                             animateY(1400, Easing.EaseInOutQuad) // 1.4초 동안 애니메이션 설정
                             setTouchEnabled(false)  // 차트 터치 비활성화
                             setOnChartValueSelectedListener(null)  // 클릭 이벤트 리스너 제거
-//                        animate()
                         }
                     }
                 }

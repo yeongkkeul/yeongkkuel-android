@@ -23,6 +23,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -112,6 +113,7 @@ class StatDailyFragment : Fragment() {
                         add(PieEntry(othersTotal.toFloat(), "나머지"))
                     }
                 }
+
 
                 val colorList = uiState.spendingList.map {
                     ContextCompat.getColor(requireContext(), it.color.id)
