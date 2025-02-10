@@ -76,9 +76,9 @@ class StatWeeklyCompareListAdapter(
                     }
 
                     val descriptionText = if (spendingDiff >= 0) {
-                        "${tvComparedTarget.text}보다 ${spendingDiff.toMoneyString()} 원 덜 썼어요"
+                        "${tvComparedTarget.text}보다 ${spendingDiff.toMoneyString()} 원 더 썼어요"
                     } else {
-                        "${tvComparedTarget.text}보다 ${(-spendingDiff).toMoneyString()} 원 더 썼어요"
+                        "${tvComparedTarget.text}보다 ${(-spendingDiff).toMoneyString()} 원 덜 썼어요"
                     }
 
                     val boldText = if (spendingDiff >= 0) "${spendingDiff.toMoneyString()} 원"
