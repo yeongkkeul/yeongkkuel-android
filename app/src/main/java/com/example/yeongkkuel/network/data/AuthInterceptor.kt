@@ -28,34 +28,6 @@ class AuthInterceptor(private val context: Context) : Interceptor {
             originalRequest
         }
 
-        val response = chain.proceed(newRequest)
-
-        if(response.code == 401) {
-            // 리프레시 토큰을 가져와서 , 갱신 요청을 한다.
-            var refreshedAccessToken: String
-            var refreshedRefreshToken: String
-
-            runBlocking {
-                val refreshTokenRequest = ReissueRequest(accessToken, refreshToken)
-                val refreshTokenResponse =
-                    RetrofitClient.reissueApiService.reissueToken(refreshTokenRequest)
-                        .execute().body()!!
-
-                // 토큰 갱신 성공  및 저장
-                refreshedAccessToken = refreshTokenResponse.accessToken
-                refreshedRefreshToken = refreshTokenResponse.refreshToken
-                TokenManager.saveTokens(context, refreshedAccessToken, refreshedRefreshToken)
-                Timber.d("Token refreshed successfully: new access token = $refreshedAccessToken")
-
-
-            }
-            val refreshedRequest = chain.request().newBuilder()
-                .header("Authorization","Bearer $refreshedAccessToken")
-                .build()
-            return chain.proceed(refreshedRequest)
-        }
-
-        // 요청 진행
-        return response
+        return chain.proceed(newRequest)
     }
 }

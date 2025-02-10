@@ -67,6 +67,7 @@
         app:layout_constraintEnd_toEndOf="@id/iv_chartCenter"
         app:layout_constraintStart_toStartOf="@id/iv_chartCenter"
         app:layout_constraintTop_toBottomOf="@id/tv_chartTarget"
-        tools:text="하루 목표 지출액보다\n2,500원 덜 썻어요!" />
+        tools:text="하루 목표 지출액보다\n2,500원 덜 썻어요!"
+        tools:visibility="gone"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

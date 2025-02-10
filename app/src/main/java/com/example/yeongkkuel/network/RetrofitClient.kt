@@ -2,6 +2,8 @@ package com.example.yeongkkuel.network
 
 import android.content.Context
 import com.example.yeongkkuel.network.data.AuthInterceptor
+import com.example.yeongkkuel.network.data.AuthTokenManager
+import com.example.yeongkkuel.network.data.TokenAuthenticator
 import com.example.yeongkkuel.network.service.MyPageService
 import com.example.yeongkkuel.network.service.StatService
 import okhttp3.OkHttpClient
@@ -38,6 +40,7 @@ object RetrofitClient {
             val client = OkHttpClient.Builder()
                 .addInterceptor(AuthInterceptor(context))  // JWT 헤더 자동 추가
                 .addInterceptor(logging)
+                .authenticator(TokenAuthenticator(AuthTokenManager(context)))
                 .build()
 
             authRetrofit = Retrofit.Builder()
@@ -49,7 +52,7 @@ object RetrofitClient {
     }
 
     val reissueApiService: ReissueApiService by lazy {
-        authRetrofit!!.create(ReissueApiService::class.java)
+        baseRetrofit!!.create(ReissueApiService::class.java)
     }
 
     val loginApiService: LoginApiService by lazy {
