@@ -20,6 +20,7 @@ import com.example.yeongkkuel.databinding.FragmentStatWeeklyBinding
 import com.example.yeongkkuel.presentation.stat.weekly.adapter.StatWeeklyCompareListAdapter
 import com.example.yeongkkuel.presentation.stat.weekly.adapter.StatWeeklyPieChartCategoryListAdapter
 import com.example.yeongkkuel.presentation.stat.weekly.adapter.StatWeeklyWeekListAdapter
+import com.example.yeongkkuel.presentation.util.Week
 import com.example.yeongkkuel.presentation.util.toMoneyString
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.data.LineData
@@ -31,7 +32,10 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.TextStyle
 import java.util.Calendar
+import java.util.Locale
 import kotlin.math.exp
 
 class StatWeeklyFragment(
@@ -69,7 +73,7 @@ class StatWeeklyFragment(
         initViewModel()
     }
 
-    private fun getData(){
+    private fun getData() {
         viewModel.getWeekExpenditureList()
         viewModel.getWeekExpenditureAverage()
     }
@@ -81,12 +85,12 @@ class StatWeeklyFragment(
                 layoutManager = GridLayoutManager(requireContext(), 7)
             }
 
-            rvCompare.run{
+            rvCompare.run {
                 adapter = compareListAdapter
                 layoutManager = LinearLayoutManager(requireContext())
             }
 
-            rvSpendingCategory.run{
+            rvSpendingCategory.run {
                 adapter = pieChartCategoryListAdapter
                 layoutManager = LinearLayoutManager(requireContext())
             }
@@ -119,7 +123,7 @@ class StatWeeklyFragment(
     }
 
     private fun onBind(uiState: StatWeeklyUiState) = with(binding) {
-        fun initRvData(){
+        fun initRvData() {
             weekListAdapter.submitList(uiState.weekList)
             compareListAdapter.submitList(uiState.compareList)
             pieChartCategoryListAdapter.submitList(uiState.pieChartList)
@@ -127,9 +131,12 @@ class StatWeeklyFragment(
 
         fun initLineChart() {
             uiState.weekList.let { list ->
+                val todayWeekNum = getDayOfWeekNum(LocalDate.now())  // 오늘의 요일을 한글로 가져옴
+
                 val entries = list.mapNotNull {
                     it.entry
-                }
+                }.take(todayWeekNum)
+
                 entries.forEachIndexed { index, entry ->
                     val iconRes = if (entry.y >= uiState.targetSpending) {
                         R.drawable.ic_point_up  // 적절한 리소스 이름으로 변경
@@ -217,12 +224,11 @@ class StatWeeklyFragment(
         fun setTargetSpending() {
             weekListAdapter.setTargetSpending(uiState.targetSpending)
 
-            val totalSepnding = uiState.targetSpending.toMoneyString()
-            tvTotalSpending.text = "${totalSepnding}원"
-            tvLineTargetSpending.text = "하루 목표 지출액 ${totalSepnding}원"
+            tvTotalSpending.text = "${uiState.totalSpending.toMoneyString()}원"
+            tvLineTargetSpending.text = "하루 목표 지출액 ${uiState.targetSpending.toMoneyString()}원"
         }
 
-        fun initPieChart(){
+        fun initPieChart() {
             uiState.pieChartList.let { pieChartList ->
                 val list = pieChartList.sortedByDescending { it.expenditure }
                 val pieChartDataList = ArrayList<PieEntry>().apply {
@@ -281,17 +287,17 @@ class StatWeeklyFragment(
             }
         }
 
-        fun initPieChartDescription(){
+        fun initPieChartDescription() {
             val mostSpendingKind = uiState.pieChartList
                 .maxByOrNull { spending ->
                     spending.expenditure
                 }?.category
 
-            if(mostSpendingKind != null) {
+            if (mostSpendingKind != null) {
                 val mostSpendingKindKor = mostSpendingKind.kor
                 val message = "${mostSpendingKindKor}에 가장 많이 썼어요"
 
-                if(mostSpendingKindKor == "")
+                if (mostSpendingKindKor == "")
                     tvMostSpending.text = "지출을 입력해주세요."
                 else {
                     val spannable = SpannableString(message)
@@ -307,7 +313,7 @@ class StatWeeklyFragment(
 
                     tvMostSpending.text = spannable
                 }
-            } else{
+            } else {
                 tvMostSpending.text = "지출을 입력해주세요."
             }
         }
@@ -320,6 +326,19 @@ class StatWeeklyFragment(
         initPieChartDescription()
     }
 
+    private fun getDayOfWeekNum(date: LocalDate): Int {
+        val dayString = date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.KOREAN) // 예: "월요일"
+        return when (dayString) {
+            "월요일" -> 1
+            "화요일" -> 2
+            "수요일" -> 3
+            "목요일" -> 4
+            "금요일" -> 5
+            "토요일" -> 6
+            "일요일" -> 7
+            else -> 0
+        }
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

@@ -28,9 +28,10 @@ class StatWeeklyViewModel : ViewModel() {
                         _uiState.update { prev ->
                             prev.copy(
                                 weekList = expenses.map {
+                                    val dayOfWeek = getDayOfWeek(it.expenseDate)
                                     StatWeeklyUiState.DayData(
-                                        getDayOfWeek(date = it.expenseDate),
-                                        Entry(0f, it.expenditure?.toFloat() ?: 0.0f)
+                                        dayOfWeek,
+                                        Entry(getYByDayOfWeek(dayOfWeek), it.expenditure?.toFloat() ?: 0.0f)
                                     )
                                 },
                                 totalSpending = weekExpenditure,
@@ -90,5 +91,18 @@ class StatWeeklyViewModel : ViewModel() {
         val parts = date.split(", ")
         val dayOfWeek = parts[1] // "Saturday" 추출
         return Week.fromString(dayOfWeek)
+    }
+
+    private fun getYByDayOfWeek(dayOfWeek:Week): Float{
+       return when(dayOfWeek){
+            Week.SUN -> 6.0f
+            Week.MON -> 0.0f
+            Week.TUE -> 1.0f
+            Week.WED -> 2.0f
+            Week.THU -> 3.0f
+            Week.FRI -> 4.0f
+            Week.SAT -> 5.0f
+            Week.ERROR -> 0f
+        }
     }
 }
