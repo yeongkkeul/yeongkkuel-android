@@ -21,6 +21,7 @@
     <dimen name="sp_small">12sp</dimen>
 
     <!--Chat-->
+    <dimen name="chat_room_photo">2dp</dimen>
     <dimen name="design_fab_size_normal">48dp</dimen>
     <dimen name="design_fab_image_size">48dp</dimen>
     <dimen name="space_chat_room_rank">28dp</dimen>
