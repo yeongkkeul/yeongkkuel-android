@@ -6,7 +6,6 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +20,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentCategoryAddBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
+import com.example.yeongkkuel.presentation.home.category.adapter.ColorPaletteAdapter
+import com.example.yeongkkuel.presentation.home.category.data.Category
 import com.example.yeongkkuel.presentation.util.Colors
 
 class CategoryAddFragment : Fragment() {
@@ -122,7 +123,7 @@ class CategoryAddFragment : Fragment() {
 
         val title = binding.etCategoryAddInput.text.toString().trim()
 
-        // 🚨 토스트 메시지 순차 실행을 위한 핸들러
+        // 토스트 메시지 순차 실행을 위한 핸들러
         val handler = Handler(Looper.getMainLooper())
 
         // 제목 & 색상 입력 여부 확인
@@ -157,7 +158,14 @@ class CategoryAddFragment : Fragment() {
             ContextCompat.getColor(requireContext(), colorValue.id) == selectedColor
         } ?: return
 
-        val newCategory = Category(name = title, color = categoryColor)
+        val newCategory = Category(
+            id = 0, // 새로운 카테고리는 서버에서 id 생성
+            name = title,
+            color = categoryColor
+        )
+
+        println("Category Name: ${newCategory.name}") // ✅ 제목 확인 로그 추가
+        println("Category Color: ${newCategory.color}") // ✅ 색상 확인 로그 추가
 
         // ViewModel에 카테고리 추가
         categoryViewModel.addCategory(newCategory)
