@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class StatWeeklyViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<StatWeeklyUiState>(StatWeeklyUiState.init())
@@ -38,6 +39,7 @@ class StatWeeklyViewModel : ViewModel() {
                                 targetSpending = dayTargetExpenditure
                             )
                         }
+                        Timber.d("result: ${_uiState.value}")
                     }
                 }
             }

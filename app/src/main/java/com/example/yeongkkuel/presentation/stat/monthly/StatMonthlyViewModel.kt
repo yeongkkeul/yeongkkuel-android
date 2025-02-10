@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.Calendar
 import java.util.Date
 
@@ -23,14 +24,6 @@ class StatMonthlyViewModel : ViewModel() {
             StatMonthlyUiState.CalendarData.CalendarDayOfWeek(week)
         }
 
-    init {
-        val date = Date()
-        val year = date.year + 1900  // 현재 연도
-        val month = date.month + 1   // 현재 월 (0부터 시작하므로 +1)
-
-        getCalender(year = year, month = month)
-    }
-
     fun getCalender(year: Int, month: Int) = viewModelScope.launch {
         suspend fun List<StatMonthlyUiState.CalendarData.CalendarDay>.getData(): List<StatMonthlyUiState.CalendarData.CalendarDay> {
             try {
@@ -38,17 +31,18 @@ class StatMonthlyViewModel : ViewModel() {
                     if (isSuccess) {
                         _uiState.update { prev->
                             prev.copy(
-                                achieveDay = result.achievedDays,
-                                rewardsAmount = result.rewards
+                                targetExpenditure = result.dayTargetExpenditure,
+                                achieveDay = result.achieveDays,
+                                rewardsAmount = result.rewards,
+                                totalSpending = result.totalMonthExpenditure
                             )
                         }
 
                         val dataList = result.selectedMonthExpenses.map {
                             StatMonthlyUiState.CalendarData.CalendarDay(
-                                targetExpenditure = result.dayTargetExpenditure,
                                 targetMonth = Pair(year, month),
                                 day = it.expenseDate.getDay(),
-                                pieDataList = listOf(
+                                pieDataList = if(result.dayTargetExpenditure != null)listOf(
                                     PieEntry(
                                         maxOf(
                                             (result.dayTargetExpenditure - it.expenditure).toFloat(),
@@ -56,7 +50,7 @@ class StatMonthlyViewModel : ViewModel() {
                                         ), "나머지"
                                     ),
                                     PieEntry(it.expenditure.toFloat(), "지출")
-                                )
+                                ) else emptyList()
                             )
                         }
                         val mergedList = this@getData.toMutableList()
@@ -114,7 +108,6 @@ class StatMonthlyViewModel : ViewModel() {
                 val rest = if (targetSpending - daySpending > 0) targetSpending - daySpending else 0
 
                 StatMonthlyUiState.CalendarData.CalendarDay(
-                    targetExpenditure = null,
                     targetMonth = Pair(year, month),
                     day = day,
                     pieDataList = listOf(

@@ -84,7 +84,7 @@ class StatDailyFragment : Fragment() {
                 val total = totalList.sum()
                 val othersTotal = uiState.targetSpending - total
 
-                val otherTotalString = othersTotal.toMoneyString() + "원"
+
                 val totalString = total.toMoneyString() + "원"
                 tvChartTarget.text = totalString
                 if(uiState.targetSpending < 0){
@@ -93,9 +93,11 @@ class StatDailyFragment : Fragment() {
                 else {
                     tvChartDescription.visibility = View.VISIBLE
                     if (othersTotal > 0) {
+                        val otherTotalString = othersTotal.toMoneyString() + "원"
                         tvChartDescription.text = "하루 목표 지출액보다\n" +
                                 "${otherTotalString}원 덜 썻어요!"
                     } else {
+                        val otherTotalString = (-othersTotal).toMoneyString() + "원"
                         tvChartDescription.text = "하루 목표 지출액보다\n" +
                                 "${otherTotalString}원 더 썻어요!"
                     }
@@ -106,7 +108,9 @@ class StatDailyFragment : Fragment() {
                         val totalPrice = spending.history.sumOf { it.price }
                         add(PieEntry(totalPrice.toFloat(), spending.kind))
                     }
-                    add(PieEntry(othersTotal.toFloat(), "나머지"))
+                    if (othersTotal > 0) {
+                        add(PieEntry(othersTotal.toFloat(), "나머지"))
+                    }
                 }
 
                 val colorList = uiState.spendingList.map {

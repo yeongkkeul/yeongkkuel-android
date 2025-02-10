@@ -23,6 +23,12 @@ class StatMonthlyCalendarListAdapter(
 ) : ListAdapter<StatMonthlyUiState.CalendarData, StatMonthlyCalendarListAdapter.ViewHolder>(
     StatMonthlyCalendarDiffUtil()
 ) {
+    private var targetExpenditure: Int? = null
+
+    fun setTargetExpenditure(targetExpenditure:Int?){
+        this.targetExpenditure = targetExpenditure
+    }
+
     abstract inner class ViewHolder(
         view: View
     ) : RecyclerView.ViewHolder(view) {
@@ -50,11 +56,10 @@ class StatMonthlyCalendarListAdapter(
         override fun bind(item: StatMonthlyUiState.CalendarData): Unit = with(binding) {
             (item as StatMonthlyUiState.CalendarData.CalendarDay).let { dayItem ->
                 fun initData() {
-//                    if(dayItem.targetExpenditure == null){
-//                        pieChart.visibility = View.GONE
-//                    } else {
-                        tvDay.text = dayItem.day.toString()
-
+                    tvDay.text = dayItem.day.toString()
+                    if(targetExpenditure == null){
+                        pieChart.visibility = View.INVISIBLE
+                    } else {
                         val colorList = listOf(
                             ContextCompat.getColor(binding.root.context, R.color.main4),
                             ContextCompat.getColor(binding.root.context, R.color.black0),
@@ -80,7 +85,7 @@ class StatMonthlyCalendarListAdapter(
                             setOnChartValueSelectedListener(null)  // 클릭 이벤트 리스너 제거
 //                        animate()
                         }
-//                    }
+                    }
                 }
 
                 if(dayItem.day == 0){

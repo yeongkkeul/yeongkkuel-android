@@ -9,6 +9,7 @@ data class StatMonthlyUiState(
     val rewardsAmount: Int,
     val achieveDay: Int?,
     val calendarList: List<CalendarData>,
+    val targetExpenditure: Int?
 ) {
     sealed interface CalendarData {
         data class CalendarDayOfWeek(
@@ -16,7 +17,6 @@ data class StatMonthlyUiState(
         ) : CalendarData
 
         data class CalendarDay(
-            val targetExpenditure: Int? = null,
             val targetMonth: Pair<Int, Int>,// year, month
             val day: Int,
             val pieDataList: List<PieEntry>
@@ -27,9 +27,10 @@ data class StatMonthlyUiState(
     companion object {
         fun init() = StatMonthlyUiState(
             targetMonth = Pair(2025, 1),
-            totalSpending = 210300,
+            totalSpending = 0,
             rewardsAmount = 140,
             achieveDay = 13,
+            targetExpenditure = null,
             calendarList = emptyList()
         )
     }

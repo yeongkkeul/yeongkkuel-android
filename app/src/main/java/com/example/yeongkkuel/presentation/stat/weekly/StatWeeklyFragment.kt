@@ -139,16 +139,15 @@ class StatWeeklyFragment(
 
                 entries.forEachIndexed { index, entry ->
                     val iconRes = if (entry.y >= uiState.targetSpending) {
-                        R.drawable.ic_point_up  // 적절한 리소스 이름으로 변경
+                        R.drawable.ic_point_up
                     } else {
-                        R.drawable.ic_point_down  // 적절한 리소스 이름으로 변경
+                        R.drawable.ic_point_down
                     }
-                    val drawable = ContextCompat.getDrawable(requireContext(), iconRes)
 
-                    if (drawable != null) {
-                        entry.icon = drawable
-                    }
+                    val drawable = ContextCompat.getDrawable(requireContext(), iconRes)
+                    drawable?.let { entry.setIcon(it) }
                 }
+
 
                 // LineDataSet 생성
                 val dataSet = LineDataSet(entries, "Label").apply {
@@ -184,7 +183,9 @@ class StatWeeklyFragment(
                         granularity = 1f
                         axisMinimum = 0f
                         axisMaximum = 6f
+
                     }
+
                     val maxValue = entries.maxOf { it.y }
                     val minValue = entries.minOf { it.y }
 
