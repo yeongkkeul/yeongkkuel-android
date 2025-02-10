@@ -2,16 +2,20 @@ package com.example.yeongkkuel.network
 
 import android.content.Context
 import com.example.yeongkkuel.network.data.AuthInterceptor
-import com.example.yeongkkuel.network.data.AuthTokenManager
-import com.example.yeongkkuel.network.data.TokenAuthenticator
+
+import com.example.yeongkkuel.presentation.home.HomeApiService
+import com.example.yeongkkuel.presentation.home.store.StoreApiService
+
 import com.example.yeongkkuel.network.service.MyPageService
 import com.example.yeongkkuel.network.service.StatService
+
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
+
     private const val BASE_URL = "https://dev.yeongkkeul.store"
 
     /**
@@ -24,6 +28,13 @@ object RetrofitClient {
      */
     private var authRetrofit: Retrofit? = null
 
+    /**
+     * HttpLoggingInterceptor 추가! (네트워크 요청 및 응답 로그 출력)
+     */
+    private val loggingInterceptor = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.BODY // 요청과 응답 바디를 로그로 출력
+    }
+
     fun init(context: Context) {
         if (baseRetrofit == null) {
             baseRetrofit = Retrofit.Builder()
@@ -33,14 +44,9 @@ object RetrofitClient {
         }
 
         if (authRetrofit == null) {
-            val logging = HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
-            }
-
             val client = OkHttpClient.Builder()
                 .addInterceptor(AuthInterceptor(context))  // JWT 헤더 자동 추가
-                .addInterceptor(logging)
-                .authenticator(TokenAuthenticator(AuthTokenManager(context)))
+                .addInterceptor(loggingInterceptor) // 📌 HttpLoggingInterceptor 추가!
                 .build()
 
             authRetrofit = Retrofit.Builder()
@@ -52,7 +58,7 @@ object RetrofitClient {
     }
 
     val reissueApiService: ReissueApiService by lazy {
-        baseRetrofit!!.create(ReissueApiService::class.java)
+        authRetrofit!!.create(ReissueApiService::class.java)
     }
 
     val loginApiService: LoginApiService by lazy {
@@ -63,7 +69,21 @@ object RetrofitClient {
         authRetrofit!!.create(StatService::class.java)
     }
 
+
+    val categoryApiService: CategoryApiService by lazy {
+        authRetrofit!!.create(CategoryApiService::class.java)
+    }
+
+    val homeApiService: HomeApiService by lazy {
+        authRetrofit!!.create(HomeApiService::class.java)
+    }
+
+    val storeapiService: StoreApiService by lazy {
+        authRetrofit!!.create(StoreApiService::class.java)
+    }
+
     val myPageService: MyPageService by lazy {
         authRetrofit!!.create(MyPageService::class.java)
     }
+
 }

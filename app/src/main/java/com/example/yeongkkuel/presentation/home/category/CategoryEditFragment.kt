@@ -17,6 +17,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentCategoryEditBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
+import com.example.yeongkkuel.presentation.home.category.adapter.ColorPaletteAdapter
+import com.example.yeongkkuel.presentation.home.category.data.Category
 import com.example.yeongkkuel.presentation.util.Colors
 
 
@@ -150,8 +152,15 @@ class CategoryEditFragment : Fragment() {
     }
 
     private fun updateSelectedColor(color: Int) {
-        // Colors Enum에서 ARGB 값으로 매칭된 Enum 가져오기
-        val selectedEnumColor = Colors.fromARGB(color) ?: return
+        // Colors Enum에서 RGB 값으로 매칭된 Enum 가져오기
+        val red = (color shr 16) and 0xFF
+        val green = (color shr 8) and 0xFF
+        val blue = color and 0xFF
+
+        val selectedEnumColor = Colors.fromRGB(red, green, blue) ?: run {
+            Toast.makeText(requireContext(), "유효하지 않은 색상입니다.", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         // 선택한 색상 저장
         selectedColor = color
@@ -162,7 +171,6 @@ class CategoryEditFragment : Fragment() {
         binding.etCategoryEditInput.setTextColor(color) // 제목 텍스트 색상 업데이트
 
         // 필요하다면 Enum을 기반으로 추가 작업 가능
-        // 예: 로깅하거나 ViewModel에 Enum 값을 저장
         println("Selected Color Enum: $selectedEnumColor")
 
         binding.rvColorPalette.visibility = View.GONE
@@ -180,26 +188,46 @@ class CategoryEditFragment : Fragment() {
             return
         }
 
-        // Colors Enum으로 변환된 색상 값 가져오기
-        val selectedColorEnum = Colors.fromARGB(updatedColor) ?: run {
+        // Colors Enum으로 변환된 색상 값 가져오기 (ARGB → RGB)
+        val red = (updatedColor shr 16) and 0xFF
+        val green = (updatedColor shr 8) and 0xFF
+        val blue = updatedColor and 0xFF
+
+        val selectedColorEnum = Colors.fromRGB(red, green, blue) ?: run {
             Toast.makeText(requireContext(), "유효하지 않은 색상입니다.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val originalCategoryName = arguments?.getString("categoryName") ?: return
+        // originalCategory 정의
+        val originalCategory = arguments?.let {
+            Category(
+                id = it.getInt("categoryId"),
+                name = it.getString("categoryName") ?: "",
+                color = Colors.fromId(it.getInt("categoryColor")) ?: Colors.RED1
+            )
+        } ?: run {
+            Toast.makeText(requireContext(), "카테고리 데이터를 불러올 수 없습니다.", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         // 업데이트된 카테고리 생성
-        val updatedCategory = Category(name = updatedTitle, color = selectedColorEnum)
+        val updatedCategory = Category(
+            id = originalCategory.id, // 기존 ID 유지
+            name = updatedTitle,
+            color = selectedColorEnum // 선택된 색상 Enum 적용
+        )
 
-        // BotSheetViewModel 업데이트
-        botSheetViewModel.updateCategory(originalCategoryName, updatedCategory)
-
-        // CategoryViewModel 업데이트
-        categoryViewModel.updateCategory(originalCategoryName, updatedCategory)
+        // ViewModel 업데이트
+        categoryViewModel.updateCategory(originalCategory.name, updatedCategory)
+        botSheetViewModel.updateCategory(originalCategory.name, updatedCategory)
 
         Toast.makeText(requireContext(), "카테고리가 수정되었습니다.", Toast.LENGTH_SHORT).show()
-        findNavController().popBackStack(R.id.categoryManageFragment, false)
+
+        // ✅ popBackStack() 대신 navigate() 사용하여 강제 새로고침
+        findNavController().navigate(R.id.action_categoryEditFragment_to_categoryManageFragment)
     }
+
+
 
     override fun onDestroyView() {
         super.onDestroyView()

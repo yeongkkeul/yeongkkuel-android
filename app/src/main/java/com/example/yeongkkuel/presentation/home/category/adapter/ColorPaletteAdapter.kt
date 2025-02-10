@@ -1,6 +1,5 @@
-package com.example.yeongkkuel.presentation.home.category
+package com.example.yeongkkuel.presentation.home.category.adapter
 
-import android.graphics.PorterDuff
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View

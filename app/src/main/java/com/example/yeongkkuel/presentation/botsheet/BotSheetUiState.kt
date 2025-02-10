@@ -1,5 +1,6 @@
 package com.example.yeongkkuel.presentation.botsheet
 
+import com.example.yeongkkuel.R
 import com.example.yeongkkuel.presentation.util.Colors
 import com.example.yeongkkuel.presentation.util.SpendingCategory
 import java.util.Date

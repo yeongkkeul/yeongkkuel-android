@@ -74,7 +74,7 @@ class StatWeeklyViewModel : ViewModel() {
                                 ),
                                 pieChartList = categories.map {
                                     StatWeeklyUiState.PieChartData(
-                                        category = SpendingCategory.fromKor(it.categoryName),
+                                        category = SpendingCategory.fromName(it.categoryName),
                                         expenditure = it.totalExpenditure,
                                         color = Colors.getRGB(
                                             red = it.red,

@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.presentation.home.category
+package com.example.yeongkkuel.presentation.home.category.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.databinding.ItemCategoryBinding
+import com.example.yeongkkuel.presentation.home.category.data.Category
 
 class CategoryAdapter(
     private val onCategoryClick: (Category) -> Unit // 클릭 이벤트 전달
@@ -24,10 +25,9 @@ class CategoryAdapter(
 
             // 클릭 이벤트 처리
             root.setOnClickListener {
-                onCategoryClick(item)
+                onCategoryClick(item) // 클릭 이벤트 실행
             }
         }
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
@@ -40,16 +40,16 @@ class CategoryAdapter(
     }
 
     override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position)) // 데이터 바인딩
     }
 
     class CategoryDiffCallback : DiffUtil.ItemCallback<Category>() {
         override fun areItemsTheSame(oldItem: Category, newItem: Category): Boolean {
-            return oldItem.name == newItem.name
+            return oldItem.id == newItem.id // ID로 고유성 판단
         }
 
         override fun areContentsTheSame(oldItem: Category, newItem: Category): Boolean {
-            return oldItem == newItem
+            return oldItem == newItem // 데이터 클래스 전체 비교
         }
     }
 }
