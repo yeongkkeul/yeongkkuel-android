@@ -3,6 +3,7 @@ package com.example.yeongkkuel.network
 import com.example.yeongkkuel.network.request.login.ReferralRequest
 import com.example.yeongkkuel.network.request.login.TermsAgreeRequest
 import com.example.yeongkkuel.network.request.login.UserInfoRequest
+import com.example.yeongkkuel.network.response.Response
 import com.example.yeongkkuel.network.response.login.KakaoLoginResponse
 import com.example.yeongkkuel.network.response.login.ReferralResponse
 import com.example.yeongkkuel.network.response.login.TermsAgreeResponse
@@ -35,5 +36,12 @@ interface LoginApiService {
     fun agreeTerms(
         @Body request: TermsAgreeRequest
     ): Call<TermsAgreeResponse>
+
+    @POST("/api/auth/logout/")
+    fun logout(
+        // 쿼리 파라미터로 token 을 담아서 보내기
+        @Query("token") token: String?
+    ): Response<String>
+
 
 }
