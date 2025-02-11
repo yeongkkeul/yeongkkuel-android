@@ -39,7 +39,7 @@ class StatWeeklyViewModel : ViewModel() {
                                     )
                                 },
                                 totalSpending = weekExpenditure,
-                                targetSpending = dayTargetExpenditure ?: -1
+                                targetSpending = dayTargetExpenditure
                             )
                         }
                     }

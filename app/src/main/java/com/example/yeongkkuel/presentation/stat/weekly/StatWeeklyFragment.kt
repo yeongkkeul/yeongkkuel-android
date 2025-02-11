@@ -23,6 +23,7 @@ import com.example.yeongkkuel.presentation.stat.weekly.adapter.StatWeeklyWeekLis
 import com.example.yeongkkuel.presentation.util.Week
 import com.example.yeongkkuel.presentation.util.toMoneyString
 import com.github.mikephil.charting.animation.Easing
+import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.data.PieData
@@ -130,6 +131,8 @@ class StatWeeklyFragment(
         }
 
         fun initLineChart() {
+            val targetSpending: Int = uiState.targetSpending ?: 0
+
             uiState.weekList.let { list ->
                 val todayWeekNum = getDayOfWeekNum(LocalDate.now())  // 오늘의 요일을 한글로 가져옴
 
@@ -138,7 +141,7 @@ class StatWeeklyFragment(
                 }.take(todayWeekNum)
 
                 entries.forEachIndexed { index, entry ->
-                    val iconRes = if (entry.y >= uiState.targetSpending) {
+                    val iconRes = if (entry.y >= (uiState.targetSpending ?: Int.MAX_VALUE)) {
                         R.drawable.ic_point_up
                     } else {
                         R.drawable.ic_point_down
@@ -147,7 +150,6 @@ class StatWeeklyFragment(
                     val drawable = ContextCompat.getDrawable(requireContext(), iconRes)
                     drawable?.let { entry.setIcon(it) }
                 }
-
 
                 // LineDataSet 생성
                 val dataSet = LineDataSet(entries, "Label").apply {
@@ -185,25 +187,22 @@ class StatWeeklyFragment(
                         axisMaximum = 6f
                     }
 
-                    val maxValue = entries.maxOf { it.y }
-                    val minValue = entries.minOf { it.y }
 
-                    val maxDiff = maxValue - uiState.targetSpending
-                    val minDiff = uiState.targetSpending - minValue
 
-                    axisLeft.run {
-                        val diff = if (minDiff > maxDiff) minDiff else maxDiff
-
-                        // y축의 최소값과 최대값을 targetSpending을 기준으로 설정
-                        axisMinimum = uiState.targetSpending - diff
-                        axisMaximum = uiState.targetSpending + diff
-
-                        setDrawGridLines(true)  // 그리드선 표시
-                        setDrawAxisLine(true)   // 축선 그리기
-                        axisLineColor = Color.BLACK
-                        textColor = Color.BLACK
-                    }
                     axisLeft.apply {
+                        // y축의 최소값과 최대값을 targetSpending을 기준으로 설정
+                        if(targetSpending != 0) {
+                            val maxValue = entries.maxOf { it.y }
+                            val minValue = entries.minOf { it.y }
+
+                            val maxDiff = maxValue - targetSpending
+                            val minDiff = targetSpending - minValue
+
+                            val diff = if (minDiff > maxDiff) minDiff else maxDiff
+
+                            axisMinimum = targetSpending - diff
+                            axisMaximum = targetSpending + diff
+                        }
                         setDrawGridLines(false)
                         setDrawAxisLine(false)
                         axisLineColor = Color.TRANSPARENT
@@ -217,15 +216,13 @@ class StatWeeklyFragment(
                     }
                 }
             }
-
-
         }
 
         fun setTargetSpending() {
             weekListAdapter.setTargetSpending(uiState.targetSpending)
 
             tvTotalSpending.text = "${uiState.totalSpending.toMoneyString()}원"
-            tvLineTargetSpending.text = "하루 목표 지출액 ${uiState.targetSpending.toMoneyString()}원"
+            tvLineTargetSpending.text = "하루 목표 지출액 ${(uiState.targetSpending ?: 0).toMoneyString()}원"
         }
 
         fun initPieChart() {
@@ -318,9 +315,18 @@ class StatWeeklyFragment(
             }
         }
 
+        fun dayTargetExpenditureNull(){
+            if(uiState.targetSpending == null){
+                tvLineTargetSpending.text = ""
+                viewDivLineChart.visibility = View.INVISIBLE
+            }
+        }
+
         initRvData()
         initLineChart()
         setTargetSpending()
+
+        dayTargetExpenditureNull()
 
         initPieChart()
         initPieChartDescription()

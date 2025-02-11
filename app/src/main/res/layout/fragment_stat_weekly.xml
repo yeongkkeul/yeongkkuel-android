@@ -76,6 +76,7 @@
                 app:layout_constraintTop_toBottomOf="@id/rv_weekSending" />
 
             <View
+                android:id="@+id/view_divLineChart"
                 android:layout_width="0dp"
                 android:layout_height="1dp"
                 android:background="@color/sub1"

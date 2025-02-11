@@ -22,8 +22,8 @@ class StatWeeklyWeekListAdapter(
 ) {
     private var targetSpending: Int? = null
 
-    fun setTargetSpending(targetSpending: Int) {
-        this.targetSpending = targetSpending
+    fun setTargetSpending(targetSpending: Int?) {
+        this.targetSpending = targetSpending ?: Int.MAX_VALUE
     }
 
     inner class ViewHolder(
