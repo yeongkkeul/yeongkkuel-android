@@ -5,7 +5,9 @@ import com.example.yeongkkuel.network.RetrofitClient.myPageService
 import com.example.yeongkkuel.network.request.mypage.DeleteMemberRequest
 import com.example.yeongkkuel.network.request.mypage.PatchMyPageRequest
 import com.example.yeongkkuel.network.response.Response
+import com.example.yeongkkuel.network.response.login.ReferralResponse
 import com.example.yeongkkuel.network.response.mypage.MyPageResult
+import com.example.yeongkkuel.network.response.mypage.UserReferralCodeResult
 import com.example.yeongkkuel.network.service.MyPageService
 import com.google.gson.Gson
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -28,6 +30,20 @@ class ProfileRepository(private val apiService: MyPageService) {
             }
         } catch (e: Exception) {
             // 예외 처리 (네트워크 오류 등)
+            e.printStackTrace()
+            null
+        }
+    }
+
+    suspend fun getReferralCode() : Response<UserReferralCodeResult>? {
+        return try {
+            val response = apiService.getUserReferralCode()
+            if(response.isSuccess){
+                response
+            } else {
+                null
+            }
+        } catch (e: Exception) {
             e.printStackTrace()
             null
         }

@@ -62,6 +62,7 @@ class MyFragment : Fragment() {
                 binding.tvAge.text = convertAgeGroup(result.ageGroup)
 
                 binding.tvJob.text = convertJob(result.job)
+                binding.tvRewardAmount.text = result.rewardBalance.toString()
 
                 // 프로필 이미지 로드
                 result.profileImageUrl?.takeIf { it.isNotEmpty() }?.let { url ->
@@ -144,6 +145,9 @@ class MyFragment : Fragment() {
         val codeTv: TextView = dialog.findViewById<TextView>(R.id.tv_my_recommend_code)
         val copyBtn = dialog.findViewById<ImageView>(R.id.iv_copy)
 
+        // 추천 코드 가져와서 codeTV에 넣기
+        val referralCode = viewModel.referralCode.value
+        codeTv.text = referralCode
 
         //클립보드에 복사 하고 모달 나가기
         copyBtn.setOnClickListener {
@@ -152,6 +156,7 @@ class MyFragment : Fragment() {
             clipboard.setPrimaryClip(clip)
             dialog.dismiss()
         }
+
         dialog.show()
 
     }
@@ -182,10 +187,10 @@ class MyFragment : Fragment() {
         logoutBtn.setOnClickListener {
 
             // (1) 서버에 로그아웃 API 호출 (socialToken 전달이 필요하면 여기에 구현)
-            logoutServerApi()
+//            logoutServerApi()
 
             // (2) SDK 로그아웃
-            logoutSocialIfNeeded()
+//            logoutSocialIfNeeded()
 
             // (3) 앱 내부 토큰 삭제
             clearLocalToken()

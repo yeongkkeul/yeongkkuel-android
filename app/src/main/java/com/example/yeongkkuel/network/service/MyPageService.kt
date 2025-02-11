@@ -33,12 +33,12 @@ interface MyPageService {
     ): Response<MyPageResult>
 
     // 추천인 코드 조회
-    @GET("/api/userreferralcode")
+    @GET("/api/userReferralCode")
     suspend fun getUserReferralCode(): Response<UserReferralCodeResult>
 
     // 리워드 목록 조회
     @GET("/api/rewards")
-    suspend fun getRewards(): Response<RewardsResult>
+    suspend fun getRewards(): Response<List<RewardsResult>>
 
     // 회원탈퇴
     @DELETE("/api/auth/delete")

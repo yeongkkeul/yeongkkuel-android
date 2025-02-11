@@ -8,6 +8,7 @@ import com.example.yeongkkuel.network.RetrofitClient
 import com.example.yeongkkuel.network.request.my.UserProfileRequest
 import com.example.yeongkkuel.network.request.mypage.PatchMyPageRequest
 import com.example.yeongkkuel.network.response.Response
+import com.example.yeongkkuel.network.response.login.ReferralResponse
 import com.example.yeongkkuel.network.response.my.UserProfileResponse
 import com.example.yeongkkuel.network.response.my.UserProfileResult
 import com.example.yeongkkuel.network.response.mypage.MyPageResult
@@ -23,10 +24,15 @@ class ProfileViewModel : ViewModel() {
     init {
         repository = ProfileRepository(RetrofitClient.myPageService)
         fetchUserProfile()
+        getReferralCode()
     }
 
     private val _profileResponse = MutableLiveData<Response<MyPageResult>>()
     val profileResponse: LiveData<Response<MyPageResult>> get() = _profileResponse
+
+
+
+
 
     private val _updateStatus = MutableLiveData<Result<Unit>>()
     val updateStatus: LiveData<Result<Unit>> get() = _updateStatus
@@ -47,12 +53,19 @@ class ProfileViewModel : ViewModel() {
     private val _profileImageUrl = MutableLiveData<String>()
     val profileImageUrl: LiveData<String> get() = _profileImageUrl
 
+    // 추천인 코드 응답
+    private val _referralCode = MutableLiveData<String>()
+    val referralCode: LiveData<String> get() = _referralCode
+
+
+
     // setter
     fun updateNickname(newNickname: String) { _nickname.value = newNickname }
     fun updateGender(newGender: String) { _gender.value = newGender }
     fun updateAgeGroup(newAgeGroup: String) { _ageGroup.value = newAgeGroup }
     fun updateJob(newJob: String) { _job.value = newJob }
     fun updateProfileImageUrl(newUrl: String) { _profileImageUrl.value = newUrl }
+    fun updateReferralCode(newCode: String) { _referralCode.value = newCode }
 
 
     // 프로필 조회
@@ -69,6 +82,19 @@ class ProfileViewModel : ViewModel() {
                     _profileImageUrl.value = result.profileImageUrl
 
                     _profileResponse.value = it
+                }
+            }
+        }
+    }
+
+    // 추천인 코드 조회
+    fun getReferralCode() {
+        viewModelScope.launch {
+            val response = repository.getReferralCode()
+            response?.let {
+                if (it.isSuccess) {
+                    val result = it.result
+                    _referralCode.value = result.userReferralCode
                 }
             }
         }
