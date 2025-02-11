@@ -51,7 +51,7 @@ class StatDailyFragment : Fragment() {
     }
 
     private fun initView() = with(binding) {
-        fun initBotSheet(){
+        fun initBotSheet() {
             viewModel.getSpendingList()
         }
 
@@ -62,8 +62,25 @@ class StatDailyFragment : Fragment() {
             tvChartDate.text = formattedDateChart
         }
 
+        fun initErrorListener() {
+            fun hideErrorMessage() {
+                ivError.animate()
+                    .translationY(ivError.height.toFloat())  // 아래로 이동
+                    .alpha(0f)  // 투명하게 변경
+                    .setDuration(300)  // 300ms 동안 실행
+                    .withEndAction {
+                        ivError.visibility = View.GONE  // 애니메이션 종료 후 숨기기
+                    }
+                    .start()
+            }
+            ivError.setOnClickListener {
+                hideErrorMessage()
+            }
+        }
+
         initBotSheet()
         initDate()
+        initErrorListener()
     }
 
     private fun initViewModel() = with(viewModel) {
@@ -88,10 +105,9 @@ class StatDailyFragment : Fragment() {
 
                 val totalString = total.toMoneyString() + "원"
                 tvChartTarget.text = totalString
-                if(uiState.targetSpending < 0){
+                if (uiState.targetSpending < 0) {
                     tvChartDescription.visibility = View.GONE
-                }
-                else {
+                } else {
                     tvChartDescription.visibility = View.VISIBLE
                     if (othersTotal > 0) {
                         val otherTotalString = othersTotal.toMoneyString() + "원"
@@ -105,19 +121,23 @@ class StatDailyFragment : Fragment() {
                 }
 
                 val pieChartDataList = ArrayList<PieEntry>().apply {
-                    uiState.spendingList.forEach { spending ->
-                        val totalPrice = spending.history.sumOf { it.price }
-                        add(PieEntry(totalPrice.toFloat(), spending.kind))
-                    }
-                    if (othersTotal > 0) {
-                        add(PieEntry(othersTotal.toFloat(), "나머지"))
+                    if (uiState.targetSpending >= 0) {
+                        uiState.spendingList.forEach { spending ->
+                            val totalPrice = spending.history.sumOf { it.price }
+                            add(PieEntry(totalPrice.toFloat(), spending.kind))
+                        }
+                        if (othersTotal > 0) {
+                            add(PieEntry(othersTotal.toFloat(), "나머지"))
+                        }
+                    } else {
+                        add(PieEntry(1f, "나머지"))
                     }
                 }
-
                 val colorList = uiState.spendingList.map {
                     ContextCompat.getColor(requireContext(), it.color.id)
                 }.toMutableList()
 
+                if(uiState.targetSpending < 0 ) colorList.clear()
                 colorList.add(ContextCompat.getColor(requireContext(), R.color.black1)) // 색상 추가
 
                 val dataSet = PieDataSet(pieChartDataList, "").apply {
@@ -157,7 +177,22 @@ class StatDailyFragment : Fragment() {
             }
         }
 
+        fun showErrorMessage() {
+            if (uiState.targetSpending == -1) {
+                ivError.visibility = View.VISIBLE
+                ivError.translationY = ivError.height.toFloat()  // 아래에서 시작
+                ivError.alpha = 0f  // 투명도 0으로 시작
+
+                ivError.animate()
+                    .translationY(0f)  // 원래 위치로 이동
+                    .alpha(1f)  // 투명도를 1로 변경
+                    .setDuration(300)  // 300ms 동안 애니메이션 실행
+                    .start()
+            }
+        }
+
         initPieChart()
+        showErrorMessage()
     }
 
 

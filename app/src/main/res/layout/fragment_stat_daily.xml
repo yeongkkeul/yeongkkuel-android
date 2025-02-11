@@ -70,4 +70,17 @@
         tools:text="하루 목표 지출액보다\n2,500원 덜 썻어요!"
         tools:visibility="gone"/>
 
+    <ImageView
+        android:id="@+id/iv_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/pieChart"
+        app:layout_constraintDimensionRatio="1"
+        android:src="@drawable/ic_error_target"
+        android:visibility="gone"
+        tools:visibility="visible"/>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
