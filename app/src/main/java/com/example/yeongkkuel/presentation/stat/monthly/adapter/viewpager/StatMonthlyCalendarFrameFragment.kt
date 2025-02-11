@@ -89,10 +89,12 @@ class StatMonthlyCalendarFrameFragment(
         listAdapter.submitList(uiState.calendarList)
     }
 
+    fun setTargetExpenditure(targetExpenditure: Int?){
+        listAdapter.setTargetExpenditure(targetExpenditure)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
-
-
 }

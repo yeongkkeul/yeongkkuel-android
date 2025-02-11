@@ -17,12 +17,19 @@ import com.example.yeongkkuel.presentation.stat.monthly.StatMonthlyUiState
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
+import timber.log.Timber
 
 class StatMonthlyCalendarListAdapter(
     private val viewModel: BotSheetViewModel
 ) : ListAdapter<StatMonthlyUiState.CalendarData, StatMonthlyCalendarListAdapter.ViewHolder>(
     StatMonthlyCalendarDiffUtil()
 ) {
+    private var targetExpenditure: Int? = null
+
+    fun setTargetExpenditure(targetExpenditure:Int?){
+        this.targetExpenditure = targetExpenditure
+    }
+
     abstract inner class ViewHolder(
         view: View
     ) : RecyclerView.ViewHolder(view) {
@@ -51,31 +58,34 @@ class StatMonthlyCalendarListAdapter(
             (item as StatMonthlyUiState.CalendarData.CalendarDay).let { dayItem ->
                 fun initData() {
                     tvDay.text = dayItem.day.toString()
+                    if(targetExpenditure == null){
+                        pieChart.visibility = View.INVISIBLE
+                    } else {
+                        if(item.day == 10) Timber.d("timber: ${item}")
+                        val colorList = listOf(
+                            ContextCompat.getColor(binding.root.context, R.color.main4),
+                            ContextCompat.getColor(binding.root.context, R.color.black0),
+                        )
 
-                    val colorList = listOf(
-                        ContextCompat.getColor(binding.root.context, R.color.main4),
-                        ContextCompat.getColor(binding.root.context, R.color.black0),
-                    )
+                        val dataSet = PieDataSet(dayItem.pieDataList, "").apply {
+                            colors = colorList // 색상 리스트 적용
+                        }
 
-                    val dataSet = PieDataSet(dayItem.pieDataList, "").apply {
-                        colors = colorList // 색상 리스트 적용
-                    }
+                        dataSet.setDrawValues(false)
 
-                    dataSet.setDrawValues(false)
+                        val pieData = PieData(dataSet)
 
-                    val pieData = PieData(dataSet)
-
-                    pieChart.apply {
-                        data = pieData
-                        description.isEnabled = false // 차트 설명 비활성화
-                        legend.isEnabled = false // 하단 설명 비활성화
-                        isRotationEnabled = true // 차트 회전 활성화
-                        setDrawEntryLabels(false) // 엔트리 라벨 비활성화
-                        setEntryLabelColor(Color.BLACK) // label 색상
-                        animateY(1400, Easing.EaseInOutQuad) // 1.4초 동안 애니메이션 설정
-                        setTouchEnabled(false)  // 차트 터치 비활성화
-                        setOnChartValueSelectedListener(null)  // 클릭 이벤트 리스너 제거
-//                        animate()
+                        pieChart.apply {
+                            data = pieData
+                            description.isEnabled = false // 차트 설명 비활성화
+                            legend.isEnabled = false // 하단 설명 비활성화
+                            isRotationEnabled = true // 차트 회전 활성화
+                            setDrawEntryLabels(false) // 엔트리 라벨 비활성화
+                            setEntryLabelColor(Color.BLACK) // label 색상
+                            animateY(1400, Easing.EaseInOutQuad) // 1.4초 동안 애니메이션 설정
+                            setTouchEnabled(false)  // 차트 터치 비활성화
+                            setOnChartValueSelectedListener(null)  // 클릭 이벤트 리스너 제거
+                        }
                     }
                 }
 
@@ -83,17 +93,16 @@ class StatMonthlyCalendarListAdapter(
                     binding.root.visibility = View.INVISIBLE
                 } else {
                     binding.root.visibility = View.VISIBLE
-                    initData()
-                }
-
-                binding.root.setOnClickListener {
-                    item.run {
-                        viewModel.getSpendingList(
-                            year = targetMonth.first,
-                            month = targetMonth.second,
-                            day = day
-                        )
+                    binding.root.setOnClickListener {
+                        item.run {
+                            viewModel.getSpendingList(
+                                year = targetMonth.first,
+                                month = targetMonth.second,
+                                day = day
+                            )
+                        }
                     }
+                    initData()
                 }
             }
         }

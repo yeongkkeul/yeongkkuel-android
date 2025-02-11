@@ -23,6 +23,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -50,7 +51,7 @@ class StatDailyFragment : Fragment() {
     }
 
     private fun initView() = with(binding) {
-        fun initBotSheet(){
+        fun initBotSheet() {
             viewModel.getSpendingList()
         }
 
@@ -61,8 +62,25 @@ class StatDailyFragment : Fragment() {
             tvChartDate.text = formattedDateChart
         }
 
+        fun initErrorListener() {
+            fun hideErrorMessage() {
+                ivError.animate()
+                    .translationY(ivError.height.toFloat())  // 아래로 이동
+                    .alpha(0f)  // 투명하게 변경
+                    .setDuration(300)  // 300ms 동안 실행
+                    .withEndAction {
+                        ivError.visibility = View.GONE  // 애니메이션 종료 후 숨기기
+                    }
+                    .start()
+            }
+            ivError.setOnClickListener {
+                hideErrorMessage()
+            }
+        }
+
         initBotSheet()
         initDate()
+        initErrorListener()
     }
 
     private fun initViewModel() = with(viewModel) {
@@ -76,84 +94,87 @@ class StatDailyFragment : Fragment() {
 
     private fun onBind(uiState: BotSheetUiState) = with(binding) {
         fun initPieChart() {
-            uiState.spendingList.let {
-                val totalList = uiState.spendingList.map { spending ->
-                    spending.history.sumOf { history -> history.price }
-                }
+            val spendingList = uiState.spendingList
+            val totalList = spendingList.map { spending ->
+                spending.history.sumOf { it.price }
+            }
 
-                val othersTotal = uiState.targetSpending - totalList.sum()
+            val total = totalList.sum()
+            val othersTotal = uiState.targetSpending - total
 
-                val otherTotalString = Math.abs(othersTotal).toMoneyString() + "원"
+            // 목표 지출액 텍스트 설정
+            tvChartTarget.text = total.toMoneyString() + "원"
+            tvChartDescription.visibility = if (uiState.targetSpending < 0) View.GONE else View.VISIBLE
+            tvChartDescription.text = if (othersTotal > 0) {
+                "하루 목표 지출액보다\n${othersTotal.toMoneyString()}원 덜 썼어요!"
+            } else {
+                "하루 목표 지출액보다\n${(-othersTotal).toMoneyString()}원 더 썼어요!"
+            }
 
-                if(uiState.targetSpending < 0){
-                    tvChartDescription.visibility = View.GONE
-                    tvChartTarget.text = "하루 목표 지출액을\n" +
-                            "설정해주세요."
-                }
-                else {
-                    tvChartTarget.text = otherTotalString
-                    tvChartDescription.visibility = View.VISIBLE
-                    if (othersTotal > 0) {
-                        tvChartDescription.text = "하루 목표 지출액보다\n" +
-                                "${otherTotalString}원 덜 썻어요!"
-                    } else {
-                        tvChartDescription.text = "하루 목표 지출액보다\n" +
-                                "${otherTotalString}원 더 썻어요!"
-                    }
-                }
-
-                val pieChartDataList = ArrayList<PieEntry>().apply {
-                    uiState.spendingList.forEach { spending ->
+            // PieEntry 리스트 생성
+            val pieChartDataList = ArrayList<PieEntry>().apply {
+                if (uiState.targetSpending >= 0) {
+                    spendingList.forEach { spending ->
                         val totalPrice = spending.history.sumOf { it.price }
                         add(PieEntry(totalPrice.toFloat(), spending.kind))
                     }
-                    add(PieEntry(othersTotal.toFloat(), "나머지"))
+                    if (othersTotal > 0) add(PieEntry(othersTotal.toFloat(), "나머지"))
+                } else {
+                    add(PieEntry(1f, "나머지"))
                 }
+            }
 
-                val colorList = uiState.spendingList.map {
-                    ContextCompat.getColor(requireContext(), it.color.id)
-                }.toMutableList()
+            // 색상 리스트 생성
+            val colorList = spendingList.map {
+                ContextCompat.getColor(requireContext(), it.color.id)
+            }.toMutableList().apply {
+                if (uiState.targetSpending < 0) clear()
+                add(ContextCompat.getColor(requireContext(), R.color.black1))
+            }
 
-                colorList.add(ContextCompat.getColor(requireContext(), R.color.black1)) // 색상 추가
+            // PieData 설정
+            val pieData = PieData(PieDataSet(pieChartDataList, "").apply {
+                colors = colorList
+                valueTextSize = 16F
+                setDrawValues(false) // 값 표시 비활성화
+            })
 
-                val dataSet = PieDataSet(pieChartDataList, "").apply {
-                    colors = colorList // 색상 리스트 적용
-                }
+            // PieChart 설정
+            pieChart.apply {
+                data = pieData
+                description.isEnabled = false
+                legend.isEnabled = false
+                isRotationEnabled = true
+                setDrawEntryLabels(false)
+                setEntryLabelColor(Color.BLACK)
+                animateY(1400, Easing.EaseInOutQuad)
+                setTouchEnabled(false)
+                setOnChartValueSelectedListener(null)
+            }
 
-                dataSet.valueTextSize = 16F
-                dataSet.setDrawValues(false) // value 비활성화
+            // JSON 변환 및 정렬
+            val copiedList = Gson().fromJson<List<PieEntry>>(
+                Gson().toJson(pieChartDataList), object : TypeToken<List<PieEntry>>() {}.type
+            ).sortedByDescending { it.value }
+        }
 
-                val pieData = PieData(dataSet)
 
-                pieChart.apply {
-                    data = pieData
-                    description.isEnabled = false // 차트 설명 비활성화
-                    legend.isEnabled = false // 하단 설명 비활성화
-                    isRotationEnabled = true // 차트 회전 활성화
-                    setDrawEntryLabels(false) // 엔트리 라벨 비활성화
-                    setEntryLabelColor(Color.BLACK) // label 색상
-                    animateY(1400, Easing.EaseInOutQuad) // 1.4초 동안 애니메이션 설정
-                    setTouchEnabled(false)  // 차트 터치 비활성화
-                    setOnChartValueSelectedListener(null)  // 클릭 이벤트 리스너 제거
-                    animate()
-                }
+        fun showErrorMessage() {
+            if (uiState.targetSpending == -1) {
+                ivError.visibility = View.VISIBLE
+                ivError.translationY = ivError.height.toFloat()  // 아래에서 시작
+                ivError.alpha = 0f  // 투명도 0으로 시작
 
-                // Gson 객체 생성
-                val gson = Gson()
-
-                // 원본 데이터를 JSON 형식으로 직렬화
-                val jsonString = gson.toJson(pieChartDataList)
-
-                // JSON 형식의 데이터를 다시 역직렬화하여 리스트로 변환
-                val typeToken = object : TypeToken<List<PieEntry>>() {}.type
-                val copiedList = gson.fromJson<List<PieEntry>>(jsonString, typeToken)
-
-                // 내림차순으로 정렬
-                val sortedList = copiedList.sortedByDescending { it.value }
+                ivError.animate()
+                    .translationY(0f)  // 원래 위치로 이동
+                    .alpha(1f)  // 투명도를 1로 변경
+                    .setDuration(300)  // 300ms 동안 애니메이션 실행
+                    .start()
             }
         }
 
         initPieChart()
+        showErrorMessage()
     }
 
 

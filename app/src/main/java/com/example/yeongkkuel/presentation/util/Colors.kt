@@ -31,8 +31,8 @@ enum class Colors(val id: Int, val red: Int, val green: Int, val blue: Int) {
         }
 
         // RGB 값으로 Colors Enum 찾기
-        fun fromRGB(red: Int, green: Int, blue: Int): Colors? {
-            return entries.firstOrNull { it.red == red && it.green == green && it.blue == blue }
+        fun fromRGB(red: Int, green: Int, blue: Int): Colors {
+            return entries.firstOrNull { it.red == red && it.green == green && it.blue == blue } ?: RED1
         }
 
         // 서버에서 사용하는 Code로 Colors Enum 찾기
@@ -40,8 +40,5 @@ enum class Colors(val id: Int, val red: Int, val green: Int, val blue: Int) {
             return entries.firstOrNull { it.name == code }
         }
 
-        fun getRGB(red:Int, blue:Int, green:Int): Colors{
-            return RED1
-        }
     }
 }

@@ -6,7 +6,7 @@ import com.example.yeongkkuel.presentation.util.Week
 import com.github.mikephil.charting.data.Entry
 
 data class StatWeeklyUiState(
-    val targetSpending: Int,
+    val targetSpending: Int?,
     val totalSpending: Int,
     val weekList: List<DayData>,
     val compareList: List<CompareData>,
