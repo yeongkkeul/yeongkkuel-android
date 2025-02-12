@@ -35,19 +35,19 @@ class RewardFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 뒤로가기 버튼 클릭 시 이전 화면으로 이동
-        binding.ivBack.setOnClickListener {
-            findNavController().popBackStack()
-        }
-
         // RecyclerView 설정
         rewardAdapter = RewardAdapter(emptyList()) { clickedItem ->
             // 아이템 클릭 시 이동 로직
 //            navigateToFragment(clickedItem.type)
-
         }
-        binding.rvReward.layoutManager = LinearLayoutManager(requireContext())
-        binding.rvReward.adapter = rewardAdapter
+
+        binding.apply {
+            rvReward.adapter = rewardAdapter
+            rvReward.layoutManager = LinearLayoutManager(requireContext())
+            ivBack.setOnClickListener {
+                findNavController().popBackStack()
+            }
+        }
 
 
         fetchRewardsFromServer()
