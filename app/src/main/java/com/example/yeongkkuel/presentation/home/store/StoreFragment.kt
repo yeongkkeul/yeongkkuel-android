@@ -12,6 +12,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
@@ -23,6 +24,7 @@ import com.google.android.material.tabs.TabLayout
 class StoreFragment : Fragment() {
     private lateinit var navController: NavController
     private var products: MutableList<Product> = mutableListOf() // MutableList 사용
+    private val viewModel: StoreViewModel by viewModels()
 
     private var _binding: FragmentStoreBinding? = null
     private val binding get() = _binding!!
@@ -61,20 +63,81 @@ class StoreFragment : Fragment() {
         }
         binding.imgSaveIcon.setOnClickListener {
             selectedProductInMyTab?.let { product ->
-                Log.d("StoreFragment", "Saving selected MY Product: ${product.name}")
-
-                // FragmentResult를 사용하여 HomeFragment에 데이터 전달
-                parentFragmentManager.setFragmentResult(
-                    "selectedProductKey",
-                    Bundle().apply { putParcelable("selectedProduct", product) }
-                )
-                Toast.makeText(requireContext(), "저장했어요!", Toast.LENGTH_SHORT).show()
-                // StoreFragment 종료 후 HomeFragment로 이동
-                navController.popBackStack()
+                val purchaseIdList = listOf(product.id)
+                viewModel.saveEquippedSkins(purchaseIdList)
+                Toast.makeText(requireContext(), "스킨 착용을 저장 중...", Toast.LENGTH_SHORT).show()
             } ?: Log.d("StoreFragment", "No product selected in MY tab.")
         }
+        viewModel.equipResponse.observe(viewLifecycleOwner) { response ->
+            if (response?.isSuccess == true) {
+                Toast.makeText(requireContext(), "스킨 착용이 저장되었습니다!", Toast.LENGTH_SHORT).show()
+                navController.popBackStack()
+            } else {
+                Toast.makeText(requireContext(), "스킨 착용 저장 실패: ${response?.message ?: "오류 발생"}", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        binding.imgPurchaseIcon.setOnClickListener {
+            selectedProduct?.let { product ->
+                viewModel.purchaseSkin(
+                    itemId = product.id,
+                    itemType = product.category.name, // 예: "SWING"
+                    itemName = product.name,
+                    reward = product.price
+                )
+                Toast.makeText(requireContext(), "스킨 구매 중...", Toast.LENGTH_SHORT).show()
+            } ?: Log.d("StoreFragment", "선택된 상품 없음")
+        }
+
+        // ✅ 스킨 구매 응답 처리
+        viewModel.purchaseResponse.observe(viewLifecycleOwner) { response ->
+            if (response?.isSuccess == true) {
+                Toast.makeText(requireContext(), "스킨 구매 성공!", Toast.LENGTH_SHORT).show()
+                navController.popBackStack()
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "스킨 구매 실패: ${response?.message ?: "오류 발생"}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
+        viewModel.fetchShopData("SWING")
+        Log.d("StoreFragment", "🔍 Fetching shop data for category: SWING")
+
+        viewModel.shopResponse.observe(viewLifecycleOwner) { response ->
+            Log.d("StoreFragment", "API Response: $response")
+
+            if (response?.isSuccess == true) {
+                binding.tvCoin.text = "보유 리워드: ${response.result.myReward}"
+                val shopItems = response.result.itemList.map { shopItem ->
+                    Product(
+                        id = shopItem.id,
+                        name = shopItem.itemName,
+                        price = shopItem.price,
+                        imageResId = getDrawableFromUrl(shopItem.itemImg),
+                        category = ProductCategory.valueOf(response.result.itemType)
+                    )
+                }
+                updateProductList(shopItems)
+            } else {
+                Log.e("StoreFragment", "상점 데이터 불러오기 실패: ${response?.message ?: "오류 발생"}")
+                Toast.makeText(requireContext(), "상점 데이터 불러오기 실패: ${response?.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         setupRecyclerView()
         setupTabLayout()
+    }
+    private fun getDrawableFromUrl(url: String): Int {
+        return when (url) {
+            "swing_1.png" -> R.drawable.img_product_swing1
+            "toy_1.png" -> R.drawable.img_product_toy1
+            "bowl_1.png" -> R.drawable.img_product_bowl1
+            "nest_1.png" -> R.drawable.img_product_nest1
+            else -> R.drawable.img_product_swing1
+        }
     }
 
     private fun setupRecyclerView() {
@@ -122,7 +185,6 @@ class StoreFragment : Fragment() {
                     Log.d("StoreFragment", "Nest Image Updated: $imageResId")
                 }
 
-
             }
 
         }
@@ -139,6 +201,7 @@ class StoreFragment : Fragment() {
                 it.category == ProductCategory.SWING
             }.map { productUiStateProduct ->
                 Product(
+                    id = productUiStateProduct.id,
                     name = productUiStateProduct.name,
                     price = productUiStateProduct.price,
                     imageResId = adjustResourceId(productUiStateProduct.iconResId),
@@ -165,6 +228,7 @@ class StoreFragment : Fragment() {
     private fun getProductsByCategory(category: ProductCategory): List<Product> {
         return ProductUiState.init().productList.filter { it.category == category }.map { productUiStateProduct ->
             Product(
+                id = productUiStateProduct.id,
                 name = productUiStateProduct.name,
                 price = productUiStateProduct.price,
                 imageResId = adjustResourceId(productUiStateProduct.iconResId),

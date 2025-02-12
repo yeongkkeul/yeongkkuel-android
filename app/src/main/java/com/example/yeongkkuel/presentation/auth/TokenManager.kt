@@ -1,9 +1,9 @@
 package com.example.yeongkkuel.presentation.auth
 
 import android.content.Context
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
-import timber.log.Timber
+//import androidx.security.crypto.EncryptedSharedPreferences
+//import androidx.security.crypto.MasterKey
+//import timber.log.Timber
 
 
 // 예: SharedPreferences Util (Singleton)
@@ -32,6 +32,11 @@ object TokenManager {
 
     fun getAccessToken(context: Context): String? {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val accessToken = prefs.getString(KEY_ACCESS_TOKEN, null)
+
+        // ✅ Access Token 값 확인용 로그
+        println("Saved Access Token in TokenManager: $accessToken")
+
         return prefs.getString(KEY_ACCESS_TOKEN, null)
     }
 

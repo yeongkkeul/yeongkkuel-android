@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -38,6 +39,7 @@ class HomeFragment : Fragment() {
         get() = requireNotNull(_binding) { "FragmentHomeBinding -> null" }
     private val PREFS_NAME = "AppPrefs"
     private val KEY_LAST_HIDDEN_DATE = "lastHiddenDate"
+    private val homeViewModel: HomeViewModel by viewModels()
 
     // BotSheetViewModel을 참조
     private val botSheetViewModel: BotSheetViewModel by viewModels()
@@ -106,8 +108,53 @@ class HomeFragment : Fragment() {
         }
 
         setupSwipeToDismiss(binding.imgWarningStart)
+
+        homeViewModel.fetchHomeData()
+
+        // ✅ LiveData 관찰
+        homeViewModel.homeResponse.observe(viewLifecycleOwner) { response ->
+            if (response?.isSuccess == true) {
+                binding.tvCoin.text = "보유 리워드: ${response.result.myReward}"
+
+                // ✅ 보유한 스킨 업데이트
+                updateMySkins(response.result.mySkin)
+
+                // ✅ 지출 내역 업데이트
+                updateCategoryExpenses(response.result.categories)
+            } else {
+                Toast.makeText(requireContext(), "홈 데이터 불러오기 실패", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    private fun updateCategoryExpenses(categories: List<Category>) {
+        categories.forEach { category ->
+            category.expenses.forEach { expense ->
+                Log.d("HomeFragment", "카테고리: ${category.categoryName}, 지출: ${expense.content}, 금액: ${expense.amount}")
+            }
+        }
+    }
+    private fun getDrawableFromUrl(url: String): Int {
+        return when (url) {
+            "swing_1.png" -> R.drawable.img_home_swing1
+            "toy_1.png" -> R.drawable.img_home_toy1
+            "bowl_1.png" -> R.drawable.img_home_bowl1
+            "nest_1.png" -> R.drawable.img_home_nest1
+            else -> R.drawable.img_home_nest1
+        }
     }
 
+    private fun updateMySkins(mySkins: List<MySkin>) {
+        mySkins.forEach { skin ->
+            val imageResId = getDrawableFromUrl(skin.imgUrl)
+
+            when (skin.itemType) {
+                "SWING" -> binding.imgHomeSwing.setImageResource(imageResId)
+                "TOY" -> binding.imgHomeToy.setImageResource(imageResId)
+                "BOWL" -> binding.imgHomeBowl.setImageResource(imageResId)
+                "NEST" -> binding.imgHomeNest.setImageResource(imageResId)
+            }
+        }
+    }
 
 
     override fun onDestroyView() {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="space_xx_small">4dp</dimen>
-    <dimen name="space_x_small">4dp</dimen>
+    <dimen name="space_x_small">8dp</dimen>
     <dimen name="space_small">12dp</dimen>
     <dimen name="space_median">16dp</dimen>
     <dimen name="space_s_large">18dp</dimen>
@@ -21,6 +21,7 @@
     <dimen name="sp_small">12sp</dimen>
 
     <!--Chat-->
+    <dimen name="chat_room_photo">2dp</dimen>
     <dimen name="design_fab_size_normal">48dp</dimen>
     <dimen name="design_fab_image_size">48dp</dimen>
     <dimen name="space_chat_room_rank">28dp</dimen>

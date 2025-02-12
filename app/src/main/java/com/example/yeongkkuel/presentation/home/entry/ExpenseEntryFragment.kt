@@ -261,7 +261,7 @@ class ExpenseEntryFragment : Fragment() {
 
         // SpendingCategory 처리
         return try {
-            val categoryEnum = SpendingCategory.fromKor(selectedCategory) // fromKor 메서드 사용
+            val categoryEnum = SpendingCategory.fromName(selectedCategory)
             botSheetViewModel.addExpenseToCategory(categoryEnum, expenseHistory)
             Toast.makeText(requireContext(), "지출 내역이 저장되었습니다.", Toast.LENGTH_SHORT).show()
             true
