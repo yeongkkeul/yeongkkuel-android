@@ -79,8 +79,6 @@ class AuthInterceptor(private val context: Context) : Interceptor {
                 val intent = Intent(context, MainActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 context.startActivity(intent)
-
-                return secondResponse
             }
 
             return secondResponse
