@@ -9,6 +9,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,8 +21,11 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentMyBinding
+import com.example.yeongkkuel.network.RetrofitClient
+import com.example.yeongkkuel.network.request.mypage.DeleteMemberRequest
 import com.example.yeongkkuel.presentation.auth.TokenManager
 import com.example.yeongkkuel.presentation.base.MainActivity
 import com.kakao.sdk.user.UserApiClient
@@ -33,6 +37,7 @@ class MyFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: ProfileViewModel by viewModels({ requireActivity() })
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -44,8 +49,9 @@ class MyFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
         observeViewModel()
-        // 클릭 리스너들
+        viewModel.fetchUserProfile()
         setupClickListeners()
     }
 
@@ -53,12 +59,26 @@ class MyFragment : Fragment() {
         viewModel.profileResponse.observe(viewLifecycleOwner) { response ->
             response.result?.let { result ->
                 binding.tvNickname.text = result.nickname
-                binding.tvAge.text = result.ageGroup + "대"
-                binding.tvJob.text = result.job
-                binding.ivProfile.setImageURI(Uri.parse(result.profileImageUrl))
+                binding.tvAge.text = convertAgeGroup(result.ageGroup)
+
+                binding.tvJob.text = convertJob(result.job)
+                binding.tvRewardAmount.text = result.rewardBalance.toString()
+
+                // 프로필 이미지 로드
+                result.profileImageUrl?.takeIf { it.isNotEmpty() }?.let { url ->
+                    val imageUrl = result.profileImageUrl
+                    Glide.with(this)
+                        .load(imageUrl)
+                        .placeholder(R.drawable.ic_my_profile)  // 로딩 중 표시
+                        .error(R.drawable.ic_my_profile)        // 에러 시 표시
+                        .into(binding.ivProfile)
+                } ?: run {
+                    // 기본 이미지 설정 또는 아무 작업도 하지 않음
+                    binding.ivProfile.setImageResource(R.drawable.ic_my_profile)
+                }
                 binding.tvEmail.text = result.email
-                binding.tvDailyLimit.text = result.dayTargetExpenditure.toString() + "원"
-                binding.tvDailyPercent.text = result.weeklyAchievementRate.toString() + "%"
+                binding.tvDailyLimit.text = result.dayTargetExpenditure.toString() + " 원"
+                binding.tvDailyPercent.text = result.weeklyAchievementRate.toString() + " %"
             }
         }
     }
@@ -125,6 +145,9 @@ class MyFragment : Fragment() {
         val codeTv: TextView = dialog.findViewById<TextView>(R.id.tv_my_recommend_code)
         val copyBtn = dialog.findViewById<ImageView>(R.id.iv_copy)
 
+        // 추천 코드 가져와서 codeTV에 넣기
+        val referralCode = viewModel.referralCode.value
+        codeTv.text = referralCode
 
         //클립보드에 복사 하고 모달 나가기
         copyBtn.setOnClickListener {
@@ -133,6 +156,7 @@ class MyFragment : Fragment() {
             clipboard.setPrimaryClip(clip)
             dialog.dismiss()
         }
+
         dialog.show()
 
     }
@@ -161,19 +185,23 @@ class MyFragment : Fragment() {
         // 건너뛰기
         //copybtn 클릭시 클립보드에 복사 하고 모달 나가기
         logoutBtn.setOnClickListener {
-            //TODO: 로그아웃 로직
 
-            // 1) 소셜 로그아웃
+            // (1) 서버에 로그아웃 API 호출 (socialToken 전달이 필요하면 여기에 구현)
+//            logoutServerApi()
+
+            // (2) SDK 로그아웃
 //            logoutSocialIfNeeded()
 
-            // 2) 내부 JWT 삭제
+            // (3) 앱 내부 토큰 삭제
             clearLocalToken()
 
-            // 3) 필요 시 서버에 로그아웃 API (선택적)
-            // logoutServerApi()
-
-            // 4) 로그인 화면으로 이동
+            // (4) 로그인 화면으로 이동
             navigateToLogin()
+
+
+
+//            clearLocalToken()
+//            navigateToLogin()
 
             dialog.dismiss()
         }
@@ -294,10 +322,20 @@ class MyFragment : Fragment() {
 
         withdrawBtn.setOnClickListener {
             //TODO: 탈퇴 로직
-            // TODO: 실제로 탈퇴(연결 끊기) 로직 실행
+            val reason = when {
+                ivCheckLowUsage.isSelected -> "LOW_USAGE"
+                ivCheckService.isSelected -> "SERVICE"
+                ivCheckBoredom.isSelected -> "BOREDOM"
+                ivCheckDifficulty.isSelected -> "DIFFICULTY"
+                ivCheckElse.isSelected -> "ELSE"
+                else -> "ELSE"
+            }
+            val detail = etElseDetail.text.toString()
+            val request = DeleteMemberRequest(reason, detail)
+
+            withdrawServerApi(request)
             unlinkSocialIfNeeded()      // 카카오 unlink, 구글 revokeAccess
             clearLocalToken()           // 내부 JWT 삭제
-            withdrawServerApi()         // 서버 DB에서 사용자 삭제 (탈퇴 API)
             navigateToLogin()           // or 앱 초기화
             dialog.dismiss()
 
@@ -335,15 +373,16 @@ class MyFragment : Fragment() {
 
     private fun logoutSocialIfNeeded() {
         val loginProvider = getLoginProvider() // "kakao", "google" 등
-
         when (loginProvider) {
             "kakao" -> {
                 // 카카오 로그아웃
                 UserApiClient.instance.logout { error ->
                     if (error != null) {
                         // 로그 남기기
+                        Log.e("MyFragment", "카카오 로그아웃 실패", error)
                     } else {
                         // 카카오 로그아웃 완료
+                        Log.d("MyFragment", "카카오 로그아웃 성공")
                     }
                 }
             }
@@ -368,6 +407,7 @@ class MyFragment : Fragment() {
      * 카카오는 unlink, 구글은 revokeAccess
      */
     private fun unlinkSocialIfNeeded() {
+
         val loginProvider = getLoginProvider()
         when (loginProvider) {
             "kakao" -> {
@@ -375,8 +415,10 @@ class MyFragment : Fragment() {
                 UserApiClient.instance.unlink { error ->
                     if (error != null) {
                         // 에러 처리
+                        Log.e("MyFragment", "카카오 연결 끊기 실패", error)
+
                     } else {
-                        // 연결 끊기 성공
+                        Log.d("MyFragment", "카카오 연결 끊기 성공")
                     }
                 }
             }
@@ -393,35 +435,72 @@ class MyFragment : Fragment() {
 
     private fun clearLocalToken() {
         //tokenmanager 사용
-        TokenManager.clearTokens(requireContext())
+        TokenManager.clearAllTokens(requireContext())
         //토큰이 잘 없어졌는지 로깅
         Timber.d("TokenManager: ${TokenManager.getAccessToken(requireContext())}")
     }
 
     private fun getLoginProvider(): String {
-        // 예: SharedPreferences에서 "login_provider" 값 가져오기
-        val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
-        return prefs.getString("login_provider", "") ?: ""
+        // 소셜 타입 가져오기
+        return TokenManager.getSocialType(requireContext()).name.lowercase()
     }
 
 
     private fun logoutServerApi() {
         // 예: Retrofit2, OkHttp 등을 사용해 서버 로그아웃 API 호출
         // ex) apiService.logout("Bearer $jwt").enqueue(...)
+
+        val socialType = TokenManager.getSocialType(requireContext())
+        val socialToken = when(socialType) {
+            TokenManager.SocialType.KAKAO -> TokenManager.getKakaoToken(requireContext())
+            TokenManager.SocialType.GOOGLE -> TokenManager.getGoogleIdToken(requireContext())
+            else -> null
+        }
+        // 로그아웃 api 호출
+        val response = RetrofitClient.loginApiService.logout(socialToken)
+        if (response.isSuccess) {
+            // 로그아웃 성공
+            Log.d("MyFragment", "로그아웃 성공")
+        } else {
+            // 로그아웃 실패
+            Log.e("MyFragment", "로그아웃 실패: ${response.code}, ${response.message}")
+        }
+
     }
 
-    private fun withdrawServerApi() {
-        // 예: Retrofit2, OkHttp로 탈퇴 API 호출
-        // ex) apiService.withdraw("Bearer $jwt").enqueue(...)
+    private fun withdrawServerApi(request: DeleteMemberRequest) {
+
+
     }
 
     private fun navigateToLogin() {
-        //TODO : 로그인 화면으로 이동
-
         // 로그인 화면으로 이동
         val intent = Intent(requireContext(), MainActivity::class.java)
         startActivity(intent)
         requireActivity().finish()
+    }
+
+    private fun convertJob(apiJob: String): String {
+        return when(apiJob.uppercase()) {
+            "STUDENT" -> "학생"
+            "EMPLOYEE" -> "직장인"
+            "SELF_EMPLOYED" -> "자영업자"
+            "HOMEMAKER" -> "주부"
+            "UNDECIDED" -> "무직"
+            else -> "무직"  // 알 수 없는 경우 원본 문자열 그대로 사용
+        }
+    }
+
+    private fun convertAgeGroup(apiAge: String): String {
+        return when(apiAge.uppercase()) {
+            "TEENAGER" -> "10대"
+            "TWENTIES" -> "20대"
+            "THIRTIES" -> "30대"
+            "FORTIES" -> "40대"
+            "FIFTIES" -> "50대"
+            "SIXTIES_AND_ABOVE" -> "60대"
+            else -> " 대"  // 알 수 없는 경우 원본 문자열 그대로 사용
+        }
     }
 
 

@@ -6,7 +6,5 @@ data class PatchMyPageRequest(
     @SerializedName("nickname") val nickname: String,
     @SerializedName("gender") val gender: String,
     @SerializedName("ageGroup") val ageGroup: String,
-    @SerializedName("job") val job: String,
-
-    @SerializedName("profileImage") val profileImage: String?
+    @SerializedName("job") val job: String
 )

@@ -278,7 +278,7 @@
             app:destination="@id/navigation_my_edit" />
         <action
             android:id="@+id/action_myFragment_to_navigation_daily_expense_goal"
-            app:destination="@id/navigation_daily_expense_goal" />
+            app:destination="@id/navigation_stat_setting" />
         <action
             android:id="@+id/action_myPageFragment_to_notificationFragment"
             app:destination="@id/navigation_notification" />

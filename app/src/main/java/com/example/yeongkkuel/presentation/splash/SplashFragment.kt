@@ -61,6 +61,7 @@ class SplashFragment : Fragment() {
 
 
     suspend fun autoLogin(context: Context, tokenManager: TokenManager): Boolean {
+        Log.d("SplashFragment", "autoLogin")
         // SharedPreferences에서 토큰을 가져옴 (앱의 이름이나 PREF_KEY는 상황에 맞게 설정)
         var accessToken = tokenManager.getAccessToken(context)?: null
         val refreshToken = tokenManager.getRefreshToken(context)?: null
@@ -88,7 +89,7 @@ class SplashFragment : Fragment() {
                         val newAccessToken = response.body()!!.accessToken
                         val newRefreshToken = response.body()!!.refreshToken
                         if (newAccessToken.isNotEmpty()) {
-                            tokenManager.saveTokens(context, newAccessToken, refreshToken)
+                            tokenManager.saveTokens(context, newAccessToken, newRefreshToken)
                         }
                     }
                     true  // 자동 로그인 성공
@@ -97,11 +98,6 @@ class SplashFragment : Fragment() {
                     e.printStackTrace()
                     tokenManager.clearTokens(context)
                     false
-                } finally {
-                    // 자동 로그인 실패 시 로그아웃 처리
-                    if (!true) {
-                        tokenManager.clearTokens(context)
-                    }
                 }
             } else {
                 // access token이 유효한 경우 바로 자동 로그인 성공
@@ -113,6 +109,7 @@ class SplashFragment : Fragment() {
             e.printStackTrace()
             false
         }
+        return true
     }
 
 

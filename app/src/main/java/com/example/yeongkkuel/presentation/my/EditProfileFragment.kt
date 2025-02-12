@@ -26,17 +26,46 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentEditProfileBinding
+import com.example.yeongkkuel.presentation.my.util.UriUtil
+import org.w3c.dom.Text
+import java.io.File
 
 class EditProfileFragment : Fragment() {
 
     private var _binding: FragmentEditProfileBinding? = null
     private val binding get() = _binding!!
+
+    // ViewModel 연결
     private val viewModel: ProfileViewModel by viewModels()
-    private lateinit var imagePickerLauncher: ActivityResultLauncher<Intent>
 
+//    private lateinit var imagePickerLauncher: ActivityResultLauncher<Intent>
 
+//    private var selectedImageFile: File? = null
+// 실제 서버 전송용 파일
+    private var selectedFile: File? = null
+
+    // 이미지 선택 ActivityResult
+    private val imagePickerLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val uri = result.data?.data
+            uri?.let {
+                // Uri -> File (JPEG 압축) -> selectedFile
+                val compressedFile = UriUtil.toFile(requireContext(), it)
+                selectedFile = compressedFile
+
+                // 미리보기
+                val bitmap = BitmapFactory.decodeFile(compressedFile.absolutePath)
+                binding.ivProfile.setImageBitmap(bitmap)
+                // 필요하면 ViewModel에 경로 업데이트
+                viewModel.updateProfileImageUrl(compressedFile.absolutePath)
+            }
+        }
+    }
     private var selectedGender: View? = null
     private var selectedAge: View? = null
     private var selectedJob: View? = null
@@ -52,29 +81,62 @@ class EditProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        // 갤러리에서 이미지 가져오기 위한 launcher 등록
+        /*imagePickerLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val uri = result.data?.data
                 uri?.let {
-                    val inputStream = requireContext().contentResolver.openInputStream(it)
-                    val bitmap = BitmapFactory.decodeStream(inputStream)
+                    // ContentResolver를 사용하여 선택한 이미지 데이터를 임시 파일로 복사
+                    val tempFile = createFileFromUri(it)
+                    if (tempFile != null) {
+                        selectedImageFile = tempFile  // 실제 파일 보관
 
-                    // 원형으로 변환 후 이미지 설정
-                    val circularBitmap = bitmap.toCircularBitmap()
-                    binding.ivProfile.setImageBitmap(circularBitmap)
+                        // 파일로부터 Bitmap 생성 (캐시된 파일을 읽어오기 때문에 FileNotFound 오류 방지)
+                        val bitmap = BitmapFactory.decodeFile(tempFile.absolutePath)
+                        val circularBitmap = bitmap.toCircularBitmap()
+                        binding.ivProfile.setImageBitmap(circularBitmap)
 
-                    // URI를 ViewModel에 업데이트
-                    viewModel.updateProfileImageUrl(uri.toString())
+                        // ViewModel에 파일의 경로(또는 필요에 따라 URI)를 업데이트 (API 전송 시 사용)
+                        viewModel.updateProfileImageUrl(tempFile.absolutePath)
+                    } else {
+                        Toast.makeText(requireContext(), "이미지 로드 실패", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
-        }
+        }*/
+        /*imagePickerLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val uri = result.data?.data
+                uri?.let {
+                    val tempFile = createFileFromUri(it)
+                    if (tempFile != null) {
+                        selectedImageFile = tempFile  // 실제 파일 저장
+                        // Bitmap 생성 및 원형 변환
+                        val bitmap = BitmapFactory.decodeFile(tempFile.absolutePath)
+                        val circularBitmap = bitmap.toCircularBitmap()
+                        binding.ivProfile.setImageBitmap(circularBitmap)
+                        // 필요 시 ViewModel에 파일 경로 업데이트 (여기서는 저장 시 파일 객체를 직접 전달)
+                        viewModel.updateProfileImageUrl(tempFile.absolutePath)
+                    } else {
+                        Toast.makeText(requireContext(), "이미지 로드 실패", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }*/
 
+
+
+        // 화면 진입 시 기존 프로필 불러오기
+//        viewModel.fetchUserProfile()
         setupSelectableViews()
         setupListeners()
         observeViewModel()
 
-        // 더미 데이터 로드
-        viewModel.fetchUserProfile()
+
     }
 
     private fun setupSelectableViews() {
@@ -91,7 +153,7 @@ class EditProfileFragment : Fragment() {
         for (i in 0 until group.childCount) {
             val child = group.getChildAt(i)
             child.setOnClickListener {
-                // 기존 선택 초기화
+                // 기존 선택 해제
                 for (j in 0 until group.childCount) {
                     val sibling = group.getChildAt(j)
                     sibling.isSelected = false
@@ -101,26 +163,29 @@ class EditProfileFragment : Fragment() {
                     }
                 }
 
-                // 현재 선택
+                // 새로 선택
                 child.isSelected = true
                 (child as? TextView)?.apply {
                     setTextColor(ContextCompat.getColor(requireContext(), R.color.main1))
                     setTextAppearance(R.style.body_semibo)
                 }
 
-                // 선택된 데이터 반영
+                // ViewModel에 반영
                 when (group.id) {
                     R.id.gl_gender_group -> {
                         selectedGender = child
-                        viewModel.updateGender((child as TextView).text.toString())
+                        val displayValue = (child as TextView).text.toString()
+                        viewModel.updateGender(convertBackGender(displayValue))
                     }
                     R.id.gl_age_group -> {
                         selectedAge = child
-                        viewModel.updateAgeGroup((child as TextView).text.toString())
+                        val displayValue = (child as TextView).text.toString()
+                        viewModel.updateAgeGroup(convertBackAgeGroup(displayValue))
                     }
                     R.id.gl_job_group -> {
                         selectedJob = child
-                        viewModel.updateJob((child as TextView).text.toString())
+                        val displayValue = (child as TextView).text.toString()
+                        viewModel.updateJob(convertBackJob(displayValue))
                     }
                 }
             }
@@ -128,46 +193,44 @@ class EditProfileFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        // 닉네임 입력 처리
+        // 닉네임 입력
         binding.etNickname.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 viewModel.updateNickname(s.toString())
                 binding.tvNicknameCount.text = "${s?.length ?: 0}/10"
             }
-
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-        // 프로필 이미지 편집
+        // 이미지 편집 버튼
         binding.tvProfileImageEdit.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             imagePickerLauncher.launch(intent)
         }
 
-        // 저장 버튼 클릭
+        // 저장 버튼
         binding.tvEdit.setOnClickListener {
             if (validateSelection()) {
-//                viewModel.saveChangesToServer()
-                viewModel.saveUserProfile()
+                // ViewModel 메서드 호출
+                viewModel.saveUserProfile(selectedFile)
                 Toast.makeText(requireContext(), "프로필이 저장되었습니다.", Toast.LENGTH_SHORT).show()
                 findNavController().navigateUp()
-
             }
         }
 
+        // 뒤로가기
         binding.ivBack.setOnClickListener {
-            findNavController().navigateUp() // 이전 화면으로 이동
+            findNavController().navigateUp()
         }
     }
 
-    fun Bitmap.toCircularBitmap(): Bitmap {
-        val size = Math.min(this.width, this.height)
+    /*fun Bitmap.toCircularBitmap(): Bitmap {
+        val size = minOf(width, height)
         val output = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
 
         val canvas = Canvas(output)
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-
         val rect = Rect(0, 0, size, size)
         val rectF = RectF(rect)
 
@@ -176,7 +239,7 @@ class EditProfileFragment : Fragment() {
         canvas.drawBitmap(this, rect, rect, paint)
 
         return output
-    }
+    }*/
 
     private fun validateSelection(): Boolean {
         val gender = (selectedGender as? TextView)?.text?.toString()
@@ -187,41 +250,67 @@ class EditProfileFragment : Fragment() {
             Toast.makeText(requireContext(), "모든 항목을 선택해주세요.", Toast.LENGTH_SHORT).show()
             return false
         }
-
         return true
     }
 
     private fun observeViewModel() {
+        // 조회/수정 결과 모두 이 LiveData로 받아서 처리
         viewModel.profileResponse.observe(viewLifecycleOwner) { response ->
-            response.result?.let { result ->
-                binding.etNickname.setText(result.nickname)
-                binding.ivProfile.setImageURI(Uri.parse(result.profileImageUrl))
-                binding.tvNicknameCount.text = "${result.nickname.length}/10"
+            // 서버 응답이 성공일 때
+            if (response.isSuccess) {
+                response.result?.let { result ->
+                    // 조회 시: UI에 기존 값들 반영
+                    binding.etNickname.setText(result.nickname)
+                    result.profileImageUrl?.takeIf { it.isNotEmpty() }?.let { url ->
+                        val imageUrl = result.profileImageUrl  // "https://yeongkkeul-s3.s3.ap-northeast-2.amazonaws.com/user-profile/11"
+                        Glide.with(this)
+                            .load(imageUrl)
+                            .placeholder(R.drawable.ic_my_profile)  // 로딩 중 표시
+                            .error(R.drawable.ic_my_profile)        // 에러 시 표시
+                            .into(binding.ivProfile)
+                    } ?: run {
+                        // 기본 이미지 설정 또는 아무 작업도 하지 않음
+                        binding.ivProfile.setImageResource(R.drawable.ic_my_profile)
+                    }
+                    binding.tvNicknameCount.text = "${result.nickname.length}/10"
 
-                // 초기 선택 값 UI 반영
-                updateInitialSelection(binding.glGenderGroup, result.gender)
-                updateInitialSelection(binding.glAgeGroup, result.ageGroup)
-                updateInitialSelection(binding.glJobGroup, result.job)
+                    // 기존에 선택된 값들도 반영
+                    val displayAgeGroup = convertAgeGroup(result.ageGroup)
+                    val displayGenderGroup  = convertGender(result.gender)
+                    val displayJobGroup = convertJob(result.job)
+
+                    updateInitialSelection(binding.glGenderGroup,displayGenderGroup )
+                    updateInitialSelection(binding.glAgeGroup, displayAgeGroup)
+                    updateInitialSelection(binding.glJobGroup, displayJobGroup)
+                }
+            } else {
+                // 에러 처리
+                Toast.makeText(requireContext(),
+                    "실패: ${response.message ?: "오류가 발생했습니다."}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
         viewModel.updateStatus.observe(viewLifecycleOwner) { result ->
             result.onSuccess {
-                Toast.makeText(requireContext(), "수정 완료!", Toast.LENGTH_SHORT).show()
+                // PATCH 요청이 정상적으로 완료된 시점
+                Toast.makeText(requireContext(), "프로필이 저장되었습니다.", Toast.LENGTH_SHORT).show()
                 findNavController().navigateUp()
-            }.onFailure {
-                Toast.makeText(requireContext(), "수정 실패: ${it.message}", Toast.LENGTH_SHORT).show()
+            }.onFailure { e ->
+                Toast.makeText(requireContext(), "수정 실패: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
+
     }
 
     private fun updateInitialSelection(group: ViewGroup, value: String) {
         for (i in 0 until group.childCount) {
             val child = group.getChildAt(i) as? TextView
             if (child?.text.toString() == value) {
-                child!!.isSelected = true
-                child.setTextColor(ContextCompat.getColor(requireContext(), R.color.main1))
-                child.setTextAppearance(R.style.body_semibo)
+                child?.isSelected = true
+                child?.setTextColor(ContextCompat.getColor(requireContext(), R.color.main1))
+                child?.setTextAppearance(R.style.body_semibo)
                 when (group.id) {
                     R.id.gl_gender_group -> selectedGender = child
                     R.id.gl_age_group -> selectedAge = child
@@ -234,6 +323,102 @@ class EditProfileFragment : Fragment() {
             }
         }
     }
+
+    private fun convertAgeGroup(apiAgeGroup: String): String {
+        return when (apiAgeGroup.uppercase()) {
+            "TEENAGER" -> "14~19세"
+            "TWENTIES" -> "20대"
+            "THIRTIES" -> "30대"
+            "FORTIES" -> "40대"
+            "FIFTIES" -> "50대"
+            "SIXTIES_AND_ABOVE" -> "60대 이상"
+            else -> apiAgeGroup // 추가 케이스가 있으면 여기에 추가
+        }
+    }
+    // 성별 변환
+    private fun convertGender(apiGender: String): String {
+        return when (apiGender.uppercase()) {
+            "FEMALE" -> "여자"
+            "MALE" -> "남자"
+            else -> apiGender // 추가 케이스가 있으면 여기에 추가
+        }
+    }
+
+    // 직업 변환
+    private fun convertJob(apiJob: String): String {
+        return when (apiJob.uppercase()) {
+            "STUDENT" -> "학생"
+            "EMPLOYEE" -> "직장인"
+            "SELF_EMPLOYED" -> "자영업자"
+            "HOMEMAKER" -> "주부"
+            "UNDECIDED" -> "무직"
+            else -> apiJob // 추가 케이스가 있으면 여기에 추가
+        }
+    }
+
+    // 반대로 변환
+    private fun convertBackAgeGroup(displayAgeGroup: String): String {
+        return when (displayAgeGroup) {
+            "14~19세" -> "TEENAGER"
+            "20대" -> "TWENTIES"
+            "30대" -> "THIRTIES"
+            "40대" -> "FORTIES"
+            "50대" -> "FIFTIES"
+            "60대 이상" -> "SIXTIES_AND_ABOVE"
+            else -> displayAgeGroup
+        }
+    }
+
+    private fun convertBackGender(displayGender: String): String {
+        return when (displayGender) {
+            "여자" -> "Female"
+            "남자" -> "Male"
+            else -> displayGender
+        }
+    }
+
+    private fun convertBackJob(displayJob: String): String {
+        return when (displayJob) {
+            "학생" -> "STUDENT"
+            "직장인" -> "EMPLOYEE"
+            "자영업자" -> "SELF_EMPLOYED"
+            "주부" -> "HOMEMAKER"
+            else -> "UNDECIDED"
+        }
+    }
+
+
+    // 임시 파일 생성 함수
+    private fun createFileFromUri(uri: Uri): File? {
+        return try {
+            // 캐시 디렉토리에 임시 파일 생성
+            val inputStream = requireContext().contentResolver.openInputStream(uri) ?: return null
+            val tempFile = File.createTempFile("profile_image", ".png", requireContext().cacheDir)
+            tempFile.outputStream().use { output ->
+                inputStream.copyTo(output)
+            }
+            tempFile
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    // Bitmap을 원형으로 변환하는 확장 함수
+    fun Bitmap.toCircularBitmap(): Bitmap {
+        val size = minOf(width, height)
+        val output = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(output)
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        val rect = Rect(0, 0, size, size)
+        val rectF = RectF(rect)
+        canvas.drawOval(rectF, paint)
+        paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
+        canvas.drawBitmap(this, rect, rect, paint)
+        return output
+    }
+
+
 
     override fun onDestroyView() {
         super.onDestroyView()

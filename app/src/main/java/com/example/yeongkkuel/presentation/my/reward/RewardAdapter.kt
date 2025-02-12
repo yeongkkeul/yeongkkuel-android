@@ -13,7 +13,7 @@ import com.example.yeongkkuel.presentation.my.reward.data.RewardItem
 import com.example.yeongkkuel.presentation.my.reward.data.RewardType
 
 class RewardAdapter (
-    private val items: List<RewardItem>,
+    private var items: List<RewardItem>,
     private val onItemClick: (RewardItem) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -66,12 +66,32 @@ class RewardAdapter (
 
     override fun getItemCount(): Int = items.size
 
+
     class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val tvHeader = itemView.findViewById<TextView>(R.id.tvHeader)
         private val viewHeaderDivider = itemView.findViewById<View>(R.id.viewHeaderDivider)
+        private val ivIcon = itemView.findViewById<ImageView>(R.id.ivRewardIcon)
+        private val tvMessage = itemView.findViewById<TextView>(R.id.tvRewardMessage)
+        private val reward = itemView.findViewById<TextView>(R.id.tvReward)
 
         fun bind(item: RewardItem, isFirstHeader: Boolean) {
             tvHeader.text = item.section
+
+            val iconRes = when (item.type) {
+                RewardType.CHALLENGE_JOIN -> R.drawable.ic_challenge_join
+                RewardType.RANKING_REWARD -> R.drawable.ic_ranking_reward
+                RewardType.NO_SPEND_REWARD -> R.drawable.ic_no_spend_reward
+                RewardType.DAILY_EXCEED -> R.drawable.ic_daily_exceed
+                RewardType.CHALLENGE_RANKING_UPDATE -> R.drawable.ic_ranking_update
+                else -> R.drawable.ic_challenge_join
+            }
+
+
+            ivIcon.setImageResource(iconRes)
+
+            // 점수, 메시지 반영
+            tvMessage.text = item.message
+            reward.text = item.rewardText
 
             // 첫 헤더에는 구분선을 숨기고, 두 번째 이후 헤더에는 보여주기
             viewHeaderDivider.visibility = if (isFirstHeader) View.GONE else View.VISIBLE
@@ -105,5 +125,10 @@ class RewardAdapter (
                 onClick(item)
             }
         }
+    }
+
+    fun updateItems(newItems: List<RewardItem>) {
+        items = newItems
+        notifyDataSetChanged()
     }
 }

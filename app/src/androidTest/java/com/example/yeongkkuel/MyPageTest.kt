@@ -28,12 +28,12 @@ class MyPageTest {
         try {
             myPageService.patchMyPage(
                 request = PatchMyPageRequest(
+                    nickname = "dd",
                     gender = "Female",
                     ageGroup = "20s",
-                    job = "직장인",
-                    nickname = "dd",
-                    profileImage = null
-                )
+                    job = "직장인"
+                ),
+                profileImage = null
             ).let {
                 Log.d("test", it.toString())
             }
