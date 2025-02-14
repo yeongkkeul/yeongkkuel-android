@@ -16,6 +16,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -67,10 +69,6 @@ class StoreFragment : Fragment() {
                 viewModel.resetFailureDialog() // 다이얼로그 상태 초기화
             }
         }
-        if (_binding == null) {
-            Log.e("StoreFragment", "❌ binding이 null 상태에서 onViewCreated 호출됨")
-            return
-        }
 
         navController = Navigation.findNavController(view)
         binding.imgGoHome.setOnClickListener {
@@ -106,7 +104,7 @@ class StoreFragment : Fragment() {
                         name = productUiState.name,
                         price = productUiState.price,
                         category = productUiState.category,
-                        imageUrl = productUiState.imageUrl // ✅ 변경된 속성 사용
+                        imageUrl = productUiState.imageUrl // ✅ 변경
                     )
                 }
                 updateProductList(productList) // ✅ 변환 후 호출
@@ -126,9 +124,20 @@ class StoreFragment : Fragment() {
             }
         }
 
-        viewModel.purchaseResponse.observe(viewLifecycleOwner) { response ->
-            Log.d("StoreFragment", "🔍 스킨 구매 API 응답: $response")
+        binding.imgPurchaseIcon.setOnClickListener {
+            selectedProduct?.let { product ->
+                viewModel.purchaseSkin(
+                    itemId = product.id,
+                    itemType = product.category.name, // 예: "SWING"
+                    itemName = product.name,
+                    reward = product.price
+                )
+                Toast.makeText(requireContext(), "스킨 구매 중...", Toast.LENGTH_SHORT).show()
+            } ?: Log.d("StoreFragment", "선택된 상품 없음")
+        }
 
+        // ✅ 스킨 구매 응답 처리
+        viewModel.purchaseResponse.observe(viewLifecycleOwner) { response ->
             if (response?.isSuccess == true) {
                 Toast.makeText(requireContext(), "스킨 구매 성공!", Toast.LENGTH_SHORT).show()
                 navController.popBackStack()
@@ -143,10 +152,8 @@ class StoreFragment : Fragment() {
                 }
             }
         }
-
         viewModel.fetchShopData("SWING")
         Log.d("StoreFragment", "🔍 Fetching shop data for category: SWING")
-
         viewModel.shopResponse.observe(viewLifecycleOwner) { response ->
             Log.d("StoreFragment", "🛍 API Response: $response") // ✅ 응답 확인 로그 추가
 
@@ -182,6 +189,7 @@ class StoreFragment : Fragment() {
                 Log.e("StoreFragment", "❌ 상점 데이터 불러오기 실패: ${response?.message ?: "오류 발생"}")
             }
         }
+        viewModel.fetchShopData("SWING") // ✅ 초기 데이터 로드
 
         setupRecyclerView()
         setupTabLayout()
@@ -251,6 +259,7 @@ class StoreFragment : Fragment() {
 
 
             }
+
         }
 
         binding.rvStoreItems.apply {
@@ -295,7 +304,7 @@ class StoreFragment : Fragment() {
                 id = productUiStateProduct.id,
                 name = productUiStateProduct.name,
                 price = productUiStateProduct.price,
-                imageUrl = productUiStateProduct.imageUrl, // ✅ imageResId 대신 imageUrl 사용
+                imageResId = adjustResourceId(productUiStateProduct.iconResId),
                 category = productUiStateProduct.category
             )
         }
@@ -404,7 +413,7 @@ class StoreFragment : Fragment() {
     }
 
     private fun showPurchaseDialog(product: Product) {
-//        Log.d("showPurchaseDialog", "Product: ${product.name}, ResId: ${product.imageResId}")
+        Log.d("showPurchaseDialog", "Product: ${product.name}, ResId: ${product.imageResId}")
 
         val dialogView = LayoutInflater.from(requireContext())
             .inflate(R.layout.dialog_purchase_success, null)

@@ -36,6 +36,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.bumptech.glide.Glide
 
 
 class HomeFragment : Fragment() {
@@ -302,7 +303,6 @@ class HomeFragment : Fragment() {
             }
         }
     }
-
 
     private fun showRewardDialog() {
         val dialog = Dialog(requireContext())

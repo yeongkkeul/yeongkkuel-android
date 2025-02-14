@@ -6,14 +6,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yeongkkuel.R
+import com.example.yeongkkuel.presentation.home.category.data.Category
 import com.example.yeongkkuel.network.RetrofitClient
 import com.example.yeongkkuel.network.response.Response
 import com.example.yeongkkuel.network.response.expenditure.DayExpenditureResponse
 import com.example.yeongkkuel.presentation.home.category.data.Category
 import com.example.yeongkkuel.presentation.util.Colors
 import com.example.yeongkkuel.presentation.util.SpendingCategory
-import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.reflect.TypeToken
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -36,9 +37,6 @@ class BotSheetViewModel : ViewModel() {
         MutableStateFlow<List<BotSheetUiState.Spending.History>>(emptyList())
     val spendingHistoryList = _spendingHistoryList.asStateFlow()
 
-    private val _categoryList = MutableLiveData<List<Category>>(emptyList()) // ✅ MutableLiveData 선언 추가
-    val categoryList: LiveData<List<Category>> get() = _categoryList // ✅ LiveData로 접근
-
     // 🔹 지출 내역 추가 기능
     fun addExpenseToCategory(
         category: SpendingCategory,
@@ -56,6 +54,7 @@ class BotSheetViewModel : ViewModel() {
         }
         updateSpendingHistoryList() // ✅ 추가된 내역 반영
     }
+
     private val mutex = Mutex()
 
     suspend fun updateBotSheetHistory(updatedExpense: BotSheetUiState.Spending.History) {
@@ -196,7 +195,6 @@ class BotSheetViewModel : ViewModel() {
     fun addCategory(category: Category) {
         val spendingCategory = SpendingCategory.CUSTOM(category.name)
         val categoryColor = category.color
-
         val plusIconResId = mapCategoryToIcon(categoryColor)
 
         _uiState.update { prev ->
@@ -290,7 +288,7 @@ class BotSheetViewModel : ViewModel() {
                     }
                 }
             }
-        }catch (e:Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }

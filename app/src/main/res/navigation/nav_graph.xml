@@ -356,6 +356,4 @@
         android:label="fragment_term_4"
         tools:layout="@layout/fragment_term4">
     </fragment>
-
-
 </navigation>
