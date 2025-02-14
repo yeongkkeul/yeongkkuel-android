@@ -21,6 +21,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.Calendar
+import com.example.yeongkkuel.presentation.home.entry.data.ExpenseListResponse
+
 
 
 class BotSheetViewModel : ViewModel() {
@@ -88,10 +90,67 @@ class BotSheetViewModel : ViewModel() {
 
                 prevState.copy(spendingList = updatedSpendingList)
             }
-
+            addExpenseToCategory(
+                SpendingCategory.CUSTOM(updatedExpense.name),
+                updatedExpense
+            )
+            addExpenseHistory(updatedExpense)
             updateSpendingHistoryList() // ✅ 최신 데이터 반영
         }
     }
+
+    private fun Category.toBotSheetSpending(): BotSheetUiState.Spending {
+        return BotSheetUiState.Spending(
+            categoryId = this.id, // ✅ 기존 categoryId → id 로 변경
+            kind = SpendingCategory.fromName(this.name), // ✅ 기존 categoryName → name 변경
+            color = this.color, // ✅ 기존 Colors.RED1 → 서버에서 받은 색상 적용
+            plusIconResId = R.drawable.ic_plus_default,
+            history = emptyList() // ✅ 초기 history는 비워둠 (이후 업데이트 가능)
+        )
+    }
+    fun updateBotSheetCategories(categories: List<Category>) {
+        Log.d("BotSheetViewModel", "🚀 updateBotSheetCategories 실행됨! categories: $categories")
+
+        val updatedSpendingList = categories.map { category ->
+            BotSheetUiState.Spending(
+                categoryId = category.id,
+                kind = SpendingCategory.fromName(category.name),
+                color = category.color,
+                plusIconResId = R.drawable.ic_plus_default,
+                history = emptyList() // 기본값 (필요에 따라 업데이트 가능)
+            )
+        }
+
+        _uiState.update { prevState ->
+            Log.d("BotSheetViewModel", "✅ 바텀시트 UI 업데이트 완료! 카테고리 개수: ${updatedSpendingList.size}")
+            prevState.copy(spendingList = updatedSpendingList)
+        }
+    }
+
+    fun updateBotSheetData(response: ExpenseListResponse) {
+        _uiState.update { prevState ->
+            val updatedSpendingList = response.result.map { expense ->
+                Log.d("BotSheetViewModel", "🚀 updateBotSheetData(): expenseId=${expense.id}, category=${expense.content}")
+
+                BotSheetUiState.Spending(
+                    categoryId = expense.id,
+                    kind = SpendingCategory.fromName(expense.content),
+                    color = Colors.RED1, // 서버에서 색상을 제공하는 경우 수정 필요
+                    plusIconResId = R.drawable.ic_plus_default,
+                    history = listOf(
+                        BotSheetUiState.Spending.History(
+                            id = expense.id,
+                            name = expense.content,
+                            price = expense.amount,
+                            imgExist = expense.imageUrl.isNotEmpty()
+                        )
+                    )
+                )
+            }
+            prevState.copy(spendingList = updatedSpendingList)
+        }
+    }
+
 
 
     private fun updateSpendingHistoryList() {

@@ -13,7 +13,7 @@ data class Product(
     val id: Int, // ✅ id 추가
     val name: String,
     val price: Int,
-    val imageResId: Int,
+    val imageUrl: String, // ✅ 변경된 속성
     val category: ProductCategory,
     var area: String? = null
 ) : Parcelable
@@ -57,7 +57,7 @@ class StoreAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(product: Product, isSelected: Boolean) {
-            binding.imgStoreProduct.setImageResource(product.imageResId)
+            binding.imgStoreProduct.setImageResource(product.id)
             binding.tvStoreProductName.text = product.name
 
             binding.imgStoreCollect.visibility = if (isSelected) View.VISIBLE else View.GONE

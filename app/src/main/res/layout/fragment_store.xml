@@ -83,14 +83,14 @@
                 android:layout_height="180dp"
                 app:layout_columnWeight="1">
 
-            <ImageView
-                android:id="@+id/img_store_nest"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="fitCenter"
-                android:src="@drawable/img_home_nest1"
-                app:layout_column="1"
-                app:layout_row="0" />
+                <ImageView
+                    android:id="@+id/img_store_nest"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/img_home_nest1"
+                    app:layout_column="1"
+                    app:layout_row="0" />
             </FrameLayout>
         </androidx.gridlayout.widget.GridLayout>
 
@@ -170,7 +170,7 @@
                 android:layout_width="26dp"
                 android:layout_height="20dp"
                 android:layout_marginStart="6dp"
-                android:text="124"
+                android:text=" "
                 android:textColor="@color/black"
                 android:textSize="15sp"
                 android:textStyle="normal" />
@@ -203,27 +203,27 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintTop_toBottomOf="@id/tab_layout" />
 
-        <ImageView
-            android:id="@+id/img_purchase_icon"
-            android:layout_width="80dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="4dp"
-            android:layout_marginBottom="20dp"
-            android:visibility="visible"
-            android:src="@drawable/ic_store_topurchase"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
-        <ImageView
-            android:id="@+id/img_save_icon"
-            android:layout_width="80dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="4dp"
-            android:layout_marginBottom="20dp"
-            android:visibility="gone"
-            android:src="@drawable/ic_store_tosave"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+    <ImageView
+        android:id="@+id/img_purchase_icon"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="20dp"
+        android:visibility="visible"
+        android:src="@drawable/ic_store_topurchase"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+    <ImageView
+        android:id="@+id/img_save_icon"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="20dp"
+        android:visibility="gone"
+        android:src="@drawable/ic_store_tosave"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
