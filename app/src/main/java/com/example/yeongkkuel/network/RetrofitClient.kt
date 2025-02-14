@@ -2,6 +2,7 @@ package com.example.yeongkkuel.network
 
 import android.content.Context
 import com.example.yeongkkuel.network.data.AuthInterceptor
+import com.example.yeongkkuel.network.service.ChatService
 
 import com.example.yeongkkuel.presentation.home.HomeApiService
 import com.example.yeongkkuel.presentation.home.store.StoreApiService
@@ -69,7 +70,6 @@ object RetrofitClient {
         authRetrofit!!.create(StatService::class.java)
     }
 
-
     val categoryApiService: CategoryApiService by lazy {
         authRetrofit!!.create(CategoryApiService::class.java)
     }
@@ -86,4 +86,7 @@ object RetrofitClient {
         authRetrofit!!.create(MyPageService::class.java)
     }
 
+    val chatService: ChatService by lazy {
+        authRetrofit!!.create(ChatService::class.java)
+    }
 }

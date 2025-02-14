@@ -210,7 +210,7 @@
 
     <fragment
         android:id="@+id/navigation_chat_room_search"
-        android:name="com.example.yeongkkuel.presentation.chat.ChatRoomSearchFragment"
+        android:name="com.example.yeongkkuel.presentation.chat.search.ChatRoomSearchFragment"
         tools:layout="@layout/fragment_chat_room_search">
         <action
             android:id="@+id/action_navigation_chat_room_search_to_register"

@@ -82,7 +82,7 @@ interface ChatService {
     suspend fun getChatroomSearch(
         @Query("keyword") keyword:String,
         @Query("page") page:Int
-    ): ChatSearchResult // swagger에 공통 Response 형식으로 감싸져 있지 않아 있습니다.
+    ): ChatSearchResult
 
     // 영수증 조회
     @GET("api/chats/receipts/{expenseId}")
@@ -91,13 +91,12 @@ interface ChatService {
     ): Response<ReceiptResult>
 
     // 채팅방 둘러보기
-    @GET("/api/chats/expore") // swagger에 expord이라 나와있는거 맞습니다.
+    @GET("/api/chats/expore")
     suspend fun getChatroomExplore(
-        @Query("age") age:String,
-        @Query("minAmount") minAmount: Int,
-        @Query("maxAmount") maxAmount:Int,
-        @Query("job") job :String,
+        @Query("age") age:String? = null,
+        @Query("minAmount") minAmount: Int? = null,
+        @Query("maxAmount") maxAmount:Int? = null,
+        @Query("job") job :String? = null,
         @Query("page") page:Int,
-    ): Response<List<ChatSearchResult.PublicChatRoomDetailDto>>
-
+    ): ChatSearchResult
 }
