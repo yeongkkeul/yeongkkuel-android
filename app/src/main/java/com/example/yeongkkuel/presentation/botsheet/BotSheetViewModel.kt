@@ -414,7 +414,7 @@ class BotSheetViewModel : ViewModel() {
             )
         }
         Log.d("BotSheetViewModel", "getCategoryList() 반환: $categoryList")
-        return categoryList
+        return _categoryList.value.orEmpty()
     }
 
     fun addExpenseHistory(history: BotSheetUiState.Spending.History) {
