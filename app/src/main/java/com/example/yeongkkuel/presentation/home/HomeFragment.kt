@@ -15,6 +15,7 @@ import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -51,11 +52,14 @@ class HomeFragment : Fragment() {
         HomeViewModel.Factory(HomeRepository())
     }
     private val categoryViewModel: CategoryViewModel by viewModels()
-    private val botSheetViewModel: BotSheetViewModel by viewModels()
+    private val botSheetViewModel: BotSheetViewModel by activityViewModels()
+
 
     override fun onResume() {
         super.onResume()
-        updateWarningVisibility(botSheetViewModel.uiState.value)
+
+        Log.d("HomeFragment", "✅ onResume() - getSpendingList() 실행됨") // 디버깅용 로그 추가
+        botSheetViewModel.getSpendingList()
     }
 
     override fun onCreateView(
@@ -96,7 +100,8 @@ class HomeFragment : Fragment() {
         setupSwipeToDismiss(binding.imgWarningStart)
         renderMyProductsForHome()
 
-        // ✅ StateFlow를 collect 할 때 viewLifecycleOwner.lifecycleScope.launch 사용
+
+        // StateFlow를 collect 할 때 viewLifecycleOwner.lifecycleScope.launch 사용
         viewLifecycleOwner.lifecycleScope.launch {
             botSheetViewModel.uiState.collectLatest { uiState ->
                 updateWarningVisibility(uiState)
@@ -208,16 +213,21 @@ class HomeFragment : Fragment() {
         val lastHiddenDate = sharedPreferences.getString(KEY_LAST_HIDDEN_DATE, null)
         val todayDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
 
-        // 🔥 한 번 숨김 처리가 되었다면 다시 표시되지 않도록 설정
         if (lastHiddenDate == null) {
             sharedPreferences.edit().putString(KEY_LAST_HIDDEN_DATE, todayDate).apply()
         }
 
         val hasSpendingData = uiState.spendingList.isNotEmpty()
-        val categoryList = botSheetViewModel.getCategoryList()
+        // `_uiState.value.spendingList`를 바로 사용해서 카테고리 개수 확인
+        val categoryList = uiState.spendingList.map { spending ->
+            Category(
+                id = spending.categoryId,
+                name = spending.kind.name,
+                color = spending.color
+            )
+        }
         val hasCategories = categoryList.isNotEmpty()
 
-        Log.d("HomeFragment", "📌 lastHiddenDate 확인: $lastHiddenDate, todayDate: $todayDate")
         Log.d("HomeFragment", "📌 현재 카테고리 개수: ${categoryList.size}, 지출 내역 개수: ${uiState.spendingList.size}")
 
         binding.imgWarningStart.post {
