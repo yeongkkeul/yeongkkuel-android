@@ -4,6 +4,8 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.presentation.home.category.adapter.CategoryAdapter
 
+// TODO - 다른 기능 구현 끝나고 나서 파일 분리 시작 하자
+
 class CategoryItemTouchHelper(
     private val categoryAdapter: CategoryAdapter
 ) : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {

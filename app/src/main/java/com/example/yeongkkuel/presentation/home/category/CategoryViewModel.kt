@@ -37,18 +37,20 @@ class CategoryViewModel : ViewModel() {
                 val response = RetrofitClient.categoryApiService.getCategories()
                 if (response.isSuccess) {
                     val categoryListResponse = response.result
-                    _categories.value = categoryListResponse.categoryList.map { it.toCategory() } // setValue()로 직접 갱신
-                    Log.d("CategoryViewModel", "LiveData postValue() 업데이트 완료!")
+                    _categories.postValue(categoryListResponse.categoryList.map { it.toCategory() }) // ✅ postValue()로 변경
+
+                    Log.d("CategoryViewModel", "✅ LiveData postValue() 업데이트 완료!")
                 }
             } catch (e: Exception) {
-                _errorMessage.postValue("Error: ${e.message}") // postValue() 사용
+                _errorMessage.postValue("Error: ${e.message}") // ✅ postValue() 사용
             }
         }
     }
 
+
     fun updateCategoryOrderLocally(updatedList: List<Category>) {
         _categories.value = updatedList // 서버 요청 없이 UI만 업데이트 -  변경된 리스트를 LiveData에 반영
-        Log.d("CategoryViewModel", "카테고리 순서 로컬 업데이트 완료")
+        Log.d("CategoryViewModel", "✅ 카테고리 순서 로컬 업데이트 완료")
     }
 
 
