@@ -350,9 +350,10 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
 
         // iv_hamberger 클릭 리스너 추가
         binding.ivHamberger.setOnClickListener {
+            categoryViewModel.updateCategoryOrderLocally(botSheetViewModel.getCategoryList()) // 현재 카테고리 목록을 ViewModel에 업데이트
             navController.navigate(R.id.categoryManageFragment)
             val bottomSheetBehavior = BottomSheetBehavior.from(binding.clItemBotSheet)
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED // BottomSheet 닫기
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
 

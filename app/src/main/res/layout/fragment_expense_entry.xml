@@ -218,6 +218,27 @@
                     app:layout_constraintBottom_toBottomOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <!-- 지출 내역 - 지출 내용 보기-->
+            <TextView
+                android:id="@+id/tv_detail_input_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/bg_edit_text"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="start|center_vertical"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="5dp"
+                android:layout_marginStart="13dp"
+                android:layout_marginTop="35dp"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:visibility="gone"
+                app:layout_constraintStart_toEndOf="@id/tv_expense_detail"
+                app:layout_constraintTop_toBottomOf="@id/tv_category_input"
+                app:layout_constraintBottom_toBottomOf="@id/tv_expense_detail"/>
+
 
             <!--  지출액 -->
             <TextView
@@ -258,6 +279,36 @@
                 android:textSize="15sp"
                 app:layout_constraintStart_toEndOf="@id/et_amount_input"
                 app:layout_constraintBaseline_toBaselineOf="@id/et_amount_input" />
+
+            <!-- 지출 내역 - 지출액 보기-->
+            <TextView
+                android:id="@+id/tv_amount_input_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_edit_text"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:layout_marginStart="34dp"
+                android:layout_marginTop="35dp"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="5dp"
+                android:visibility="gone"
+                app:layout_constraintStart_toEndOf="@id/tv_expense_amount"
+                app:layout_constraintTop_toBottomOf="@id/cl_detail_input"/>
+
+            <TextView
+                android:id="@+id/tv_currency_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="원"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:visibility="gone"
+                app:layout_constraintStart_toEndOf="@id/tv_amount_input_view"
+                app:layout_constraintBaseline_toBaselineOf="@id/et_amount_input" />
+
+
 
             <!-- 무지출 체크 -->
             <androidx.constraintlayout.widget.ConstraintLayout
