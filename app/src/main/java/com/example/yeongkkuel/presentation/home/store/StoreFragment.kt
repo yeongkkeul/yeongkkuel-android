@@ -16,9 +16,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
@@ -28,8 +25,6 @@ import com.example.yeongkkuel.databinding.FragmentStoreBinding
 import com.google.android.material.tabs.TabLayout
 import com.bumptech.glide.Glide
 
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class StoreFragment : Fragment() {
     private lateinit var navController: NavController
@@ -124,20 +119,9 @@ class StoreFragment : Fragment() {
             }
         }
 
-        binding.imgPurchaseIcon.setOnClickListener {
-            selectedProduct?.let { product ->
-                viewModel.purchaseSkin(
-                    itemId = product.id,
-                    itemType = product.category.name, // 예: "SWING"
-                    itemName = product.name,
-                    reward = product.price
-                )
-                Toast.makeText(requireContext(), "스킨 구매 중...", Toast.LENGTH_SHORT).show()
-            } ?: Log.d("StoreFragment", "선택된 상품 없음")
-        }
-
-        // ✅ 스킨 구매 응답 처리
         viewModel.purchaseResponse.observe(viewLifecycleOwner) { response ->
+            Log.d("StoreFragment", "🔍 스킨 구매 API 응답: $response")
+
             if (response?.isSuccess == true) {
                 Toast.makeText(requireContext(), "스킨 구매 성공!", Toast.LENGTH_SHORT).show()
                 navController.popBackStack()
@@ -256,10 +240,7 @@ class StoreFragment : Fragment() {
                         .into(binding.imgStoreNest)
                     Log.d("StoreFragment", "Nest Image Updated: $imageUrl")
                 }
-
-
             }
-
         }
 
         binding.rvStoreItems.apply {
@@ -304,7 +285,7 @@ class StoreFragment : Fragment() {
                 id = productUiStateProduct.id,
                 name = productUiStateProduct.name,
                 price = productUiStateProduct.price,
-                imageResId = adjustResourceId(productUiStateProduct.iconResId),
+                imageUrl = productUiStateProduct.imageUrl, // ✅ imageResId 대신 imageUrl 사용
                 category = productUiStateProduct.category
             )
         }
@@ -413,7 +394,6 @@ class StoreFragment : Fragment() {
     }
 
     private fun showPurchaseDialog(product: Product) {
-        Log.d("showPurchaseDialog", "Product: ${product.name}, ResId: ${product.imageResId}")
 
         val dialogView = LayoutInflater.from(requireContext())
             .inflate(R.layout.dialog_purchase_success, null)
@@ -466,11 +446,6 @@ class StoreFragment : Fragment() {
         btnCancel.setOnClickListener {
             dialog.dismiss()
         }
-        dialog.window?.apply {
-            setBackgroundDrawableResource(R.drawable.ic_store_topurchase) // VectorDrawable 설정
-            decorView.clipToOutline = true // 💡 둥근 모서리 적용
-        }
-
         dialog.show()
     }
 
