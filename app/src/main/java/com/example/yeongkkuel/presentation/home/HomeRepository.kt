@@ -2,7 +2,10 @@ package com.example.yeongkkuel.presentation.home
 
 import android.util.Log
 import com.example.yeongkkuel.network.RetrofitClient
+import retrofit2.HttpException
+import java.io.IOException
 
+/*
 class HomeRepository {
     private val api = RetrofitClient.homeApiService
 
@@ -16,8 +19,8 @@ class HomeRepository {
         }
     }
 }
+*/
 
-/*
 class HomeRepository {
     private val api = RetrofitClient.homeApiService
     private var isFetching = false // API 중복 요청 방지
@@ -57,4 +60,3 @@ class HomeRepository {
 
     }
 }
- */

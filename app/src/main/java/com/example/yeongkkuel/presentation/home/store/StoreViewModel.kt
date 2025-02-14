@@ -107,7 +107,9 @@ class StoreViewModel : ViewModel() {
                             name = shopItem.itemName,
                             price = shopItem.price,
                             category = ProductCategory.valueOf(response.result.itemType),
-                            imageUrl = shopItem.itemImg
+                            imageUrl = shopItem.itemImg,
+                            itemType = response.result.itemType, // ✅ itemType 값 추가
+                            area = mapItemTypeToArea(response.result.itemType) // 🔥 itemType 없음 (오류 발생)
                         )
                     }
 
@@ -126,6 +128,17 @@ class StoreViewModel : ViewModel() {
                 _shopResponse.postValue(null)
             }
         }
+
     }
+    private fun mapItemTypeToArea(itemType: String): String {
+        return when (itemType) {
+            "SWING" -> "Swing Area"
+            "TOY" -> "Toy Area"
+            "BOWL" -> "Bowl Area"
+            "NEST" -> "Nest Area"
+            else -> "Unknown Area" // ✅ 예외 처리
+        }
+    }
+
 }
 

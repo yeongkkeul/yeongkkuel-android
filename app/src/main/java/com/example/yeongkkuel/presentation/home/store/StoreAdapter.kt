@@ -16,6 +16,7 @@ data class Product(
     val price: Int,
     val imageUrl: String, // ✅ 변경
     val category: ProductCategory,
+    val itemType: String, // ✅ 추가: itemType 필드
     var area: String? = null
 ) : Parcelable
 

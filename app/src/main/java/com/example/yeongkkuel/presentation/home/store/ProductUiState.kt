@@ -8,8 +8,10 @@ data class ProductUiState(
         val id: Int,
         val name: String,
         val price: Int,
+        val imageUrl: String,
         val category: ProductCategory,
-        val imageUrl: String // ✅ 로컬 리소스 ID 대신 서버 이미지 URL 사용
+        val area: String? = null,       // ✅ area 필드 (기존에 있다면 유지)
+        val itemType: String            // ✅ itemType 필드 추가
     )
 
     companion object {

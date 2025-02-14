@@ -67,8 +67,6 @@ class HomeFragment : Fragment() {
         val showRewardModal = arguments?.getBoolean("showRewardModal") ?: false
 
         repository = HomeRepository()
-//        val factory = HomeViewModel.Factory(repository)
-//        homeViewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
         if (showRewardModal) {
             showRewardDialog()
         }
@@ -87,15 +85,14 @@ class HomeFragment : Fragment() {
             binding.imgWarningStart.visibility = View.GONE
         }
 
-        // FragmentResult API를 통해 StoreFragment에서 데이터 수신
+        // StoreFragment에서 선택한 상품을 수신하여 홈 화면 업데이트
         parentFragmentManager.setFragmentResultListener("selectedProductKey", this) { _, bundle ->
             val selectedProduct = bundle.getParcelable<Product>("selectedProduct")
             selectedProduct?.let {
-                Log.d("HomeFragment", "Received selected product: ${it.name}")
+                Log.d("HomeFragment", "✅ StoreFragment에서 받은 상품: ${it.name}, area: ${it.area}, imageUrl: ${it.imageUrl}")
                 applySelectedProductToHome(it)
-            }
+            } ?: Log.e("HomeFragment", "❌ StoreFragment에서 받은 상품이 null입니다!")
         }
-
         setupSwipeToDismiss(binding.imgWarningStart)
         renderMyProductsForHome()
 
@@ -118,10 +115,16 @@ class HomeFragment : Fragment() {
         ivHamberger.setOnClickListener {
             navController.navigate(R.id.categoryManageFragment)
         }
-
+        homeViewModel.homeResponse.observe(viewLifecycleOwner) { response ->
+            if (response != null && response.isSuccess) {
+                Log.d("HomeFragment", "✅ 홈 데이터 수신 완료: ${response.result}")
+                binding.tvCoin.text = "보유 리워드: ${response.result.myReward}"
+                updateMySkins(response.result.mySkin)
+            } else {
+                Log.e("HomeFragment", "🚨 홈 데이터 수신 실패 또는 응답 없음!")
+            }
+        }
         setupSwipeToDismiss(binding.imgWarningStart)
-
-//        homeViewModel.fetchHomeData()
 
         Log.d("HomeFragment", "🚀 fetchHomeData() 호출됨!") // ✅ 로그 추가
 
@@ -138,25 +141,25 @@ class HomeFragment : Fragment() {
                 }
             }
         }
-        homeViewModel.homeResponse.observe(viewLifecycleOwner) { response ->
-            if (response != null && response.isSuccess) {
-                Log.d("HomeFragment", "✅ 홈 데이터 정상 수신: $response")
-
-                binding.tvCoin.text = "보유 리워드: ${response.result.myReward}"
-                updateMySkins(response.result.mySkin)
-
-                // ✅ 여기서 `toCategory(categoryViewModel)`로 변경!
-                val categories = response.result.categories.map { it.toCategory(categoryViewModel) }
-                val expensesMap = response.result.categories.associate { it.categoryId to it.expenses }
-
-                updateCategoryExpenses(categories, expensesMap)
-
-                Log.d("HomeFragment", "🚀 updateBotSheetCategories 호출됨!")
-                botSheetViewModel.updateBotSheetCategories(categories)
-            } else {
-                Log.e("HomeFragment", "🚨 홈 데이터 불러오기 실패 또는 응답 없음!")
-            }
-        }
+//        homeViewModel.homeResponse.observe(viewLifecycleOwner) { response ->
+//            if (response != null && response.isSuccess) {
+//                Log.d("HomeFragment", "✅ 홈 데이터 정상 수신: $response")
+//
+//                binding.tvCoin.text = "보유 리워드: ${response.result.myReward}"
+//                updateMySkins(response.result.mySkin)
+//
+//                // ✅ 여기서 `toCategory(categoryViewModel)`로 변경!
+//                val categories = response.result.categories.map { it.toCategory(categoryViewModel) }
+//                val expensesMap = response.result.categories.associate { it.categoryId to it.expenses }
+//
+//                updateCategoryExpenses(categories, expensesMap)
+//
+//                Log.d("HomeFragment", "🚀 updateBotSheetCategories 호출됨!")
+//                botSheetViewModel.updateBotSheetCategories(categories)
+//            } else {
+//                Log.e("HomeFragment", "🚨 홈 데이터 불러오기 실패 또는 응답 없음!")
+//            }
+//        }
     }
 
     // ✅ 변환된 Category 리스트를 받도록 변경
@@ -273,33 +276,34 @@ class HomeFragment : Fragment() {
         }
     }
     private fun applySelectedProductToHome(product: Product) {
-        val homeImageUrl = product.imageUrl // ✅ 서버에서 받은 URL 사용
+        Log.d("HomeFragment", "🎨 applySelectedProductToHome 호출 - 상품: ${product.name}, area: ${product.area}, imageUrl: ${product.imageUrl}")
 
         when (product.area) {
             "Swing Area" -> binding.imgHomeSwing.post {
                 Glide.with(binding.imgHomeSwing.context)
-                    .load(homeImageUrl)
-                    .into(binding.imgHomeSwing) // ✅ 네트워크 이미지 로드
-                Log.d("HomeFragment", "Swing Image Updated: $homeImageUrl")
+                    .load(product.imageUrl)
+                    .into(binding.imgHomeSwing)
+                Log.d("HomeFragment", "✅ Swing Image 업데이트 완료: ${product.imageUrl}")
             }
             "Toy Area" -> binding.imgHomeToy.post {
                 Glide.with(binding.imgHomeToy.context)
-                    .load(homeImageUrl)
+                    .load(product.imageUrl)
                     .into(binding.imgHomeToy)
-                Log.d("HomeFragment", "Toy Image Updated: $homeImageUrl")
+                Log.d("HomeFragment", "✅ Toy Image 업데이트 완료: ${product.imageUrl}")
             }
             "Bowl Area" -> binding.imgHomeBowl.post {
                 Glide.with(binding.imgHomeBowl.context)
-                    .load(homeImageUrl)
+                    .load(product.imageUrl)
                     .into(binding.imgHomeBowl)
-                Log.d("HomeFragment", "Bowl Image Updated: $homeImageUrl")
+                Log.d("HomeFragment", "✅ Bowl Image 업데이트 완료: ${product.imageUrl}")
             }
             "Nest Area" -> binding.imgHomeNest.post {
                 Glide.with(binding.imgHomeNest.context)
-                    .load(homeImageUrl)
+                    .load(product.imageUrl)
                     .into(binding.imgHomeNest)
-                Log.d("HomeFragment", "Nest Image Updated: $homeImageUrl")
+                Log.d("HomeFragment", "✅ Nest Image 업데이트 완료: ${product.imageUrl}")
             }
+            else -> Log.e("HomeFragment", "❌ 알 수 없는 area: ${product.area}, imageUrl: ${product.imageUrl}")
         }
     }
 
@@ -334,30 +338,53 @@ class HomeFragment : Fragment() {
      * MY 상품을 Home 화면에 렌더링
      */
     private fun renderMyProductsForHome() {
-        val myProducts = StoreFragment.myProducts // ✅ 리스트 복사 없이 직접 사용
+        val myProducts = StoreFragment.myProducts
+        Log.d("HomeFragment", "🛒 MY 탭에서 가져온 상품 리스트: ${myProducts.size}개")
+
+        if (myProducts.isEmpty()) {
+            Log.e("HomeFragment", "❌ MY 탭에 저장된 상품이 없습니다!")
+        }
 
         myProducts.forEach { product ->
-            when (product.area) {
+            // ✅ `area` 값이 null이면 `itemType`을 기반으로 기본값 설정
+            val area = product.area ?: when (product.itemType) {
+                "SWING" -> "Swing Area"
+                "TOY" -> "Toy Area"
+                "BOWL" -> "Bowl Area"
+                "NEST" -> "Nest Area"
+                else -> "Unknown Area"
+            }
+
+            Log.d("HomeFragment", "🛠 ${area}에 적용할 상품: ${product.name}, imageUrl: ${product.imageUrl}")
+
+            when (area) {
                 "Swing Area" -> Glide.with(binding.imgHomeSwing.context)
-                    .load(product.imageUrl) // ✅ 서버에서 받은 이미지 URL 사용
+                    .load(product.imageUrl)
                     .into(binding.imgHomeSwing)
+                    .also { Log.d("HomeFragment", "✅ Swing Image Updated: ${product.imageUrl}") }
 
                 "Toy Area" -> Glide.with(binding.imgHomeToy.context)
                     .load(product.imageUrl)
                     .into(binding.imgHomeToy)
+                    .also { Log.d("HomeFragment", "✅ Toy Image Updated: ${product.imageUrl}") }
 
                 "Bowl Area" -> Glide.with(binding.imgHomeBowl.context)
                     .load(product.imageUrl)
                     .into(binding.imgHomeBowl)
+                    .also { Log.d("HomeFragment", "✅ Bowl Image Updated: ${product.imageUrl}") }
 
                 "Nest Area" -> Glide.with(binding.imgHomeNest.context)
                     .load(product.imageUrl)
                     .into(binding.imgHomeNest)
+                    .also { Log.d("HomeFragment", "✅ Nest Image Updated: ${product.imageUrl}") }
+
+                else -> Log.e("HomeFragment", "❌ 올바르지 않은 area 값: $area")
             }
         }
     }
 
-//    private fun mapToHomeResource(storeResourceId: Int): Int {
+
+    //    private fun mapToHomeResource(storeResourceId: Int): Int {
 //        return when (storeResourceId) {
 //            R.drawable.img_product_swing1 -> R.drawable.img_home_swing1
 //            R.drawable.img_product_swing2 -> R.drawable.img_home_swing2

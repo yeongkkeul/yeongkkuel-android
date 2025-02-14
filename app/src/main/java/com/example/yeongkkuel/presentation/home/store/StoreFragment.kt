@@ -72,8 +72,8 @@ class StoreFragment : Fragment() {
 
         binding.imgPurchaseIcon.setOnClickListener {
             selectedProduct?.let { product ->
-                if (viewModel.currentReward < product.price) { // ✅ 보유 리워드 체크
-                    showPurchaseFailureDialog() // 리워드 부족 시 다이얼로그 표시
+                if (viewModel.currentReward < product.price) {
+                    showPurchaseFailureDialog()
                 } else {
                     viewModel.purchaseSkin(
                         itemId = product.id,
@@ -81,16 +81,25 @@ class StoreFragment : Fragment() {
                         itemName = product.name,
                         reward = product.price
                     )
+                    // ✅ MY 카테고리에 추가
+                    if (!myProducts.contains(product)) {
+                        myProducts.add(product)
+                        Log.d("StoreFragment", "✅ ${product.name}이 MY 카테고리에 추가됨")
+                    }
                 }
-            } ?: Log.d("StoreFragment", "선택된 상품 없음")
+            } ?: Log.d("StoreFragment", "❌ 선택된 상품 없음")
         }
+
         binding.imgSaveIcon.setOnClickListener {
             selectedProductInMyTab?.let { product ->
-                val purchaseIdList = listOf(product.id)
-                viewModel.saveEquippedSkins(purchaseIdList)
-                Toast.makeText(requireContext(), "스킨 착용을 저장 중...", Toast.LENGTH_SHORT).show()
-            } ?: Log.d("StoreFragment", "No product selected in MY tab.")
+                val bundle = Bundle().apply {
+                    putParcelable("selectedProduct", product)
+                }
+                Log.d("StoreFragment", "✅ ${product.name} 선택됨, 홈 화면 업데이트")
+                navController.navigate(R.id.action_storeFragment_to_homeFragment, bundle)
+            } ?: Log.d("StoreFragment", "❌ 선택된 상품 없음")
         }
+
         viewModel.productUiState.observe(viewLifecycleOwner) { uiState ->
             if (uiState.productList.isNotEmpty()) {
                 val productList = uiState.productList.map { productUiState ->
@@ -99,7 +108,9 @@ class StoreFragment : Fragment() {
                         name = productUiState.name,
                         price = productUiState.price,
                         category = productUiState.category,
-                        imageUrl = productUiState.imageUrl // ✅ 변경
+                        imageUrl = productUiState.imageUrl,
+                        itemType = productUiState.itemType, // ✅ itemType 추가
+                        area = mapItemTypeToArea(productUiState.itemType) // ✅ area 자동 설정
                     )
                 }
                 updateProductList(productList) // ✅ 변환 후 호출
@@ -107,8 +118,6 @@ class StoreFragment : Fragment() {
                 Log.d("StoreFragment", "❌ 상품 데이터가 없습니다.")
             }
         }
-
-
 
         viewModel.equipResponse.observe(viewLifecycleOwner) { response ->
             if (response?.isSuccess == true) {
@@ -145,12 +154,14 @@ class StoreFragment : Fragment() {
                 binding.tvCoin.text = "보유 리워드: ${response.result.myReward}"
 
                 val shopItems = response.result.itemList.map { shopItem ->
-                    Product(
+                    ProductUiState.Product( // ✅ ProductUiState.Product → Product 변환
                         id = shopItem.id,
                         name = shopItem.itemName,
                         price = shopItem.price,
                         imageUrl = shopItem.itemImg, // ✅ 서버에서 받은 이미지 URL 사용
-                        category = ProductCategory.valueOf(response.result.itemType)
+                        category = ProductCategory.valueOf(response.result.itemType),
+                        itemType = response.result.itemType, // ✅ itemType 값 추가
+                        area = mapItemTypeToArea(response.result.itemType) // ✅ itemType을 area로 변환하여 저장
                     )
                 }
 
@@ -165,7 +176,7 @@ class StoreFragment : Fragment() {
                 if (selectedCategory != null) {
                     val filteredItems = shopItems.filter { it.category == selectedCategory }
                     Log.d("StoreFragment", "🛒 Filtered items: $filteredItems") // ✅ 필터링된 상품 로그 추가
-                    updateProductList(filteredItems)
+//                    updateProductList(filteredItems) // ✅ 변환된 타입 사용
                 } else {
                     updateProductList(myProducts, isMyTab = true)
                 }
@@ -173,6 +184,7 @@ class StoreFragment : Fragment() {
                 Log.e("StoreFragment", "❌ 상점 데이터 불러오기 실패: ${response?.message ?: "오류 발생"}")
             }
         }
+
         viewModel.fetchShopData("SWING") // ✅ 초기 데이터 로드
 
         setupRecyclerView()
@@ -207,6 +219,7 @@ class StoreFragment : Fragment() {
                         .into(binding.imgStoreSwing)
                     Log.d("StoreFragment", "Swing Image Updated: $imageUrl")
                 }
+
                 ProductCategory.TOY -> {
                     val imageUrl = when (product.name) {
                         "탱탱볼" -> "drawable/img_home_toy1"
@@ -218,6 +231,7 @@ class StoreFragment : Fragment() {
                         .into(binding.imgStoreToy)
                     Log.d("StoreFragment", "Toy Image Updated: $imageUrl")
                 }
+
                 ProductCategory.BOWL -> {
                     val imageUrl = when (product.name) {
                         "밥그릇 1" -> "drawable/img_home_bowl1"
@@ -229,6 +243,7 @@ class StoreFragment : Fragment() {
                         .into(binding.imgStoreBowl)
                     Log.d("StoreFragment", "Bowl Image Updated: $imageUrl")
                 }
+
                 ProductCategory.NEST -> {
                     val imageUrl = when (product.name) {
                         "둥지 1" -> "drawable/img_home_nest1"
@@ -258,8 +273,10 @@ class StoreFragment : Fragment() {
                     id = productUiStateProduct.id,
                     name = productUiStateProduct.name,
                     price = productUiStateProduct.price,
-                    imageUrl = productUiStateProduct.imageUrl, // ✅ imageResId 대신 imageUrl 사용
-                    category = productUiStateProduct.category
+                    imageUrl = productUiStateProduct.imageUrl,
+                    category = productUiStateProduct.category,
+                    itemType = productUiStateProduct.itemType, // ✅ itemType 추가
+                    area = mapItemTypeToArea(productUiStateProduct.itemType) // ✅ itemType을 area로 변환
                 )
             }
         )
@@ -279,17 +296,17 @@ class StoreFragment : Fragment() {
         }
     }
 
-    private fun getProductsByCategory(category: ProductCategory): List<Product> {
-        return ProductUiState.init().productList.filter { it.category == category }.map { productUiStateProduct ->
-            Product(
-                id = productUiStateProduct.id,
-                name = productUiStateProduct.name,
-                price = productUiStateProduct.price,
-                imageUrl = productUiStateProduct.imageUrl, // ✅ imageResId 대신 imageUrl 사용
-                category = productUiStateProduct.category
-            )
-        }
-    }
+//    private fun getProductsByCategory(category: ProductCategory): List<Product> {
+//        return ProductUiState.init().productList.filter { it.category == category }.map { productUiStateProduct ->
+//            Product(
+//                id = productUiStateProduct.id,
+//                name = productUiStateProduct.name,
+//                price = productUiStateProduct.price,
+//                imageUrl = productUiStateProduct.imageUrl, // ✅ imageResId 대신 imageUrl 사용
+//                category = productUiStateProduct.category
+//            )
+//        }
+//    }
 
     private fun updateImage(imageView: ImageView, imageResId: Int) {
         imageView.setImageResource(imageResId)
@@ -332,9 +349,11 @@ class StoreFragment : Fragment() {
 
                     if (selectedCategory != null) {
                         Log.d("StoreFragment", "🔄 Fetching data for category: ${selectedCategory.name}") // ✅ 로그 추가
-                        viewModel.fetchShopData(selectedCategory.name) // ✅ API 다시 호출
+                        viewModel.fetchShopData(selectedCategory.name)// ✅ API 다시 호출
+                        showPurchaseIconOnly()
                     } else {
                         updateProductList(myProducts, isMyTab = true)
+                        showSaveIconOnly()
                     }
                 }
             }
@@ -517,6 +536,15 @@ class StoreFragment : Fragment() {
         }
 
         dialog.show()
+    }
+    private fun mapItemTypeToArea(itemType: String): String {
+        return when (itemType) {
+            "SWING" -> "Swing Area"
+            "TOY" -> "Toy Area"
+            "BOWL" -> "Bowl Area"
+            "NEST" -> "Nest Area"
+            else -> "Unknown Area" // ✅ 예외 처리
+        }
     }
 
 
