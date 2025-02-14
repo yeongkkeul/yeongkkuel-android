@@ -56,42 +56,36 @@ class CategoryDetailFragment : Fragment() {
             findNavController().popBackStack() // 이전 화면으로 이동
         }
 
-        // 더보기 버튼 클릭 이벤트
+        // 더보기 버튼 클릭 이벤트: PopupWindow 대신 cl_more의 visibility 토글
         binding.tvCategoryMore.setOnClickListener {
-            showCustomMenu(it, categoryName, categoryColorId) // 수정/삭제 메뉴 표시
+            binding.clMore.visibility =
+                if (binding.clMore.visibility == View.GONE) View.VISIBLE else View.GONE
         }
-    }
 
-    // 수정/삭제 커스텀 메뉴 표시
-    private fun showCustomMenu(anchor: View, categoryName: String?, categoryColor: Int?) {
-        val popupBinding = ItemMenuPopupBinding.inflate(layoutInflater)
-        val popupWindow = PopupWindow(popupBinding.root, 300, 300, true)
-
-        popupBinding.tvModify.setOnClickListener {
+        // cl_more 내 수정 버튼 클릭 이벤트
+        binding.clMore.findViewById<TextView>(R.id.tv_modify).setOnClickListener {
             // 수정 화면으로 이동
             val bundle = Bundle().apply {
                 putString("categoryName", categoryName)
-                putInt("categoryColor", categoryColor ?: android.graphics.Color.BLACK)
+                putInt("categoryColor", categoryColorId ?: android.graphics.Color.BLACK)
             }
             findNavController().navigate(
                 R.id.action_categoryDetailFragment_to_categoryEditFragment,
                 bundle
             )
-            popupWindow.dismiss()
+            binding.clMore.visibility = View.GONE
         }
 
-        popupBinding.tvDelete.setOnClickListener {
-            // 삭제 확인 다이얼로그 표시
+        // cl_more 내 삭제 버튼 클릭 이벤트
+        binding.clMore.findViewById<TextView>(R.id.tv_delete).setOnClickListener {
             categoryName?.let {
                 showDeleteConfirmationDialog(it) // Non-nullable로 전달
             } ?: run {
-                Toast.makeText(requireContext(), "카테고리 이름이 없습니다.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "카테고리 이름이 없습니다.", Toast.LENGTH_SHORT)
+                    .show()
             }
-            popupWindow.dismiss()
+            binding.clMore.visibility = View.GONE
         }
-
-        popupWindow.elevation = 10f
-        popupWindow.showAsDropDown(anchor, 0, 0) // 앵커 기준으로 표시
     }
 
     // 삭제 확인 다이얼로그 표시
