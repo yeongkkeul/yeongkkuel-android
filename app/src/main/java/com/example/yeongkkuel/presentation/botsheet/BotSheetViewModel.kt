@@ -155,6 +155,8 @@ class BotSheetViewModel : ViewModel() {
     fun updateBotSheetCategories(categories: List<Category>) {
         Log.d("BotSheetViewModel", "🚀 updateBotSheetCategories 실행됨! categories: $categories")
 
+        _categoryList.postValue(categories)
+
         val updatedSpendingList = categories.map { category ->
             BotSheetUiState.Spending(
                 categoryId = category.id,
@@ -355,21 +357,36 @@ class BotSheetViewModel : ViewModel() {
     fun getSpendingList(year: Int, month: Int, day: Int) = viewModelScope.launch {
         try {
             // yeongkkuelService를 통해 데이터 요청
-            statService.getExpendituresMonthCategory(
-                year = year,
-                month = month,
-                day = day
-            ).run {
+            statService.getExpendituresMonthCategory(year, month, day).run {
                 if (isSuccess) {
                     result.run {
+                        val categories = categories.map { category ->
+                            Category(
+                                id = category.categoryId,
+                                name = category.categoryName,
+                                color = Colors.fromRGB(
+                                    red = category.red,
+                                    blue = category.blue,
+                                    green = category.green
+                                ) ?: Colors.RED1
+                            )
+                        }
+
+                        // ✅ 추가: 바텀시트 UI 업데이트
+                        updateBotSheetCategories(categories)
+
                         _uiState.update { prev ->
                             val updatedSpendingList = categories.map { category ->
+                                // ✅ 카테고리 ID 기반으로 해당 카테고리의 지출 내역 찾기
+                                val expenses = result.categories
+                                    .find { it.categoryId == category.id }?.expenses ?: emptyList()
+
                                 BotSheetUiState.Spending(
-                                    categoryId = 1,
-                                    kind = SpendingCategory.fromName(category.categoryName),
-                                    color = Colors.fromRGB(red = category.red, blue = category.blue, green = category.green) ?: Colors.RED1,
+                                    categoryId = category.id, // ✅ 기존 1 → category.id 로 수정
+                                    kind = SpendingCategory.fromName(category.name),
+                                    color = category.color,
                                     plusIconResId = R.drawable.ic_plus_default,
-                                    history = category.expenses.map { expense ->
+                                    history = expenses.map { expense -> // ✅ expenses를 여기서 가져오기
                                         BotSheetUiState.Spending.History(
                                             id = expense.expenseId,
                                             name = expense.expenseName,
@@ -386,14 +403,16 @@ class BotSheetViewModel : ViewModel() {
                                 }.time
                             )
                         }
+                        updateSpendingHistoryList() // 최신 데이터 반영
                     }
-                    updateSpendingHistoryList() // 최신 데이터 반영
                 }
             }
         } catch (e: Exception) {
             Log.e("BotSheetViewModel", "🚨 getSpendingList() 오류: ${e.message}")
         }
     }
+
+
 
 //    fun updateExpense(updatedExpense: BotSheetUiState.Spending.History) {
 //        _spendingHistoryList.value = _spendingHistoryList.value.map { expense ->
@@ -414,7 +433,8 @@ class BotSheetViewModel : ViewModel() {
             )
         }
         Log.d("BotSheetViewModel", "getCategoryList() 반환: $categoryList")
-        return _categoryList.value.orEmpty()
+        Log.d("BotSheetViewModel", "📌 getCategoryList() 호출됨, 현재 카테고리 개수: ${_categoryList.value?.size ?: 0}")
+        return categoryList
     }
 
     fun addExpenseHistory(history: BotSheetUiState.Spending.History) {

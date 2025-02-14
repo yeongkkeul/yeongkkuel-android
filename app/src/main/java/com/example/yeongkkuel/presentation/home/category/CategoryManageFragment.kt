@@ -33,59 +33,17 @@ class CategoryManageFragment : Fragment() {
     private lateinit var categoryAdapter: CategoryAdapter
     private lateinit var itemTouchHelper: ItemTouchHelper
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentCategoryManageBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         // categoryAdapter 초기화
         categoryAdapter = CategoryAdapter(
-            onCategoryClick = { category ->
-                navigateToCategoryDetail(category)
-            },
-            onStartDrag = { viewHolder ->
-                itemTouchHelper.startDrag(viewHolder)
-            }
+            onCategoryClick = { category -> navigateToCategoryDetail(category) },
+            onStartDrag = { viewHolder -> itemTouchHelper.startDrag(viewHolder) }
         )
 
-        // ✅ itemTouchHelper 초기화
-        itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
-            ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0
-        ) {
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-                val fromPosition = viewHolder.bindingAdapterPosition
-                val toPosition = target.bindingAdapterPosition
-                Log.d("CategoryManageFragment", "📌 아이템 이동: $fromPosition -> $toPosition")
-
-                categoryAdapter.moveItem(fromPosition, toPosition) // UI 순서 변경
-                return true
-            }
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                // 스와이프 기능 비활성화
-            }
-
-            override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
-                super.clearView(recyclerView, viewHolder)
-
-                val updatedList = categoryAdapter.getCategoryList()
-                // ViewModel에 변경된 카테고리 순서 반영
-                viewModel.updateCategoryOrderLocally(updatedList)
-
-                // 변경된 리스트를 RecyclerView에 반영
-                categoryAdapter.submitList(updatedList)
-            }
-        })
+        // ItemTouchHelper 클래스 분리해서 사용
+        itemTouchHelper = ItemTouchHelper(CategoryItemTouchHelper(categoryAdapter))
 
         // RecyclerView 설정
         setupRecyclerView()
@@ -94,8 +52,6 @@ class CategoryManageFragment : Fragment() {
         // 데이터 가져오기 및 UI 업데이트
         observeViewModel()
         fetchCategoriesFromServer()
-
-        Log.d("CategoryManageFragment", "✅ onViewCreated() 완료")
 
         // 추가 버튼 클릭 이벤트
         binding.tvCategoryAdd.setOnClickListener {
@@ -113,7 +69,6 @@ class CategoryManageFragment : Fragment() {
         }
     }
 
-
     override fun onResume() {
         super.onResume()
         viewModel.fetchCategories()
@@ -128,22 +83,21 @@ class CategoryManageFragment : Fragment() {
             // 카테고리 데이터 관찰
             viewModel.categories.observe(viewLifecycleOwner) { categories ->
                 if (categories.isNotEmpty()) {
-                    categoryAdapter.submitList(categories)
+                    categoryAdapter.submitList(categories)  // submitList()로 RecyclerView 갱신
                 }
             }
 
             // 바텀시트 데이터 관찰
             botSheetViewModel.categoryList.observe(viewLifecycleOwner) { categories ->
                 if (categories.isNotEmpty()) {
-                    categoryAdapter.submitList(categories)
-                    categoryAdapter.notifyDataSetChanged()
+                    categoryAdapter.submitList(categories)  // submitList()로 RecyclerView 갱신
                 }
             }
 
             // 에러 메시지 관찰
             viewModel.errorMessage.observe(viewLifecycleOwner) { errorMessage ->
                 errorMessage?.let {
-                    Log.e("CategoryManageFragment", "❌ ViewModel 에러 발생: $it") // ✅ 추가 로그
+                    Log.e("CategoryManageFragment", "❌ ViewModel 에러 발생: $it")
                     android.widget.Toast.makeText(requireContext(), it, android.widget.Toast.LENGTH_SHORT).show()
                 }
             }
@@ -156,12 +110,7 @@ class CategoryManageFragment : Fragment() {
             adapter = categoryAdapter
 
             addItemDecoration(object : RecyclerView.ItemDecoration() {
-                override fun getItemOffsets(
-                    outRect: Rect,
-                    view: View,
-                    parent: RecyclerView,
-                    state: RecyclerView.State
-                ) {
+                override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
                     outRect.top = 16
                     outRect.bottom = 16
                 }
@@ -182,17 +131,12 @@ class CategoryManageFragment : Fragment() {
     }
 
     private fun showLimitReachedPopup() {
-        val dialogView = LayoutInflater.from(requireContext())
-            .inflate(R.layout.dialog_category_limit, null)
-
-        val dialog = android.app.AlertDialog.Builder(requireContext())
-            .setView(dialogView)
-            .create()
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_category_limit, null)
+        val dialog = android.app.AlertDialog.Builder(requireContext()).setView(dialogView).create()
 
         dialogView.findViewById<TextView>(R.id.tv_reward).setOnClickListener {
             dialog.dismiss()
         }
-
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.show()
     }
