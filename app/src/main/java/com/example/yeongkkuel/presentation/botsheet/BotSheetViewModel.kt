@@ -107,26 +107,15 @@ class BotSheetViewModel : ViewModel() {
         mutex.withLock {
             _uiState.update { prevState ->
                 val updatedSpendingList = prevState.spendingList.map { spending ->
-                    val historyMatch = spending.history.find {
-                        it.name == updatedExpense.name
+                    val updatedHistoryList = spending.history.map { history ->
+                        if (history.id == updatedExpense.id) {
+                            updatedExpense.copy() // ✅ 내용과 금액만 변경 (카테고리 변경 없음)
+                        } else {
+                            history
+                        }
                     }
+                    spending.copy(history = updatedHistoryList) // ✅ 카테고리 수정 없이 내용만 업데이트
 
-                    if (historyMatch != null) {
-                        Log.d("BotSheetViewModel", "✅ 기존 데이터 찾음: $historyMatch → $updatedExpense")
-
-                        spending.copy(
-                            history = spending.history.map { history ->
-                                if (history.name == updatedExpense.name) {
-                                    updatedExpense // ✅ 기존 항목을 수정된 값으로 변경
-                                } else {
-                                    history
-                                }
-                            }
-                        )
-                    } else {
-                        Log.d("BotSheetViewModel", "❌ 기존 데이터 없음: 업데이트되지 않음.")
-                        spending
-                    }
                 }
                 Log.d("BotSheetViewModel", "✅ spendingList 업데이트 완료: $updatedSpendingList")
                 prevState.copy(spendingList = updatedSpendingList)

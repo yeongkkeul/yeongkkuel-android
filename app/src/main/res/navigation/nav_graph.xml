@@ -75,7 +75,7 @@
         android:id="@+id/navigation_expense_view"
         android:name="com.example.yeongkkuel.presentation.home.entry.ExpenseViewFragment"
         android:label="지출 내역 확인"
-        tools:layout="@layout/fragment_expense_entry">
+        tools:layout="@layout/fragment_expense_view">
 
         <action
             android:id="@+id/action_ExpenseViewFragment_to_ExpenseEditFragment"
@@ -85,8 +85,11 @@
     <fragment
         android:id="@+id/navigation_expense_edit"
         android:name="com.example.yeongkkuel.presentation.home.entry.ExpenseEditFragment"
-        android:label="지출 내역 확인"
-        tools:layout="@layout/fragment_expense_entry">
+        android:label="지출 내역 수정"
+        tools:layout="@layout/fragment_expense_view">
+        <action
+            android:id="@+id/action_ExpenseEditFragment_to_HomeFragment"
+            app:destination="@id/navigation_home" />
     </fragment>
 
 
