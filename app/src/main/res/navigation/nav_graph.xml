@@ -302,7 +302,21 @@
         tools:layout="@layout/fragment_notification">
         <action
             android:id="@+id/action_notificationFragment_to_rewardFragment"
-            app:destination="@id/navigation_reward" />
+            app:destination="@id/navigation_reward"
+            app:popUpTo="@id/navigation_reward"
+            app:popUpToInclusive="true" />
+            />
+        <action
+            android:id="@+id/action_notificationFragment_to_chatFragment"
+            app:destination="@id/navigation_chat"
+            app:popUpTo="@id/navigation_chat"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_notificationFragment_to_navigation_stat"
+            app:destination="@id/navigation_stat"
+            app:popUpTo="@id/navigation_stat"
+            app:popUpToInclusive="true" />
+
     </fragment>
 
     <fragment

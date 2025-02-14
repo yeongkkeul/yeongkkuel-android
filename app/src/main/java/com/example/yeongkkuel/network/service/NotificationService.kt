@@ -32,19 +32,16 @@ interface NotificationService {
 
     @PATCH("/api/notifications/settings")
     suspend fun patchNotificationSettings(
-        // request body로 NotificationRequest를 받아옵니다.
-        // NotificationRequest는 notificationType, content, targetUrl을 가지고 있습니다.
-        // notificationType은 String형으로 받아옵니다.
-        // content는 String형으로 받아옵니다.
-        // targetUrl은 String형으로 받아옵니다.
         @Body notificationAgreed: Boolean
-
     ): Response<Boolean>
 
     @GET("/api/notifications/unread")
     suspend fun getUnreadNotificationCount(
     ): Response<Boolean>
 
+    @PATCH("api/notifications/read-all")
+    suspend fun patchAllNotificationRead(
+    ): Response<Int>
 
 
 
