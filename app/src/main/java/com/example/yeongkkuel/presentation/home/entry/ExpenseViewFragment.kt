@@ -1,378 +1,208 @@
 package com.example.yeongkkuel.presentation.home.entry
 
-import android.app.AlertDialog
-import android.graphics.Color
+import android.graphics.Rect
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
+import android.view.TouchDelegate
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
+import android.widget.PopupMenu
 import android.widget.PopupWindow
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.NavController
-import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
-import com.example.yeongkkuel.R
-import com.example.yeongkkuel.databinding.FragmentExpenseEntryBinding
-import com.example.yeongkkuel.databinding.ItemMenuPopupBinding
-import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
+import com.example.yeongkkuel.databinding.FragmentExpenseViewBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
+import java.text.SimpleDateFormat
+import java.util.Locale
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.text.NumberFormat
-import java.text.SimpleDateFormat
+import com.example.yeongkkuel.R // ✅ R import 추가
+import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
+import org.w3c.dom.Text
+import java.util.Calendar
 import java.util.Date
-import java.util.Locale
 
 class ExpenseViewFragment : Fragment() {
 
-    private var _binding: FragmentExpenseEntryBinding? = null
+    private var _binding: FragmentExpenseViewBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: BotSheetViewModel by activityViewModels()  // ✅ 중복 제거
+
+    private val viewModel: BotSheetViewModel by activityViewModels()
+    private var selectedCategoryId: Int? = null // ✅ 카테고리 ID 저장
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentExpenseEntryBinding.inflate(inflater, container, false)
+        _binding = FragmentExpenseViewBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // ✅ 최신 내역을 감시하여 UI 업데이트
-        observeLatestHistory()
-
-        // ✅ 수정된 데이터가 반영되도록 설정
-        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Bundle>("editedExpense")
-            ?.observe(viewLifecycleOwner) { bundle ->
-                bundle?.let {
-//                    val updatedExpense = BotSheetUiState.Spending.History(
-//                        date = it.getString("expenseDate", getCurrentDate()),
-//                        categoryName = it.getString("categoryName", ""),
-//                        categoryColor = it.getString("categoryColor", ""),
-//                        name = it.getString("expenseContent", ""),
-//                        content = it.getString("expenseContent", ""),
-//                        price = it.getInt("expensePrice", 0),
-//                        photoUrl = it.getString("expensePhoto", "")
-//                    )
-//                    Log.d("ExpenseViewFragment", "Received editedExpense: $updatedExpense")
-//                    updateUiWithHistory(updatedExpense)
-                }
-            }
-
-        setupUi()
-        Log.d("ExpenseViewFragment", "📌 arguments: $arguments") // ✅ 전체 arguments 확인
-
-        val expenseDate = arguments?.getString("expenseDate", getCurrentDate())
-        val categoryName = arguments?.getString("categoryName", "기본 카테고리")
-        val categoryColorStr = arguments?.getString("categoryColor") // ✅ HEX 값으로 받을 경우
-        val categoryColorResId: Int = arguments?.getInt("categoryColor") ?: -1
-
-        Log.d("ExpenseViewFragment", "📌 expenseDate: $expenseDate, categoryName: $categoryName, categoryColorStr: $categoryColorStr, categoryColorResId: $categoryColorResId")
-
-        setupCategory(categoryName, categoryColorStr, categoryColorResId)
-        binding.icMore.setOnClickListener { view ->
-            showCustomMenu(view)
-        }
-    }
-    private fun setupCategory(categoryName: String?, categoryColorStr: String?, categoryColorResId: Int) {
-        binding.tvCategoryInput.text = categoryName ?: "기본 카테고리"
-
-        try {
-            when {
-                !categoryColorStr.isNullOrEmpty() && categoryColorStr.startsWith("#") -> {
-                    // ✅ HEX 코드 처리
-                    binding.tvCategoryInput.setTextColor(Color.parseColor(categoryColorStr))
-                    Log.d("ExpenseViewFragment", "✅ HEX 색상 적용됨: $categoryColorStr")
-                }
-                categoryColorResId != -1 -> {
-                    // ✅ 리소스 ID 처리
-                    val resolvedColor = ContextCompat.getColor(requireContext(), categoryColorResId)
-                    binding.tvCategoryInput.setTextColor(resolvedColor)
-                    Log.d("ExpenseViewFragment", "✅ 리소스 ID 색상 적용됨: $categoryColorResId")
-                }
-                else -> {
-                    // ✅ 기본 색상 적용
-                    binding.tvCategoryInput.setTextColor(Color.BLACK)
-                    Log.e("ExpenseViewFragment", "❌ categoryColor 값이 올바르지 않음!")
-                }
-            }
-        } catch (e: Exception) {
-            Log.e("ExpenseViewFragment", "❌ 색상 적용 실패: ${e.message}")
-            binding.tvCategoryInput.setTextColor(Color.BLACK) // 기본 색상 적용
-        }
-    }
-
-
-    private fun observeLatestHistory() {
-        lifecycleScope.launch {
-            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.spendingHistoryList.collectLatest { historyList ->
-                    if (historyList.isNotEmpty()) {
-                        val latestHistory = historyList.last() // 🔹 가장 최근 지출 내역 가져오기
-                        updateUiWithHistory(latestHistory)
-                    }
-                    updateIcMoreVisibility(historyList) // ✅ `icMore` 가시성 업데이트
-                }
-            }
-        }
-    }
-    private fun updateIcMoreVisibility(historyList: List<BotSheetUiState.Spending.History>) {
-        val hasOnlyNoExpense = historyList.isNotEmpty() && historyList.isNotEmpty() // ✅ 모든 항목이 무지출인지 확인
-        binding.icMore.visibility = if (hasOnlyNoExpense) View.GONE else View.VISIBLE // ✅ `isNoExpense` 값에 따라 표시 여부 조정
-    }
-
-    private fun updateUiWithHistory(history: BotSheetUiState.Spending.History) {
-        Log.d("ExpenseViewFragment", "updateUiWithHistory - content: '${history.name}'")
-
-//        binding.tvDateInput.text = history.date.ifEmpty { getCurrentDate() }
-//        binding.tvCategoryInput.text = history.categoryName
-//        binding.tvCategoryInput.setTextColor(Color.parseColor(history.categoryColor))
-//        binding.etDetailInput.setText(history.name)
-//        binding.etAmountInput.setText(formatPrice(history.price))
-
-//        if (history.photoUrl.isNotEmpty()) {
-//            Glide.with(binding.root.context) // 🔹 올바른 Context 제공
-//                .load(history.photoUrl)
-//                .into(binding.imgPhotoFrame)
-//            binding.ivPhotoIcon.visibility = View.GONE
-//        } else {
-//            binding.ivPhotoIcon.visibility = View.VISIBLE
-//        }
-//        if ((history.content ?: "").trim() == "무지출 기록") {
-//            Log.d("ExpenseViewFragment", "ic_more 숨김 처리")
-//            binding.icMore.visibility = View.GONE
-//        } else {
-//            Log.d("ExpenseViewFragment", "ic_more 표시 처리")
-//            binding.icMore.visibility = View.VISIBLE
-//        }
-        adjustEditTextWidth(binding.etDetailInput)
-
-    }
-
-    private fun setupUi() {
-        // 🔹 제목 텍스트뷰 visibility 변경
-        binding.tvExpenseViewTitle.visibility = View.VISIBLE
-        binding.tvExpenseTitle.visibility = View.GONE
         binding.btnBack.setOnClickListener {
-            saveHistoryToBotSheet() // 수정된 내용 저장
-            findNavController().popBackStack()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
+        binding.icMore.setOnClickListener {
+            showEditDeleteMenu(it) // ✅ `meu_edit_delete` 표시 기능 추가
+            expandClickArea(binding.icMore, 40) // ✅ 터치 영역 40dp 확장
+
         }
 
-        lifecycleScope.launch {
+
+
+        // ✅ StateFlow를 collectLatest()로 감지
+        viewLifecycleOwner.lifecycleScope.launch {
             viewModel.spendingHistoryList.collectLatest { historyList ->
-                if (historyList.isNotEmpty()) {
-                    val latestHistory = historyList.last()
-                    updateUiWithHistory(latestHistory)
-                }
-            }
-        }
+                val selectedExpense = historyList.lastOrNull()
 
-        arguments?.let {
-            val expenseDate = it.getString("expenseDate", getCurrentDate())
-            val categoryName = it.getString("categoryName", "")
-            val categoryColor = it.getInt("categoryColor", R.color.black2)
-            val expenseContent = it.getString("expenseContent", "")
-            val expensePrice = it.getInt("expensePrice", 0)
-            val expensePhotoUrl = it.getString("expensePhoto", "")
+                if (selectedExpense != null) {
+                    // ✅ 최신 spendingList 업데이트 대기 후 UI 업데이트
+                    viewModel.uiState.collectLatest { uiState ->
+                        binding.tvDateInput.text = formatDate(viewModel.uiState.value.date)
 
-            binding.tvDateInput.text = expenseDate
-            binding.tvCategoryInput.text = categoryName
-            binding.tvCategoryInput.setTextColor(categoryColor) // Int 값을 바로 사용
-            binding.etDetailInput.setText(expenseContent)
-            binding.etAmountInput.setText(formatPrice(expensePrice))
+                        val category = getCategoryForExpense(selectedExpense.id)
+                        selectedCategoryId = category?.categoryId //
 
-            if (expensePhotoUrl.isNotEmpty()) {
-                Glide.with(this)
-                    .load(expensePhotoUrl)
-                    .into(binding.imgPhotoFrame)
-                binding.ivPhotoIcon.visibility = View.GONE
-            } else {
-                binding.ivPhotoIcon.visibility = View.VISIBLE
-            }
-            adjustEditTextWidth(binding.etDetailInput) // 초기 UI 설정 시에도 높이 조정
+                        binding.tvCategoryInput.text = category?.kind?.name ?: "기타"
+                        binding.etDetailInput.setText(selectedExpense.name)
+                        binding.etAmountInput.setText(selectedExpense.price.toString())
 
-        }
-
-        binding.tvDateInput.isEnabled = false
-        binding.tvCategoryInput.isEnabled = false
-        binding.etDetailInput.isEnabled = false
-        binding.etAmountInput.isEnabled = false
-
-        binding.tvDateInput.isFocusable = false
-        binding.tvCategoryInput.isFocusable = false
-        binding.etDetailInput.isFocusable = false
-        binding.etAmountInput.isFocusable = false
-
-        binding.tvCharacterCount.visibility = View.GONE
-        binding.tvEntryComplete.visibility = View.GONE
-        binding.clExpenseAuto.visibility = View.GONE
-        binding.clCheckNoExpense.visibility = View.GONE
-        binding.icMore.visibility = View.VISIBLE
-        binding.tvEntryComplete.setOnClickListener {
-            saveEditedExpense()
-        }
-        binding.icMore.setOnClickListener { view ->
-            showCustomMenu(view)
-        }
-    }
-
-    private fun getCurrentDate(): String {
-        val dateFormat = SimpleDateFormat("yyyy년 M월 d일 E요일", Locale.KOREA)
-        return dateFormat.format(Date())
-    }
-
-    private fun formatPrice(price: Int): String {
-        return NumberFormat.getNumberInstance(Locale.KOREA).format(price)
-    }
-
-    private fun saveEditedExpense() {
-        // 🔹 수정된 데이터를 저장하는 로직 추가
-    }
-
-    // 수정/삭제 커스텀 메뉴 표시
-    private fun showCustomMenu(anchor: View) {
-        try {
-            val categoryName = binding.tvCategoryInput.text.toString()
-
-            val categoryColor = String.format("#%06X", (0xFFFFFF and binding.tvCategoryInput.currentTextColor)) // ✅ HEX 변환
-
-            val popupBinding = ItemMenuPopupBinding.inflate(requireActivity().layoutInflater)
-            val popupWindow = PopupWindow(popupBinding.root, 300, 300, true)
-
-            popupBinding.tvModify.setOnClickListener {
-                // ✅ 올바른 네비게이션 컨트롤러 확인 후 이동
-                val navController = findNavControllerSafely()
-                if (navController != null) {
-                    val bundle = Bundle().apply {
-                        putString("categoryName", categoryName)
-                        putString("categoryColor", "#FF5733")
+                        // ✅ 최신 데이터 반영 후 카테고리 색상 적용
+                        val updatedColor = getCategoryTextColor(category?.kind?.name ?: "기타")
+                        binding.tvCategoryInput.setTextColor(updatedColor)
                     }
-                    navController.navigate(R.id.action_ExpenseViewFragment_to_ExpenseEditFragment, bundle)
-                    Log.d("ExpenseViewFragment", "수정 버튼 클릭됨: categoryName=$categoryName, categoryColor=$categoryColor")
-                } else {
-                    Log.e("ExpenseViewFragment", "네비게이션 컨트롤러를 찾을 수 없음!")
                 }
-                popupWindow.dismiss()
             }
+        }
+    }
+    private fun getCategoryForExpense(expenseId: Int): BotSheetUiState.Spending? {
+        return viewModel.uiState.value.spendingList.find { spending ->
+            spending.history.any { it.id == expenseId }
+        }
+    }
+    private fun showEditDeleteMenu(anchor: View) {
+        val popupMenu = PopupMenu(requireContext(), anchor)
+        popupMenu.menuInflater.inflate(R.menu.menu_edit_delete, popupMenu.menu)
 
-            popupBinding.tvDelete.setOnClickListener {
-                showDeleteConfirmationDialog()
-                popupWindow.dismiss()
+        // ✅ 메뉴 아이템 클릭 리스너 설정
+        popupMenu.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.action_modify -> {
+                    navigateToExpenseEdit()
+                    true
+                }
+                R.id.action_delete -> {
+                    deleteExpense()
+                    true
+                }
+                else -> false
             }
+        }
 
-            popupWindow.elevation = 10f
-            popupWindow.showAsDropDown(anchor, 0, 0)
+        popupMenu.show() // ✅ 팝업 메뉴 표시
+    }
 
-        } catch (e: Exception) {
-            Log.e("ExpenseViewFragment", "showCustomMenu 오류: ${e.message}")
+    private fun navigateToExpenseEdit() {
+        val selectedExpense = viewModel.spendingHistoryList.value.lastOrNull()
+
+        if (selectedExpense != null) {
+            val bundle = Bundle().apply {
+                putInt("expenseId", selectedExpense.id)
+                putString("expenseName", selectedExpense.name)
+                putInt("expensePrice", selectedExpense.price)
+            }
+            findNavController().navigate(R.id.action_ExpenseViewFragment_to_ExpenseEditFragment, bundle)
         }
     }
 
-    private fun Fragment.findNavControllerSafely(): NavController? {
-        return try {
-            findNavController()
-        } catch (e: IllegalStateException) {
-            Log.e("NavigationError", "NavController를 찾을 수 없음: ${e.message}")
-            null
-        }
-    }
+    /**
+     * ✅ 지출 내역 삭제 처리
+     */
+    private fun deleteExpense() {
+        val selectedExpense = viewModel.spendingHistoryList.value.lastOrNull() ?: return
 
-    private fun showDeleteConfirmationDialog() {
+        // ✅ 다이얼로그 띄우기
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_expense_delete, null)
-
         val dialog = AlertDialog.Builder(requireContext())
             .setView(dialogView)
-            .setCancelable(true)
             .create()
 
-        val cancelBtn = dialogView.findViewById<TextView>(R.id.tv_cancel_btn)
-        val deleteBtn = dialogView.findViewById<TextView>(R.id.tv_delete_btn)
-        val titleTextView = dialogView.findViewById<TextView>(R.id.tv_expense_title)
+        // ✅ 다이얼로그 내 버튼 설정
+        val btnConfirm = dialogView.findViewById<TextView>(R.id.tv_delete_btn)
+        val btnCancel = dialogView.findViewById<TextView>(R.id.tv_cancel_btn)
 
-        val expenseName = binding.etDetailInput.text.toString()
-        titleTextView.text = expenseName // 🔥 다이얼로그에 삭제할 항목 표시
-
-        cancelBtn.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        deleteBtn.setOnClickListener {
-            viewModel.removeExpense(expenseName) // ✅ BotSheetViewModel에서 삭제
-            Log.d("ExpenseViewFragment", "✅ 삭제 요청: $expenseName")
-
+        btnConfirm.setOnClickListener {
+            // ✅ 지출 내역 삭제 진행
+            viewModel.removeExpense(selectedExpense.name)
             Toast.makeText(requireContext(), "지출 내역이 삭제되었습니다.", Toast.LENGTH_SHORT).show()
-            dialog.dismiss()
 
-            // ✅ 삭제 후 BotSheet 업데이트 트리거
-            viewModel.spendingHistoryList.value.let {
-                Log.d("ExpenseViewFragment", "삭제 후 바텀시트 업데이트 -> 남은 항목: ${it.size} 개")
-            }
+            dialog.dismiss() // 다이얼로그 닫기
+            findNavController().popBackStack(R.id.navigation_home, false)
 
-            // ✅ 삭제 후 바텀시트 업데이트를 보장하기 위해 데이터 전달
-            findNavController().previousBackStackEntry?.savedStateHandle?.set("expenseDeleted", true)
-
-            findNavController().popBackStack() // 이전 화면으로 이동
         }
 
+        btnCancel.setOnClickListener {
+            dialog.dismiss() // 다이얼로그 닫기 (취소)
+        }
+
+        // ✅ 다이얼로그 스타일 적용
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.show()
     }
 
+    private fun getCategoryNameForExpense(expenseName: String): String {
+        val spendingList = viewModel.uiState.value.spendingList
+
+        // 🔹 `spendingList`에서 `History` 항목 중에서 해당하는 `name`이 포함된 `Spending`을 찾음
+        val category = spendingList.find { spending ->
+            spending.history.any { it.name == expenseName }
+        }
+
+        return category?.kind?.name ?: "기타" // ✅ 카테고리 이름 반환 (없으면 "기타")
+    }
 
 
-    private fun saveHistoryToBotSheet() {
-//        val updatedExpense = BotSheetUiState.Spending.History(
-//            date = binding.tvDateInput.text.toString(),
-//            categoryName = binding.tvCategoryInput.text.toString(),
-//            categoryColor = String.format("#%06X", (0xFFFFFF and binding.tvCategoryInput.currentTextColor)), // 색상 HEX 변환
-//            name = binding.etDetailInput.text.toString(),
-//            content = binding.etDetailInput.text.toString(),
-//            price = binding.etAmountInput.text.toString().replace(",", "").toIntOrNull() ?: 0,
-//            photoUrl = "" // 📝 이미지 추가 필요시 업데이트
-//        )
+    private fun formatDate(date: Date?): String {
+        return if (date != null) {
+            val sdf = SimpleDateFormat("yyyy년 M월 d일 E요일", Locale.KOREAN)
+            sdf.format(date)
+        } else {
+            "날짜 없음"
+        }
+    }
 
-//        Log.d("ExpenseViewFragment", "saveHistoryToBotSheet called with: $updatedExpense")
+    private fun getCategoryTextColor(categoryName: String): Int {
+        val spendingList = viewModel.uiState.value.spendingList
 
-        // ✅ ViewModel을 통해 바텀시트에 반영
+        val category = spendingList.find { it.kind.name == categoryName }
+
+        return category?.color?.id?.let { colorId ->
+            ContextCompat.getColor(requireContext(), colorId) // ✅ 카테고리 색상 적용
+        } ?: ContextCompat.getColor(requireContext(), R.color.black2) // 기본 색상 적용
+    }
+    private fun expandClickArea(view: View, extraPadding: Int) {
+        val parent = view.parent as View
+        parent.post {
+            val rect = Rect()
+            view.getHitRect(rect)
+            rect.top -= extraPadding
+            rect.bottom += extraPadding
+            rect.left -= extraPadding
+            rect.right += extraPadding
+            parent.touchDelegate = TouchDelegate(rect, view)
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-    private fun adjustEditTextWidth(editText: EditText) {
-        editText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                // 텍스트 변경 시 넓이 조정
-                adjustWidth(editText)
-            }
-
-            override fun afterTextChanged(s: Editable?) {}
-        })
-
-        // 초기 넓이 조정
-        adjustWidth(editText)
-    }
-
-    private fun adjustWidth(editText: EditText) {
-        val paint = editText.paint
-        val width = (paint.measureText(editText.text.toString()) + editText.paddingLeft + editText.paddingRight).toInt()
-        editText.width = width
     }
 }
