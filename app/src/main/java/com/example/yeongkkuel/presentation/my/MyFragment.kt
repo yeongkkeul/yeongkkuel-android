@@ -50,6 +50,9 @@ class MyFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
+
+        // viewModel 의 알림여부 LiveData를 observe 하여 알림 아이콘 색상 변경
+
         observeViewModel()
         viewModel.fetchUserProfile()
         setupClickListeners()
@@ -79,6 +82,14 @@ class MyFragment : Fragment() {
                 binding.tvEmail.text = result.email
                 binding.tvDailyLimit.text = result.dayTargetExpenditure.toString() + " 원"
                 binding.tvDailyPercent.text = result.weeklyAchievementRate.toString() + " %"
+            }
+        }
+
+        viewModel.unreadNotificationCount.observe(viewLifecycleOwner) { isUnread ->
+            if (isUnread) {
+                binding.icNotiDot.visibility = View.VISIBLE
+            } else {
+                binding.icNotiDot.visibility = View.GONE
             }
         }
     }

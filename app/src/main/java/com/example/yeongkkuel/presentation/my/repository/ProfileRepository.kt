@@ -1,6 +1,7 @@
 package com.example.yeongkkuel.presentation.my.repository
 
 import android.util.Log
+import com.example.yeongkkuel.network.RetrofitClient
 import com.example.yeongkkuel.network.RetrofitClient.myPageService
 import com.example.yeongkkuel.network.request.mypage.DeleteMemberRequest
 import com.example.yeongkkuel.network.request.mypage.PatchMyPageRequest
@@ -49,6 +50,20 @@ class ProfileRepository(private val apiService: MyPageService) {
         }
     }
 
+    suspend fun getUnreadNotificationCount() : Response<Boolean>? {
+        return try {
+            val response = RetrofitClient.notificationService.getUnreadNotificationCount()
+            if(response.isSuccess){
+                response
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
     suspend fun updateProfile(
         info: PatchMyPageRequest,
         profileImageFile: File? = null
@@ -71,7 +86,7 @@ class ProfileRepository(private val apiService: MyPageService) {
             }
 
             // 3. API 호출
-            val response = myPageService.patchMyPage(infoBody, imagePart)
+            val response = apiService.patchMyPage(infoBody, imagePart)
             if (response.isSuccess) {
                 response
             } else {

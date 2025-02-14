@@ -25,13 +25,12 @@ class ProfileViewModel : ViewModel() {
         repository = ProfileRepository(RetrofitClient.myPageService)
         fetchUserProfile()
         getReferralCode()
+        // 읽지 않은 알림 여부
+        getUnreadNotificationCount()
     }
 
     private val _profileResponse = MutableLiveData<Response<MyPageResult>>()
     val profileResponse: LiveData<Response<MyPageResult>> get() = _profileResponse
-
-
-
 
 
     private val _updateStatus = MutableLiveData<Result<Unit>>()
@@ -56,6 +55,10 @@ class ProfileViewModel : ViewModel() {
     // 추천인 코드 응답
     private val _referralCode = MutableLiveData<String>()
     val referralCode: LiveData<String> get() = _referralCode
+
+    // 읽지 않은 알림 여부
+    private val _unreadNotificationCount = MutableLiveData<Boolean>()
+    val unreadNotificationCount: LiveData<Boolean> get() = _unreadNotificationCount
 
 
 
@@ -87,6 +90,16 @@ class ProfileViewModel : ViewModel() {
         }
     }
 
+    fun getUnreadNotificationCount() {
+        viewModelScope.launch {
+            val response = repository.getUnreadNotificationCount()
+            response?.let {
+                if (it.isSuccess) {
+                    _unreadNotificationCount.value = it.result
+                }
+            }
+        }
+    }
     // 추천인 코드 조회
     fun getReferralCode() {
         viewModelScope.launch {

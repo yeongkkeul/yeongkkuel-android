@@ -7,6 +7,7 @@ import com.example.yeongkkuel.presentation.home.HomeApiService
 import com.example.yeongkkuel.presentation.home.store.StoreApiService
 
 import com.example.yeongkkuel.network.service.MyPageService
+import com.example.yeongkkuel.network.service.NotificationService
 import com.example.yeongkkuel.network.service.StatService
 
 import okhttp3.OkHttpClient
@@ -84,6 +85,10 @@ object RetrofitClient {
 
     val myPageService: MyPageService by lazy {
         authRetrofit!!.create(MyPageService::class.java)
+    }
+
+    val notificationService: NotificationService by lazy {
+        authRetrofit!!.create(NotificationService::class.java)
     }
 
 }
