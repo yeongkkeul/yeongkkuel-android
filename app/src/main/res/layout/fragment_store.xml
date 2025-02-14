@@ -148,7 +148,7 @@
         <!-- 코인 -->
         <LinearLayout
             android:id="@+id/ly_coin_bar"
-            android:layout_width="67dp"
+            android:layout_width="wrap_content"
             android:layout_height="28dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
@@ -167,13 +167,14 @@
 
             <TextView
                 android:id="@+id/tv_coin"
-                android:layout_width="26dp"
+                android:layout_width="wrap_content"
                 android:layout_height="20dp"
                 android:layout_marginStart="6dp"
                 android:text=" "
                 android:textColor="@color/black"
                 android:textSize="15sp"
-                android:textStyle="normal" />
+                android:textStyle="normal"
+                android:layout_marginEnd="8dp"/>
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 

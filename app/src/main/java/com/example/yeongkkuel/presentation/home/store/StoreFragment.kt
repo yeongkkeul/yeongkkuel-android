@@ -1,6 +1,8 @@
 package com.example.yeongkkuel.presentation.home.store
 
+import android.graphics.Color
 import android.graphics.Rect
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
@@ -132,8 +134,9 @@ class StoreFragment : Fragment() {
             Log.d("StoreFragment", "🔍 스킨 구매 API 응답: $response")
 
             if (response?.isSuccess == true) {
-                Toast.makeText(requireContext(), "스킨 구매 성공!", Toast.LENGTH_SHORT).show()
-                navController.popBackStack()
+                selectedProduct?.let { product ->
+                    showPurchaseDialog(product) // ✅ 구매 성공 시 다이얼로그 표시
+                }
             } else {
                 Log.e("StoreFragment", "❌ 스킨 구매 실패: ${response?.message ?: "서버 응답 없음"}")
 
@@ -151,17 +154,17 @@ class StoreFragment : Fragment() {
             Log.d("StoreFragment", "🛍 API Response: $response") // ✅ 응답 확인 로그 추가
 
             if (response?.isSuccess == true) {
-                binding.tvCoin.text = "보유 리워드: ${response.result.myReward}"
+                binding.tvCoin.text = response.result.myReward.toString() // ✅ 숫자만 표시
 
                 val shopItems = response.result.itemList.map { shopItem ->
-                    ProductUiState.Product( // ✅ ProductUiState.Product → Product 변환
+                    Product( // ✅ ProductUiState.Product → Product 변환
                         id = shopItem.id,
                         name = shopItem.itemName,
-                        price = shopItem.price,
+                        price = shopItem.price ?: 0, // ✅ null 방지
                         imageUrl = shopItem.itemImg, // ✅ 서버에서 받은 이미지 URL 사용
                         category = ProductCategory.valueOf(response.result.itemType),
                         itemType = response.result.itemType, // ✅ itemType 값 추가
-                        area = mapItemTypeToArea(response.result.itemType) // ✅ itemType을 area로 변환하여 저장
+                        area = mapItemTypeToArea(response.result.itemType)
                     )
                 }
 
@@ -175,8 +178,12 @@ class StoreFragment : Fragment() {
 
                 if (selectedCategory != null) {
                     val filteredItems = shopItems.filter { it.category == selectedCategory }
-                    Log.d("StoreFragment", "🛒 Filtered items: $filteredItems") // ✅ 필터링된 상품 로그 추가
-//                    updateProductList(filteredItems) // ✅ 변환된 타입 사용
+                    if (filteredItems.isEmpty()) {
+                        Log.d("StoreFragment", "⚠ ${selectedCategory.name} 카테고리의 상품이 없습니다.")
+                        updateProductList(emptyList()) // ✅ 빈 리스트 전달
+                    } else {
+                        updateProductList(filteredItems)
+                    }
                 } else {
                     updateProductList(myProducts, isMyTab = true)
                 }
@@ -350,6 +357,7 @@ class StoreFragment : Fragment() {
                     if (selectedCategory != null) {
                         Log.d("StoreFragment", "🔄 Fetching data for category: ${selectedCategory.name}") // ✅ 로그 추가
                         viewModel.fetchShopData(selectedCategory.name)// ✅ API 다시 호출
+                        storeAdapter.clearSelection()
                         showPurchaseIconOnly()
                     } else {
                         updateProductList(myProducts, isMyTab = true)
@@ -376,6 +384,8 @@ class StoreFragment : Fragment() {
                     if (selectedCategory != null) {
                         Log.d("StoreFragment", "🔄 Re-fetching data for category: ${selectedCategory.name}")
                         viewModel.fetchShopData(selectedCategory.name) // ✅ 같은 탭 다시 눌러도 데이터 로드
+                        storeAdapter.clearSelection()
+
                     }
                 }
             }
@@ -420,7 +430,9 @@ class StoreFragment : Fragment() {
         val dialog = androidx.appcompat.app.AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .create()
-
+        dialog.window?.apply {
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT)) // ✅ 배경을 투명하게 설정
+        }
         val imgProduct = dialogView.findViewById<ImageView>(R.id.img_product)
         val tvProductName = dialogView.findViewById<TextView>(R.id.tv_product_name)
         val tvProductPrice = dialogView.findViewById<TextView>(R.id.tv_product_price)
@@ -431,6 +443,7 @@ class StoreFragment : Fragment() {
             .load(product.imageUrl) // ✅ 서버에서 받은 이미지 URL 사용
             .into(imgProduct) // ✅ 이미지뷰에 적용
         tvProductName.text = product.name
+        tvProductPrice.text = product.price.toString() // ✅ 스웨거에서 받은 가격 적용
 
         btnConfirm.setOnClickListener {
             if (!myProducts.contains(product)) { // 중복 방지
@@ -473,6 +486,7 @@ class StoreFragment : Fragment() {
         productList.clear()
         productList.addAll(if (isMyTab) myProducts else newList)
         storeAdapter.notifyDataSetChanged()
+
     }
 
 

@@ -39,6 +39,7 @@ class StoreAdapter(
         val product = products[position]
         holder.bind(product, position == selectedPosition)
 
+
         // 아이템 클릭 이벤트 처리
         holder.itemView.setOnClickListener {
             val previousPosition = selectedPosition
@@ -54,8 +55,12 @@ class StoreAdapter(
     }
 
     override fun getItemCount(): Int = products.size
-
-    inner class StoreViewHolder(private val binding: ItemStoreProductBinding) :
+    fun clearSelection() {
+        val previousPosition = selectedPosition
+        selectedPosition = RecyclerView.NO_POSITION
+        notifyItemChanged(previousPosition) // 선택 해제된 아이템만 업데이트
+    }
+    class StoreViewHolder(private val binding: ItemStoreProductBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(product: Product, isSelected: Boolean) {
@@ -65,9 +70,13 @@ class StoreAdapter(
                 .into(binding.imgStoreProduct) // ✅ 이미지 로드
 
             binding.tvStoreProductName.text = product.name
+            binding.tvProductPrice.text = product.price.toString()
 
-            binding.imgStoreCollect.visibility = if (isSelected) View.VISIBLE else View.GONE
-
+            if (!isSelected) {
+                binding.imgStoreCollect.visibility = View.GONE
+            } else {
+                binding.imgStoreCollect.visibility = View.VISIBLE
+            }
         }
     }
 }

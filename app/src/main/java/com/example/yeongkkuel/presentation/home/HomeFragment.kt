@@ -118,7 +118,7 @@ class HomeFragment : Fragment() {
         homeViewModel.homeResponse.observe(viewLifecycleOwner) { response ->
             if (response != null && response.isSuccess) {
                 Log.d("HomeFragment", "✅ 홈 데이터 수신 완료: ${response.result}")
-                binding.tvCoin.text = "보유 리워드: ${response.result.myReward}"
+                binding.tvCoin.text = response.result.myReward.toString() // ✅ 숫자만 표시
                 updateMySkins(response.result.mySkin)
             } else {
                 Log.e("HomeFragment", "🚨 홈 데이터 수신 실패 또는 응답 없음!")
