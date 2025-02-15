@@ -62,11 +62,9 @@ class ChatRoomSearchAdapter(
 
                 tvChatRoomTagDays.text = chatRoomDetailDto.chatRoomDDay
 
-                val formattedExpense = NumberFormat.getNumberInstance(Locale.getDefault())
-                    .format(chatRoomDetailDto.chatRoomSpendingAmount) + "원"
-                tvChatRoomGoalExpense.text = formattedExpense
+                tvChatRoomGoalExpense.text = chatRoomDetailDto.chatRoomSpendingAmount
 
-                tvChatRoomAmountPeople.text = "${chatRoomDetailDto.chatRoomParticipationCount}명"
+                tvChatRoomAmountPeople.text = chatRoomDetailDto.chatRoomMaxUserCount
 
                 tvLock.visibility = if (chatRoomDetailDto.isPassword) View.VISIBLE else View.GONE
 
@@ -78,7 +76,7 @@ class ChatRoomSearchAdapter(
     }
 
     fun updateList(newList: MutableList<ChatRoomDetailDto>) {
-        Timber.d("Updating items. Adapter: $this, Items: ${System.identityHashCode(newList)}")
+        Timber.d("Updating items. Adapter: $this, Items: $newList")
         chatRoomDetail.clear()
         chatRoomDetail.addAll(newList)
         notifyDataSetChanged()

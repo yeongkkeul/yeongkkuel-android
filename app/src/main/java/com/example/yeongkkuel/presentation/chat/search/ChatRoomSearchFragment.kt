@@ -149,10 +149,10 @@ class ChatRoomSearchFragment : Fragment(), ChatRoomSearchClickListener {
         }
     }
 
-    override fun onItemClicked(chatRoom: ChatRoomDetailDto) {
+    override fun onItemClicked(chatRoomSearch: ChatRoomDetailDto) {
         // 아이템 클릭 시 실행할 로직
-        showToast("Clicked: ${chatRoom.chatRoomTitle}")
-        chatGroupViewModel.setSelectedChatRoomId(chatRoom.chatRoomId)
+        showToast("Clicked: ${chatRoomSearch.chatRoomTitle}")
+        chatGroupViewModel.setSelectedChatRoomId(chatRoomSearch.chatRoomId)
         navController.navigate(R.id.action_navigation_chat_room_search_to_register)
     }
 

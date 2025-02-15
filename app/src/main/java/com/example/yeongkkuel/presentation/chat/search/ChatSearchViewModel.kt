@@ -10,6 +10,7 @@ import com.example.yeongkkuel.network.response.chat.ChatRoomDetailDto
 import com.example.yeongkkuel.presentation.chat.data.Age
 import com.example.yeongkkuel.presentation.chat.data.Job
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class ChatSearchViewModel : ViewModel() {
     val selectedAgeOption: MutableLiveData<Age?> = MutableLiveData(null)
@@ -31,9 +32,11 @@ class ChatSearchViewModel : ViewModel() {
                 val page = 0
 
                 val response = RetrofitClient.chatService.getChatroomExplore(age, minAmount, maxAmount, job, page)
+                Timber.d("response: $response")
                 _chatRoomList.postValue(response.publicChatRoomDetailDtos.toMutableList())
             } catch (e: Exception) {
                 // 네트워크 에러 등 예외 처리
+                Timber.d("response: $e")
             }
         }
     }
