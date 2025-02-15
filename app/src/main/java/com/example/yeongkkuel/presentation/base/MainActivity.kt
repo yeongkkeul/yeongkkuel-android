@@ -106,6 +106,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         }
     }
 
+
     private fun initView() = with(binding) {
         fun initBottomSheet() {
             val bottomSheet = binding.clItemBotSheet
@@ -321,7 +322,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         lifecycleScope.launch {
             uiState.flowWithLifecycle(lifecycle)
                 .collectLatest { uiState ->
-                    onBind(uiState) // ✅ UI 데이터 바인딩
+                    onBind(uiState) // UI 데이터 바인딩
                 }
         }
     }
