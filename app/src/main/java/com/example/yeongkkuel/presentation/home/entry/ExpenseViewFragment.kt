@@ -109,9 +109,7 @@ class ExpenseViewFragment : Fragment() {
         }
     }
 
-    /**
-     * ✅ 지출 내역 삭제 처리
-     */
+    // 지출 내역 삭제
     private fun deleteExpense() {
         val selectedExpense = viewModel.spendingHistoryList.value.lastOrNull() ?: return
 
