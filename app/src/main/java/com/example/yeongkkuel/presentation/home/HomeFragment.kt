@@ -37,6 +37,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import com.bumptech.glide.Glide
+import com.example.yeongkkuel.presentation.base.MainActivity
+import com.example.yeongkkuel.presentation.util.dpToPx
 
 
 class HomeFragment : Fragment() {
@@ -85,9 +87,10 @@ class HomeFragment : Fragment() {
         val lastHiddenDate = sharedPreferences.getString(KEY_LAST_HIDDEN_DATE, "")
         val todayDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
 
-        if (lastHiddenDate == todayDate) {
-            binding.imgWarningStart.visibility = View.GONE
-        }
+        // 홈 탭에 진입할 때 바텀시트 상태(피크 높이)를 재설정
+        val displayHeight = resources.displayMetrics.heightPixels
+        val desiredPeekHeight = displayHeight - 430.dpToPx(requireContext())
+        (activity as? MainActivity)?.setPeekHeight(desiredPeekHeight)
 
         // StoreFragment에서 선택한 상품을 수신하여 홈 화면 업데이트
         parentFragmentManager.setFragmentResultListener("selectedProductKey", this) { _, bundle ->
@@ -97,11 +100,11 @@ class HomeFragment : Fragment() {
                 applySelectedProductToHome(it)
             } ?: Log.e("HomeFragment", "❌ StoreFragment에서 받은 상품이 null입니다!")
         }
-        setupSwipeToDismiss(binding.imgWarningStart)
+
+        setupSwipeToDismiss(binding.ivError)
         renderMyProductsForHome()
 
-
-        // StateFlow를 collect 할 때 viewLifecycleOwner.lifecycleScope.launch 사용
+        // StateFlow collect
         viewLifecycleOwner.lifecycleScope.launch {
             botSheetViewModel.uiState.collectLatest { uiState ->
                 updateWarningVisibility(uiState)
@@ -139,16 +142,15 @@ class HomeFragment : Fragment() {
                 Log.e("HomeFragment", "🚨 홈 데이터 수신 실패 또는 응답 없음!")
             }
         }
-
-        setupSwipeToDismiss(binding.imgWarningStart)
+        setupSwipeToDismiss(binding.ivError)
 
         Log.d("HomeFragment", "🚀 fetchHomeData() 호출됨!") // ✅ 로그 추가
 
-        // ✅ 중복 실행 방지: 최초 실행 여부 체크
+        // 중복 실행 방지: 최초 실행 여부 체크
         if (savedInstanceState == null) {
             homeViewModel.fetchHomeData()
         }
-        // ✅ Null 체크 추가
+        // Null 체크 추가
         parentFragmentManager.setFragmentResultListener("selectedProductKey", this) { _, bundle ->
             if (bundle.containsKey("selectedProduct")) {
                 bundle.getParcelable<Product>("selectedProduct")?.let {
@@ -159,7 +161,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    // ✅ 변환된 Category 리스트를 받도록 변경
+    // 변환된 Category 리스트를 받도록 변경
     private fun updateCategoryExpenses(categories: List<Category>, expensesMap: Map<Int, List<Expense>>) {
         categories.forEach { category ->
             val expenses = expensesMap[category.id] ?: emptyList() // ✅ 카테고리에 해당하는 지출 내역 가져오기
@@ -201,43 +203,21 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateWarningVisibility(uiState: BotSheetUiState) {
-        val sharedPreferences = requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val lastHiddenDate = sharedPreferences.getString(KEY_LAST_HIDDEN_DATE, null)
-        val todayDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-
-        if (lastHiddenDate == null) {
-            sharedPreferences.edit().putString(KEY_LAST_HIDDEN_DATE, todayDate).apply()
-        }
-
-        val hasSpendingData = uiState.spendingList.isNotEmpty()
-        // `_uiState.value.spendingList`를 바로 사용해서 카테고리 개수 확인
-        val categoryList = uiState.spendingList.map { spending ->
-            Category(
-                id = spending.categoryId,
-                name = spending.kind.name,
-                color = spending.color
-            )
-        }
-        val hasCategories = categoryList.isNotEmpty()
-
-        Log.d("HomeFragment", "📌 현재 카테고리 개수: ${categoryList.size}, 지출 내역 개수: ${uiState.spendingList.size}")
-
-        binding.imgWarningStart.post {
-            if (lastHiddenDate == todayDate) {
-                // 🔹 오늘 한 번 숨긴 경우 -> 계속 숨김 유지
-                binding.imgWarningStart.visibility = View.GONE
-                Log.d("HomeFragment", "🚨 오늘 이미 숨김 처리됨 -> imgWarningStart 숨기기")
-            } else {
-                // 🔹 카테고리가 없거나 지출 내역이 없을 때만 보이도록 설정
-                binding.imgWarningStart.visibility = if (hasSpendingData || hasCategories) View.GONE else View.VISIBLE
-                Log.d(
-                    "HomeFragment",
-                    if (hasSpendingData || hasCategories) "✅ 지출 내역 또는 카테고리 있음 -> imgWarningStart 숨기기"
-                    else "❗ 지출 내역 및 카테고리 없음 -> imgWarningStart 보이기"
-                )
-            }
+        // 지출 내역 추가 여부를 판단: 하나라도 있으면 숨기고, 없으면 보이도록 함
+        val hasExpense = uiState.spendingList.any { it.history.isNotEmpty() }
+        if (hasExpense) {
+            binding.ivError.visibility = View.GONE
+        } else {
+            // 지출 내역이 없으면 플로팅 알람 보이기 (애니메이션 적용)
+            binding.ivError.visibility = View.VISIBLE
+            binding.ivError.alpha = 0f
+            binding.ivError.animate()
+                .alpha(1f)
+                .setDuration(300)
+                .start()
         }
     }
+
 
     private fun setupSwipeToDismiss(view: View) {
         var startY = 0f
@@ -277,6 +257,7 @@ class HomeFragment : Fragment() {
             }
         }
     }
+
     private fun applySelectedProductToHome(product: Product) {
         Log.d("HomeFragment", "🎨 applySelectedProductToHome 호출 - 상품: ${product.name}, area: ${product.area}, imageUrl: ${product.imageUrl}")
 
@@ -331,7 +312,7 @@ class HomeFragment : Fragment() {
         }
         dialog.window?.apply {
             setBackgroundDrawableResource(R.drawable.ic_store_topurchase) // VectorDrawable 설정
-            decorView.clipToOutline = true // 💡 둥근 모서리 적용
+            decorView.clipToOutline = true // 둥근 모서리 적용
         }
         dialog.show()
     }
@@ -385,20 +366,6 @@ class HomeFragment : Fragment() {
         }
     }
 
-
-    //    private fun mapToHomeResource(storeResourceId: Int): Int {
-//        return when (storeResourceId) {
-//            R.drawable.img_product_swing1 -> R.drawable.img_home_swing1
-//            R.drawable.img_product_swing2 -> R.drawable.img_home_swing2
-//            R.drawable.img_product_toy1 -> R.drawable.img_home_toy1
-//            R.drawable.img_product_toy2 -> R.drawable.img_home_toy2
-//            R.drawable.img_product_bowl1 -> R.drawable.img_home_bowl1
-//            R.drawable.img_product_bowl2 -> R.drawable.img_home_bowl2
-//            R.drawable.img_product_nest1 -> R.drawable.img_home_nest1
-//            R.drawable.img_product_nest2 -> R.drawable.img_home_nest2
-//            else -> storeResourceId
-//        }
-//    }
     private fun saveHiddenDate() {
         val sharedPreferences = requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val todayDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())

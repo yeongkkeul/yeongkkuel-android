@@ -97,13 +97,10 @@ class CategoryDetailFragment : Fragment() {
             .setView(dialogView)
             .create()
 
-        // 💡 다이얼로그 스타일 설정
-        dialog.window?.apply {
-            setBackgroundDrawableResource(R.drawable.bg_category_limit_dialog)
-            decorView.clipToOutline = true
-        }
+        // 다이얼로그 스타일 설정
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
-        // 커스텀 뷰에서 버튼 참조 및 이벤트 처리
+        // 다이얼로그 내 버튼 설정
         val cancelBtn = dialogView.findViewById<TextView>(R.id.tv_cancel_btn)
         val deleteBtn = dialogView.findViewById<TextView>(R.id.tv_delete_btn)
 

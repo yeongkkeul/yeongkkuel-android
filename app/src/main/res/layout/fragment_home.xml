@@ -195,15 +195,19 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
     <ImageView
-        android:id="@+id/img_warning_start"
-        android:layout_width="296dp"
-        android:layout_height="52dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/iv_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="271dp"
-        android:src="@drawable/ic_error_target"
-        android:visibility="gone"/>
+        app:layout_constraintBottom_toBottomOf="@+id/img_bird_background"
+        app:layout_constraintDimensionRatio="1"
+        android:src="@drawable/ic_warning_start"
+        android:layout_marginBottom="45dp"
+        android:visibility="gone"
+        tools:visibility="visible"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
