@@ -29,7 +29,7 @@ class BotSheetCategoryListAdapter(
 
         // 🔹 클릭 리스너를 Adapter에 직접 추가하지 않고, Fragment로 전달
         private val historyListAdapter = BotSheetHistoryListAdapter { selectedHistory ->
-                Color.RED // 기본값 검정색 적용
+                Color.RED
 
             botSheetListener.navigateToExpenseView(
                 selectedHistory.name,
@@ -69,13 +69,13 @@ class BotSheetCategoryListAdapter(
 
             if (isEmpty) {
                 binding.tvNoSpend.visibility = View.GONE
-                botSheetListener.onNoExpenseChanged(false) // ✅ 일반 지출이 없으므로 icMore 보이도록
+                botSheetListener.onNoExpenseChanged(false) // 일반 지출이 없으므로 icMore 보이도록
             } else if (hasNoExpenseEntry) {
                 binding.tvNoSpend.visibility = View.VISIBLE
-                botSheetListener.onNoExpenseChanged(true) // ✅ 무지출 항목만 있으면 icMore 숨김
+                botSheetListener.onNoExpenseChanged(true) // 무지출 항목만 있으면 icMore 숨김
             } else {
                 binding.tvNoSpend.visibility = View.GONE
-                botSheetListener.onNoExpenseChanged(false) // ✅ 일반 지출이 있으면 icMore 보이도록
+                botSheetListener.onNoExpenseChanged(false) // 일반 지출이 있으면 icMore 보이도록
             }
         }
     }
@@ -102,7 +102,7 @@ class SpendingCategoryListDiffUtil : DiffUtil.ItemCallback<BotSheetUiState.Spend
         oldItem: BotSheetUiState.Spending,
         newItem: BotSheetUiState.Spending
     ): Boolean {
-        return oldItem == newItem
+        return oldItem.categoryId == newItem.categoryId
     }
 
     override fun areContentsTheSame(

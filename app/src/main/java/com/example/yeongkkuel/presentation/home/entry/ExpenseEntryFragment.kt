@@ -47,7 +47,7 @@ class ExpenseEntryFragment : Fragment() {
     private var expensePhotoUrl: String = ""
 
     private val botSheetViewModel: BotSheetViewModel by activityViewModels()
-    private lateinit var expenseViewModel: ExpenseViewModel // ✅ ViewModel 초기화 방식 변경
+    private lateinit var expenseViewModel: ExpenseViewModel
 
 
     override fun onCreateView(
