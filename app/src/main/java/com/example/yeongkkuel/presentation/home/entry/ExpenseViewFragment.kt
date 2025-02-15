@@ -2,6 +2,7 @@ package com.example.yeongkkuel.presentation.home.entry
 
 import android.graphics.Rect
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.TouchDelegate
 import android.view.View
@@ -20,6 +21,7 @@ import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -46,6 +48,7 @@ class ExpenseViewFragment : Fragment() {
         binding.btnBack.setOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
+        expandClickArea(binding.icMore, 20)
 
         // icMore 클릭 시 cl_more의 visibility 토글 (수정/삭제 메뉴 표시)
         binding.icMore.setOnClickListener {
@@ -80,7 +83,8 @@ class ExpenseViewFragment : Fragment() {
 
                         binding.tvCategoryInput.text = category?.kind?.name ?: "기타"
                         binding.etDetailInput.setText(selectedExpense.name)
-                        binding.etAmountInput.setText(selectedExpense.price.toString())
+
+                        binding.etAmountInput.setText(formatPrice(selectedExpense.price))
 
                         // 최신 데이터 반영 후 카테고리 색상 적용
                         val updatedColor = getCategoryTextColor(category?.kind?.name ?: "기타")
@@ -112,6 +116,7 @@ class ExpenseViewFragment : Fragment() {
     // 지출 내역 삭제
     private fun deleteExpense() {
         val selectedExpense = viewModel.spendingHistoryList.value.lastOrNull() ?: return
+        Log.d("ExpenseViewFragment", "🟠 삭제 요청: expenseId=${selectedExpense.id}, name=${selectedExpense.name}")
 
         // 삭제 확인 다이얼로그 띄우기
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_expense_delete, null)
@@ -125,10 +130,12 @@ class ExpenseViewFragment : Fragment() {
         val btnCancel = dialogView.findViewById<TextView>(R.id.tv_cancel_btn)
 
         btnConfirm.setOnClickListener {
+            Log.d("ExpenseViewFragment", "🔹 삭제 요청 버튼 클릭됨")
             viewModel.deleteExpense(selectedExpense.id) // ✅ 서버에 삭제 요청
 
             viewModel.deleteResult.observe(viewLifecycleOwner) { isDeleted ->
                 if (isDeleted) {
+                    Log.d("ExpenseViewFragment", "✅ 삭제 성공: expenseId=${selectedExpense.id}")
                     Toast.makeText(requireContext(), "지출 내역이 삭제되었습니다.", Toast.LENGTH_SHORT).show()
                     findNavController().popBackStack(R.id.navigation_home, false)
                 } else {
@@ -177,6 +184,11 @@ class ExpenseViewFragment : Fragment() {
             parent.touchDelegate = TouchDelegate(rect, view)
         }
     }
+
+    private fun formatPrice(price: Int): String {
+        return NumberFormat.getInstance(Locale.KOREAN).format(price)
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

@@ -7,11 +7,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.network.RetrofitClient
-import com.example.yeongkkuel.network.RetrofitClient.expenseApiService
 import com.example.yeongkkuel.network.response.Response
 import com.example.yeongkkuel.network.response.expenditure.DayExpenditureResponse
 import com.example.yeongkkuel.presentation.home.category.data.Category
 import com.example.yeongkkuel.presentation.home.entry.data.ExpenseListResponse
+import com.example.yeongkkuel.presentation.home.entry.data.ExpenseUpdateRequest
+import com.example.yeongkkuel.presentation.home.entry.data.ExpenseUpdateResponse
 import com.example.yeongkkuel.presentation.util.Colors
 import com.example.yeongkkuel.presentation.util.SpendingCategory
 import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.reflect.TypeToken
@@ -41,6 +42,9 @@ class BotSheetViewModel : ViewModel() {
     val categoryList: LiveData<List<Category>> get() = _categoryList // ✅ LiveData로 접근
     private val _deleteResult = MutableLiveData<Boolean>()
     val deleteResult: LiveData<Boolean> get() = _deleteResult
+
+    private val _updateResult = MutableLiveData<Boolean>()
+    val updateResult: LiveData<Boolean> get() = _updateResult
 
     fun deleteExpense(expenseId: Int) {
         viewModelScope.launch {
@@ -413,17 +417,34 @@ class BotSheetViewModel : ViewModel() {
         }
     }
 
+    suspend fun updateExpense(expenseId: Int, request: ExpenseUpdateRequest): ExpenseUpdateResponse? {
+        return try {
+            Log.d("BotSheetViewModel", "🟡 API 지출 수정 요청 시작: expenseId=$expenseId, request=$request")
 
+            val response = expenseApiService.updateExpense(expenseId, request)
 
-//    fun updateExpense(updatedExpense: BotSheetUiState.Spending.History) {
-//        _spendingHistoryList.value = _spendingHistoryList.value.map { expense ->
-//            if (expense.date == updatedExpense.date && expense.name == updatedExpense.name) {
-//                updatedExpense // 기존 항목을 수정된 값으로 변경
-//            } else {
-//                expense
-//            }
-//        }
-//    }
+            Log.d("BotSheetViewModel", "📌 서버 응답 코드: ${response.code()}")
+            Log.d("BotSheetViewModel", "📌 서버 응답 헤더: ${response.headers()}")
+
+            if (response.isSuccessful) {
+                val updateResponse = response.body()
+
+                updateResponse?.let {
+                    Log.d("BotSheetViewModel", "✅ API 지출 수정 성공: ${it.message}")
+                    return it
+                }
+            } else {
+                // ✅ `ResponseBody`를 안전하게 읽기
+                val errorBody = response.errorBody()?.charStream()?.buffered()?.use { it.readText() } ?: "오류 메시지 없음"
+                Log.e("BotSheetViewModel", "❌ 서버 응답 실패 - 상태 코드: ${response.code()}, 오류 메시지: $errorBody")
+            }
+            null
+        } catch (e: Exception) {
+            Log.e("BotSheetViewModel", "🚨 API 호출 중 오류 발생", e)
+            null
+        }
+    }
+
 
     fun getCategoryList(): List<Category> {
         val categoryList = _uiState.value.spendingList.map { spending ->

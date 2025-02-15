@@ -1,6 +1,9 @@
 package com.example.yeongkkuel.presentation.home.entry
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +22,8 @@ import kotlinx.coroutines.launch
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentExpenseEditBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
+import com.example.yeongkkuel.presentation.home.entry.data.ExpenseUpdateRequest
+import java.text.NumberFormat
 import java.util.Date
 
 class ExpenseEditFragment : Fragment() {
@@ -63,6 +68,8 @@ class ExpenseEditFragment : Fragment() {
 
                     binding.tvCategoryInput.text = category?.kind?.name ?: "기타"
                     binding.etDetailInput.setText(selectedExpense.name)
+
+                    setupAmountInput()
                     binding.etAmountInput.setText(selectedExpense.price.toString())
 
                     // ✅ 카테고리 색상 적용
@@ -119,37 +126,105 @@ class ExpenseEditFragment : Fragment() {
 
     private fun saveExpense() {
         val newDetail = binding.etDetailInput.text.toString().trim()
-        val newAmount = binding.etAmountInput.text.toString().trim().replace(",", "").toIntOrNull() ?: 0
+        val newAmount =
+            binding.etAmountInput.text.toString().trim().replace(",", "").toIntOrNull() ?: 0
 
         if (newDetail.isEmpty() || newAmount <= 0) {
             Toast.makeText(requireContext(), "모든 항목을 입력하세요.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val selectedExpense = viewModel.spendingHistoryList.value.lastOrNull()
+        val selectedExpense = viewModel.spendingHistoryList.value.lastOrNull() ?: return
+        val category = getCategoryForExpense(selectedExpense.id)
 
-        if (selectedExpense != null) {
-            // ✅ 기존 카테고리 ID 유지
-            val existingCategoryId = selectedCategoryId ?: return // 기존 카테고리 ID를 유지
+        // ✅ `imgExist`가 true이면 이미지가 존재하므로, 서버에서 가져오도록 ""로 설정
+        val expenseImage =
+            if (category?.history?.find { it.id == selectedExpense.id }?.imgExist == true) {
+                "" // 서버에서 기존 이미지를 유지하도록 설정
+            } else {
+                null // 이미지가 없을 경우 null로 설정
+            }
 
-            val updatedExpense = selectedExpense.copy(
-                name = newDetail,
-                price = newAmount
-            )
+        val updatedExpense = ExpenseUpdateRequest(
+            day = formatDateToApiFormat(viewModel.uiState.value.date), // ✅ 날짜 변환 추가
+            categoryId = selectedCategoryId ?: return,
+            content = newDetail,
+            amount = newAmount,
+            expenseImg = expenseImage // ✅ `imgExist` 값을 기반으로 설정
+        )
 
-            // ✅ suspend 함수는 Coroutine Scope 내에서 호출해야 함!
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.updateBotSheetHistory(updatedExpense)
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                Log.d("ExpenseEditFragment", "🟡 지출 수정 요청 시작: $updatedExpense")
 
-                // ✅ 변경된 내역을 반영하기 위해 UIState를 갱신
-                _binding?.let {
-                    binding.etDetailInput.setText(newDetail)
-                    binding.etAmountInput.setText(newAmount.toString())
+                val updateResponse = viewModel.updateExpense(selectedExpense.id, updatedExpense)
+
+                if (updateResponse != null) {
+                    if (updateResponse.isSuccess) {
+                        Log.d("ExpenseEditFragment", "✅ 지출 수정 성공: ${updateResponse.message}")
+
+                        Toast.makeText(requireContext(), "지출 내역이 수정되었습니다.", Toast.LENGTH_SHORT)
+                            .show()
+                        findNavController().navigate(R.id.action_ExpenseEditFragment_to_HomeFragment)
+                    } else {
+                        Log.e(
+                            "ExpenseEditFragment",
+                            "❌ 지출 수정 실패, 서버 응답 메시지: ${updateResponse.message}"
+                        )
+                        Toast.makeText(
+                            requireContext(),
+                            "수정 실패: ${updateResponse.message ?: "알 수 없는 오류"}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                } else {
+                    Log.e("ExpenseEditFragment", "❌ 서버 응답이 `null`입니다. 상태 코드와 오류 메시지를 확인하세요.")
+                    Toast.makeText(requireContext(), "수정 실패: 서버 응답 없음", Toast.LENGTH_SHORT).show()
                 }
-                Toast.makeText(requireContext(), "지출 내역이 수정되었습니다.", Toast.LENGTH_SHORT).show()
-                findNavController().navigate(R.id.action_ExpenseEditFragment_to_HomeFragment)
+            } catch (e: Exception) {
+                Log.e("ExpenseEditFragment", "🚨 API 호출 중 오류 발생", e)
+                Toast.makeText(requireContext(), "네트워크 오류 발생. 다시 시도해주세요.", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
+
+    }
+
+    private fun formatDateToApiFormat(date: Date?): String {
+        return if (date != null) {
+            val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.KOREAN) // ✅ 서버 요구 형식
+            sdf.format(date)
+        } else {
+            ""
+        }
+    }
+    private fun setupAmountInput() {
+        binding.etAmountInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                binding.etAmountInput.removeTextChangedListener(this)
+
+                val rawInput = s?.toString()?.replace(",", "") ?: ""
+                val input = rawInput.toLongOrNull() ?: 0
+
+                // 🔹 최대 8자리까지만 입력 가능하도록 제한
+                val trimmedInput = if (rawInput.length > 8) rawInput.substring(0, 8) else rawInput
+                val limitedValue = trimmedInput.toLongOrNull()?.coerceAtMost(99_999_999) ?: 0
+
+                // 🔹 쉼표(,)를 자동으로 추가하여 1,000,000 형식으로 표시
+                val formatted = NumberFormat.getInstance(Locale.KOREAN).format(limitedValue)
+
+                if (formatted != s.toString()) {
+                    binding.etAmountInput.setText(formatted)
+                    binding.etAmountInput.setSelection(formatted.length)
+                }
+
+                binding.etAmountInput.addTextChangedListener(this)
+            }
+        })
     }
 
     override fun onDestroyView() {
