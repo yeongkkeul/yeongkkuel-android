@@ -1,5 +1,7 @@
 package com.example.yeongkkuel.presentation.home.entry.data
 
+import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
+
 data class ExpenseResponse(
     val isSuccess: Boolean,
     val code: String,
@@ -43,3 +45,30 @@ data class ExpenseUpdateResult(
     val imageUrl: String?,  // 이미지 URL
     val isSend: Boolean     // 자동 전송 여부
 )
+data class ExpenseDeleteResponse(
+    val isSuccess: Boolean,
+    val code: String,
+    val message: String,
+    val result: Any? = null // 삭제 요청 시 반환 데이터가 없는 경우 고려
+)
+
+fun ExpenseResult.toBotSheetHistory(): BotSheetUiState.Spending.History {
+    return BotSheetUiState.Spending.History(
+        id = this.id,
+        name = this.content,
+        price = this.amount,
+        imgExist = !this.imageUrl.isNullOrEmpty()
+    )
+}
+
+fun ExpenseUpdateResult.toBotSheetHistory(): BotSheetUiState.Spending.History {
+    return BotSheetUiState.Spending.History(
+        id = this.id,
+        name = this.content, // ✅ 지출 내용
+        price = this.amount, // ✅ 지출 금액
+        imgExist = !this.imageUrl.isNullOrEmpty() // ✅ 사진이 있으면 true
+    )
+}
+
+
+

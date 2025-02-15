@@ -25,21 +25,56 @@ import java.util.Calendar
 
 
 class BotSheetViewModel : ViewModel() {
-    private val _uiState = MutableStateFlow(BotSheetUiState.init())
+    private val _uiState = MutableStateFlow<BotSheetUiState>(BotSheetUiState.init())
     val uiState = _uiState.asStateFlow()
 
     private val statService = RetrofitClient.statService
+    private val expenseApiService = RetrofitClient.expenseApiService
 
     // ✅ LiveData → StateFlow로 일관된 상태 관리
     private val _spendingHistoryList =
         MutableStateFlow<List<BotSheetUiState.Spending.History>>(emptyList())
     val spendingHistoryList = _spendingHistoryList.asStateFlow()
 
-    private val _categoryList = MutableLiveData<List<Category>>(emptyList())
-    val categoryList: LiveData<List<Category>> get() = _categoryList
+    private val _categoryList = MutableLiveData<List<Category>>(emptyList()) // ✅ MutableLiveData 선언 추가
+    val categoryList: LiveData<List<Category>> get() = _categoryList // ✅ LiveData로 접근
+    private val _deleteResult = MutableLiveData<Boolean>()
+    val deleteResult: LiveData<Boolean> get() = _deleteResult
 
+    fun deleteExpense(expenseId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = expenseApiService.deleteExpense(expenseId)
 
-    // 지출 내역 추가 기능
+                if (response.isSuccessful && response.body()?.isSuccess == true) {
+                    _deleteResult.postValue(true) // ✅ 삭제 성공
+                } else {
+                    Log.e("BotSheetViewModel", "삭제 실패: ${response.body()?.message}")
+                    _deleteResult.postValue(false) // ✅ 삭제 실패
+                }
+            } catch (e: Exception) {
+                Log.e("BotSheetViewModel", "API 호출 중 오류 발생", e)
+                _deleteResult.postValue(false)
+            }
+        }
+    }
+
+    private fun removeExpenseFromUi(expenseId: Int) {
+        _uiState.update { prevState ->
+            val updatedSpendingList = prevState.spendingList.map { spending ->
+                val updatedHistory = spending.history.filterNot { it.id == expenseId }
+                spending.copy(history = updatedHistory)
+            }.filterNot { it.history.isEmpty() } // 🔥 내역이 비어 있으면 해당 카테리 삭제
+
+            prevState.copy(spendingList = updatedSpendingList)
+        }
+
+        // ✅ 최신 지출 내역 반영
+        updateSpendingHistoryList()
+        Log.d("BotSheetViewModel", "📌 삭제됨: expenseId=$expenseId, 남은 지출 개수=${_spendingHistoryList.value.size}")
+    }
+
+    // 🔹 지출 내역 추가 기능
     fun addExpenseToCategory(category: SpendingCategory, history: BotSheetUiState.Spending.History) {
         _uiState.update { prev ->
             val updatedList = prev.spendingList.toMutableList()
@@ -106,6 +141,15 @@ class BotSheetViewModel : ViewModel() {
         }
     }
 
+    private fun Category.toBotSheetSpending(): BotSheetUiState.Spending {
+        return BotSheetUiState.Spending(
+            categoryId = this.id, // ✅ 기존 categoryId → id 로 변경
+            kind = SpendingCategory.fromName(this.name), // ✅ 기존 categoryName → name 변경
+            color = this.color, // ✅ 기존 Colors.RED1 → 서버에서 받은 색상 적용
+            plusIconResId = R.drawable.ic_plus_default,
+            history = emptyList() // ✅ 초기 history는 비워둠 (이후 업데이트 가능)
+        )
+    }
 
     fun updateBotSheetCategories(categories: List<Category>) {
         Log.d("BotSheetViewModel", "🚀 updateBotSheetCategories 실행됨! categories: $categories")
@@ -362,6 +406,18 @@ class BotSheetViewModel : ViewModel() {
             Log.e("BotSheetViewModel", "🚨 getSpendingList() 오류: ${e.message}")
         }
     }
+
+
+
+//    fun updateExpense(updatedExpense: BotSheetUiState.Spending.History) {
+//        _spendingHistoryList.value = _spendingHistoryList.value.map { expense ->
+//            if (expense.date == updatedExpense.date && expense.name == updatedExpense.name) {
+//                updatedExpense // 기존 항목을 수정된 값으로 변경
+//            } else {
+//                expense
+//            }
+//        }
+//    }
 
     fun getCategoryList(): List<Category> {
         val categoryList = _uiState.value.spendingList.map { spending ->

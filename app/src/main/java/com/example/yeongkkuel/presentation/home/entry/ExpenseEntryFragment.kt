@@ -215,7 +215,7 @@ class ExpenseEntryFragment : Fragment() {
         val tvEntryComplete = view.findViewById<View>(R.id.tv_entry_complete)
         tvEntryComplete.setOnClickListener {
             if (validateAndSaveEntry(view)) {
-                saveExpense(view) // ✅ API 요청 및 저장
+                saveExpense(view) // API 요청 및 저장
             }
         }
     }
@@ -232,24 +232,27 @@ class ExpenseEntryFragment : Fragment() {
         val isNoExpenseChecked = ivCircleExpenseChecked.visibility == View.VISIBLE // ✅ 무지출 체크 여부 확인
         val isSendChatRoomChecked = ivCircleSendChecked.visibility == View.VISIBLE
 
-        // ✅ 유효한 카테고리 ID를 가져옴 (API 요청 오류 방지)
-        val selectedCategoryId = arguments?.getInt("categoryId") ?: -1 // 기본값을 -1로 설정
-        val availableCategories = botSheetViewModel.uiState.value.spendingList.map { it.categoryId }
-        val validCategoryId = if (selectedCategoryId in availableCategories) {
-            selectedCategoryId
-        } else {
-            availableCategories.firstOrNull() ?: -1
+        // 유효한 카테고리 ID를 가져옴 (API 요청 오류 방지)
+        val selectedCategoryName = arguments?.getString("selectedCategory") ?: "기본 카테고리"
+        val matchingCategory = botSheetViewModel.uiState.value.spendingList.find {
+            it.kind.name.equals(selectedCategoryName, ignoreCase = true)
         }
+        if(matchingCategory == null) {
+            Log.e("ExpenseEntryFragment", "선택된 카테고리에 해당하는 항목이 없습니다.")
+            Toast.makeText(requireContext(), "사용 가능한 카테고리가 없습니다.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val validCategoryId = matchingCategory.categoryId
+
 
         if (validCategoryId == -1) {
-            Log.e("ExpenseEntryFragment", "🚨 사용 가능한 카테고리가 없습니다.")
             Toast.makeText(requireContext(), "사용 가능한 카테고리가 없습니다.", Toast.LENGTH_SHORT).show()
             return
         }
 
         val expenseRequest = ExpenseRequest(
-            day = formatDateForServer(tvDateInput.text.toString()), // ✅ 날짜 포맷 변환
-            categoryId = validCategoryId, // ✅ 유효한 카테고리 ID
+            day = formatDateForServer(tvDateInput.text.toString()), // 날짜 포맷 변환
+            categoryId = validCategoryId, // 유효한 카테고리 ID
             content = detail,
             amount = if (isNoExpenseChecked) 0 else amount,
             isExpense = isNoExpenseChecked,
@@ -257,15 +260,14 @@ class ExpenseEntryFragment : Fragment() {
             sendChatRoom = isSendChatRoomChecked
         )
 
-        Log.d("ExpenseRepository", "🚀 지출 내역 요청 데이터: $expenseRequest") // ✅ 요청 데이터 로깅
-
+        Log.d("ExpenseEntryFragment", "지출 내역 요청 데이터: $expenseRequest")
         expenseViewModel.createExpense(expenseRequest) { response ->
             if (response?.isSuccess == true) {
-                Log.d("ExpenseRepository", "✅ 지출 내역 저장 완료: ${response.result}")
+                Log.d("ExpenseEntryFragment", "지출 내역 저장 완료: ${response.result}")
                 Toast.makeText(requireContext(), "지출 내역이 저장되었습니다.", Toast.LENGTH_SHORT).show()
-                navController.navigate(R.id.navigation_home) // ✅ 홈 화면으로 이동
+                navController.navigate(R.id.navigation_home)
             } else {
-                Log.e("ExpenseRepository", "🚨 지출 내역 저장 실패: ${response?.message}")
+                Log.e("ExpenseEntryFragment", "지출 내역 저장 실패: ${response?.message}")
                 Toast.makeText(requireContext(), "지출 내역 저장 실패.", Toast.LENGTH_SHORT).show()
             }
         }
@@ -276,8 +278,8 @@ class ExpenseEntryFragment : Fragment() {
         val matchResult = regex.find(date)
         return matchResult?.let {
             val (year, month, day) = it.destructured
-            "%04d-%02d-%02d".format(year.toInt(), month.toInt(), day.toInt()) // ✅ YYYY-MM-DD로 변환
-        } ?: SimpleDateFormat("yyyy-MM-dd", Locale.KOREAN).format(Date()) // 기본값
+            "%04d-%02d-%02d".format(year.toInt(), month.toInt(), day.toInt())
+        } ?: SimpleDateFormat("yyyy-MM-dd", Locale.KOREAN).format(Date())
     }
 
 
@@ -320,8 +322,9 @@ class ExpenseEntryFragment : Fragment() {
         }
 
         // ViewModel에 저장
-        val selectedCategoryColor: String? = null
         val selectedCategory = arguments?.getString("selectedCategory") ?: "기타"
+        // 선택된 카테고리 값 확인
+        Log.d("ExpenseEntryFragment", "validateAndSaveEntry - selectedCategory: '$selectedCategory'")
         val expenseHistory = BotSheetUiState.Spending.History(
             id = 1,
             name =  detail,
@@ -335,11 +338,11 @@ class ExpenseEntryFragment : Fragment() {
         // SpendingCategory 처리
         return try {
             val categoryEnum = SpendingCategory.fromName(selectedCategory)
+            Log.d("ExpenseEntryFragment", "SpendingCategory.fromName 결과: $categoryEnum")
             botSheetViewModel.addExpenseToCategory(categoryEnum, expenseHistory)
             Toast.makeText(requireContext(), "지출 내역이 저장되었습니다.", Toast.LENGTH_SHORT).show()
             true
         } catch (e: Exception) {
-            hasError = true
             Toast.makeText(requireContext(), "카테고리가 유효하지 않습니다.", Toast.LENGTH_SHORT).show()
             Log.e("ExpenseEntryFragment", "Error saving data: ${e.message}", e)
             false
@@ -396,7 +399,7 @@ class ExpenseEntryFragment : Fragment() {
                 val ivPhotoIcon = view?.findViewById<ImageView>(R.id.iv_photo_icon)
                 imgPhotoFrame?.setImageURI(uri)
                 ivPhotoIcon?.visibility = View.GONE
-                expensePhotoUrl = uri.toString() // 🔹 사진 URL 저장
+                expensePhotoUrl = uri.toString()
             }
         }
     }
