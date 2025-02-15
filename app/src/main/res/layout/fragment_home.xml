@@ -203,7 +203,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="271dp"
-        android:src="@drawable/img_warning_start"
+        android:src="@drawable/ic_error_target"
         android:visibility="gone"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

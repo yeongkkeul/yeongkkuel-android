@@ -11,8 +11,8 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 
 class HomeViewModel(private val repository: HomeRepository) : ViewModel() {
-    private val _homeResponse = MutableLiveData<HomeResponse?>()
-    val homeResponse: LiveData<HomeResponse?> get() = _homeResponse
+    private val _homeResult = MutableLiveData<HomeResult?>() // ✅ HomeResult로 변경
+    val homeResult: LiveData<HomeResult?> get() = _homeResult
 
     fun fetchHomeData() {
         viewModelScope.launch {
@@ -20,21 +20,21 @@ class HomeViewModel(private val repository: HomeRepository) : ViewModel() {
                 val response = repository.getHomeData()
                 if (response != null) {
                     Log.d("HomeViewModel", "✅ 홈 데이터 업데이트 완료! $response")
-                    _homeResponse.postValue(response)
+                    _homeResult.postValue(response) // ✅ result만 저장
                 } else {
                     Log.e("HomeViewModel", "🚨 홈 데이터 null 반환됨, 기본값 설정")
-                    _homeResponse.postValue(
-                        HomeResponse(
-                            isSuccess = false,
-                            code = "ERROR",
-                            message = "홈 데이터를 불러올 수 없습니다.",
-                            result = HomeResult(0, emptyList(), "", emptyList())
+                    _homeResult.postValue(
+                        HomeResult(
+                            myReward = 0,
+                            mySkin = emptyList(),
+                            today = "",
+                            categories = emptyList()
                         )
                     )
                 }
             } catch (e: Exception) {
                 Log.e("HomeViewModel", "❌ 홈 데이터 불러오기 실패: ${e.message}")
-                _homeResponse.postValue(null)
+                _homeResult.postValue(null)
             }
         }
     }

@@ -177,7 +177,7 @@ class BotSheetViewModel : ViewModel() {
                             id = expense.id,
                             name = expense.content,
                             price = expense.amount,
-                            imgExist = expense.imageUrl.isNotEmpty()
+                            imgExist = expense.imageUrl?.isNotEmpty() ?: false // ✅ 안전한 처리
                         )
                     )
                 )

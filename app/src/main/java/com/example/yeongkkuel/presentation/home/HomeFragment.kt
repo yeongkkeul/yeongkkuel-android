@@ -120,15 +120,26 @@ class HomeFragment : Fragment() {
         ivHamberger.setOnClickListener {
             navController.navigate(R.id.categoryManageFragment)
         }
-        homeViewModel.homeResponse.observe(viewLifecycleOwner) { response ->
-            if (response != null && response.isSuccess) {
-                Log.d("HomeFragment", "✅ 홈 데이터 수신 완료: ${response.result}")
-                binding.tvCoin.text = response.result.myReward.toString() // ✅ 숫자만 표시
-                updateMySkins(response.result.mySkin)
+        homeViewModel.homeResult.observe(viewLifecycleOwner) { result ->
+            if (result != null) {
+                Log.d("HomeFragment", "✅ 홈 데이터 수신 완료: $result")
+
+                // ✅ 수정된 데이터 바인딩 방식
+                binding.tvCoin.text = result.myReward.toString() // ✅ 숫자만 표시
+                updateMySkins(result.mySkin) // ✅ 변경된 데이터 클래스 반영
+
+                // ✅ 카테고리 정보 업데이트
+                val categories = result.categories.map { it.toCategory(categoryViewModel) }
+                val expensesMap = result.categories.associate { it.categoryId to it.expenses }
+                updateCategoryExpenses(categories, expensesMap)
+
+                Log.d("HomeFragment", "🚀 updateBotSheetCategories 호출됨!")
+                botSheetViewModel.updateBotSheetCategories(categories)
             } else {
                 Log.e("HomeFragment", "🚨 홈 데이터 수신 실패 또는 응답 없음!")
             }
         }
+
         setupSwipeToDismiss(binding.imgWarningStart)
 
         Log.d("HomeFragment", "🚀 fetchHomeData() 호출됨!") // ✅ 로그 추가
@@ -146,25 +157,6 @@ class HomeFragment : Fragment() {
                 }
             }
         }
-//        homeViewModel.homeResponse.observe(viewLifecycleOwner) { response ->
-//            if (response != null && response.isSuccess) {
-//                Log.d("HomeFragment", "✅ 홈 데이터 정상 수신: $response")
-//
-//                binding.tvCoin.text = "보유 리워드: ${response.result.myReward}"
-//                updateMySkins(response.result.mySkin)
-//
-//                // ✅ 여기서 `toCategory(categoryViewModel)`로 변경!
-//                val categories = response.result.categories.map { it.toCategory(categoryViewModel) }
-//                val expensesMap = response.result.categories.associate { it.categoryId to it.expenses }
-//
-//                updateCategoryExpenses(categories, expensesMap)
-//
-//                Log.d("HomeFragment", "🚀 updateBotSheetCategories 호출됨!")
-//                botSheetViewModel.updateBotSheetCategories(categories)
-//            } else {
-//                Log.e("HomeFragment", "🚨 홈 데이터 불러오기 실패 또는 응답 없음!")
-//            }
-//        }
     }
 
     // ✅ 변환된 Category 리스트를 받도록 변경
