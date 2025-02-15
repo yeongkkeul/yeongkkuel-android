@@ -119,15 +119,23 @@ class ExpenseViewFragment : Fragment() {
             .setView(dialogView)
             .create()
 
-        // 다이얼로그 내 버튼 설정
+        val tvExpenseTitle = dialogView.findViewById<TextView>(R.id.tv_expense_title)
+        tvExpenseTitle.text = binding.etDetailInput.text.toString() // ✅ 수정된 부분
         val btnConfirm = dialogView.findViewById<TextView>(R.id.tv_delete_btn)
         val btnCancel = dialogView.findViewById<TextView>(R.id.tv_cancel_btn)
 
         btnConfirm.setOnClickListener {
-            viewModel.removeExpense(selectedExpense.name)
-            Toast.makeText(requireContext(), "지출 내역이 삭제되었습니다.", Toast.LENGTH_SHORT).show()
+            viewModel.deleteExpense(selectedExpense.id) // ✅ 서버에 삭제 요청
+
+            viewModel.deleteResult.observe(viewLifecycleOwner) { isDeleted ->
+                if (isDeleted) {
+                    Toast.makeText(requireContext(), "지출 내역이 삭제되었습니다.", Toast.LENGTH_SHORT).show()
+                    findNavController().popBackStack(R.id.navigation_home, false)
+                } else {
+                    Toast.makeText(requireContext(), "삭제 실패. 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
+                }
+            }
             dialog.dismiss()
-            findNavController().popBackStack(R.id.navigation_home, false)
         }
 
         btnCancel.setOnClickListener {
@@ -137,6 +145,7 @@ class ExpenseViewFragment : Fragment() {
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.show()
     }
+
 
     private fun formatDate(date: Date?): String {
         return if (date != null) {

@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.network.RetrofitClient
+import com.example.yeongkkuel.network.RetrofitClient.expenseApiService
 import com.example.yeongkkuel.network.response.Response
 import com.example.yeongkkuel.network.response.expenditure.DayExpenditureResponse
 import com.example.yeongkkuel.presentation.home.category.data.Category
@@ -29,7 +30,7 @@ class BotSheetViewModel : ViewModel() {
     val uiState = _uiState.asStateFlow()
 
     private val statService = RetrofitClient.statService
-//    private val expenseApiService = RetrofitClient.expenseApiService
+    private val expenseApiService = RetrofitClient.expenseApiService
 
     // ✅ LiveData → StateFlow로 일관된 상태 관리
     private val _spendingHistoryList =
@@ -38,30 +39,41 @@ class BotSheetViewModel : ViewModel() {
 
     private val _categoryList = MutableLiveData<List<Category>>(emptyList()) // ✅ MutableLiveData 선언 추가
     val categoryList: LiveData<List<Category>> get() = _categoryList // ✅ LiveData로 접근
+    private val _deleteResult = MutableLiveData<Boolean>()
+    val deleteResult: LiveData<Boolean> get() = _deleteResult
 
-//    // 서버 API 호출 코드 추가
-//    fun fetchUpdatedExpenses() {
-//        viewModelScope.launch {
-//            try {
-//                Log.d("BotSheetViewModel", "🚀 서버에서 최신 지출 내역 가져오는 중...")
-//
-//                // ✅ 요청 URL 및 상태 확인
-//                val response = expenseApiService.getExpenses()
-//
-//                Log.d("BotSheetViewModel", "🚀 서버 응답 상태: ${response.isSuccess}, 응답 데이터: $response")
-//
-//                if (response.isSuccess) {
-//                    Log.d("BotSheetViewModel", "✅ 서버에서 지출 내역 가져오기 성공!")
-//                    updateBotSheetData(response)
-//                } else {
-//                    Log.e("BotSheetViewModel", "🚨 서버 응답 실패: ${response.message}")
-//                }
-//            } catch (e: Exception) {
-//                Log.e("BotSheetViewModel", "🚨 네트워크 요청 중 오류 발생: ${e.localizedMessage}")
-//            }
-//        }
-//    }
+    fun deleteExpense(expenseId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = expenseApiService.deleteExpense(expenseId)
 
+                if (response.isSuccessful && response.body()?.isSuccess == true) {
+                    _deleteResult.postValue(true) // ✅ 삭제 성공
+                } else {
+                    Log.e("BotSheetViewModel", "삭제 실패: ${response.body()?.message}")
+                    _deleteResult.postValue(false) // ✅ 삭제 실패
+                }
+            } catch (e: Exception) {
+                Log.e("BotSheetViewModel", "API 호출 중 오류 발생", e)
+                _deleteResult.postValue(false)
+            }
+        }
+    }
+
+    private fun removeExpenseFromUi(expenseId: Int) {
+        _uiState.update { prevState ->
+            val updatedSpendingList = prevState.spendingList.map { spending ->
+                val updatedHistory = spending.history.filterNot { it.id == expenseId }
+                spending.copy(history = updatedHistory)
+            }.filterNot { it.history.isEmpty() } // 🔥 내역이 비어 있으면 해당 카테리 삭제
+
+            prevState.copy(spendingList = updatedSpendingList)
+        }
+
+        // ✅ 최신 지출 내역 반영
+        updateSpendingHistoryList()
+        Log.d("BotSheetViewModel", "📌 삭제됨: expenseId=$expenseId, 남은 지출 개수=${_spendingHistoryList.value.size}")
+    }
 
     // 🔹 지출 내역 추가 기능
     fun addExpenseToCategory(category: SpendingCategory, history: BotSheetUiState.Spending.History) {

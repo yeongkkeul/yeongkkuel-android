@@ -17,12 +17,13 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import com.example.yeongkkuel.R
+import com.example.yeongkkuel.databinding.FragmentExpenseEditBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
 import java.util.Date
 
 class ExpenseEditFragment : Fragment() {
 
-    private var _binding: FragmentExpenseViewBinding? = null
+    private var _binding: FragmentExpenseEditBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: BotSheetViewModel by activityViewModels()
@@ -32,7 +33,7 @@ class ExpenseEditFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentExpenseViewBinding.inflate(inflater, container, false)
+        _binding = FragmentExpenseEditBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -43,9 +44,7 @@ class ExpenseEditFragment : Fragment() {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
-        binding.tvExpenseTitle.visibility = View.GONE // 기존 제목 숨김
         binding.tvExpenseTitleEdit.visibility = View.VISIBLE // 수정 제목 보이기
-        binding.icMore.visibility = View.GONE // 더보기 아이콘 숨김
         binding.tvEntryComplete.visibility = View.VISIBLE
         binding.tvEntryComplete.setOnClickListener {
             saveExpense()
