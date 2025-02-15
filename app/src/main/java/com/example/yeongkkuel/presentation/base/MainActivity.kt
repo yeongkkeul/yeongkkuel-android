@@ -244,7 +244,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                 when (destination.id) {
                     R.id.navigation_home,
                     R.id.navigation_stat,
-                        -> setBotSheetVisible()
+                    -> setBotSheetVisible()
 
 
                     else -> setBotSheetGone()
@@ -426,23 +426,31 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         navController.navigate(R.id.expenseEntryFragment, bundle)
     }
 
-    override fun navigateToExpenseView(expenseName: String, expensePrice: Int, categoryColor: Int) {
-        Log.d("MainActivity", "📌 navigateToExpenseView() 호출됨")
-        Log.d("MainActivity", "📌 전달된 데이터 - name: $expenseName, price: $expensePrice, categoryColor: $categoryColor")
+    override fun navigateToExpenseView(
+        expenseId: Int,
+        expenseName: String,
+        expensePrice: Int,
+        categoryColor: Int,
+        categoryName: String
+    ) {
+        Log.d("MainActivity", "navigateToExpenseView() 호출됨 - id=$expenseId, name=$expenseName, price=$expensePrice, color=$categoryColor")
 
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         val navController = navHostFragment.navController
 
-        // 🔹 번들에 데이터 추가하여 ExpenseViewFragment로 전달
         val bundle = Bundle().apply {
+            putInt("expenseId", expenseId)
             putString("expenseName", expenseName)
             putInt("expensePrice", expensePrice)
-            putInt("categoryColor", categoryColor) // ✅ categoryColor를 Int로 전달
+            putInt("categoryColor", categoryColor)
+            putString("categoryName", categoryName)
         }
 
         navController.navigate(R.id.navigation_expense_view, bundle)
     }
+
+
+
     override fun onNoExpenseChanged(isNoExpense: Boolean) {
     }
 

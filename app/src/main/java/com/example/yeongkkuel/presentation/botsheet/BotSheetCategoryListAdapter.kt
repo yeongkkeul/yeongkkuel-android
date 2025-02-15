@@ -27,58 +27,60 @@ class BotSheetCategoryListAdapter(
         private val binding: ItemBotsheetCategoryBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        // 🔹 클릭 리스너를 Adapter에 직접 추가하지 않고, Fragment로 전달
-        private val historyListAdapter = BotSheetHistoryListAdapter { selectedHistory ->
-                Color.RED
-
-            botSheetListener.navigateToExpenseView(
-                selectedHistory.name,
-                selectedHistory.price,
-                1
-            )
-        }
-
         fun onBind(item: BotSheetUiState.Spending) = with(binding) {
-            tvCategory.text = item.kind.name
-            val context = binding.root.context
-            val color = item.color.id // Colors Enum의 id 사용
-            tvCategory.setTextColor(ContextCompat.getColor(context, color))
-            ivBtnAdd.backgroundTintList =
-                ColorStateList.valueOf(ContextCompat.getColor(context, color))
-            binding.ivBtnAdd.setImageResource(R.drawable.ic_plus_default)
-            binding.ivBtnAdd.imageTintList =
-                ColorStateList.valueOf(ContextCompat.getColor(context, item.color.id))
+            // 카테고리 색상 등 item 정보를 여기서 가져올 수 있음
+            val categoryColor = item.color.id
+
+            // ✅ onBind() 내부에서 historyListAdapter 생성
+            val localHistoryListAdapter = BotSheetHistoryListAdapter { selectedHistory ->
+                // item.color.id를 여기서 쓸 수 있음!
+                botSheetListener.navigateToExpenseView(
+                    expenseId = selectedHistory.id,
+                    expenseName = selectedHistory.name,
+                    expensePrice = selectedHistory.price,
+                    categoryColor = categoryColor,
+                    categoryName = item.kind.name
+                )
+            }
 
             rvHistory.run {
-                adapter = historyListAdapter
-                historyListAdapter.submitList(item.history ?: emptyList()) {
+                adapter = localHistoryListAdapter
+                localHistoryListAdapter.submitList(item.history ?: emptyList()) {
                     // ✅ 최신 데이터 반영 후 UI 업데이트
                     updateNoSpendAndMoreVisibility(item)
                 }
-                layoutManager = LinearLayoutManager(binding.root.context)
+                layoutManager = LinearLayoutManager(root.context)
             }
+
+            tvCategory.text = item.kind.name
+            val context = root.context
+            tvCategory.setTextColor(ContextCompat.getColor(context, categoryColor))
+            ivBtnAdd.backgroundTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(context, categoryColor))
+            ivBtnAdd.setImageResource(R.drawable.ic_plus_default)
+            ivBtnAdd.imageTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(context, categoryColor))
+
             // 🔹 카테고리 추가 버튼 클릭 리스너
             ivBtnAdd.setOnClickListener {
-                botSheetListener.navigateToExpenseEntry(item.kind.name, item.color.id)
+                botSheetListener.navigateToExpenseEntry(item.kind.name, categoryColor)
             }
         }
 
         private fun updateNoSpendAndMoreVisibility(item: BotSheetUiState.Spending) {
-            val hasNoExpenseEntry = item.history.isEmpty() // 모든 항목이 무지출인지 확인
-            val isEmpty = item.history.isEmpty() // 리스트가 비어 있는지 확인
+            val isEmpty = item.history.isEmpty()
 
             if (isEmpty) {
                 binding.tvNoSpend.visibility = View.GONE
-                botSheetListener.onNoExpenseChanged(false) // 일반 지출이 없으므로 icMore 보이도록
-            } else if (hasNoExpenseEntry) {
-                binding.tvNoSpend.visibility = View.VISIBLE
-                botSheetListener.onNoExpenseChanged(true) // 무지출 항목만 있으면 icMore 숨김
+                botSheetListener.onNoExpenseChanged(false)
             } else {
-                binding.tvNoSpend.visibility = View.GONE
-                botSheetListener.onNoExpenseChanged(false) // 일반 지출이 있으면 icMore 보이도록
+                binding.tvNoSpend.visibility = View.VISIBLE
+                botSheetListener.onNoExpenseChanged(true)
             }
         }
     }
+
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int

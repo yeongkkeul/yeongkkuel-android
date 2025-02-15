@@ -65,30 +65,58 @@ class ExpenseViewFragment : Fragment() {
             binding.clMore.visibility = View.GONE
         }
 
-        // ✅ StateFlow를 collectLatest()로 감지해서 최신 데이터를 UI에 반영
+        // Bundle에서 데이터 가져와서 UI에 표시
+        val expenseId = arguments?.getInt("expenseId") ?: 0
+        val expenseName = arguments?.getString("expenseName") ?: ""
+        val expensePrice = arguments?.getInt("expensePrice") ?: 0
+        val categoryColor = arguments?.getInt("categoryColor") ?: R.color.black2
+        val categoryName = arguments?.getString("categoryName") ?: "카테고리 없음"
+
+        // 이제 이 값들을 UI에 세팅
+        binding.etDetailInput.setText(expenseName)
+        binding.etAmountInput.setText(expensePrice.toString())
+
+        binding.tvCategoryInput.setTextColor(ContextCompat.getColor(requireContext(), categoryColor))
+        binding.tvCategoryInput.text = categoryName
+        binding.tvCategoryInput.setTextColor(ContextCompat.getColor(requireContext(), categoryColor))
+
+        // 날짜 등은 viewModel에서 가져올 수 있음
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.spendingHistoryList.collectLatest { historyList ->
-                val selectedExpense = historyList.lastOrNull()
-
-                if (selectedExpense != null) {
-                    // 최신 spendingList 업데이트 후 UI 업데이트
-                    viewModel.uiState.collectLatest { uiState ->
-                        binding.tvDateInput.text = formatDate(uiState.date)
-
-                        val category = getCategoryForExpense(selectedExpense.id)
-                        selectedCategoryId = category?.categoryId
-
-                        binding.tvCategoryInput.text = category?.kind?.name ?: "기타"
-                        binding.etDetailInput.setText(selectedExpense.name)
-                        binding.etAmountInput.setText(selectedExpense.price.toString())
-
-                        // 최신 데이터 반영 후 카테고리 색상 적용
-                        val updatedColor = getCategoryTextColor(category?.kind?.name ?: "기타")
-                        binding.tvCategoryInput.setTextColor(updatedColor)
-                    }
-                }
+            viewModel.uiState.collectLatest { uiState ->
+                binding.tvDateInput.text = formatDate(uiState.date)
             }
         }
+
+        // 필요하면 getCategoryForExpense(expenseId)로 카테고리 찾기
+        val matchedCategory = getCategoryForExpense(expenseId)
+        selectedCategoryId = matchedCategory?.categoryId
+
+
+
+//        // ✅ StateFlow를 collectLatest()로 감지해서 최신 데이터를 UI에 반영
+//        viewLifecycleOwner.lifecycleScope.launch {
+//            viewModel.spendingHistoryList.collectLatest { historyList ->
+//                val selectedExpense = historyList.lastOrNull()
+//
+//                if (selectedExpense != null) {
+//                    // 최신 spendingList 업데이트 후 UI 업데이트
+//                    viewModel.uiState.collectLatest { uiState ->
+//                        binding.tvDateInput.text = formatDate(uiState.date)
+//
+//                        val category = getCategoryForExpense(selectedExpense.id)
+//                        selectedCategoryId = category?.categoryId
+//
+//                        binding.tvCategoryInput.text = category?.kind?.name ?: "기타"
+//                        binding.etDetailInput.setText(selectedExpense.name)
+//                        binding.etAmountInput.setText(selectedExpense.price.toString())
+//
+//                        // 최신 데이터 반영 후 카테고리 색상 적용
+//                        val updatedColor = getCategoryTextColor(category?.kind?.name ?: "기타")
+//                        binding.tvCategoryInput.setTextColor(updatedColor)
+//                    }
+//                }
+//            }
+//        }
     }
 
     private fun getCategoryForExpense(expenseId: Int): BotSheetUiState.Spending? {
@@ -164,19 +192,6 @@ class ExpenseViewFragment : Fragment() {
         } ?: ContextCompat.getColor(requireContext(), R.color.black2)
     }
 
-    // 필요시 터치 영역 확장 (옵션)
-    private fun expandClickArea(view: View, extraPadding: Int) {
-        val parent = view.parent as View
-        parent.post {
-            val rect = Rect()
-            view.getHitRect(rect)
-            rect.top -= extraPadding
-            rect.bottom += extraPadding
-            rect.left -= extraPadding
-            rect.right += extraPadding
-            parent.touchDelegate = TouchDelegate(rect, view)
-        }
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()
