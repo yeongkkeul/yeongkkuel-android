@@ -2,7 +2,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -90,17 +91,60 @@
 
             <ImageView
                 android:id="@+id/ic_more"
-                android:layout_width="20dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_more"
                 android:layout_marginStart="190dp"
-                android:layout_marginEnd="15dp"
+                android:padding="15dp"
                 android:visibility="visible"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_more"
+            android:layout_width="92dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/space_median"
+            android:background="@drawable/bg_box_main1"
+            android:elevation="9dp"
+            android:padding="@dimen/space_small"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cl_toolbar"
+            android:layout_marginTop="-16dp"
+            tools:visibility="visible">
+
+            <TextView
+                android:id="@+id/tv_modify"
+                style="@style/body_semibo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/space_xx_small"
+                android:text="수정"
+                android:textColor="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_delete"
+                style="@style/body_semibo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:padding="@dimen/space_xx_small"
+                android:text="삭제"
+                android:textColor="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_modify" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
         <!-- 콘텐츠 -->
         <androidx.constraintlayout.widget.ConstraintLayout
