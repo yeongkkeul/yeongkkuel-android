@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.yeongkkuel.network.RetrofitClient
+import com.example.yeongkkuel.network.response.chat.ChatBannerResult
 import com.example.yeongkkuel.presentation.chat.data.ChatItemModel
 import com.example.yeongkkuel.presentation.chat.data.ChatMessage
 import com.example.yeongkkuel.presentation.chat.data.ChatRequest
@@ -14,6 +16,34 @@ import timber.log.Timber
 class ChatGroupViewModel : ViewModel() {
     private val _messages = MutableLiveData<MutableList<ChatItemModel>>()
     val messages: LiveData<MutableList<ChatItemModel>> get() = _messages
+
+    private val _selectedChatRoomId = MutableLiveData<Int?>()
+    val selectedChatRoomId: LiveData<Int?> get() = _selectedChatRoomId
+
+    fun setSelectedChatRoomId(id: Int) {
+        _selectedChatRoomId.value = id
+    }
+
+    private val _bannerData = MutableLiveData<ChatBannerResult>()
+    val bannerData: LiveData<ChatBannerResult> get() = _bannerData
+
+    fun fetchBanner(chatRoomId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitClient.chatService.getChatroomBanner(chatRoomId)
+                if (response.isSuccess) {
+                    response.result.let {
+                        _bannerData.value = it
+                    }
+                } else {
+                    // 에러 처리 (예: 로그 출력, 에러 LiveData 갱신 등)
+                }
+            } catch (e: Exception) {
+                // 네트워크 에러 등 예외 처리
+                e.printStackTrace()
+            }
+        }
+    }
 
     val message = MutableLiveData<String>()
 

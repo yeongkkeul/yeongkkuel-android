@@ -50,13 +50,6 @@ class ChatSearchViewModel : ViewModel() {
         }
     }
 
-    private val _selectedChatRoomId = MutableLiveData<Int?>()
-    val selectedChatRoomId: LiveData<Int?> get() = _selectedChatRoomId
-
-    fun setSelectedChatRoomId(id: Int) {
-        _selectedChatRoomId.value = id
-    }
-
     fun fetchChatDetail(chatRoomId: Int, onResult: (ChatDetailResult?) -> Unit) {
         viewModelScope.launch {
             try {

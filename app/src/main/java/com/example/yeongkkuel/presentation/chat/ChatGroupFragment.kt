@@ -25,8 +25,10 @@ import com.example.yeongkkuel.presentation.chat.adapter.ChatRoomDrawerAdapter
 import com.example.yeongkkuel.presentation.chat.data.ChatRoomRank
 import com.example.yeongkkuel.presentation.chat.dialog.ChatRoomGroupExitDialog
 import com.example.yeongkkuel.presentation.chat.dialog.ChatRoomProfilePartyDialog
+import com.example.yeongkkuel.presentation.chat.search.ChatSearchViewModel
 import com.example.yeongkkuel.utils.ChatItemDecoration
 import timber.log.Timber
+import java.text.NumberFormat
 
 class ChatGroupFragment : Fragment(), ChatMessageClickListener {
     private lateinit var navController: NavController
@@ -76,6 +78,26 @@ class ChatGroupFragment : Fragment(), ChatMessageClickListener {
 
         binding.btnMenu.setOnClickListener {
             binding.drawerLayout.openDrawer(GravityCompat.END)
+        }
+
+        chatGroupViewModel.selectedChatRoomId.observe(viewLifecycleOwner) { chatRoomId ->
+            if (chatRoomId != null) {
+                chatGroupViewModel.fetchBanner(chatRoomId)
+            }
+        }
+
+        chatGroupViewModel.bannerData.observe(viewLifecycleOwner) { banner ->
+            banner?.let {
+                binding.tvCreatedAt.text = it.createdAt
+                // 예: "6/6 명" 형태로 표시
+                binding.tvDataGoalSuccessChallenger.text = "${it.achievingCount}/${it.chatRoomUserCount} 명"
+                // 금액을 천 단위로 포맷팅 후 "원" 단위 추가
+                binding.tvDataExpenseAverage.text = "${NumberFormat.getInstance().format(it.avgAmount)} 원"
+                // 연령과 직업을 결합하여 표시 (예: "20대 학생")
+                binding.tvRankGroupAge.text = "${it.age} ${it.job}"
+                // 상위 퍼센트 표시
+                binding.tvDataRankGroupAge.text = "상위 ${it.topRate}%"
+            }
         }
 
 //        setupKeyboardListener()

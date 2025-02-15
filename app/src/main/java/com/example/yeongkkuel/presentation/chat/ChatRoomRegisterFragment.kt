@@ -31,6 +31,7 @@ class ChatRoomRegisterFragment : Fragment() {
     private val expel = false
 
     private val viewModel: ChatSearchViewModel by activityViewModels()
+    private val chatGroupViewModel: ChatGroupViewModel by activityViewModels()
 
     private var chatDetail: ChatDetailResult? = null
 
@@ -50,7 +51,7 @@ class ChatRoomRegisterFragment : Fragment() {
 
         navController = Navigation.findNavController(view)
 
-        viewModel.selectedChatRoomId.value?.let { chatRoomId ->
+        chatGroupViewModel.selectedChatRoomId.value?.let { chatRoomId ->
             viewModel.fetchChatDetail(chatRoomId) { detail ->
                 detail ?.let {
                     chatDetail = it  // 상세 정보 저장
@@ -68,7 +69,7 @@ class ChatRoomRegisterFragment : Fragment() {
             if (chatDetail?.isPassword == true) {
                 val dialog = ChatRoomPwDialog(
                     context = requireContext(),
-                    chatRoomId = viewModel.selectedChatRoomId.value ?: 0,
+                    chatRoomId = chatGroupViewModel.selectedChatRoomId.value ?: 0,
                     onCancelClick = { /* 취소 처리 */ },
                     onConfirmClick = { expenseAutoSendDialogShow() }
                 )

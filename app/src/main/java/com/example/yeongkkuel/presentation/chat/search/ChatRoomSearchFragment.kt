@@ -18,6 +18,7 @@ import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentChatRoomSearchBinding
 import com.example.yeongkkuel.network.response.chat.ChatRoomDetailDto
 import com.example.yeongkkuel.presentation.base.MainActivity
+import com.example.yeongkkuel.presentation.chat.ChatGroupViewModel
 import com.example.yeongkkuel.presentation.chat.adapter.ChatRoomSearchAdapter
 
 class ChatRoomSearchFragment : Fragment(), ChatRoomSearchClickListener {
@@ -29,6 +30,7 @@ class ChatRoomSearchFragment : Fragment(), ChatRoomSearchClickListener {
     private lateinit var chatRoomSearchAdapter: ChatRoomSearchAdapter
 
     private val viewModel: ChatSearchViewModel by activityViewModels()
+    private val chatGroupViewModel: ChatGroupViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -150,7 +152,7 @@ class ChatRoomSearchFragment : Fragment(), ChatRoomSearchClickListener {
     override fun onItemClicked(chatRoom: ChatRoomDetailDto) {
         // 아이템 클릭 시 실행할 로직
         showToast("Clicked: ${chatRoom.chatRoomTitle}")
-        viewModel.setSelectedChatRoomId(chatRoom.chatRoomId)
+        chatGroupViewModel.setSelectedChatRoomId(chatRoom.chatRoomId)
         navController.navigate(R.id.action_navigation_chat_room_search_to_register)
     }
 

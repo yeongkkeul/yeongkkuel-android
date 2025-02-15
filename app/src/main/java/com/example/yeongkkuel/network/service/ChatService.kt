@@ -3,6 +3,7 @@ package com.example.yeongkkuel.network.service
 import com.example.yeongkkuel.network.request.chat.ChatPwValidateRequest
 import com.example.yeongkkuel.network.request.chat.ChatsRequest
 import com.example.yeongkkuel.network.response.Response
+import com.example.yeongkkuel.network.response.chat.ChatBannerResult
 import com.example.yeongkkuel.network.response.chat.ChatDetailResult
 import com.example.yeongkkuel.network.response.chat.ChatMessageResponse
 import com.example.yeongkkuel.network.response.chat.ChatRoomInfoResult
@@ -75,6 +76,12 @@ interface ChatService {
     suspend fun getChatroomDetail(
         @Path("chatRoomId") chatRoomId:Int
     ): Response<ChatDetailResult>
+
+    // 채팅방 배너 조회
+    @GET("/api/chats/{chatRoomId}/banner")
+    suspend fun getChatroomBanner(
+        @Path("chatRoomId") chatRoomId:Int
+    ): Response<ChatBannerResult>
 
     // 채팅방 검색
     // 키워드에 맞는 모든 채팅방을 페이징 단위로 조회
