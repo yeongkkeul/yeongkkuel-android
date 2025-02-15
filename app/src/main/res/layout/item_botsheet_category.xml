@@ -34,7 +34,7 @@
             android:id="@+id/tv_no_spend"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="무지출!"
+            android:text="무지출 달성!"
             android:textColor="@color/black"
             style="@style/body_semibo"
             android:visibility="gone"

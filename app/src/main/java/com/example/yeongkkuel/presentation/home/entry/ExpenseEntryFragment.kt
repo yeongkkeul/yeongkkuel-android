@@ -232,6 +232,7 @@ class ExpenseEntryFragment : Fragment() {
         val isNoExpenseChecked = ivCircleExpenseChecked.visibility == View.VISIBLE // ✅ 무지출 체크 여부 확인
         val isSendChatRoomChecked = ivCircleSendChecked.visibility == View.VISIBLE
 
+
         // 유효한 카테고리 ID를 가져옴 (API 요청 오류 방지)
         val selectedCategoryName = arguments?.getString("selectedCategory") ?: "기본 카테고리"
         val matchingCategory = botSheetViewModel.uiState.value.spendingList.find {

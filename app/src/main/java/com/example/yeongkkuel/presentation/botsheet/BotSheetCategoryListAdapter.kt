@@ -1,8 +1,6 @@
 package com.example.yeongkkuel.presentation.botsheet
 
 import android.content.res.ColorStateList
-import android.graphics.Color
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -12,9 +10,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.ItemBotsheetCategoryBinding
-import android.util.Log
 import android.view.View
-import androidx.navigation.Navigation.findNavController
 
 
 class BotSheetCategoryListAdapter(
@@ -28,12 +24,19 @@ class BotSheetCategoryListAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun onBind(item: BotSheetUiState.Spending) = with(binding) {
-            // 카테고리 색상 등 item 정보를 여기서 가져올 수 있음
+            // 카테고리 색상 가져오기
             val categoryColor = item.color.id
 
-            // ✅ onBind() 내부에서 historyListAdapter 생성
+            // 1) 원본 목록 (blank+0원 항목도 들어있음)
+            val originalHistories = item.history
+
+            // 2) UI에 표시할 목록 (blank+0원 항목 필터링)
+            val displayedHistories = originalHistories.filterNot { hist ->
+                hist.name.isBlank() && hist.price == 0
+            }
+
+            // onBind() 안에서 새로 Adapter 생성
             val localHistoryListAdapter = BotSheetHistoryListAdapter { selectedHistory ->
-                // item.color.id를 여기서 쓸 수 있음!
                 botSheetListener.navigateToExpenseView(
                     expenseId = selectedHistory.id,
                     expenseName = selectedHistory.name,
@@ -45,39 +48,49 @@ class BotSheetCategoryListAdapter(
 
             rvHistory.run {
                 adapter = localHistoryListAdapter
-                localHistoryListAdapter.submitList(item.history ?: emptyList()) {
-                    // ✅ 최신 데이터 반영 후 UI 업데이트
-                    updateNoSpendAndMoreVisibility(item)
+                // 🔸 필터링된 목록만 표시!
+                localHistoryListAdapter.submitList(displayedHistories) {
+                    // 🔸 무지출 문구는 '원본 목록'으로 판단
+                    updateNoSpendAndMoreVisibility(originalHistories)
                 }
                 layoutManager = LinearLayoutManager(root.context)
             }
 
+
+            // UI 세팅
             tvCategory.text = item.kind.name
             val context = root.context
             tvCategory.setTextColor(ContextCompat.getColor(context, categoryColor))
-            ivBtnAdd.backgroundTintList =
-                ColorStateList.valueOf(ContextCompat.getColor(context, categoryColor))
+            ivBtnAdd.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, categoryColor))
             ivBtnAdd.setImageResource(R.drawable.ic_plus_default)
-            ivBtnAdd.imageTintList =
-                ColorStateList.valueOf(ContextCompat.getColor(context, categoryColor))
+            ivBtnAdd.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(context, categoryColor))
 
-            // 🔹 카테고리 추가 버튼 클릭 리스너
+            // 카테고리 추가 버튼 클릭 리스너
             ivBtnAdd.setOnClickListener {
                 botSheetListener.navigateToExpenseEntry(item.kind.name, categoryColor)
             }
         }
 
-        private fun updateNoSpendAndMoreVisibility(item: BotSheetUiState.Spending) {
-            val isEmpty = item.history.isEmpty()
 
-            if (isEmpty) {
+        private fun updateNoSpendAndMoreVisibility(histories: List<BotSheetUiState.Spending.History>) {
+            // ⚠ 인자로 '원본 목록'을 받음 (blank+0원 항목도 포함)
+            if (histories.isEmpty()) {
+                // 내역이 전혀 없으면 → 무지출 문구 안 보임 (사용자 요구사항에 따라 조정)
                 binding.tvNoSpend.visibility = View.GONE
                 botSheetListener.onNoExpenseChanged(false)
-            } else {
+                return
+            }
+            // 내역이 있고, 모두 금액 0원이면 무지출 문구 보임
+            val allZero = histories.all { it.price == 0 }
+            if (allZero) {
                 binding.tvNoSpend.visibility = View.VISIBLE
                 botSheetListener.onNoExpenseChanged(true)
+            } else {
+                binding.tvNoSpend.visibility = View.GONE
+                botSheetListener.onNoExpenseChanged(false)
             }
         }
+
     }
 
 

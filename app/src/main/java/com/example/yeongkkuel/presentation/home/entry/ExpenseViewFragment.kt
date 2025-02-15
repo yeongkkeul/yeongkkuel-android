@@ -90,33 +90,6 @@ class ExpenseViewFragment : Fragment() {
         // 필요하면 getCategoryForExpense(expenseId)로 카테고리 찾기
         val matchedCategory = getCategoryForExpense(expenseId)
         selectedCategoryId = matchedCategory?.categoryId
-
-
-
-//        // ✅ StateFlow를 collectLatest()로 감지해서 최신 데이터를 UI에 반영
-//        viewLifecycleOwner.lifecycleScope.launch {
-//            viewModel.spendingHistoryList.collectLatest { historyList ->
-//                val selectedExpense = historyList.lastOrNull()
-//
-//                if (selectedExpense != null) {
-//                    // 최신 spendingList 업데이트 후 UI 업데이트
-//                    viewModel.uiState.collectLatest { uiState ->
-//                        binding.tvDateInput.text = formatDate(uiState.date)
-//
-//                        val category = getCategoryForExpense(selectedExpense.id)
-//                        selectedCategoryId = category?.categoryId
-//
-//                        binding.tvCategoryInput.text = category?.kind?.name ?: "기타"
-//                        binding.etDetailInput.setText(selectedExpense.name)
-//                        binding.etAmountInput.setText(selectedExpense.price.toString())
-//
-//                        // 최신 데이터 반영 후 카테고리 색상 적용
-//                        val updatedColor = getCategoryTextColor(category?.kind?.name ?: "기타")
-//                        binding.tvCategoryInput.setTextColor(updatedColor)
-//                    }
-//                }
-//            }
-//        }
     }
 
     private fun getCategoryForExpense(expenseId: Int): BotSheetUiState.Spending? {
@@ -148,7 +121,7 @@ class ExpenseViewFragment : Fragment() {
             .create()
 
         val tvExpenseTitle = dialogView.findViewById<TextView>(R.id.tv_expense_title)
-        tvExpenseTitle.text = binding.etDetailInput.text.toString() // ✅ 수정된 부분
+        tvExpenseTitle.text = binding.etDetailInput.text.toString()
         val btnConfirm = dialogView.findViewById<TextView>(R.id.tv_delete_btn)
         val btnCancel = dialogView.findViewById<TextView>(R.id.tv_cancel_btn)
 
