@@ -59,8 +59,6 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-
-        Log.d("HomeFragment", "✅ onResume() - getSpendingList() 실행됨") // 디버깅용 로그 추가
         botSheetViewModel.getSpendingList()
     }
 
@@ -83,9 +81,10 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         navController = Navigation.findNavController(view)
-        val sharedPreferences = requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val lastHiddenDate = sharedPreferences.getString(KEY_LAST_HIDDEN_DATE, "")
-        val todayDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+
+        botSheetViewModel.getSpendingList()
+
+        (activity as? MainActivity)?.resetBottomSheetState()
 
         // 홈 탭에 진입할 때 바텀시트 상태(피크 높이)를 재설정
         val displayHeight = resources.displayMetrics.heightPixels
@@ -127,24 +126,26 @@ class HomeFragment : Fragment() {
             if (result != null) {
                 Log.d("HomeFragment", "✅ 홈 데이터 수신 완료: $result")
 
-                // ✅ 수정된 데이터 바인딩 방식
+                // 수정된 데이터 바인딩 방식
                 binding.tvCoin.text = result.myReward.toString() // ✅ 숫자만 표시
                 updateMySkins(result.mySkin) // ✅ 변경된 데이터 클래스 반영
 
-                // ✅ 카테고리 정보 업데이트
+                // 카테고리 정보 업데이트
                 val categories = result.categories.map { it.toCategory(categoryViewModel) }
                 val expensesMap = result.categories.associate { it.categoryId to it.expenses }
                 updateCategoryExpenses(categories, expensesMap)
 
                 Log.d("HomeFragment", "🚀 updateBotSheetCategories 호출됨!")
                 botSheetViewModel.updateBotSheetCategories(categories)
+
+                botSheetViewModel.getSpendingList() // 홈 데이터 수신 후 즉시 지출 내역 갱신 API 호출함
             } else {
                 Log.e("HomeFragment", "🚨 홈 데이터 수신 실패 또는 응답 없음!")
             }
         }
         setupSwipeToDismiss(binding.ivError)
 
-        Log.d("HomeFragment", "🚀 fetchHomeData() 호출됨!") // ✅ 로그 추가
+        Log.d("HomeFragment", "🚀 fetchHomeData() 호출됨!")
 
         // 중복 실행 방지: 최초 실행 여부 체크
         if (savedInstanceState == null) {
@@ -164,7 +165,7 @@ class HomeFragment : Fragment() {
     // 변환된 Category 리스트를 받도록 변경
     private fun updateCategoryExpenses(categories: List<Category>, expensesMap: Map<Int, List<Expense>>) {
         categories.forEach { category ->
-            val expenses = expensesMap[category.id] ?: emptyList() // ✅ 카테고리에 해당하는 지출 내역 가져오기
+            val expenses = expensesMap[category.id] ?: emptyList() // 카테고리에 해당하는 지출 내역 가져오기
 
             expenses.forEach { expense ->
                 Log.d("HomeFragment", "📌 카테고리: ${category.name}, 지출: ${expense.content}, 금액: ${expense.amount}")

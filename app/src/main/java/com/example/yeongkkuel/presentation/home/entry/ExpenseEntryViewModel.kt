@@ -3,6 +3,7 @@ package com.example.yeongkkuel.presentation.home.entry
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.yeongkkuel.presentation.home.entry.data.EntryData
 
 class ExpenseEntryViewModel : ViewModel() {
 

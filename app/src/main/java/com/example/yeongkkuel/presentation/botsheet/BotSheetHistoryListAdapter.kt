@@ -31,6 +31,21 @@ class BotSheetHistoryListAdapter(
                 item.name
             }
 
+            if (item.price > 0) {
+                // 금액이 1원 이상이면 기존처럼 표기
+                tvPrice.text = "-${item.price.toMoneyString()}원"
+            } else {
+                // 금액이 0원이면 가격 부분 숨기거나 "" 처리
+                tvPrice.text = ""
+            }
+
+            // 만약 "내용이 빈칸 + 금액 0원"도 표시하고 싶지 않다면, 여기서 추가 처리
+             if (item.name.isBlank() && item.price == 0) {
+                 root.visibility = View.GONE
+             } else {
+                 root.visibility = View.VISIBLE
+             }
+
             if (!item.imgExist) {
                 icPhotoIncluded.visibility = View.VISIBLE // 사진이 있을 경우 표시
             } else {

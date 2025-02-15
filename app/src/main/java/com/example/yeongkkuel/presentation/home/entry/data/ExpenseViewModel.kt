@@ -38,7 +38,7 @@ class ExpenseViewModel(private val repository: ExpenseRepository) : ViewModel() 
     }
 
 
-    // ✅ ViewModelProvider.Factory 추가
+    // ViewModelProvider.Factory 추가
     class Factory(private val repository: ExpenseRepository) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(ExpenseViewModel::class.java)) {

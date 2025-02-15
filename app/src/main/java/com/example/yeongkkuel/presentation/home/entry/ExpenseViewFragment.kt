@@ -2,7 +2,6 @@ package com.example.yeongkkuel.presentation.home.entry
 
 import android.graphics.Rect
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.TouchDelegate
 import android.view.View
@@ -21,7 +20,6 @@ import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -68,7 +66,22 @@ class ExpenseViewFragment : Fragment() {
             binding.clMore.visibility = View.GONE
         }
 
-        // ✅ StateFlow를 collectLatest()로 감지해서 최신 데이터를 UI에 반영
+        // Bundle에서 데이터 가져와서 UI에 표시
+        val expenseId = arguments?.getInt("expenseId") ?: 0
+        val expenseName = arguments?.getString("expenseName") ?: ""
+        val expensePrice = arguments?.getInt("expensePrice") ?: 0
+        val categoryColor = arguments?.getInt("categoryColor") ?: R.color.black2
+        val categoryName = arguments?.getString("categoryName") ?: "카테고리 없음"
+
+        // 이제 이 값들을 UI에 세팅
+        binding.etDetailInput.setText(expenseName)
+        binding.etAmountInput.setText(expensePrice.toString())
+
+        binding.tvCategoryInput.setTextColor(ContextCompat.getColor(requireContext(), categoryColor))
+        binding.tvCategoryInput.text = categoryName
+        binding.tvCategoryInput.setTextColor(ContextCompat.getColor(requireContext(), categoryColor))
+
+        // 날짜 등은 viewModel에서 가져올 수 있음
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.spendingHistoryList.collectLatest { historyList ->
                 val selectedExpense = historyList.lastOrNull()
@@ -93,6 +106,10 @@ class ExpenseViewFragment : Fragment() {
                 }
             }
         }
+
+        // 필요하면 getCategoryForExpense(expenseId)로 카테고리 찾기
+        val matchedCategory = getCategoryForExpense(expenseId)
+        selectedCategoryId = matchedCategory?.categoryId
     }
 
     private fun getCategoryForExpense(expenseId: Int): BotSheetUiState.Spending? {
@@ -125,7 +142,7 @@ class ExpenseViewFragment : Fragment() {
             .create()
 
         val tvExpenseTitle = dialogView.findViewById<TextView>(R.id.tv_expense_title)
-        tvExpenseTitle.text = binding.etDetailInput.text.toString() // ✅ 수정된 부분
+        tvExpenseTitle.text = binding.etDetailInput.text.toString()
         val btnConfirm = dialogView.findViewById<TextView>(R.id.tv_delete_btn)
         val btnCancel = dialogView.findViewById<TextView>(R.id.tv_cancel_btn)
 

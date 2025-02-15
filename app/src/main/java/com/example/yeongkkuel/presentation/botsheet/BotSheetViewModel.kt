@@ -84,11 +84,11 @@ class BotSheetViewModel : ViewModel() {
         _uiState.update { prev ->
             val updatedList = prev.spendingList.toMutableList()
 
-            // ✅ 1️⃣ 기존 카테고리가 있는지 확인
+            // 기존 카테고리가 있는지 확인
             val categoryIndex = updatedList.indexOfFirst { it.kind == category }
 
             if (categoryIndex != -1) {
-                // ✅ 2️⃣ 기존 카테고리가 있으면 해당 카테고리에 내역 추가
+                // 기존 카테고리가 있으면 해당 카테고리에 내역 추가
                 val existingCategory = updatedList[categoryIndex]
 
                 val updatedCategory = existingCategory.copy(
@@ -97,13 +97,12 @@ class BotSheetViewModel : ViewModel() {
 
                 updatedList[categoryIndex] = updatedCategory
             } else {
-                // ✅ 3️⃣ 기존 카테고리가 없으면 새로 추가 (색상 유지)
+                // 기존 카테고리가 없으면 새로 추가 (색상 유지)
                 updatedList.add(
                     BotSheetUiState.Spending(
-                        categoryId = history.id, // ✅ 카테고리 ID 설정
+                        categoryId = history.id,
                         kind = category,
                         color = prev.spendingList.find { it.kind == category }?.color ?: Colors.BLACK1,
-                        // ✅ 기존 카테고리 색상이 있으면 유지, 없으면 기본 색상(GRAY)
                         plusIconResId = R.drawable.ic_plus_default,
                         history = listOf(history)
                     )
@@ -112,7 +111,7 @@ class BotSheetViewModel : ViewModel() {
 
             prev.copy(spendingList = updatedList)
         }
-        updateSpendingHistoryList() // ✅ 최신 데이터 반영
+        updateSpendingHistoryList()
     }
 
     private val mutex = Mutex()
@@ -209,8 +208,6 @@ class BotSheetViewModel : ViewModel() {
         Log.d("BotSheetViewModel", "📌 최신 spendingHistoryList: $historyList") // ✅ 최신 리스트 확인
 
         _spendingHistoryList.value = historyList // ✅ 최신 리스트로 갱신
-
-//        _spendingHistoryList.value = historyList.sortedByDescending { it.date }
     }
 
     // 🔹 카테고리 이동 기능
@@ -266,8 +263,6 @@ class BotSheetViewModel : ViewModel() {
         }
         // 추가된 카테고리를 _categoryList에 업데이트
         _categoryList.value = _categoryList.value.orEmpty() + category
-
-        Log.d("BotSheetViewModel", "✅ 카테고리 추가됨: ${category.name}")
     }
 
     private fun mapCategoryToIcon(color: Colors): Int {
@@ -276,13 +271,13 @@ class BotSheetViewModel : ViewModel() {
 
     // 카테고리 제목, 색상 수정 후 바텀시트 업로드
     fun updateCategory(originalCategoryName: String, updatedCategory: Category) {
-        val updatedCategoryColor = updatedCategory.color // ✅ Colors 타입 유지
+        val updatedCategoryColor = updatedCategory.color
 
         val updatedSpendingList = uiState.value.spendingList.map { spending ->
             if (spending.kind.name == originalCategoryName) {
                 spending.copy(
                     kind = SpendingCategory.fromName(updatedCategory.name),
-                    color = updatedCategoryColor // ✅ Colors 타입 유지
+                    color = updatedCategoryColor
                 )
             } else {
                 spending
@@ -292,7 +287,7 @@ class BotSheetViewModel : ViewModel() {
         // 기존 카테고리 리스트 업데이트
         _categoryList.value = _categoryList.value?.map { category ->
             if (category.name == originalCategoryName) {
-                updatedCategory // 수정된 카테고리 반영
+                updatedCategory
             } else {
                 category
             }
@@ -311,7 +306,7 @@ class BotSheetViewModel : ViewModel() {
         }
     }
 
-    // 🔹 일일 목표 지출 가져오기
+    // 일일 목표 지출 가져오기
     fun getDayTargetSpending() = viewModelScope.launch {
         try {
             val response = statService.getExpendituresDay()
@@ -346,7 +341,7 @@ class BotSheetViewModel : ViewModel() {
         }
     }
 
-    // 🔹 매개변수 없는 기본 함수
+    // 매개변수 없는 기본 함수
     fun getSpendingList() {
         val calendar = Calendar.getInstance()
         val year = calendar.get(Calendar.YEAR)
@@ -357,8 +352,8 @@ class BotSheetViewModel : ViewModel() {
         getDayTargetSpending()
     }
 
-    // 🔹 매개변수를 받는 기존 함수
-    // 🔹 월별 지출 내역 가져오기
+    // 매개변수를 받는 기존 함수
+    // 월별 지출 내역 가져오기
     fun getSpendingList(year: Int, month: Int, day: Int) = viewModelScope.launch {
         try {
             // yeongkkuelService를 통해 데이터 요청
