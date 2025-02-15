@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yeongkkuel.network.RetrofitClient
 import com.example.yeongkkuel.network.response.chat.ChatBannerResult
+import com.example.yeongkkuel.network.response.chat.ChatRoomRank
+import com.example.yeongkkuel.network.response.chat.ChatRoomUserResult
 import com.example.yeongkkuel.presentation.chat.data.ChatItemModel
 import com.example.yeongkkuel.presentation.chat.data.ChatMessage
 import com.example.yeongkkuel.presentation.chat.data.ChatRequest
@@ -41,6 +43,42 @@ class ChatGroupViewModel : ViewModel() {
             } catch (e: Exception) {
                 // 네트워크 에러 등 예외 처리
                 e.printStackTrace()
+            }
+        }
+    }
+
+    private val _chatRoomRanks = MutableLiveData<List<ChatRoomRank>>()
+    val chatRoomRanks: LiveData<List<ChatRoomRank>> = _chatRoomRanks
+
+    fun getChatRoomRanks(chatRoomId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitClient.chatService.getChatroomRanks(chatRoomId)
+                if (response.isSuccess) {
+                    // 응답의 result 내부에서 userRanks 리스트를 추출하여 업데이트
+                    _chatRoomRanks.value = response.result.userRanks
+                } else {
+                    // 응답 실패 시 처리 (예: 에러 메시지 로그 출력 등)
+                    _chatRoomRanks.value = emptyList()
+                }
+            } catch (e: Exception) {
+                // 네트워크 오류 등 예외 처리
+                _chatRoomRanks.value = emptyList()
+            }
+        }
+    }
+
+    fun fetchChatroomUser(chatRoomId: Int, userId: Int, onResult: (ChatRoomUserResult?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitClient.chatService.getChatroomUser(chatRoomId, userId)
+                if (response.isSuccess) {
+                    onResult(response.result) // result에 사용자 정보가 담겨있다고 가정
+                } else {
+                    onResult(null)
+                }
+            } catch (e: Exception) {
+                onResult(null)
             }
         }
     }

@@ -19,16 +19,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentChatGroupBinding
+import com.example.yeongkkuel.network.response.chat.ChatDetailResult
 import com.example.yeongkkuel.presentation.base.MainActivity
 import com.example.yeongkkuel.presentation.chat.adapter.ChatGroupAdapter
 import com.example.yeongkkuel.presentation.chat.adapter.ChatRoomDrawerAdapter
-import com.example.yeongkkuel.presentation.chat.data.ChatRoomRank
+import com.example.yeongkkuel.presentation.chat.data.Age
+import com.example.yeongkkuel.presentation.chat.data.Job
 import com.example.yeongkkuel.presentation.chat.dialog.ChatRoomGroupExitDialog
 import com.example.yeongkkuel.presentation.chat.dialog.ChatRoomProfilePartyDialog
 import com.example.yeongkkuel.presentation.chat.search.ChatSearchViewModel
 import com.example.yeongkkuel.utils.ChatItemDecoration
 import timber.log.Timber
 import java.text.NumberFormat
+import java.util.Locale
 
 class ChatGroupFragment : Fragment(), ChatMessageClickListener {
     private lateinit var navController: NavController
@@ -38,6 +41,7 @@ class ChatGroupFragment : Fragment(), ChatMessageClickListener {
     private val binding: FragmentChatGroupBinding
         get() = requireNotNull(_binding){"FragmentChatGroupBinding -> null"}
 
+    private val viewModel: ChatSearchViewModel by activityViewModels()
     private val chatGroupViewModel: ChatGroupViewModel by activityViewModels()
 
     private var bannerOpen = false
@@ -67,6 +71,17 @@ class ChatGroupFragment : Fragment(), ChatMessageClickListener {
 
         navController = Navigation.findNavController(view)
 
+        chatGroupViewModel.selectedChatRoomId.value?.let { chatRoomId ->
+            viewModel.fetchChatDetail(chatRoomId) { detail ->
+                detail ?.let {
+                    // 예: "6/6 명" 형태로 표시
+                    binding.tvDataGoalSuccessChallenger.text = "${it.participationCount}/${it.chatRoomMaxUserCount} 명"
+                    binding.tvTitleChatGroup.text = detail.chatRoomTitle
+                    binding.tvAmountPeopleChatGroup.text = detail.participationCount.toString()
+                }
+            }
+        }
+
         binding.btnBack.setOnClickListener {
             chatGroupViewModel.clearChatMessages()
             navController.navigateUp()
@@ -89,8 +104,6 @@ class ChatGroupFragment : Fragment(), ChatMessageClickListener {
         chatGroupViewModel.bannerData.observe(viewLifecycleOwner) { banner ->
             banner?.let {
                 binding.tvCreatedAt.text = it.createdAt
-                // 예: "6/6 명" 형태로 표시
-                binding.tvDataGoalSuccessChallenger.text = "${it.achievingCount}/${it.chatRoomUserCount} 명"
                 // 금액을 천 단위로 포맷팅 후 "원" 단위 추가
                 binding.tvDataExpenseAverage.text = "${NumberFormat.getInstance().format(it.avgAmount)} 원"
                 // 연령과 직업을 결합하여 표시 (예: "20대 학생")
@@ -167,8 +180,6 @@ class ChatGroupFragment : Fragment(), ChatMessageClickListener {
             adapter = chatRoomDrawerAdapter
         }
 
-        loadDummyData()
-
         binding.apply {
             Glide.with(ivPhoto1)
                 .load(otherProfileImageUrl)
@@ -191,23 +202,6 @@ class ChatGroupFragment : Fragment(), ChatMessageClickListener {
             )
             dialog.show()
         }
-    }
-
-    private fun loadDummyData() {
-        val dummyData = generateDummyData(10)
-        chatRoomDrawerAdapter = ChatRoomDrawerAdapter(dummyData)
-        binding.rvGroupChallenger.adapter = chatRoomDrawerAdapter
-    }
-
-    private fun generateDummyData(count: Int): ArrayList<ChatRoomRank> {
-        return ArrayList(List(count) { index ->
-            ChatRoomRank(
-                nickname = "사용자 ${index + 1}",
-                profileImage = "https://helios-i.mashable.com/imagery/articles/04GeUVUQwZxpTYXdqbocKH2/hero-image.fill.size_1248x702.v1722586579.jpg",
-                rankScore = 100 - index,
-                rank = index +1
-            )
-        })
     }
 
     private fun animateButtonVisibility(show: Boolean) {
@@ -238,10 +232,5 @@ class ChatGroupFragment : Fragment(), ChatMessageClickListener {
     }
 
     override fun onMessageClicked() {
-        val dialog = ChatRoomProfilePartyDialog(
-            context = requireContext(),
-            onCancelClick = {  }
-        )
-        dialog.show()
     }
 }

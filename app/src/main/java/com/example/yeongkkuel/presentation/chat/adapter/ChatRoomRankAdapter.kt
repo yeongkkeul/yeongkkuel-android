@@ -8,11 +8,13 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.ItemChatRoomRankBinding
-import com.example.yeongkkuel.presentation.chat.data.ChatRoomRank
+import com.example.yeongkkuel.network.response.chat.ChatRoomRank
+import com.example.yeongkkuel.presentation.chat.ChatRoomRankClickListener
 
 class ChatRoomRankAdapter(
-    private val chatRoomRank: ArrayList<ChatRoomRank>
-) : RecyclerView.Adapter<ChatRoomRankAdapter.ChatRoomRankViewHolder>() {
+    private var chatRoomRank: List<ChatRoomRank>,
+    private val listener: ChatRoomRankClickListener,
+    ) : RecyclerView.Adapter<ChatRoomRankAdapter.ChatRoomRankViewHolder>() {
 
     inner class ChatRoomRankViewHolder(val binding: ItemChatRoomRankBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -31,14 +33,16 @@ class ChatRoomRankAdapter(
             tvChatRoomRankNickname.text = item.nickname
 
             if (position < 10) {
-                tvChatRoomRankNo.text = (position + 1).toString()
+                tvChatRoomRankNo.text = item.rank.toString()
                 tvChatRoomRankScore.text = "${item.rankScore}점"
             } else {
                 tvChatRoomRankNo.text = "-"
                 tvChatRoomRankScore.text = "-"
             }
 
-            when (position) {
+            // 순위별 배경 및 텍스트 색상 지정 (API rank는 1부터 시작한다고 가정)
+            val rankIndex = item.rank - 1
+            when (rankIndex) {
                 0 -> tvChatRoomRankNo.setBackgroundResource(R.drawable.bg_chat_room_rank_rankno_1)
                 1 -> tvChatRoomRankNo.setBackgroundResource(R.drawable.bg_chat_room_rank_rankno_2)
                 2 -> tvChatRoomRankNo.setBackgroundResource(R.drawable.bg_chat_room_rank_rankno_3)
@@ -46,24 +50,31 @@ class ChatRoomRankAdapter(
             }
 
             tvChatRoomRankNo.setTextColor(
-                when (position) {
-                    0 -> ContextCompat.getColor(root.context, R.color.white)
-                    1 -> ContextCompat.getColor(root.context, R.color.white)
-                    2 -> ContextCompat.getColor(root.context, R.color.white)
+                when (rankIndex) {
+                    0, 1, 2 -> ContextCompat.getColor(root.context, R.color.white)
                     else -> ContextCompat.getColor(root.context, R.color.black)
                 }
             )
 
             tvChatRoomRankScore.setTextColor(
-                when (position) {
+                when (rankIndex) {
                     0 -> ContextCompat.getColor(root.context, R.color.gold)
                     1 -> ContextCompat.getColor(root.context, R.color.silver)
                     2 -> ContextCompat.getColor(root.context, R.color.bronze)
                     else -> ContextCompat.getColor(root.context, R.color.main1)
                 }
             )
+
+            root.setOnClickListener {
+                listener.onRankItemClick(item)
+            }
         }
     }
 
     override fun getItemCount(): Int = chatRoomRank.size
+
+    fun updateData(newData: List<ChatRoomRank>) {
+        chatRoomRank = newData
+        notifyDataSetChanged()
+    }
 }
