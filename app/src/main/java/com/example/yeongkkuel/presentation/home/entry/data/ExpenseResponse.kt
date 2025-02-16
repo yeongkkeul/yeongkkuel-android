@@ -31,7 +31,7 @@ data class ExpenseUpdateResponse(
     val isSuccess: Boolean,
     val code: String,
     val message: String,
-    val result: ExpenseUpdateResult
+    val result: ExpenseUpdateResult? // ✅ 서버에서 `null`일 가능성 있음!
 )
 
 data class ExpenseUpdateResult(

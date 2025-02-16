@@ -2,6 +2,7 @@ package com.example.yeongkkuel.presentation.home.entry
 
 import android.graphics.Rect
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.TouchDelegate
 import android.view.View
@@ -18,12 +19,14 @@ import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentExpenseViewBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
+import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.client.utils.DateUtils.parseDate
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.text.NumberFormat
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.text.NumberFormat
 
 class ExpenseViewFragment : Fragment() {
 
@@ -47,6 +50,7 @@ class ExpenseViewFragment : Fragment() {
         binding.btnBack.setOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
+
         expandClickArea(binding.icMore, 20)
 
         // icMore 클릭 시 cl_more의 visibility 토글 (수정/삭제 메뉴 표시)
@@ -73,6 +77,14 @@ class ExpenseViewFragment : Fragment() {
         val expensePrice = arguments?.getInt("expensePrice") ?: 0
         val categoryColor = arguments?.getInt("categoryColor") ?: R.color.black2
         val categoryName = arguments?.getString("categoryName") ?: "카테고리 없음"
+
+        val expenseDateString = arguments?.getString("expenseDate") // yyyy-MM-dd 형식 가정
+        Log.d("ExpenseViewFragment", "📅 받은 날짜 문자열: $expenseDateString")
+
+        val expenseDate = expenseDateString?.let { parseDate(it) }
+        Log.d("ExpenseViewFragment", "📅 변환된 Date 객체: $expenseDate")
+
+        binding.tvDateInput.text = formatDate(expenseDate)
 
         // 이제 이 값들을 UI에 세팅
         binding.etDetailInput.setText(expenseName)
@@ -115,6 +127,7 @@ class ExpenseViewFragment : Fragment() {
     // 지출 내역 삭제
     private fun deleteExpense() {
         val selectedExpense = viewModel.spendingHistoryList.value.lastOrNull() ?: return
+        Log.d("ExpenseViewFragment", "🟠 삭제 요청: expenseId=${selectedExpense.id}, name=${selectedExpense.name}")
 
         // 삭제 확인 다이얼로그 띄우기
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_expense_delete, null)
@@ -128,10 +141,12 @@ class ExpenseViewFragment : Fragment() {
         val btnCancel = dialogView.findViewById<TextView>(R.id.tv_cancel_btn)
 
         btnConfirm.setOnClickListener {
+            Log.d("ExpenseViewFragment", "🔹 삭제 요청 버튼 클릭됨")
             viewModel.deleteExpense(selectedExpense.id) // ✅ 서버에 삭제 요청
 
             viewModel.deleteResult.observe(viewLifecycleOwner) { isDeleted ->
                 if (isDeleted) {
+                    Log.d("ExpenseViewFragment", "✅ 삭제 성공: expenseId=${selectedExpense.id}")
                     Toast.makeText(requireContext(), "지출 내역이 삭제되었습니다.", Toast.LENGTH_SHORT).show()
                     findNavController().popBackStack(R.id.navigation_home, false)
                 } else {
