@@ -295,7 +295,7 @@ class ExpenseEditFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                Log.d("ExpenseEditFragment", "🟡 지출 수정 요청 시작: $updatedExpense")
+                Log.d("ExpenseEditFragment", "지출 수정 요청 시작: $updatedExpense")
 
                 val updateResponse = viewModel.updateExpense(selectedExpense.id, updatedExpense)
 
@@ -320,10 +320,6 @@ class ExpenseEditFragment : Fragment() {
             }
         }
     }
-
-
-
-
 
     private fun formatDateToApiFormat(date: Date?): String {
         return if (date != null) {
