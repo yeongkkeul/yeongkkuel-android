@@ -313,7 +313,7 @@ class ExpenseEntryFragment : Fragment() {
         val byteArray = outputStream.toByteArray()
 
         // ✅ Base64 인코딩 수정 (android.util.Base64 사용)
-        return Base64.encodeToString(byteArray, Base64.DEFAULT)
+        return Base64.encodeToString(byteArray, Base64.NO_WRAP)
     }
 
     private fun encodeImageToBase64(uri: String): String? {
