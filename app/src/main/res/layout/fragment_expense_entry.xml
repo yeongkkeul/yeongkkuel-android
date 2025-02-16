@@ -161,7 +161,7 @@
                     android:gravity="start|center_vertical"
                     android:paddingHorizontal="10dp"
                     android:paddingVertical="5dp"
-                    android:textColor="@color/black"
+                    android:textColor="@color/main1"
                     android:textSize="15sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/tv_character_count"
@@ -210,7 +210,7 @@
                 android:inputType="number"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="5dp"
-                android:textColor="@color/black"
+                android:textColor="@color/main1"
                 android:textSize="15sp"
                 app:layout_constraintStart_toEndOf="@id/tv_expense_amount"
                 app:layout_constraintTop_toBottomOf="@id/cl_detail_input" />

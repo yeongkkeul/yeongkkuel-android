@@ -17,6 +17,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -146,17 +147,27 @@ class ExpenseEntryFragment : Fragment() {
 
         etAmountInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
             override fun afterTextChanged(s: Editable?) {
-                val input = s?.toString()?.replace(",", "")?.toLongOrNull() ?: return
-                val limitedValue = if (input > 99_999_999) 99_999_999 else input
+                etAmountInput.removeTextChangedListener(this)
+
+                val rawInput = s?.toString()?.replace(",", "") ?: ""
+                val input = rawInput.toLongOrNull() ?: 0
+
+                // 🔹 최대 8자리까지만 입력 가능하도록 제한
+                val trimmedInput = if (rawInput.length > 8) rawInput.substring(0, 8) else rawInput
+                val limitedValue = trimmedInput.toLongOrNull()?.coerceAtMost(99_999_999) ?: 0
+
                 val formatted = String.format("%,d", limitedValue)
+
                 if (formatted != s.toString()) {
-                    etAmountInput.removeTextChangedListener(this)
                     etAmountInput.setText(formatted)
                     etAmountInput.setSelection(formatted.length)
-                    etAmountInput.addTextChangedListener(this)
                 }
+
+                etAmountInput.addTextChangedListener(this)
             }
         })
     }
@@ -285,6 +296,7 @@ class ExpenseEntryFragment : Fragment() {
 
 
     private fun validateAndSaveEntry(view: View): Boolean {
+        val clDetailInput = view.findViewById<ConstraintLayout>(R.id.cl_detail_input) // ✅ 부모 ConstraintLayout
         val etDetailInput = view.findViewById<EditText>(R.id.et_detail_input)
         val etAmountInput = view.findViewById<EditText>(R.id.et_amount_input)
         val ivCircleExpenseChecked = view.findViewById<ImageView>(R.id.iv_circle_expense_checked)
@@ -301,11 +313,13 @@ class ExpenseEntryFragment : Fragment() {
 
         // 지출 내용 확인
         if (detail.isBlank() && !isNoExpenseChecked) {
-            etDetailInput.background = errorBackground
+            clDetailInput.setBackgroundResource(R.drawable.bg_edit_text_error) // ✅ 부모 배경 변경
+            etDetailInput.setBackgroundResource(android.R.color.transparent)  // ✅ EditText 배경 투명하게
             hasError = true
             Toast.makeText(requireContext(), "지출 내용을 입력하세요.", Toast.LENGTH_SHORT).show()
         } else {
-            etDetailInput.background = normalBackground
+            clDetailInput.setBackgroundResource(R.drawable.bg_edit_text) // ✅ 부모 배경 원래대로
+            etDetailInput.setBackgroundResource(android.R.color.transparent)
         }
 
         // 지출액 확인

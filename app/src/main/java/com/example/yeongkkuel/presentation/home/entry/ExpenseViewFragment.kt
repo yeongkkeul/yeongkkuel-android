@@ -23,6 +23,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.text.NumberFormat
 
 class ExpenseViewFragment : Fragment() {
 
@@ -46,6 +47,7 @@ class ExpenseViewFragment : Fragment() {
         binding.btnBack.setOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
+        expandClickArea(binding.icMore, 20)
 
         // icMore 클릭 시 cl_more의 visibility 토글 (수정/삭제 메뉴 표시)
         binding.icMore.setOnClickListener {
@@ -74,7 +76,7 @@ class ExpenseViewFragment : Fragment() {
 
         // 이제 이 값들을 UI에 세팅
         binding.etDetailInput.setText(expenseName)
-        binding.etAmountInput.setText(expensePrice.toString())
+        binding.etAmountInput.setText(formatPrice(expensePrice)) // 쉼표 포함 숫자 표시
 
         binding.tvCategoryInput.setTextColor(ContextCompat.getColor(requireContext(), categoryColor))
         binding.tvCategoryInput.text = categoryName
@@ -157,6 +159,20 @@ class ExpenseViewFragment : Fragment() {
         }
     }
 
+    // 필요시 터치 영역 확장 (옵션)
+    private fun expandClickArea(view: View, extraPadding: Int) {
+        val parent = view.parent as View
+        parent.post {
+            val rect = Rect()
+            view.getHitRect(rect)
+            rect.top -= extraPadding
+            rect.bottom += extraPadding
+            rect.left -= extraPadding
+            rect.right += extraPadding
+            parent.touchDelegate = TouchDelegate(rect, view)
+        }
+    }
+
     private fun getCategoryTextColor(categoryName: String): Int {
         val spendingList = viewModel.uiState.value.spendingList
         val category = spendingList.find { it.kind.name == categoryName }
@@ -165,6 +181,9 @@ class ExpenseViewFragment : Fragment() {
         } ?: ContextCompat.getColor(requireContext(), R.color.black2)
     }
 
+    private fun formatPrice(price: Int): String {
+        return NumberFormat.getInstance(Locale.KOREAN).format(price)
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

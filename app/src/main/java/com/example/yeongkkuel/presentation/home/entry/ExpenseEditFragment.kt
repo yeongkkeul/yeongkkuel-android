@@ -1,6 +1,8 @@
 package com.example.yeongkkuel.presentation.home.entry
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +21,7 @@ import kotlinx.coroutines.launch
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentExpenseEditBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
+import java.text.NumberFormat
 import java.util.Date
 
 class ExpenseEditFragment : Fragment() {
@@ -63,6 +66,8 @@ class ExpenseEditFragment : Fragment() {
 
                     binding.tvCategoryInput.text = category?.kind?.name ?: "기타"
                     binding.etDetailInput.setText(selectedExpense.name)
+
+                    setupAmountInput()
                     binding.etAmountInput.setText(selectedExpense.price.toString())
 
                     // ✅ 카테고리 색상 적용
@@ -151,6 +156,35 @@ class ExpenseEditFragment : Fragment() {
             }
         }
     }
+    private fun setupAmountInput() {
+        binding.etAmountInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                binding.etAmountInput.removeTextChangedListener(this)
+
+                val rawInput = s?.toString()?.replace(",", "") ?: ""
+                val input = rawInput.toLongOrNull() ?: 0
+
+                // 🔹 최대 8자리까지만 입력 가능하도록 제한
+                val trimmedInput = if (rawInput.length > 8) rawInput.substring(0, 8) else rawInput
+                val limitedValue = trimmedInput.toLongOrNull()?.coerceAtMost(99_999_999) ?: 0
+
+                // 🔹 쉼표(,)를 자동으로 추가하여 1,000,000 형식으로 표시
+                val formatted = NumberFormat.getInstance(Locale.KOREAN).format(limitedValue)
+
+                if (formatted != s.toString()) {
+                    binding.etAmountInput.setText(formatted)
+                    binding.etAmountInput.setSelection(formatted.length)
+                }
+
+                binding.etAmountInput.addTextChangedListener(this)
+            }
+        })
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
