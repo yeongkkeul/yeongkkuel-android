@@ -79,6 +79,13 @@ class ExpenseViewFragment : Fragment() {
         val expenseDate = expenseDateString?.let { parseDate(it) }
         val imageUrl = arguments?.getString("imageUrl") ?: ""
 
+//        // 무지출이면 `ic_more` 버튼 숨기기
+//        if (expensePrice == 0) {
+//            binding.icMore.visibility = View.GONE // 더보기 버튼 숨기기
+//        } else {
+//            binding.icMore.visibility = View.VISIBLE // 더보기 버튼 보이기
+//        }
+
         // 3) Glide로 이미지 로드
         // ✅ Base64 또는 URL 기반 이미지 로드 처리
         if (imageUrl.isNotEmpty()) {
