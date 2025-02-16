@@ -1,25 +1,37 @@
 package com.example.yeongkkuel.presentation.home.entry.data
 
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.POST
-import retrofit2.http.Path
-import retrofit2.http.DELETE
-import retrofit2.http.PATCH
+import retrofit2.http.*
 
 interface ExpenseApiService {
 
+    @Multipart
     @POST("/api/expense")
     suspend fun createExpense(
-        @Body expenseRequest: ExpenseRequest
+        @Part("day") day: String,
+        @Part("categoryId") categoryId: RequestBody,
+        @Part("content") content: String,
+        @Part("amount") amount: RequestBody,
+        @Part("isExpense") isExpense: RequestBody,
+        @Part("sendChatRoom") sendChatRoom: RequestBody,
+        @Part expenseImage: MultipartBody.Part? // 파일 첨부 (선택사항)
     ): Response<ExpenseResponse>
 
+    @Multipart
     @PATCH("/api/expense/{expenseId}")
     suspend fun updateExpense(
         @Path("expenseId") expenseId: Int,
-        @Body request: ExpenseUpdateRequest
+        @Part("day") day: String,
+        @Part("categoryId") categoryId: RequestBody,
+        @Part("content") content: String,
+        @Part("amount") amount: RequestBody,
+        @Part expenseImage: MultipartBody.Part? // 파일 첨부 (선택사항)
     ): Response<ExpenseUpdateResponse>
 
     @DELETE("/api/expense/{expenseId}")
-    suspend fun deleteExpense(@Path("expenseId") expenseId: Int): Response<ExpenseDeleteResponse>
+    suspend fun deleteExpense(
+        @Path("expenseId") expenseId: Int
+    ): Response<ExpenseDeleteResponse> // 응답을 처리할 데이터 클래스 사용
 }

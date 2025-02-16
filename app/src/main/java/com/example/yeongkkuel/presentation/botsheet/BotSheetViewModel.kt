@@ -9,7 +9,6 @@ import com.example.yeongkkuel.network.RetrofitClient
 import com.example.yeongkkuel.network.response.Response
 import com.example.yeongkkuel.network.response.expenditure.DayExpenditureResponse
 import com.example.yeongkkuel.presentation.home.category.data.Category
-import com.example.yeongkkuel.presentation.home.entry.data.ExpenseListResponse
 import com.example.yeongkkuel.presentation.home.entry.data.ExpenseUpdateRequest
 import com.example.yeongkkuel.presentation.home.entry.data.ExpenseUpdateResponse
 import com.example.yeongkkuel.presentation.util.Colors

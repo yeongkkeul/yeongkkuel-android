@@ -1,13 +1,9 @@
 package com.example.yeongkkuel.presentation.home.entry
 
 import android.app.DatePickerDialog
-import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
@@ -16,52 +12,38 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavController
 import androidx.navigation.Navigation
-import androidx.navigation.fragment.findNavController
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.network.RetrofitClient
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
-import com.example.yeongkkuel.presentation.home.entry.data.ExpenseRepository
-import com.example.yeongkkuel.presentation.home.entry.data.ExpenseRequest
-import com.example.yeongkkuel.presentation.home.entry.data.ExpenseViewModel
+import com.example.yeongkkuel.presentation.home.entry.data.*
 import com.example.yeongkkuel.presentation.util.SpendingCategory
-import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
-import java.io.ByteArrayOutputStream
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import java.io.File
 import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
-import android.util.Base64
-import java.io.InputStream
-import kotlin.io.encoding.ExperimentalEncodingApi
+import java.util.*
 
 class ExpenseEntryFragment : Fragment() {
 
-    private lateinit var navController: NavController
+    private lateinit var expenseViewModel: ExpenseViewModel
+    private val botSheetViewModel: BotSheetViewModel by activityViewModels()
+    private var selectedImageUri: Uri? = null
     private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var navController: androidx.navigation.NavController
     private val PICK_IMAGE_REQUEST = 1
     private var expenseDate: String = ""
-    private var expensePhotoUrl: String = ""
-
-    private val botSheetViewModel: BotSheetViewModel by activityViewModels()
-    private lateinit var expenseViewModel: ExpenseViewModel
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -80,7 +62,6 @@ class ExpenseEntryFragment : Fragment() {
         val repository = ExpenseRepository(RetrofitClient.expenseApiService)
         expenseViewModel = ViewModelProvider(this, ExpenseViewModel.Factory(repository)).get(ExpenseViewModel::class.java)
 
-
         setupCategory(view)
         initializeViews(view)
         setupDatePicker(view)
@@ -91,6 +72,16 @@ class ExpenseEntryFragment : Fragment() {
         setupBackButton(view)
         setupCompleteButton(view)
         setupPhotoFrame(view)
+    }
+
+    // ✅ 완료 버튼 클릭 시 데이터 저장 및 API 호출
+    private fun setupCompleteButton(view: View) {
+        val tvEntryComplete = view.findViewById<TextView>(R.id.tv_entry_complete)
+        tvEntryComplete.setOnClickListener {
+            if (validateAndSaveEntry(view)) {
+                saveExpense(view)
+            }
+        }
     }
 
     // 카테고리 관련 초기화
@@ -230,19 +221,6 @@ class ExpenseEntryFragment : Fragment() {
         }
     }
 
-    // 완료 버튼 로직
-    private fun setupCompleteButton(view: View) {
-        val tvEntryComplete = view.findViewById<View>(R.id.tv_entry_complete)
-        tvEntryComplete.setOnClickListener {
-            if (validateAndSaveEntry(view)) {
-                saveExpense(view) // ✅ API 요청 및 저장
-
-                // ✅ 저장 후 적절한 Fragment로 이동
-                handleNavigationAfterSave(view)
-            }
-        }
-    }
-
     private fun saveExpense(view: View) {
         val tvDateInput = view.findViewById<TextView>(R.id.tv_date_input)
         val etDetailInput = view.findViewById<EditText>(R.id.et_detail_input)
@@ -256,7 +234,15 @@ class ExpenseEntryFragment : Fragment() {
         val isNoExpenseChecked = ivCircleExpenseChecked.visibility == View.VISIBLE
         val isSendChatRoomChecked = ivCircleSendChecked.visibility == View.VISIBLE
 
-        // 카테고리 ID 매핑
+        val formattedDate = formatDateForServer(tvDateInput.text.toString())
+
+        // 🔹 선택된 이미지 파일을 `MultipartBody.Part`로 변환
+        val imagePart = selectedImageUri?.let { uri ->
+            val file = File(uri.path ?: "")
+            val requestFile = RequestBody.create("image/*".toMediaTypeOrNull(), file)
+            MultipartBody.Part.createFormData("expenseImage", file.name, requestFile)
+        }
+
         val selectedCategoryName = arguments?.getString("selectedCategory") ?: "기본 카테고리"
         val matchingCategory = botSheetViewModel.uiState.value.spendingList.find {
             it.kind.name.equals(selectedCategoryName, ignoreCase = true)
@@ -271,27 +257,20 @@ class ExpenseEntryFragment : Fragment() {
             return
         }
 
-        // Base64 변환된 이미지 데이터 가져오기
-        val base64Image = convertImageToBase64()
+        val expenseRequest = ExpenseRequest(
+            day = formattedDate,
+            categoryId = validCategoryId,
+            content = detail,
+            amount = if (isNoExpenseChecked) 0 else amount,
+            isExpense = isNoExpenseChecked,
+            sendChatRoom = isSendChatRoomChecked,
+            expenseImage = null
+        )
 
-        // Coroutine Scope에서 "사진"을 Base64로 변환
+
+        // ✅ API 호출
         viewLifecycleOwner.lifecycleScope.launch {
-            val base64Image: String? = if (expensePhotoUrl.isNotEmpty()) {
-                encodeImageToBase64(expensePhotoUrl)
-            } else null
-
-            val expenseRequest = ExpenseRequest(
-                day = formatDateForServer(tvDateInput.text.toString()),
-                categoryId = validCategoryId,
-                content = detail,
-                amount = if (isNoExpenseChecked) 0 else amount,
-                isExpense = isNoExpenseChecked,
-                expenseImg = base64Image,  // Base64 문자열로 전송
-                sendChatRoom = isSendChatRoomChecked
-            )
-
-            // 서버 전송
-            expenseViewModel.createExpense(expenseRequest) { response ->
+            expenseViewModel.createExpense(expenseRequest, imagePart) { response ->
                 if (response?.isSuccess == true) {
                     Toast.makeText(requireContext(), "지출 내역이 저장되었습니다.", Toast.LENGTH_SHORT).show()
                     navController.navigate(R.id.navigation_home)
@@ -301,46 +280,6 @@ class ExpenseEntryFragment : Fragment() {
             }
         }
     }
-
-    // 선택한 이미지를 Base64로 변환하는 함수
-    private fun convertImageToBase64(): String? {
-        val imgPhotoFrame = view?.findViewById<ImageView>(R.id.img_photo_frame)
-        val drawable = imgPhotoFrame?.drawable ?: return null
-        val bitmap = (drawable as? BitmapDrawable)?.bitmap ?: return null
-
-        val outputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)  // JPEG로 압축
-        val byteArray = outputStream.toByteArray()
-
-        // ✅ Base64 인코딩 수정 (android.util.Base64 사용)
-        return Base64.encodeToString(byteArray, Base64.DEFAULT)
-    }
-
-    private fun encodeImageToBase64(uri: String): String? {
-        return try {
-            val contentResolver: ContentResolver = requireContext().contentResolver
-            val inputStream: InputStream? = contentResolver.openInputStream(Uri.parse(uri))
-            val bitmap = BitmapFactory.decodeStream(inputStream)
-            val outputStream = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-            val byteArray = outputStream.toByteArray()
-            Base64.encodeToString(byteArray, Base64.DEFAULT)  // Base64 변환
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
-    }
-
-
-    private fun formatDateForServer(date: String): String {
-        val regex = """(\d{4})년 (\d{1,2})월 (\d{1,2})일""".toRegex()
-        val matchResult = regex.find(date)
-        return matchResult?.let {
-            val (year, month, day) = it.destructured
-            "%04d-%02d-%02d".format(year.toInt(), month.toInt(), day.toInt())
-        } ?: SimpleDateFormat("yyyy-MM-dd", Locale.KOREAN).format(Date())
-    }
-
 
     private fun validateAndSaveEntry(view: View): Boolean {
         val clDetailInput = view.findViewById<ConstraintLayout>(R.id.cl_detail_input)
@@ -396,7 +335,6 @@ class ExpenseEntryFragment : Fragment() {
 
         botSheetViewModel.addExpenseHistory(expenseHistory)
 
-
         // SpendingCategory 처리
         return try {
             val categoryEnum = SpendingCategory.fromName(selectedCategory)
@@ -436,7 +374,32 @@ class ExpenseEntryFragment : Fragment() {
         }
     }
 
-    // 사진 첨부 버튼 로직
+    private fun getDayOfWeek(year: Int, month: Int, day: Int): String {
+        val calendar = Calendar.getInstance()
+        calendar.set(year, month, day)
+        return when (calendar.get(Calendar.DAY_OF_WEEK)) {
+            Calendar.SUNDAY -> "일요일"
+            Calendar.MONDAY -> "월요일"
+            Calendar.TUESDAY -> "화요일"
+            Calendar.WEDNESDAY -> "수요일"
+            Calendar.THURSDAY -> "목요일"
+            Calendar.FRIDAY -> "금요일"
+            Calendar.SATURDAY -> "토요일"
+            else -> ""
+        }
+    }
+
+    // 🔹 날짜 포맷 변환 함수 (YYYY-MM-DD로 변경)
+    private fun formatDateForServer(date: String): String {
+        val regex = """(\d{4})년 (\d{1,2})월 (\d{1,2})일""".toRegex()
+        val matchResult = regex.find(date)
+        return matchResult?.let {
+            val (year, month, day) = it.destructured
+            "%04d-%02d-%02d".format(year.toInt(), month.toInt(), day.toInt())
+        } ?: SimpleDateFormat("yyyy-MM-dd", Locale.KOREAN).format(Date())
+    }
+
+    // 갤러리에서 이미지 선택
     private fun setupPhotoFrame(view: View) {
         val flPhotoFrame = view.findViewById<FrameLayout>(R.id.fl_photo_frame)
         flPhotoFrame.setOnClickListener {
@@ -455,32 +418,18 @@ class ExpenseEntryFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == AppCompatActivity.RESULT_OK) {
             data?.data?.let { uri ->
-                // 로컬에서 미리보기
+                selectedImageUri = uri // ✅ 선택한 이미지 URI 저장
+
+                // 🔹 미리보기 업데이트
                 val imgPhotoFrame = view?.findViewById<ImageView>(R.id.img_photo_frame)
                 val ivPhotoIcon = view?.findViewById<ImageView>(R.id.iv_photo_icon)
                 imgPhotoFrame?.setImageURI(uri)
                 ivPhotoIcon?.visibility = View.GONE
-
-                // 선택된 사진 URI 저장
-                expensePhotoUrl = uri.toString() // content:// 형태
             }
         }
     }
-
-    private fun getDayOfWeek(year: Int, month: Int, day: Int): String {
-        val calendar = Calendar.getInstance()
-        calendar.set(year, month, day)
-        return when (calendar.get(Calendar.DAY_OF_WEEK)) {
-            Calendar.SUNDAY -> "일요일"
-            Calendar.MONDAY -> "월요일"
-            Calendar.TUESDAY -> "화요일"
-            Calendar.WEDNESDAY -> "수요일"
-            Calendar.THURSDAY -> "목요일"
-            Calendar.FRIDAY -> "금요일"
-            Calendar.SATURDAY -> "토요일"
-            else -> ""
-        }
-    }
-
-
+//    override fun onDestroyView() {
+//        super.onDestroyView()
+//        _binding = null
+//    }
 }
