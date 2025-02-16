@@ -13,7 +13,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import com.example.yeongkkuel.databinding.FragmentExpenseViewBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -59,7 +58,9 @@ class ExpenseEditFragment : Fragment() {
 
         setupDetailInput() // 지출 내용 글자 수 카운트
 
-        // ✅ 기존 지출 내역 불러오기
+        binding.tvDateInput.setOnClickListener { showDatePickerDialog() } // 달력 설정
+
+        // 기존 지출 내역 불러오기
         val selectedExpenseId = arguments?.getInt("expenseId") ?: return
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -70,7 +71,7 @@ class ExpenseEditFragment : Fragment() {
                     binding.tvDateInput.text = formatDate(viewModel.uiState.value.date)
 
                     val category = getCategoryForExpense(selectedExpense.id)
-                    selectedCategoryId = category?.categoryId // ✅ 카테고리 ID 저장
+                    selectedCategoryId = category?.categoryId
 
                     binding.tvCategoryInput.text = category?.kind?.name ?: "기타"
                     binding.etDetailInput.setText(selectedExpense.name)
@@ -78,11 +79,9 @@ class ExpenseEditFragment : Fragment() {
                     setupAmountInput()
                     binding.etAmountInput.setText(selectedExpense.price.toString())
 
-                    // ✅ 카테고리 색상 적용
                     val updatedColor = getCategoryTextColor(category?.kind?.name ?: "기타")
                     binding.tvCategoryInput.setTextColor(updatedColor)
 
-                    // ✅ 수정 가능하도록 `EditText` 활성화
                     enableEditing()
                 }
             }
@@ -103,16 +102,16 @@ class ExpenseEditFragment : Fragment() {
         binding.tvCategoryInput.isEnabled = false // 카테고리는 수정 불가능하도록 유지
     }
 
-    private fun getCategoryNameForExpense(expenseId: Int): String {
-        val spendingList = viewModel.uiState.value.spendingList
-
-        // 🔹 expenseId 기반으로 해당 지출이 속한 카테고리를 찾음
-        val category = spendingList.find { spending ->
-            spending.history.any { it.id == expenseId }
-        }
-
-        return category?.kind?.name ?: "기타"
-    }
+//    private fun getCategoryNameForExpense(expenseId: Int): String {
+//        val spendingList = viewModel.uiState.value.spendingList
+//
+//        // 🔹 expenseId 기반으로 해당 지출이 속한 카테고리를 찾음
+//        val category = spendingList.find { spending ->
+//            spending.history.any { it.id == expenseId }
+//        }
+//
+//        return category?.kind?.name ?: "기타"
+//    }
 
     private fun formatDate(date: Date?): String {
         return if (date != null) {
@@ -141,10 +140,10 @@ class ExpenseEditFragment : Fragment() {
             return
         }
 
-        // 🔹 arguments에서 expenseId 가져오기
+        // arguments에서 expenseId 가져오기
         val selectedExpenseId = arguments?.getInt("expenseId") ?: return
 
-        // 🔹 클릭한 내역을 찾아서 업데이트
+        // 클릭한 내역을 찾아서 업데이트
         val selectedExpense = viewModel.spendingHistoryList.value.find { it.id == selectedExpenseId } ?: return
         val category = getCategoryForExpense(selectedExpense.id)
 
@@ -155,8 +154,14 @@ class ExpenseEditFragment : Fragment() {
                 null // 이미지가 없을 경우 null로 설정
             }
 
+        // ✅ 사용자가 선택한 날짜가 있으면 그걸 사용하고, 없으면 기존 날짜 사용
+        val updatedDate = selectedDate?.let { formatDateToApiFormat(it) }
+            ?: formatDateToApiFormat(viewModel.uiState.value.date)
+
+        Log.d("ExpenseEditFragment", "✅ 수정된 날짜: $updatedDate")
+
         val updatedExpense = ExpenseUpdateRequest(
-            day = formatDateToApiFormat(viewModel.uiState.value.date),
+            day = updatedDate, // 변경된 날짜 반영
             categoryId = selectedCategoryId ?: return,
             content = newDetail,
             amount = newAmount,
@@ -167,15 +172,15 @@ class ExpenseEditFragment : Fragment() {
             try {
                 val updateResponse = viewModel.updateExpense(selectedExpense.id, updatedExpense)
 
-                if (updateResponse != null) {
-                    if (updateResponse.isSuccess) {
-                        Toast.makeText(requireContext(), "지출 내역이 수정되었습니다.", Toast.LENGTH_SHORT).show()
-                        findNavController().navigate(R.id.action_ExpenseEditFragment_to_HomeFragment)
-                    } else {
-                        Toast.makeText(requireContext(), "수정 실패: ${updateResponse.message ?: "알 수 없는 오류"}", Toast.LENGTH_SHORT).show()
-                    }
+                if (updateResponse?.isSuccess == true) {
+                    // 기존 카테고리에서 삭제 후 - 새로운 날짜로 이동
+                    viewModel.removeExpenseFromCategory(selectedExpense.id)
+                    viewModel.moveExpenseToNewDate(selectedExpense, updatedDate)
+
+                    Toast.makeText(requireContext(), "지출 내역이 수정되었습니다.", Toast.LENGTH_SHORT).show()
+                    findNavController().navigate(R.id.action_ExpenseEditFragment_to_HomeFragment)
                 } else {
-                    Toast.makeText(requireContext(), "수정 실패: 서버 응답 없음", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "수정 실패: ${updateResponse?.message ?: "알 수 없는 오류"}", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 Toast.makeText(requireContext(), "네트워크 오류 발생. 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
@@ -194,7 +199,7 @@ class ExpenseEditFragment : Fragment() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val length = s?.length ?: 0
-                tvCharacterCount.text = "$length/24" // ✅ 글자 수 표시
+                tvCharacterCount.text = "$length/24" // 글자 수 표시
 
                 if (length > 24) {
                     etDetailInput.error = "최대 24자까지 입력 가능합니다."
@@ -233,19 +238,20 @@ class ExpenseEditFragment : Fragment() {
         })
     }
 
+    private var selectedDate: Date? = null // ✅ 사용자가 선택한 날짜 저장
+
     private fun showDatePickerDialog() {
         val calendar = Calendar.getInstance()
 
         val datePickerDialog = DatePickerDialog(
             requireContext(),
             { _, year, month, dayOfMonth ->
-                val selectedDate = Calendar.getInstance().apply {
+                val pickedDate = Calendar.getInstance().apply {
                     set(year, month, dayOfMonth)
                 }.time
 
-                // ✅ 날짜 형식 변환 및 업데이트
-                val formattedDate = formatDate(selectedDate)
-                binding.tvDateInput.text = formattedDate
+                selectedDate = pickedDate // ✅ 선택한 날짜 저장
+                binding.tvDateInput.text = formatDate(pickedDate) // ✅ UI 반영
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
@@ -254,65 +260,24 @@ class ExpenseEditFragment : Fragment() {
         datePickerDialog.show()
     }
 
-    private fun saveExpenseAndNavigate() {
-        val newDetail = binding.etDetailInput.text.toString().trim()
-        val newAmount = binding.etAmountInput.text.toString().trim().replace(",", "").toIntOrNull() ?: 0
 
-        if (newDetail.isEmpty() || newAmount <= 0) {
-            Toast.makeText(requireContext(), "모든 항목을 입력하세요.", Toast.LENGTH_SHORT).show()
-            return
-        }
+    private fun parseDateFromDisplay(displayDate: String): String {
+        return try {
+            val inputFormat = SimpleDateFormat("yyyy년 M월 d일 E요일", Locale.KOREAN)
+            val outputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.KOREAN) // ✅ 서버 요구 형식
 
-        val selectedExpense = viewModel.spendingHistoryList.value.lastOrNull() ?: return
-        val category = getCategoryForExpense(selectedExpense.id)
-
-        val expenseImage =
-            if (category?.history?.find { it.id == selectedExpense.id }?.imgExist == true) {
-                "" // 서버에서 기존 이미지를 유지하도록 설정
-            } else {
-                null // 이미지가 없을 경우 null로 설정
-            }
-        val updatedDate = formatDateToApiFormat(viewModel.uiState.value.date)
-
-        val updatedExpense = ExpenseUpdateRequest(
-            day = updatedDate, // ✅ 업데이트된 날짜 반영
-            categoryId = selectedCategoryId ?: return,
-            content = newDetail,
-            amount = newAmount,
-            expenseImg = expenseImage
-        )
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            try {
-                Log.d("ExpenseEditFragment", "지출 수정 요청 시작: $updatedExpense")
-
-                val updateResponse = viewModel.updateExpense(selectedExpense.id, updatedExpense)
-
-                if (updateResponse != null) {
-                    if (updateResponse.isSuccess) {
-                        Toast.makeText(requireContext(), "지출 내역이 수정되었습니다.", Toast.LENGTH_SHORT).show()
-                        viewModel.moveExpenseToNewDate(selectedExpense, updatedDate)
-                        findNavController().navigate(R.id.navigation_stat_monthly)
-                        // ✅ 수정 완료 시 navigation_stat으로 이동
-                    } else {
-                        Toast.makeText(
-                            requireContext(),
-                            "수정 실패: ${updateResponse.message ?: "알 수 없는 오류"}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                } else {
-                    Toast.makeText(requireContext(), "수정 실패: 서버 응답 없음", Toast.LENGTH_SHORT).show()
-                }
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "네트워크 오류 발생. 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
-            }
+            val date = inputFormat.parse(displayDate)
+            date?.let { outputFormat.format(it) } ?: outputFormat.format(Date()) // ✅ 변환 실패 시 현재 날짜 반환
+        } catch (e: Exception) {
+            val outputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.KOREAN)
+            outputFormat.format(Date()) // ✅ 예외 발생 시 기본값 반환
         }
     }
 
+
     private fun formatDateToApiFormat(date: Date?): String {
         return if (date != null) {
-            val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.KOREAN) // ✅ 서버 요구 형식
+            val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.KOREAN)
             sdf.format(date)
         } else {
             ""

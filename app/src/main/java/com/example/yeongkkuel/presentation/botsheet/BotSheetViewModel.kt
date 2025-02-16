@@ -58,6 +58,20 @@ class BotSheetViewModel : ViewModel() {
         }
     }
 
+    // 지출 내역 수정 페이지 - 날짜 수정시 그 날 카테고리에서 제거함
+    fun removeExpenseFromCategory(expenseId: Int) {
+        _uiState.update { prevState ->
+            val updatedSpendingList = prevState.spendingList.map { category ->
+                category.copy(
+                    history = category.history.filter { it.id != expenseId }
+                )
+            }
+            prevState.copy(spendingList = updatedSpendingList)
+        }
+    }
+
+
+
     // 지출 내역 추가 기능
     fun addExpenseToCategory(category: SpendingCategory, history: BotSheetUiState.Spending.History) {
         _uiState.update { prev ->

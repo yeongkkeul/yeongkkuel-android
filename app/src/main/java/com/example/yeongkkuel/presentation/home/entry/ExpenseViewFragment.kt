@@ -153,11 +153,8 @@ class ExpenseViewFragment : Fragment() {
                 putString("expenseName", selectedExpense.name)
                 putInt("expensePrice", selectedExpense.price)
             }
-
-            Log.d("ExpenseViewFragment", "수정 버튼 클릭 - 전달할 expenseId: ${selectedExpense.id}") // ✅ 디버깅 로그
             findNavController().navigate(R.id.action_ExpenseViewFragment_to_ExpenseEditFragment, bundle)
         } else {
-            Log.e("ExpenseViewFragment", "❌ 오류: 해당 expenseId($expenseId)에 대한 지출 내역을 찾을 수 없음")
             Toast.makeText(requireContext(), "지출 내역을 찾을 수 없습니다.", Toast.LENGTH_SHORT).show()
         }
     }
