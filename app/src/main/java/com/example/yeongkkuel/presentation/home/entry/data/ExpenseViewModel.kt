@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import kotlinx.coroutines.launch
 
 class ExpenseViewModel(private val repository: ExpenseRepository) : ViewModel() {
@@ -15,12 +16,18 @@ class ExpenseViewModel(private val repository: ExpenseRepository) : ViewModel() 
     private val _updateResponse = MutableLiveData<ExpenseUpdateResponse?>()
     val updateResponse: LiveData<ExpenseUpdateResponse?> get() = _updateResponse
 
+    private val botSheetViewModel: BotSheetViewModel by lazy {
+        BotSheetViewModel() // BotSheetViewModel 인스턴스 생성
+    }
+
     fun createExpense(expenseRequest: ExpenseRequest, onResult: (ExpenseResponse?) -> Unit) {
 
         viewModelScope.launch {
             val response = repository.createExpense(expenseRequest)
             if (response != null && response.isSuccess) {
                 Log.d("ExpenseViewModel", "지출 내역 저장 성공: $response")
+
+                botSheetViewModel.getSpendingList()
             } else {
                 Log.e("ExpenseViewModel", "지출 내역 저장 실패 또는 응답 없음")
             }

@@ -17,4 +17,3 @@ data class ExpenseUpdateRequest(
     val amount: Int,       // 지출 금액
     val expenseImg: String? // 첨부 이미지 (선택 사항)
 )
-

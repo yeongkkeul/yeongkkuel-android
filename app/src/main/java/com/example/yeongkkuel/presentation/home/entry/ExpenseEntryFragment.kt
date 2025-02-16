@@ -1,9 +1,14 @@
 package com.example.yeongkkuel.presentation.home.entry
 
 import android.app.DatePickerDialog
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -23,6 +28,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
@@ -34,10 +40,16 @@ import com.example.yeongkkuel.presentation.home.entry.data.ExpenseRepository
 import com.example.yeongkkuel.presentation.home.entry.data.ExpenseRequest
 import com.example.yeongkkuel.presentation.home.entry.data.ExpenseViewModel
 import com.example.yeongkkuel.presentation.util.SpendingCategory
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import android.util.Base64
+import java.io.InputStream
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 class ExpenseEntryFragment : Fragment() {
 
@@ -227,6 +239,7 @@ class ExpenseEntryFragment : Fragment() {
             }
         }
     }
+
     private fun saveExpense(view: View) {
         val tvDateInput = view.findViewById<TextView>(R.id.tv_date_input)
         val etDetailInput = view.findViewById<EditText>(R.id.et_detail_input)
@@ -237,46 +250,84 @@ class ExpenseEntryFragment : Fragment() {
         val detail = etDetailInput.text.toString().trim()
         val amountString = etAmountInput.text.toString().replace(",", "").trim()
         val amount = amountString.toIntOrNull() ?: 0
-        val isNoExpenseChecked = ivCircleExpenseChecked.visibility == View.VISIBLE // ✅ 무지출 체크 여부 확인
+        val isNoExpenseChecked = ivCircleExpenseChecked.visibility == View.VISIBLE
         val isSendChatRoomChecked = ivCircleSendChecked.visibility == View.VISIBLE
 
-
-        // 유효한 카테고리 ID를 가져옴 (API 요청 오류 방지)
+        // 카테고리 ID 매핑
         val selectedCategoryName = arguments?.getString("selectedCategory") ?: "기본 카테고리"
         val matchingCategory = botSheetViewModel.uiState.value.spendingList.find {
             it.kind.name.equals(selectedCategoryName, ignoreCase = true)
-        }
-        if(matchingCategory == null) {
+        } ?: run {
             Toast.makeText(requireContext(), "사용 가능한 카테고리가 없습니다.", Toast.LENGTH_SHORT).show()
             return
         }
+
         val validCategoryId = matchingCategory.categoryId
-
-
         if (validCategoryId == -1) {
             Toast.makeText(requireContext(), "사용 가능한 카테고리가 없습니다.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val expenseRequest = ExpenseRequest(
-            day = formatDateForServer(tvDateInput.text.toString()), // 날짜 포맷 변환
-            categoryId = validCategoryId, // 유효한 카테고리 ID
-            content = detail,
-            amount = if (isNoExpenseChecked) 0 else amount,
-            isExpense = isNoExpenseChecked,
-            expenseImg = expensePhotoUrl.takeIf { it.isNotEmpty() },
-            sendChatRoom = isSendChatRoomChecked
-        )
+        // Base64 변환된 이미지 데이터 가져오기
+        val base64Image = convertImageToBase64()
 
-        expenseViewModel.createExpense(expenseRequest) { response ->
-            if (response?.isSuccess == true) {
-                Toast.makeText(requireContext(), "지출 내역이 저장되었습니다.", Toast.LENGTH_SHORT).show()
-                navController.navigate(R.id.navigation_home)
-            } else {
-                Toast.makeText(requireContext(), "지출 내역 저장 실패.", Toast.LENGTH_SHORT).show()
+        // Coroutine Scope에서 "사진"을 Base64로 변환
+        viewLifecycleOwner.lifecycleScope.launch {
+            val base64Image: String? = if (expensePhotoUrl.isNotEmpty()) {
+                encodeImageToBase64(expensePhotoUrl)
+            } else null
+
+            val expenseRequest = ExpenseRequest(
+                day = formatDateForServer(tvDateInput.text.toString()),
+                categoryId = validCategoryId,
+                content = detail,
+                amount = if (isNoExpenseChecked) 0 else amount,
+                isExpense = isNoExpenseChecked,
+                expenseImg = base64Image,  // Base64 문자열로 전송
+                sendChatRoom = isSendChatRoomChecked
+            )
+
+            // 서버 전송
+            expenseViewModel.createExpense(expenseRequest) { response ->
+                if (response?.isSuccess == true) {
+                    Toast.makeText(requireContext(), "지출 내역이 저장되었습니다.", Toast.LENGTH_SHORT).show()
+                    navController.navigate(R.id.navigation_home)
+                } else {
+                    Toast.makeText(requireContext(), "지출 내역 저장 실패.", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
+
+    // 선택한 이미지를 Base64로 변환하는 함수
+    private fun convertImageToBase64(): String? {
+        val imgPhotoFrame = view?.findViewById<ImageView>(R.id.img_photo_frame)
+        val drawable = imgPhotoFrame?.drawable ?: return null
+        val bitmap = (drawable as? BitmapDrawable)?.bitmap ?: return null
+
+        val outputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)  // JPEG로 압축
+        val byteArray = outputStream.toByteArray()
+
+        // ✅ Base64 인코딩 수정 (android.util.Base64 사용)
+        return Base64.encodeToString(byteArray, Base64.DEFAULT)
+    }
+
+    private fun encodeImageToBase64(uri: String): String? {
+        return try {
+            val contentResolver: ContentResolver = requireContext().contentResolver
+            val inputStream: InputStream? = contentResolver.openInputStream(Uri.parse(uri))
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+            val outputStream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+            val byteArray = outputStream.toByteArray()
+            Base64.encodeToString(byteArray, Base64.DEFAULT)  // Base64 변환
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
 
     private fun formatDateForServer(date: String): String {
         val regex = """(\d{4})년 (\d{1,2})월 (\d{1,2})일""".toRegex()
@@ -400,11 +451,14 @@ class ExpenseEntryFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == AppCompatActivity.RESULT_OK) {
             data?.data?.let { uri ->
+                // 로컬에서 미리보기
                 val imgPhotoFrame = view?.findViewById<ImageView>(R.id.img_photo_frame)
                 val ivPhotoIcon = view?.findViewById<ImageView>(R.id.iv_photo_icon)
                 imgPhotoFrame?.setImageURI(uri)
                 ivPhotoIcon?.visibility = View.GONE
-                expensePhotoUrl = uri.toString()
+
+                // 선택된 사진 URI 저장
+                expensePhotoUrl = uri.toString() // content:// 형태
             }
         }
     }

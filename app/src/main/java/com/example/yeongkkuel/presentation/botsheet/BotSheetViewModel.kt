@@ -320,6 +320,7 @@ class BotSheetViewModel : ViewModel() {
         }
     }
 
+    // 지출 내역 수정
     suspend fun updateExpense(expenseId: Int, request: ExpenseUpdateRequest): ExpenseUpdateResponse? {
         return try {
             val response = expenseApiService.updateExpense(expenseId, request)
