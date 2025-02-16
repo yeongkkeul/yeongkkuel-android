@@ -5,22 +5,6 @@ import com.example.yeongkkuel.network.RetrofitClient
 import retrofit2.HttpException
 import java.io.IOException
 
-/*
-class HomeRepository {
-    private val api = RetrofitClient.homeApiService
-
-    suspend fun getHomeData(): HomeResponse? {
-        return try {
-            val response = api.getHomeData()
-            if (response.isSuccessful) response.body() else null
-        } catch (e: Exception) {
-            Log.e("HomeRepository", "홈 데이터 조회 오류: ${e.message}")
-            null
-        }
-    }
-}
-*/
-
 class HomeRepository {
     private val api = RetrofitClient.homeApiService
     private var isFetching = false // API 중복 요청 방지

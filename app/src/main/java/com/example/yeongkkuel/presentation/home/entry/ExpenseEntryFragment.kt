@@ -223,10 +223,14 @@ class ExpenseEntryFragment : Fragment() {
         val tvEntryComplete = view.findViewById<View>(R.id.tv_entry_complete)
         tvEntryComplete.setOnClickListener {
             if (validateAndSaveEntry(view)) {
-                saveExpense(view) // API 요청 및 저장
+                saveExpense(view) // ✅ API 요청 및 저장
+
+                // ✅ 저장 후 적절한 Fragment로 이동
+                handleNavigationAfterSave(view)
             }
         }
     }
+
     private fun saveExpense(view: View) {
         val tvDateInput = view.findViewById<TextView>(R.id.tv_date_input)
         val etDetailInput = view.findViewById<EditText>(R.id.et_detail_input)

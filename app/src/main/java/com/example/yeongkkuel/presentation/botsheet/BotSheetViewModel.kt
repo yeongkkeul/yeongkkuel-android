@@ -1,6 +1,5 @@
 package com.example.yeongkkuel.presentation.botsheet
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -337,6 +336,49 @@ class BotSheetViewModel : ViewModel() {
         }
     }
 
+    fun moveExpenseToNewDate(expense: BotSheetUiState.Spending.History, newDate: String) {
+        _uiState.update { prevState ->
+            val oldSpendingList = prevState.spendingList.toMutableList()
+
+            // ✅ 기존 날짜에서 해당 내역 제거 (새로운 리스트 생성)
+            val updatedSpendingList = prevState.spendingList.toMutableList()
+
+            // ✅ 기존 날짜에서 해당 내역 제거
+            updatedSpendingList.forEachIndexed { index, spending ->
+                if (spending.history.any { it.id == expense.id }) {
+                    val newHistory = spending.history.filterNot { it.id == expense.id }
+                    updatedSpendingList[index] = spending.copy(history = newHistory)
+                }
+            }
+
+            // ✅ 새로운 날짜의 Spending을 찾아서 추가 (없으면 새로 생성)
+            val targetSpendingIndex = updatedSpendingList.indexOfFirst { it.kind.name == "기타" }
+            val updatedHistory = expense.copy() // ✅ 기존 데이터 유지한 채 새로운 내역 추가
+
+            if (targetSpendingIndex != -1) {
+                // ✅ 기존 카테고리에 추가 (copy()로 새로운 객체 생성)
+                val updatedSpending = updatedSpendingList[targetSpendingIndex].copy(
+                    history = updatedSpendingList[targetSpendingIndex].history + updatedHistory
+                )
+                updatedSpendingList[targetSpendingIndex] = updatedSpending
+            } else {
+                // ✅ 새로운 카테고리 생성 후 추가
+                updatedSpendingList.add(
+                    BotSheetUiState.Spending(
+                        categoryId = -1, // 기본값
+                        kind = SpendingCategory.fromName("기타"),
+                        color = Colors.BLACK1,
+                        plusIconResId = R.drawable.ic_plus_default,
+                        history = listOf(updatedHistory)
+                    )
+                )
+            }
+
+            prevState.copy(spendingList = updatedSpendingList)
+        }
+
+        updateSpendingHistoryList() // ✅ 최신 데이터 반영
+    }
 
     fun getCategoryList(): List<Category> {
         val categoryList = _uiState.value.spendingList.map { spending ->

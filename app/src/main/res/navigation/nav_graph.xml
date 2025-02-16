@@ -254,6 +254,12 @@
         android:label="fragment_stat"
         tools:layout="@layout/fragment_stat">
     </fragment>
+    <fragment
+        android:id="@+id/navigation_stat_monthly"
+        android:name="com.example.yeongkkuel.presentation.stat.monthly.StatMonthlyFragment"
+        android:label="fragment_stat_monthly"
+        tools:layout="@layout/fragment_stat_monthly">
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_stat_setting"
