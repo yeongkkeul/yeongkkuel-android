@@ -235,7 +235,10 @@ class ExpenseEntryFragment : Fragment() {
         val tvEntryComplete = view.findViewById<View>(R.id.tv_entry_complete)
         tvEntryComplete.setOnClickListener {
             if (validateAndSaveEntry(view)) {
-                saveExpense(view) // API 요청 및 저장
+                saveExpense(view) // ✅ API 요청 및 저장
+
+                // ✅ 저장 후 적절한 Fragment로 이동
+                handleNavigationAfterSave(view)
             }
         }
     }
