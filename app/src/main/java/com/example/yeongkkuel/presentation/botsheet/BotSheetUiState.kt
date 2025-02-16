@@ -19,9 +19,9 @@ data class BotSheetUiState(
     ) {
         data class History(
             val id: Int,
-            val name: String,       // 🔹 지출 이름
-            val price: Int,         // 🔹 금액
-            val imgExist: Boolean   // 🔹 사진 URL 추가
+            val name: String,       // 지출 이름
+            val price: Int,         // 금액
+            val imgExist: Boolean,   // 사진 URL 추가
         )
     }
 

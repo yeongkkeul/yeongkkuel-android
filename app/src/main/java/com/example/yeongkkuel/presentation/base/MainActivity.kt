@@ -431,7 +431,8 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         expenseName: String,
         expensePrice: Int,
         categoryColor: Int,
-        categoryName: String
+        categoryName: String,
+        imageUrl: Boolean
     ) {
         Log.d("MainActivity", "navigateToExpenseView() 호출됨 - id=$expenseId, name=$expenseName, price=$expensePrice, color=$categoryColor")
 

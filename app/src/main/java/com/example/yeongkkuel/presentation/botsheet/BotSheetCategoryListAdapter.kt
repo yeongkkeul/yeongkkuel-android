@@ -42,15 +42,16 @@ class BotSheetCategoryListAdapter(
                     expenseName = selectedHistory.name,
                     expensePrice = selectedHistory.price,
                     categoryColor = categoryColor,
-                    categoryName = item.kind.name
+                    categoryName = item.kind.name,
+                    imageUrl = selectedHistory.imgExist
                 )
             }
 
             rvHistory.run {
                 adapter = localHistoryListAdapter
-                // 🔸 필터링된 목록만 표시!
+                // 필터링된 목록만 표시!
                 localHistoryListAdapter.submitList(displayedHistories) {
-                    // 🔸 무지출 문구는 '원본 목록'으로 판단
+                    // 무지출 문구는 '원본 목록'으로 판단
                     updateNoSpendAndMoreVisibility(originalHistories)
                 }
                 layoutManager = LinearLayoutManager(root.context)
@@ -75,13 +76,15 @@ class BotSheetCategoryListAdapter(
         private fun updateNoSpendAndMoreVisibility(histories: List<BotSheetUiState.Spending.History>) {
             // ⚠ 인자로 '원본 목록'을 받음 (blank+0원 항목도 포함)
             if (histories.isEmpty()) {
-                // 내역이 전혀 없으면 → 무지출 문구 안 보임 (사용자 요구사항에 따라 조정)
+                // 내역이 전혀 없으면 → 무지출 문구 안 보임
                 binding.tvNoSpend.visibility = View.GONE
                 botSheetListener.onNoExpenseChanged(false)
                 return
             }
-            // 내역이 있고, 모두 금액 0원이면 무지출 문구 보임
+
+            // 내역이 있고, 모두 `price == 0`이면 무지출 문구 보이기
             val allZero = histories.all { it.price == 0 }
+
             if (allZero) {
                 binding.tvNoSpend.visibility = View.VISIBLE
                 botSheetListener.onNoExpenseChanged(true)
@@ -90,7 +93,6 @@ class BotSheetCategoryListAdapter(
                 botSheetListener.onNoExpenseChanged(false)
             }
         }
-
     }
 
 
