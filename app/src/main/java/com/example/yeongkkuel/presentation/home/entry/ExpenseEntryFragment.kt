@@ -353,25 +353,26 @@ class ExpenseEntryFragment : Fragment() {
         val amount = amountString.toIntOrNull() ?: 0
         val isNoExpenseChecked = ivCircleExpenseChecked.visibility == View.VISIBLE
 
-        val errorBackground = ContextCompat.getDrawable(requireContext(), R.drawable.bg_edit_text_error)
+        val errorBackground = ContextCompat.getDrawable(requireContext(), R.drawable.bg_edit_text_error) // 지출 내용 에러
+        val errorBackground2 = ContextCompat.getDrawable(requireContext(), R.drawable.bg_edit_text_error2) // 지출액 에러
         val normalBackground = ContextCompat.getDrawable(requireContext(), R.drawable.bg_edit_text)
 
         var hasError = false
 
         // 지출 내용 확인
         if (detail.isBlank() && !isNoExpenseChecked) {
-            clDetailInput.setBackgroundResource(R.drawable.bg_edit_text_error)
+            clDetailInput.background = errorBackground
             etDetailInput.setBackgroundResource(android.R.color.transparent)
             hasError = true
             Toast.makeText(requireContext(), "지출 내용을 입력하세요.", Toast.LENGTH_SHORT).show()
         } else {
-            clDetailInput.setBackgroundResource(R.drawable.bg_edit_text)
+            clDetailInput.background = normalBackground
             etDetailInput.setBackgroundResource(android.R.color.transparent)
         }
 
         // 지출액 확인
         if (amount <= 0 && !isNoExpenseChecked) {
-            etAmountInput.background = errorBackground
+            etAmountInput.background = errorBackground2
             hasError = true
             Toast.makeText(requireContext(), "지출액을 입력하세요.", Toast.LENGTH_SHORT).show()
         } else {

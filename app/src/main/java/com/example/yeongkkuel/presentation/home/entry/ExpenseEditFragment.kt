@@ -62,7 +62,11 @@ class ExpenseEditFragment : Fragment() {
         // ✅ 기존 지출 내역 불러오기
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.spendingHistoryList.collectLatest { historyList ->
-                val selectedExpense = historyList.lastOrNull()
+                // 🔹 arguments에서 expenseId 가져오기
+                val selectedExpenseId = arguments?.getInt("expenseId") ?: return@collectLatest
+
+                // 🔹 클릭한 ID에 해당하는 지출 내역 찾기
+                val selectedExpense = historyList.find { it.id == selectedExpenseId }
 
                 if (selectedExpense != null) {
                     binding.tvDateInput.text = formatDate(viewModel.uiState.value.date)
@@ -85,6 +89,7 @@ class ExpenseEditFragment : Fragment() {
                 }
             }
         }
+
     }
     private fun getCategoryForExpense(expenseId: Int): BotSheetUiState.Spending? {
         return viewModel.uiState.value.spendingList.find { spending ->
@@ -159,22 +164,14 @@ class ExpenseEditFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                Log.d("ExpenseEditFragment", "지출 수정 요청 시작: $updatedExpense")
-
                 val updateResponse = viewModel.updateExpense(selectedExpense.id, updatedExpense)
 
                 if (updateResponse != null) {
                     if (updateResponse.isSuccess) {
-                        Log.d("ExpenseEditFragment", "✅ 지출 수정 성공: ${updateResponse.message}")
-
                         Toast.makeText(requireContext(), "지출 내역이 수정되었습니다.", Toast.LENGTH_SHORT)
                             .show()
                         findNavController().navigate(R.id.action_ExpenseEditFragment_to_HomeFragment)
                     } else {
-                        Log.e(
-                            "ExpenseEditFragment",
-                            "❌ 지출 수정 실패, 서버 응답 메시지: ${updateResponse.message}"
-                        )
                         Toast.makeText(
                             requireContext(),
                             "수정 실패: ${updateResponse.message ?: "알 수 없는 오류"}",
@@ -182,11 +179,9 @@ class ExpenseEditFragment : Fragment() {
                         ).show()
                     }
                 } else {
-                    Log.e("ExpenseEditFragment", "❌ 서버 응답이 `null`입니다. 상태 코드와 오류 메시지를 확인하세요.")
                     Toast.makeText(requireContext(), "수정 실패: 서버 응답 없음", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                Log.e("ExpenseEditFragment", "🚨 API 호출 중 오류 발생", e)
                 Toast.makeText(requireContext(), "네트워크 오류 발생. 다시 시도해주세요.", Toast.LENGTH_SHORT)
                     .show()
             }
@@ -196,7 +191,7 @@ class ExpenseEditFragment : Fragment() {
     // 지출 내용 글자 수 제한 로직 추가
     private fun setupDetailInput() {
         val etDetailInput = binding.etDetailInput
-        val tvCharacterCount = binding.tvCharacterCount // ✅ tvCharacterCount 추가해야 함 (XML에서 확인)
+        val tvCharacterCount = binding.tvCharacterCount
 
         etDetailInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -209,7 +204,6 @@ class ExpenseEditFragment : Fragment() {
                     etDetailInput.error = "최대 24자까지 입력 가능합니다."
                 }
             }
-
             override fun afterTextChanged(s: Editable?) {}
         })
     }
@@ -256,8 +250,6 @@ class ExpenseEditFragment : Fragment() {
                 // ✅ 날짜 형식 변환 및 업데이트
                 val formattedDate = formatDate(selectedDate)
                 binding.tvDateInput.text = formattedDate
-
-
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
