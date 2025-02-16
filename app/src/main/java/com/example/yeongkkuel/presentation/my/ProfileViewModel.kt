@@ -33,8 +33,9 @@ class ProfileViewModel : ViewModel() {
     val profileResponse: LiveData<Response<MyPageResult>> get() = _profileResponse
 
 
-    private val _updateStatus = MutableLiveData<Result<Unit>>()
-    val updateStatus: LiveData<Result<Unit>> get() = _updateStatus
+    private val _updateStatusEvent = MutableLiveData<Event<Boolean>>()
+    val updateStatusEvent: LiveData<Event<Boolean>> get() = _updateStatusEvent
+
 
 
     private val _nickname = MutableLiveData<String>()
@@ -157,10 +158,10 @@ class ProfileViewModel : ViewModel() {
                 // 수정 성공
                 // profileResponse도 갱신할 수 있음
                 _profileResponse.value = patchResult as Response<MyPageResult>
-                _updateStatus.value = Result.success(Unit)
+                _updateStatusEvent.value = Event(true)   // <-- 이벤트 발행
             } else {
                 // 수정 실패
-                _updateStatus.value = Result.failure(Exception("프로필 수정 실패"))
+                _updateStatusEvent.value = Event(false)   // <-- 이벤트 발행
             }
         }
     }
