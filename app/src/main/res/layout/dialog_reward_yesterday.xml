@@ -29,7 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/space_large"
-        android:text="어제 총 293 리워드를 획득했어요."
+        android:text="어제 총 0 리워드를 획득했어요."
         android:textColor="@color/black"
         />
 
