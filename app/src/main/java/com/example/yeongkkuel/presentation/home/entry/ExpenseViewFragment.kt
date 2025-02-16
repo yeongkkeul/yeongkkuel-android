@@ -34,7 +34,7 @@ class ExpenseViewFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: BotSheetViewModel by activityViewModels()
-    private var selectedCategoryId: Int? = null // ✅ 카테고리 ID 저장
+    private var selectedCategoryId: Int? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -79,10 +79,8 @@ class ExpenseViewFragment : Fragment() {
         val categoryName = arguments?.getString("categoryName") ?: "카테고리 없음"
 
         val expenseDateString = arguments?.getString("expenseDate") // yyyy-MM-dd 형식 가정
-        Log.d("ExpenseViewFragment", "📅 받은 날짜 문자열: $expenseDateString")
 
         val expenseDate = expenseDateString?.let { parseDate(it) }
-        Log.d("ExpenseViewFragment", "📅 변환된 Date 객체: $expenseDate")
 
         binding.tvDateInput.text = formatDate(expenseDate)
 
@@ -127,7 +125,6 @@ class ExpenseViewFragment : Fragment() {
     // 지출 내역 삭제
     private fun deleteExpense() {
         val selectedExpense = viewModel.spendingHistoryList.value.lastOrNull() ?: return
-        Log.d("ExpenseViewFragment", "🟠 삭제 요청: expenseId=${selectedExpense.id}, name=${selectedExpense.name}")
 
         // 삭제 확인 다이얼로그 띄우기
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_expense_delete, null)
@@ -141,12 +138,10 @@ class ExpenseViewFragment : Fragment() {
         val btnCancel = dialogView.findViewById<TextView>(R.id.tv_cancel_btn)
 
         btnConfirm.setOnClickListener {
-            Log.d("ExpenseViewFragment", "🔹 삭제 요청 버튼 클릭됨")
-            viewModel.deleteExpense(selectedExpense.id) // ✅ 서버에 삭제 요청
+            viewModel.deleteExpense(selectedExpense.id) // 서버에 삭제 요청
 
             viewModel.deleteResult.observe(viewLifecycleOwner) { isDeleted ->
                 if (isDeleted) {
-                    Log.d("ExpenseViewFragment", "✅ 삭제 성공: expenseId=${selectedExpense.id}")
                     Toast.makeText(requireContext(), "지출 내역이 삭제되었습니다.", Toast.LENGTH_SHORT).show()
                     findNavController().popBackStack(R.id.navigation_home, false)
                 } else {

@@ -87,9 +87,6 @@ class ExpenseEntryFragment : Fragment() {
         val categoryColor = arguments?.getInt("categoryColor") ?: R.color.black2
         val tvCategoryInput = view.findViewById<TextView>(R.id.tv_category_input)
         tvCategoryInput.text = selectedCategory
-
-        Log.d("ExpenseEntryFragment", "setupCategory - selectedCategory: $selectedCategory, categoryColor: $categoryColor")
-
         tvCategoryInput.setTextColor(requireContext().getColor(categoryColor))
     }
 
@@ -250,7 +247,6 @@ class ExpenseEntryFragment : Fragment() {
             it.kind.name.equals(selectedCategoryName, ignoreCase = true)
         }
         if(matchingCategory == null) {
-            Log.e("ExpenseEntryFragment", "선택된 카테고리에 해당하는 항목이 없습니다.")
             Toast.makeText(requireContext(), "사용 가능한 카테고리가 없습니다.", Toast.LENGTH_SHORT).show()
             return
         }
@@ -272,14 +268,11 @@ class ExpenseEntryFragment : Fragment() {
             sendChatRoom = isSendChatRoomChecked
         )
 
-        Log.d("ExpenseEntryFragment", "지출 내역 요청 데이터: $expenseRequest")
         expenseViewModel.createExpense(expenseRequest) { response ->
             if (response?.isSuccess == true) {
-                Log.d("ExpenseEntryFragment", "지출 내역 저장 완료: ${response.result}")
                 Toast.makeText(requireContext(), "지출 내역이 저장되었습니다.", Toast.LENGTH_SHORT).show()
                 navController.navigate(R.id.navigation_home)
             } else {
-                Log.e("ExpenseEntryFragment", "지출 내역 저장 실패: ${response?.message}")
                 Toast.makeText(requireContext(), "지출 내역 저장 실패.", Toast.LENGTH_SHORT).show()
             }
         }
@@ -296,7 +289,7 @@ class ExpenseEntryFragment : Fragment() {
 
 
     private fun validateAndSaveEntry(view: View): Boolean {
-        val clDetailInput = view.findViewById<ConstraintLayout>(R.id.cl_detail_input) // ✅ 부모 ConstraintLayout
+        val clDetailInput = view.findViewById<ConstraintLayout>(R.id.cl_detail_input)
         val etDetailInput = view.findViewById<EditText>(R.id.et_detail_input)
         val etAmountInput = view.findViewById<EditText>(R.id.et_amount_input)
         val ivCircleExpenseChecked = view.findViewById<ImageView>(R.id.iv_circle_expense_checked)
@@ -313,12 +306,12 @@ class ExpenseEntryFragment : Fragment() {
 
         // 지출 내용 확인
         if (detail.isBlank() && !isNoExpenseChecked) {
-            clDetailInput.setBackgroundResource(R.drawable.bg_edit_text_error) // ✅ 부모 배경 변경
-            etDetailInput.setBackgroundResource(android.R.color.transparent)  // ✅ EditText 배경 투명하게
+            clDetailInput.setBackgroundResource(R.drawable.bg_edit_text_error)
+            etDetailInput.setBackgroundResource(android.R.color.transparent)
             hasError = true
             Toast.makeText(requireContext(), "지출 내용을 입력하세요.", Toast.LENGTH_SHORT).show()
         } else {
-            clDetailInput.setBackgroundResource(R.drawable.bg_edit_text) // ✅ 부모 배경 원래대로
+            clDetailInput.setBackgroundResource(R.drawable.bg_edit_text)
             etDetailInput.setBackgroundResource(android.R.color.transparent)
         }
 
@@ -339,7 +332,6 @@ class ExpenseEntryFragment : Fragment() {
         // ViewModel에 저장
         val selectedCategory = arguments?.getString("selectedCategory") ?: "기타"
         // 선택된 카테고리 값 확인
-        Log.d("ExpenseEntryFragment", "validateAndSaveEntry - selectedCategory: '$selectedCategory'")
         val expenseHistory = BotSheetUiState.Spending.History(
             id = 1,
             name =  detail,
@@ -353,13 +345,11 @@ class ExpenseEntryFragment : Fragment() {
         // SpendingCategory 처리
         return try {
             val categoryEnum = SpendingCategory.fromName(selectedCategory)
-            Log.d("ExpenseEntryFragment", "SpendingCategory.fromName 결과: $categoryEnum")
             botSheetViewModel.addExpenseToCategory(categoryEnum, expenseHistory)
             Toast.makeText(requireContext(), "지출 내역이 저장되었습니다.", Toast.LENGTH_SHORT).show()
             true
         } catch (e: Exception) {
             Toast.makeText(requireContext(), "카테고리가 유효하지 않습니다.", Toast.LENGTH_SHORT).show()
-            Log.e("ExpenseEntryFragment", "Error saving data: ${e.message}", e)
             false
         }
 

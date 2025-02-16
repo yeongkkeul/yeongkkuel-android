@@ -16,14 +16,13 @@ class ExpenseViewModel(private val repository: ExpenseRepository) : ViewModel() 
     val updateResponse: LiveData<ExpenseUpdateResponse?> get() = _updateResponse
 
     fun createExpense(expenseRequest: ExpenseRequest, onResult: (ExpenseResponse?) -> Unit) {
-        Log.d("ExpenseViewModel", "📌 createExpense() 호출됨 - 요청 데이터: $expenseRequest") // ✅ 요청 로그 추가
 
         viewModelScope.launch {
             val response = repository.createExpense(expenseRequest)
             if (response != null && response.isSuccess) {
-                Log.d("ExpenseViewModel", "✅ 지출 내역 저장 성공: $response") // ✅ 성공 로그
+                Log.d("ExpenseViewModel", "지출 내역 저장 성공: $response")
             } else {
-                Log.e("ExpenseViewModel", "❌ 지출 내역 저장 실패 또는 응답 없음")
+                Log.e("ExpenseViewModel", "지출 내역 저장 실패 또는 응답 없음")
             }
             onResult(response)
         }

@@ -5,13 +5,13 @@ import android.util.Log
 class ExpenseRepository(private val api: ExpenseApiService) {
 
     suspend fun createExpense(expenseRequest: ExpenseRequest): ExpenseResponse? {
-        Log.d("ExpenseRepository", "🚀 지출 내역 API 요청: $expenseRequest") // ✅ 요청 데이터 로그 추가
+        Log.d("ExpenseRepository", "🚀 지출 내역 API 요청: $expenseRequest")
 
         return try {
             val response = api.createExpense(expenseRequest)
             if (response.isSuccessful) {
                 val responseBody = response.body()
-                Log.d("ExpenseRepository", "✅ 지출 내역 저장 성공: $responseBody") // ✅ 응답 데이터 로그 추가
+                Log.d("ExpenseRepository", "✅ 지출 내역 저장 성공: $responseBody")
                 responseBody
             } else {
                 Log.e("ExpenseRepository", "🚨 API 요청 실패: ${response.errorBody()?.string()}")
