@@ -1,6 +1,6 @@
 package com.example.yeongkkuel.presentation.home.entry.data
 
-data class Expense(
+data class EntryData(
     val noExpense: Boolean,
     val autoSendChat: Boolean,
     val dateInput: String,

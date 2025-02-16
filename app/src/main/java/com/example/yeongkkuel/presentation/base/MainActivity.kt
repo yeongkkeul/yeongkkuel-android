@@ -49,8 +49,6 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     private var rvBottomSheetCollapseStateHeight: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
-
         // 스플래시 화면 설정
         val splashScreen = this.installSplashScreen()
 
@@ -71,10 +69,14 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 스플래시 화면 종료 조건 설정 (예: 데이터 초기화 완료)
+        // 앱 초기화 작업 중 미리 API 호출하여 데이터를 프리로드
+        lifecycleScope.launch {
+            botSheetViewModel.getSpendingList()
+        }
+
+        // 스플래시 화면 종료 조건: 데이터가 로드되지 않았다면 계속 유지
         splashScreen.setKeepOnScreenCondition {
-            // 앱 초기화 작업이 완료될 때까지 유지
-            checkInitialization()
+            !isDataLoaded()  // 데이터가 아직 로드되지 않았다면 true를 반환해서 스플래시 유지
         }
 
         setupHamburgerClickListener() // 카테고리 더보기 기능 추가
@@ -96,6 +98,10 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         setupAddCategoryClickListener(navHostFragment.navController)
     }
 
+    private fun isDataLoaded(): Boolean {
+        return botSheetViewModel.uiState.value.spendingList.isNotEmpty()
+    }
+
     private fun setupAddCategoryClickListener(navController: NavController) {
         binding.tvAddCategory.setOnClickListener {
             navController.navigate(R.id.categoryAddFragment, null, NavOptions.Builder()
@@ -104,6 +110,11 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                 .build()
             )
         }
+    }
+
+    fun resetBottomSheetState() {
+        val bottomSheetBehavior = BottomSheetBehavior.from(binding.clItemBotSheet)
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
 
     private fun initView() = with(binding) {
@@ -233,7 +244,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                 when (destination.id) {
                     R.id.navigation_home,
                     R.id.navigation_stat,
-                        -> setBotSheetVisible()
+                    -> setBotSheetVisible()
 
 
                     else -> setBotSheetGone()
@@ -321,7 +332,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         lifecycleScope.launch {
             uiState.flowWithLifecycle(lifecycle)
                 .collectLatest { uiState ->
-                    onBind(uiState) // ✅ UI 데이터 바인딩
+                    onBind(uiState) // UI 데이터 바인딩
                 }
         }
     }
@@ -415,23 +426,31 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         navController.navigate(R.id.expenseEntryFragment, bundle)
     }
 
-    override fun navigateToExpenseView(expenseName: String, expensePrice: Int, categoryColor: Int) {
-        Log.d("MainActivity", "📌 navigateToExpenseView() 호출됨")
-        Log.d("MainActivity", "📌 전달된 데이터 - name: $expenseName, price: $expensePrice, categoryColor: $categoryColor")
+    override fun navigateToExpenseView(
+        expenseId: Int,
+        expenseName: String,
+        expensePrice: Int,
+        categoryColor: Int,
+        categoryName: String
+    ) {
+        Log.d("MainActivity", "navigateToExpenseView() 호출됨 - id=$expenseId, name=$expenseName, price=$expensePrice, color=$categoryColor")
 
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         val navController = navHostFragment.navController
 
-        // 🔹 번들에 데이터 추가하여 ExpenseViewFragment로 전달
         val bundle = Bundle().apply {
+            putInt("expenseId", expenseId)
             putString("expenseName", expenseName)
             putInt("expensePrice", expensePrice)
-            putInt("categoryColor", categoryColor) // ✅ categoryColor를 Int로 전달
+            putInt("categoryColor", categoryColor)
+            putString("categoryName", categoryName)
         }
 
         navController.navigate(R.id.navigation_expense_view, bundle)
     }
+
+
+
     override fun onNoExpenseChanged(isNoExpense: Boolean) {
     }
 

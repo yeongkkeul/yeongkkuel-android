@@ -29,7 +29,7 @@ class BotSheetViewModel : ViewModel() {
     val uiState = _uiState.asStateFlow()
 
     private val statService = RetrofitClient.statService
-//    private val expenseApiService = RetrofitClient.expenseApiService
+    private val expenseApiService = RetrofitClient.expenseApiService
 
     // ✅ LiveData → StateFlow로 일관된 상태 관리
     private val _spendingHistoryList =
@@ -38,41 +38,52 @@ class BotSheetViewModel : ViewModel() {
 
     private val _categoryList = MutableLiveData<List<Category>>(emptyList()) // ✅ MutableLiveData 선언 추가
     val categoryList: LiveData<List<Category>> get() = _categoryList // ✅ LiveData로 접근
+    private val _deleteResult = MutableLiveData<Boolean>()
+    val deleteResult: LiveData<Boolean> get() = _deleteResult
 
-//    // 서버 API 호출 코드 추가
-//    fun fetchUpdatedExpenses() {
-//        viewModelScope.launch {
-//            try {
-//                Log.d("BotSheetViewModel", "🚀 서버에서 최신 지출 내역 가져오는 중...")
-//
-//                // ✅ 요청 URL 및 상태 확인
-//                val response = expenseApiService.getExpenses()
-//
-//                Log.d("BotSheetViewModel", "🚀 서버 응답 상태: ${response.isSuccess}, 응답 데이터: $response")
-//
-//                if (response.isSuccess) {
-//                    Log.d("BotSheetViewModel", "✅ 서버에서 지출 내역 가져오기 성공!")
-//                    updateBotSheetData(response)
-//                } else {
-//                    Log.e("BotSheetViewModel", "🚨 서버 응답 실패: ${response.message}")
-//                }
-//            } catch (e: Exception) {
-//                Log.e("BotSheetViewModel", "🚨 네트워크 요청 중 오류 발생: ${e.localizedMessage}")
-//            }
-//        }
-//    }
+    fun deleteExpense(expenseId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = expenseApiService.deleteExpense(expenseId)
 
+                if (response.isSuccessful && response.body()?.isSuccess == true) {
+                    _deleteResult.postValue(true) // ✅ 삭제 성공
+                } else {
+                    Log.e("BotSheetViewModel", "삭제 실패: ${response.body()?.message}")
+                    _deleteResult.postValue(false) // ✅ 삭제 실패
+                }
+            } catch (e: Exception) {
+                Log.e("BotSheetViewModel", "API 호출 중 오류 발생", e)
+                _deleteResult.postValue(false)
+            }
+        }
+    }
+
+    private fun removeExpenseFromUi(expenseId: Int) {
+        _uiState.update { prevState ->
+            val updatedSpendingList = prevState.spendingList.map { spending ->
+                val updatedHistory = spending.history.filterNot { it.id == expenseId }
+                spending.copy(history = updatedHistory)
+            }.filterNot { it.history.isEmpty() } // 🔥 내역이 비어 있으면 해당 카테리 삭제
+
+            prevState.copy(spendingList = updatedSpendingList)
+        }
+
+        // ✅ 최신 지출 내역 반영
+        updateSpendingHistoryList()
+        Log.d("BotSheetViewModel", "📌 삭제됨: expenseId=$expenseId, 남은 지출 개수=${_spendingHistoryList.value.size}")
+    }
 
     // 🔹 지출 내역 추가 기능
     fun addExpenseToCategory(category: SpendingCategory, history: BotSheetUiState.Spending.History) {
         _uiState.update { prev ->
             val updatedList = prev.spendingList.toMutableList()
 
-            // ✅ 1️⃣ 기존 카테고리가 있는지 확인
+            // 기존 카테고리가 있는지 확인
             val categoryIndex = updatedList.indexOfFirst { it.kind == category }
 
             if (categoryIndex != -1) {
-                // ✅ 2️⃣ 기존 카테고리가 있으면 해당 카테고리에 내역 추가
+                // 기존 카테고리가 있으면 해당 카테고리에 내역 추가
                 val existingCategory = updatedList[categoryIndex]
 
                 val updatedCategory = existingCategory.copy(
@@ -81,13 +92,12 @@ class BotSheetViewModel : ViewModel() {
 
                 updatedList[categoryIndex] = updatedCategory
             } else {
-                // ✅ 3️⃣ 기존 카테고리가 없으면 새로 추가 (색상 유지)
+                // 기존 카테고리가 없으면 새로 추가 (색상 유지)
                 updatedList.add(
                     BotSheetUiState.Spending(
-                        categoryId = history.id, // ✅ 카테고리 ID 설정
+                        categoryId = history.id,
                         kind = category,
                         color = prev.spendingList.find { it.kind == category }?.color ?: Colors.BLACK1,
-                        // ✅ 기존 카테고리 색상이 있으면 유지, 없으면 기본 색상(GRAY)
                         plusIconResId = R.drawable.ic_plus_default,
                         history = listOf(history)
                     )
@@ -96,7 +106,7 @@ class BotSheetViewModel : ViewModel() {
 
             prev.copy(spendingList = updatedList)
         }
-        updateSpendingHistoryList() // ✅ 최신 데이터 반영
+        updateSpendingHistoryList()
     }
 
     private val mutex = Mutex()
@@ -107,26 +117,15 @@ class BotSheetViewModel : ViewModel() {
         mutex.withLock {
             _uiState.update { prevState ->
                 val updatedSpendingList = prevState.spendingList.map { spending ->
-                    val historyMatch = spending.history.find {
-                        it.name == updatedExpense.name
+                    val updatedHistoryList = spending.history.map { history ->
+                        if (history.id == updatedExpense.id) {
+                            updatedExpense.copy() // ✅ 내용과 금액만 변경 (카테고리 변경 없음)
+                        } else {
+                            history
+                        }
                     }
+                    spending.copy(history = updatedHistoryList) // ✅ 카테고리 수정 없이 내용만 업데이트
 
-                    if (historyMatch != null) {
-                        Log.d("BotSheetViewModel", "✅ 기존 데이터 찾음: $historyMatch → $updatedExpense")
-
-                        spending.copy(
-                            history = spending.history.map { history ->
-                                if (history.name == updatedExpense.name) {
-                                    updatedExpense // ✅ 기존 항목을 수정된 값으로 변경
-                                } else {
-                                    history
-                                }
-                            }
-                        )
-                    } else {
-                        Log.d("BotSheetViewModel", "❌ 기존 데이터 없음: 업데이트되지 않음.")
-                        spending
-                    }
                 }
                 Log.d("BotSheetViewModel", "✅ spendingList 업데이트 완료: $updatedSpendingList")
                 prevState.copy(spendingList = updatedSpendingList)
@@ -154,6 +153,8 @@ class BotSheetViewModel : ViewModel() {
 
     fun updateBotSheetCategories(categories: List<Category>) {
         Log.d("BotSheetViewModel", "🚀 updateBotSheetCategories 실행됨! categories: $categories")
+
+        _categoryList.postValue(categories)
 
         val updatedSpendingList = categories.map { category ->
             BotSheetUiState.Spending(
@@ -186,7 +187,7 @@ class BotSheetViewModel : ViewModel() {
                             id = expense.id,
                             name = expense.content,
                             price = expense.amount,
-                            imgExist = expense.imageUrl.isNotEmpty()
+                            imgExist = expense.imageUrl?.isNotEmpty() ?: false // ✅ 안전한 처리
                         )
                     )
                 )
@@ -202,8 +203,6 @@ class BotSheetViewModel : ViewModel() {
         Log.d("BotSheetViewModel", "📌 최신 spendingHistoryList: $historyList") // ✅ 최신 리스트 확인
 
         _spendingHistoryList.value = historyList // ✅ 최신 리스트로 갱신
-
-//        _spendingHistoryList.value = historyList.sortedByDescending { it.date }
     }
 
     // 🔹 카테고리 이동 기능
@@ -259,8 +258,6 @@ class BotSheetViewModel : ViewModel() {
         }
         // 추가된 카테고리를 _categoryList에 업데이트
         _categoryList.value = _categoryList.value.orEmpty() + category
-
-        Log.d("BotSheetViewModel", "✅ 카테고리 추가됨: ${category.name}")
     }
 
     private fun mapCategoryToIcon(color: Colors): Int {
@@ -269,13 +266,13 @@ class BotSheetViewModel : ViewModel() {
 
     // 카테고리 제목, 색상 수정 후 바텀시트 업로드
     fun updateCategory(originalCategoryName: String, updatedCategory: Category) {
-        val updatedCategoryColor = updatedCategory.color // ✅ Colors 타입 유지
+        val updatedCategoryColor = updatedCategory.color
 
         val updatedSpendingList = uiState.value.spendingList.map { spending ->
             if (spending.kind.name == originalCategoryName) {
                 spending.copy(
                     kind = SpendingCategory.fromName(updatedCategory.name),
-                    color = updatedCategoryColor // ✅ Colors 타입 유지
+                    color = updatedCategoryColor
                 )
             } else {
                 spending
@@ -285,7 +282,7 @@ class BotSheetViewModel : ViewModel() {
         // 기존 카테고리 리스트 업데이트
         _categoryList.value = _categoryList.value?.map { category ->
             if (category.name == originalCategoryName) {
-                updatedCategory // 수정된 카테고리 반영
+                updatedCategory
             } else {
                 category
             }
@@ -304,7 +301,7 @@ class BotSheetViewModel : ViewModel() {
         }
     }
 
-    // 🔹 일일 목표 지출 가져오기
+    // 일일 목표 지출 가져오기
     fun getDayTargetSpending() = viewModelScope.launch {
         try {
             val response = statService.getExpendituresDay()
@@ -339,7 +336,7 @@ class BotSheetViewModel : ViewModel() {
         }
     }
 
-    // 🔹 매개변수 없는 기본 함수
+    // 매개변수 없는 기본 함수
     fun getSpendingList() {
         val calendar = Calendar.getInstance()
         val year = calendar.get(Calendar.YEAR)
@@ -350,26 +347,41 @@ class BotSheetViewModel : ViewModel() {
         getDayTargetSpending()
     }
 
-    // 🔹 매개변수를 받는 기존 함수
-    // 🔹 월별 지출 내역 가져오기
+    // 매개변수를 받는 기존 함수
+    // 월별 지출 내역 가져오기
     fun getSpendingList(year: Int, month: Int, day: Int) = viewModelScope.launch {
         try {
             // yeongkkuelService를 통해 데이터 요청
-            statService.getExpendituresMonthCategory(
-                year = year,
-                month = month,
-                day = day
-            ).run {
+            statService.getExpendituresMonthCategory(year, month, day).run {
                 if (isSuccess) {
                     result.run {
+                        val categories = categories.map { category ->
+                            Category(
+                                id = category.categoryId,
+                                name = category.categoryName,
+                                color = Colors.fromRGB(
+                                    red = category.red,
+                                    blue = category.blue,
+                                    green = category.green
+                                ) ?: Colors.RED1
+                            )
+                        }
+
+                        // ✅ 추가: 바텀시트 UI 업데이트
+                        updateBotSheetCategories(categories)
+
                         _uiState.update { prev ->
                             val updatedSpendingList = categories.map { category ->
+                                // ✅ 카테고리 ID 기반으로 해당 카테고리의 지출 내역 찾기
+                                val expenses = result.categories
+                                    .find { it.categoryId == category.id }?.expenses ?: emptyList()
+
                                 BotSheetUiState.Spending(
-                                    categoryId = 1,
-                                    kind = SpendingCategory.fromName(category.categoryName),
-                                    color = Colors.fromRGB(red = category.red, blue = category.blue, green = category.green) ?: Colors.RED1,
+                                    categoryId = category.id, // ✅ 기존 1 → category.id 로 수정
+                                    kind = SpendingCategory.fromName(category.name),
+                                    color = category.color,
                                     plusIconResId = R.drawable.ic_plus_default,
-                                    history = category.expenses.map { expense ->
+                                    history = expenses.map { expense -> // ✅ expenses를 여기서 가져오기
                                         BotSheetUiState.Spending.History(
                                             id = expense.expenseId,
                                             name = expense.expenseName,
@@ -386,14 +398,16 @@ class BotSheetViewModel : ViewModel() {
                                 }.time
                             )
                         }
+                        updateSpendingHistoryList() // 최신 데이터 반영
                     }
-                    updateSpendingHistoryList() // 최신 데이터 반영
                 }
             }
         } catch (e: Exception) {
             Log.e("BotSheetViewModel", "🚨 getSpendingList() 오류: ${e.message}")
         }
     }
+
+
 
 //    fun updateExpense(updatedExpense: BotSheetUiState.Spending.History) {
 //        _spendingHistoryList.value = _spendingHistoryList.value.map { expense ->
@@ -414,7 +428,8 @@ class BotSheetViewModel : ViewModel() {
             )
         }
         Log.d("BotSheetViewModel", "getCategoryList() 반환: $categoryList")
-        return _categoryList.value.orEmpty()
+        Log.d("BotSheetViewModel", "📌 getCategoryList() 호출됨, 현재 카테고리 개수: ${_categoryList.value?.size ?: 0}")
+        return categoryList
     }
 
     fun addExpenseHistory(history: BotSheetUiState.Spending.History) {

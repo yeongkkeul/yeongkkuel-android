@@ -54,7 +54,7 @@ class CategoryManageFragment : Fragment() {
             }
         )
 
-        // ✅ itemTouchHelper 초기화
+        // itemTouchHelper 초기화
         itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
             ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0
         ) {

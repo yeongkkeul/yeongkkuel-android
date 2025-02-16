@@ -25,7 +25,7 @@ class HomeRepository {
     private val api = RetrofitClient.homeApiService
     private var isFetching = false // API 중복 요청 방지
 
-    suspend fun getHomeData(): HomeResponse? {
+    suspend fun getHomeData(): HomeResult? { // ✅ 반환 타입 변경
         if (isFetching) {
             Log.w("HomeRepository", "⚠️ API 요청 중, 중복 요청 방지됨")
             return null
@@ -37,8 +37,8 @@ class HomeRepository {
             Log.d("HomeRepository", "🚀 홈 데이터 API 요청 시작")
             val response = api.getHomeData()
             if (response.isSuccessful) {
-                response.body() ?: run {
-                    Log.e("HomeRepository", "홈 데이터 응답이 null입니다.")
+                response.body()?.result ?: run {
+                    Log.e("HomeRepository", "홈 데이터 응답의 result가 null입니다.")
                     null
                 }
             } else {
@@ -57,6 +57,5 @@ class HomeRepository {
         } finally {
             isFetching = false // API 요청 종료 후 false로 설정
         }
-
     }
 }
