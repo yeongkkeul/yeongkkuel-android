@@ -1,6 +1,7 @@
 package com.example.yeongkkuel.presentation.home.entry.data
 
 import android.util.Log
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 
@@ -40,9 +41,9 @@ class ExpenseRepository(private val api: ExpenseApiService) {
 
             val response = api.updateExpense(
                 expenseId = expenseId,
-                day = request.day,
+                day = request.day.toRequestBody("text/plain".toMediaTypeOrNull()),
                 categoryId = request.categoryId.toString().toRequestBody(),
-                content = request.content,
+                content = request.content.toRequestBody("text/plain".toMediaTypeOrNull()),
                 amount = request.amount.toString().toRequestBody(),
                 expenseImage = imageFile
             )

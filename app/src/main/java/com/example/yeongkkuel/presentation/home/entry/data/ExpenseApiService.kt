@@ -23,9 +23,9 @@ interface ExpenseApiService {
     @PATCH("/api/expense/{expenseId}")
     suspend fun updateExpense(
         @Path("expenseId") expenseId: Int,
-        @Part("day") day: String,
+        @Part("day") day: RequestBody,
         @Part("categoryId") categoryId: RequestBody,
-        @Part("content") content: String,
+        @Part("content") content: RequestBody,
         @Part("amount") amount: RequestBody,
         @Part expenseImage: MultipartBody.Part? // 파일 첨부 (선택사항)
     ): Response<ExpenseUpdateResponse>

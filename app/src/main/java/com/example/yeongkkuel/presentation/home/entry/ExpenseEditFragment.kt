@@ -179,6 +179,12 @@ class ExpenseEditFragment : Fragment() {
         val formattedDate = selectedDate?.let { formatDateToApiFormat(it) }
             ?: formatDateToApiFormat(botSheetViewModel.uiState.value.date)
 
+        // ✅ 기존 날짜 찾기 (selectedExpense가 속한 spendingList에서 찾기)
+        val originalDate = botSheetViewModel.uiState.value.spendingList.find { spending ->
+            spending.history.any { it.id == selectedExpense.id }
+        }?.let { formatDateToApiFormat(botSheetViewModel.uiState.value.date) } ?: formattedDate
+        // 🚀 만약 기존 날짜를 찾지 못하면 기본값으로 `formattedDate` 사용!
+
         // 🔹 선택된 이미지 파일을 `MultipartBody.Part`로 변환
         val imagePart = selectedImageUri?.let { uri ->
             val file = File(uri.path ?: "")
@@ -186,7 +192,7 @@ class ExpenseEditFragment : Fragment() {
             MultipartBody.Part.createFormData("expenseImage", file.name, requestFile)
         }
 
-        Log.d("ExpenseEditFragment", "✅ 수정된 날짜: $formattedDate")
+        Log.d("ExpenseEditFragment", "✅ 기존 날짜: $originalDate, 수정된 날짜: $formattedDate")
 
         val updatedExpense = ExpenseUpdateRequest(
             day = formattedDate,
@@ -198,9 +204,16 @@ class ExpenseEditFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                expenseViewModel.updateExpense(selectedExpense.id, updatedExpense, imagePart) { updateResponse ->
+                expenseViewModel.updateExpense(selectedExpense.id, updatedExpense, imagePart) { updateResponse -> // ✅ onComplete 추가
                     if (updateResponse?.isSuccess == true) {
                         Toast.makeText(requireContext(), "지출 내역이 수정되었습니다.", Toast.LENGTH_SHORT).show()
+
+                        // ✅ 기존 날짜와 다른 날짜로 변경되었을 경우 처리
+                        if (formattedDate != originalDate) {
+                            botSheetViewModel.removeExpenseFromCategory(selectedExpense.id) // ✅ 기존 날짜에서 제거
+                            botSheetViewModel.moveExpenseToNewDate(selectedExpense, formattedDate) // ✅ 새로운 날짜로 이동
+                        }
+
                         findNavController().navigate(R.id.action_ExpenseEditFragment_to_HomeFragment)
                     } else {
                         Toast.makeText(requireContext(), "수정 실패: ${updateResponse?.message ?: "알 수 없는 오류"}", Toast.LENGTH_SHORT).show()
@@ -210,8 +223,9 @@ class ExpenseEditFragment : Fragment() {
                 Toast.makeText(requireContext(), "네트워크 오류 발생. 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
             }
         }
-
     }
+
+
 
     private fun showDatePickerDialog() {
         val calendar = Calendar.getInstance()

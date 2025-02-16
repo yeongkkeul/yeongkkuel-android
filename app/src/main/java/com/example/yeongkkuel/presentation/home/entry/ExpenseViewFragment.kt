@@ -70,9 +70,12 @@ class ExpenseViewFragment : Fragment() {
         }
 
         binding.clMore.findViewById<TextView>(R.id.tv_delete).setOnClickListener {
-            deleteExpense()
+            val expenseId = arguments?.getInt("expenseId") ?: return@setOnClickListener // ✅ null이면 실행 안 함
+            botSheetViewModel.deleteExpense(expenseId)
             binding.clMore.visibility = View.GONE
         }
+
+
 
 //        // 무지출이면 `ic_more` 버튼 숨기기
 //        if (expensePrice == 0) {

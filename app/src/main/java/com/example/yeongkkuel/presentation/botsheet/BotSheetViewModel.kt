@@ -19,6 +19,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.Calendar
 
 
@@ -123,27 +125,6 @@ class BotSheetViewModel : ViewModel() {
         }
     }
 
-//    fun updateBotSheetData(response: ExpenseListResponse) {
-//        _uiState.update { prevState ->
-//            val updatedSpendingList = response.result.map { expense ->
-//                BotSheetUiState.Spending(
-//                    categoryId = expense.id,
-//                    kind = SpendingCategory.fromName(expense.content),
-//                    color = Colors.RED1, // 서버에서 색상을 제공하는 경우 수정 필요
-//                    plusIconResId = R.drawable.ic_plus_default,
-//                    history = listOf(
-//                        BotSheetUiState.Spending.History(
-//                            id = expense.id,
-//                            name = expense.content,
-//                            price = expense.amount,
-//                            imgExist = expense.imageUrl?.isNotEmpty() ?: false
-//                        )
-//                    )
-//                )
-//            }
-//            prevState.copy(spendingList = updatedSpendingList)
-//        }
-//    }
 
     private fun updateSpendingHistoryList() {
         val historyList = _uiState.value.spendingList.flatMap { it.history }
@@ -335,7 +316,21 @@ class BotSheetViewModel : ViewModel() {
     // 지출 내역 수정
     suspend fun updateExpense(expenseId: Int, request: ExpenseUpdateRequest): ExpenseUpdateResponse? {
         return try {
-            val response = expenseApiService.updateExpense(expenseId, request)
+            // ✅ RequestBody 변환
+            val dayPart = request.day.toRequestBody("text/plain".toMediaTypeOrNull())
+            val categoryIdPart = request.categoryId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+            val contentPart = request.content.toRequestBody("text/plain".toMediaTypeOrNull())
+            val amountPart = request.amount.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+
+            // ✅ API 호출
+            val response = expenseApiService.updateExpense(
+                expenseId = expenseId,
+                day = dayPart,
+                categoryId = categoryIdPart,
+                content = contentPart,
+                amount = amountPart,
+                expenseImage = request.expenseImage // 이미지 파라미터 그대로 전달
+            )
 
             if (response.isSuccessful) {
                 val updateResponse = response.body()
@@ -351,7 +346,7 @@ class BotSheetViewModel : ViewModel() {
                                             history.copy(
                                                 name = request.content,
                                                 price = request.amount,
-                                                imgExist = !request.expenseImg.isNullOrEmpty()
+                                                imgExist = request.expenseImage != null // ✅ 이미지 여부 반영
                                             )
                                         } else {
                                             history
@@ -373,6 +368,7 @@ class BotSheetViewModel : ViewModel() {
             null
         }
     }
+
 
 
     fun moveExpenseToNewDate(expense: BotSheetUiState.Spending.History, newDate: String) {
