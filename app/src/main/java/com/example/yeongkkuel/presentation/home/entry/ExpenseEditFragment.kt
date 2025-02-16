@@ -55,6 +55,8 @@ class ExpenseEditFragment : Fragment() {
             saveExpense()
         }
 
+        setupDetailInput() // 지출 내용 글자 수 카운트
+
         // ✅ 기존 지출 내역 불러오기
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.spendingHistoryList.collectLatest { historyList ->
@@ -155,7 +157,7 @@ class ExpenseEditFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                Log.d("ExpenseEditFragment", "🟡 지출 수정 요청 시작: $updatedExpense")
+                Log.d("ExpenseEditFragment", "지출 수정 요청 시작: $updatedExpense")
 
                 val updateResponse = viewModel.updateExpense(selectedExpense.id, updatedExpense)
 
@@ -198,6 +200,28 @@ class ExpenseEditFragment : Fragment() {
             ""
         }
     }
+
+    // 지출 내용 글자 수 제한 로직 추가
+    private fun setupDetailInput() {
+        val etDetailInput = binding.etDetailInput
+        val tvCharacterCount = binding.tvCharacterCount // ✅ tvCharacterCount 추가해야 함 (XML에서 확인)
+
+        etDetailInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val length = s?.length ?: 0
+                tvCharacterCount.text = "$length/24" // ✅ 글자 수 표시
+
+                if (length > 24) {
+                    etDetailInput.error = "최대 24자까지 입력 가능합니다."
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+    }
+
     private fun setupAmountInput() {
         binding.etAmountInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
