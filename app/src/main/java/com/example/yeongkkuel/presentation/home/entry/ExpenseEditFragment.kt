@@ -53,15 +53,8 @@ class ExpenseEditFragment : Fragment() {
 
         binding.tvExpenseTitleEdit.visibility = View.VISIBLE // 수정 제목 보이기
         binding.tvEntryComplete.visibility = View.VISIBLE
-
-
-        binding.tvDateInput.setOnClickListener {
-            showDatePickerDialog()
-        }
-
-        // ✅ 수정 완료 버튼 클릭 시 navigation_stat 이동
         binding.tvEntryComplete.setOnClickListener {
-            saveExpenseAndNavigate()
+            saveExpense()
         }
 
         setupDetailInput() // 지출 내용 글자 수 카운트
@@ -148,7 +141,7 @@ class ExpenseEditFragment : Fragment() {
         val selectedExpense = viewModel.spendingHistoryList.value.lastOrNull() ?: return
         val category = getCategoryForExpense(selectedExpense.id)
 
-
+        // ✅ `imgExist`가 true이면 이미지가 존재하므로, 서버에서 가져오도록 ""로 설정
         val expenseImage =
             if (category?.history?.find { it.id == selectedExpense.id }?.imgExist == true) {
                 "" // 서버에서 기존 이미지를 유지하도록 설정
@@ -172,10 +165,16 @@ class ExpenseEditFragment : Fragment() {
 
                 if (updateResponse != null) {
                     if (updateResponse.isSuccess) {
+                        Log.d("ExpenseEditFragment", "✅ 지출 수정 성공: ${updateResponse.message}")
+
                         Toast.makeText(requireContext(), "지출 내역이 수정되었습니다.", Toast.LENGTH_SHORT)
                             .show()
                         findNavController().navigate(R.id.action_ExpenseEditFragment_to_HomeFragment)
                     } else {
+                        Log.e(
+                            "ExpenseEditFragment",
+                            "❌ 지출 수정 실패, 서버 응답 메시지: ${updateResponse.message}"
+                        )
                         Toast.makeText(
                             requireContext(),
                             "수정 실패: ${updateResponse.message ?: "알 수 없는 오류"}",
@@ -183,9 +182,11 @@ class ExpenseEditFragment : Fragment() {
                         ).show()
                     }
                 } else {
+                    Log.e("ExpenseEditFragment", "❌ 서버 응답이 `null`입니다. 상태 코드와 오류 메시지를 확인하세요.")
                     Toast.makeText(requireContext(), "수정 실패: 서버 응답 없음", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
+                Log.e("ExpenseEditFragment", "🚨 API 호출 중 오류 발생", e)
                 Toast.makeText(requireContext(), "네트워크 오류 발생. 다시 시도해주세요.", Toast.LENGTH_SHORT)
                     .show()
             }
