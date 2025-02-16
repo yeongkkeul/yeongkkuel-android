@@ -367,7 +367,7 @@ class BotSheetViewModel : ViewModel() {
                             )
                         }
 
-                        // ✅ 추가: 바텀시트 UI 업데이트
+                        // ✅ 바텀시트 UI 업데이트
                         updateBotSheetCategories(categories)
 
                         _uiState.update { prev ->

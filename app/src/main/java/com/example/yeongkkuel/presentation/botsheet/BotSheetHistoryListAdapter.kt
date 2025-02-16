@@ -46,10 +46,10 @@ class BotSheetHistoryListAdapter(
                  root.visibility = View.VISIBLE
              }
 
-            if (!item.imgExist) {
-                icPhotoIncluded.visibility = View.VISIBLE // 사진이 있을 경우 표시
+            if (item.imgExist) {
+                icPhotoIncluded.visibility = View.VISIBLE
             } else {
-                icPhotoIncluded.visibility = View.GONE // 사진이 없을 경우 숨김
+                icPhotoIncluded.visibility = View.GONE
             }
             root.setOnClickListener {
                 onItemClick(item)
