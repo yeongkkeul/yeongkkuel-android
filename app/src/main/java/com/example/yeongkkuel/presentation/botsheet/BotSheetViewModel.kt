@@ -110,27 +110,27 @@ class BotSheetViewModel : ViewModel() {
         }
     }
 
-    fun updateBotSheetData(response: ExpenseListResponse) {
-        _uiState.update { prevState ->
-            val updatedSpendingList = response.result.map { expense ->
-                BotSheetUiState.Spending(
-                    categoryId = expense.id,
-                    kind = SpendingCategory.fromName(expense.content),
-                    color = Colors.RED1, // 서버에서 색상을 제공하는 경우 수정 필요
-                    plusIconResId = R.drawable.ic_plus_default,
-                    history = listOf(
-                        BotSheetUiState.Spending.History(
-                            id = expense.id,
-                            name = expense.content,
-                            price = expense.amount,
-                            imgExist = expense.imageUrl?.isNotEmpty() ?: false
-                        )
-                    )
-                )
-            }
-            prevState.copy(spendingList = updatedSpendingList)
-        }
-    }
+//    fun updateBotSheetData(response: ExpenseListResponse) {
+//        _uiState.update { prevState ->
+//            val updatedSpendingList = response.result.map { expense ->
+//                BotSheetUiState.Spending(
+//                    categoryId = expense.id,
+//                    kind = SpendingCategory.fromName(expense.content),
+//                    color = Colors.RED1, // 서버에서 색상을 제공하는 경우 수정 필요
+//                    plusIconResId = R.drawable.ic_plus_default,
+//                    history = listOf(
+//                        BotSheetUiState.Spending.History(
+//                            id = expense.id,
+//                            name = expense.content,
+//                            price = expense.amount,
+//                            imgExist = expense.imageUrl?.isNotEmpty() ?: false
+//                        )
+//                    )
+//                )
+//            }
+//            prevState.copy(spendingList = updatedSpendingList)
+//        }
+//    }
 
     private fun updateSpendingHistoryList() {
         val historyList = _uiState.value.spendingList.flatMap { it.history }
@@ -328,6 +328,30 @@ class BotSheetViewModel : ViewModel() {
                 val updateResponse = response.body()
 
                 updateResponse?.let {
+                    if (it.isSuccess) {
+                        // ✅ 업데이트 성공 시, 기존 데이터 변경
+                        _uiState.update { prevState ->
+                            val updatedSpendingList = prevState.spendingList.map { spending ->
+                                if (spending.history.any { it.id == expenseId }) {
+                                    val updatedHistory = spending.history.map { history ->
+                                        if (history.id == expenseId) {
+                                            history.copy(
+                                                name = request.content,
+                                                price = request.amount,
+                                                imgExist = !request.expenseImg.isNullOrEmpty()
+                                            )
+                                        } else {
+                                            history
+                                        }
+                                    }
+                                    spending.copy(history = updatedHistory)
+                                } else {
+                                    spending
+                                }
+                            }
+                            prevState.copy(spendingList = updatedSpendingList)
+                        }
+                    }
                     return it
                 }
             }
@@ -336,6 +360,7 @@ class BotSheetViewModel : ViewModel() {
             null
         }
     }
+
 
     fun moveExpenseToNewDate(expense: BotSheetUiState.Spending.History, newDate: String) {
         _uiState.update { prevState ->

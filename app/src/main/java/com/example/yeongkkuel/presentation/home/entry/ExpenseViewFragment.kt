@@ -30,6 +30,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import android.util.Base64
+import android.util.Log
 
 class ExpenseViewFragment : Fragment() {
 
@@ -142,16 +143,25 @@ class ExpenseViewFragment : Fragment() {
     }
 
     private fun navigateToExpenseEdit() {
-        val selectedExpense = viewModel.spendingHistoryList.value.lastOrNull()
+        val expenseId = arguments?.getInt("expenseId") ?: 0  // 현재 보고 있는 지출 ID 가져오기
+
+        val selectedExpense = viewModel.spendingHistoryList.value.find { it.id == expenseId } // ✅ ID로 정확한 내역 찾기
+
         if (selectedExpense != null) {
             val bundle = Bundle().apply {
                 putInt("expenseId", selectedExpense.id)
                 putString("expenseName", selectedExpense.name)
                 putInt("expensePrice", selectedExpense.price)
             }
+
+            Log.d("ExpenseViewFragment", "수정 버튼 클릭 - 전달할 expenseId: ${selectedExpense.id}") // ✅ 디버깅 로그
             findNavController().navigate(R.id.action_ExpenseViewFragment_to_ExpenseEditFragment, bundle)
+        } else {
+            Log.e("ExpenseViewFragment", "❌ 오류: 해당 expenseId($expenseId)에 대한 지출 내역을 찾을 수 없음")
+            Toast.makeText(requireContext(), "지출 내역을 찾을 수 없습니다.", Toast.LENGTH_SHORT).show()
         }
     }
+
 
     // 지출 내역 삭제
     private fun deleteExpense() {

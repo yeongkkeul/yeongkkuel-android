@@ -60,13 +60,11 @@ class ExpenseEditFragment : Fragment() {
         setupDetailInput() // 지출 내용 글자 수 카운트
 
         // ✅ 기존 지출 내역 불러오기
+        val selectedExpenseId = arguments?.getInt("expenseId") ?: return
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.spendingHistoryList.collectLatest { historyList ->
-                // 🔹 arguments에서 expenseId 가져오기
-                val selectedExpenseId = arguments?.getInt("expenseId") ?: return@collectLatest
-
-                // 🔹 클릭한 ID에 해당하는 지출 내역 찾기
-                val selectedExpense = historyList.find { it.id == selectedExpenseId }
+                val selectedExpense = historyList.find { it.id == selectedExpenseId } // 🔥 선택한 지출 내역 찾기
 
                 if (selectedExpense != null) {
                     binding.tvDateInput.text = formatDate(viewModel.uiState.value.date)
@@ -89,8 +87,9 @@ class ExpenseEditFragment : Fragment() {
                 }
             }
         }
-
     }
+
+
     private fun getCategoryForExpense(expenseId: Int): BotSheetUiState.Spending? {
         return viewModel.uiState.value.spendingList.find { spending ->
             spending.history.any { it.id == expenseId }
@@ -135,18 +134,20 @@ class ExpenseEditFragment : Fragment() {
 
     private fun saveExpense() {
         val newDetail = binding.etDetailInput.text.toString().trim()
-        val newAmount =
-            binding.etAmountInput.text.toString().trim().replace(",", "").toIntOrNull() ?: 0
+        val newAmount = binding.etAmountInput.text.toString().trim().replace(",", "").toIntOrNull() ?: 0
 
         if (newDetail.isEmpty() || newAmount <= 0) {
             Toast.makeText(requireContext(), "모든 항목을 입력하세요.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val selectedExpense = viewModel.spendingHistoryList.value.lastOrNull() ?: return
+        // 🔹 arguments에서 expenseId 가져오기
+        val selectedExpenseId = arguments?.getInt("expenseId") ?: return
+
+        // 🔹 클릭한 내역을 찾아서 업데이트
+        val selectedExpense = viewModel.spendingHistoryList.value.find { it.id == selectedExpenseId } ?: return
         val category = getCategoryForExpense(selectedExpense.id)
 
-        // ✅ `imgExist`가 true이면 이미지가 존재하므로, 서버에서 가져오도록 ""로 설정
         val expenseImage =
             if (category?.history?.find { it.id == selectedExpense.id }?.imgExist == true) {
                 "" // 서버에서 기존 이미지를 유지하도록 설정
@@ -168,25 +169,20 @@ class ExpenseEditFragment : Fragment() {
 
                 if (updateResponse != null) {
                     if (updateResponse.isSuccess) {
-                        Toast.makeText(requireContext(), "지출 내역이 수정되었습니다.", Toast.LENGTH_SHORT)
-                            .show()
+                        Toast.makeText(requireContext(), "지출 내역이 수정되었습니다.", Toast.LENGTH_SHORT).show()
                         findNavController().navigate(R.id.action_ExpenseEditFragment_to_HomeFragment)
                     } else {
-                        Toast.makeText(
-                            requireContext(),
-                            "수정 실패: ${updateResponse.message ?: "알 수 없는 오류"}",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(requireContext(), "수정 실패: ${updateResponse.message ?: "알 수 없는 오류"}", Toast.LENGTH_SHORT).show()
                     }
                 } else {
                     Toast.makeText(requireContext(), "수정 실패: 서버 응답 없음", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "네트워크 오류 발생. 다시 시도해주세요.", Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(requireContext(), "네트워크 오류 발생. 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
             }
         }
     }
+
 
     // 지출 내용 글자 수 제한 로직 추가
     private fun setupDetailInput() {
