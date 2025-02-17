@@ -369,7 +369,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     }
 
     private fun onBind(uiState: BotSheetUiState) = with(binding) {
-
+        Log.e("histories1", uiState.spendingList.map { it.history }.toString())
         botSheetCategoryListAdapter.submitList(uiState.spendingList)
 
         val isEmpty = uiState.spendingList.isEmpty()
