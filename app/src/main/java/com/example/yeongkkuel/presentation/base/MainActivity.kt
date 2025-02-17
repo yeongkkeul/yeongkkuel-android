@@ -74,11 +74,6 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             botSheetViewModel.getSpendingList()
         }
 
-//        // 스플래시 화면 종료 조건: 데이터가 로드되지 않았다면 계속 유지
-//        splashScreen.setKeepOnScreenCondition {
-//            !isDataLoaded()  // 데이터가 아직 로드되지 않았다면 true를 반환해서 스플래시 유지
-//        }
-
         setupHamburgerClickListener() // 카테고리 더보기 기능 추가
 
         val navHostFragment =
@@ -369,7 +364,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     }
 
     private fun onBind(uiState: BotSheetUiState) = with(binding) {
-
+        Log.e("histories1", uiState.spendingList.map { it.history }.toString())
         botSheetCategoryListAdapter.submitList(uiState.spendingList)
 
         val isEmpty = uiState.spendingList.isEmpty()
