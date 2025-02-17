@@ -13,10 +13,10 @@ import retrofit2.http.PUT
 import retrofit2.http.Query
 
 interface StoreApiService {
-    @PUT("api")// 스킨 착용 저장 API
+    @PUT("api/shop/myskin")// 스킨 착용 저장 API
     suspend fun saveEquippedSkins(@Body request: SkinEquipRequest): Response<SkinEquipResponse>
 
-    @POST("api") // 스킨 구매 API
+    @POST("api/shop/purchase") // 스킨 구매 API
     suspend fun purchaseSkin(@Body request: SkinPurchaseRequest): Response<SkinPurchaseResponse>
 
     @GET("api/shop") // 착용 스킨 + 보유 리워드 + 상점 뷰 API 추가
