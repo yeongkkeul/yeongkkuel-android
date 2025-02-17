@@ -100,7 +100,6 @@ class BotSheetCategoryListAdapter(
         }
     }
 
-
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -116,6 +115,13 @@ class BotSheetCategoryListAdapter(
         val item = getItem(position) // 리스트 아이템을 가져옴
         holder.onBind(item)         // 아이템을 뷰홀더에 바인딩
     }
+    override fun submitList(list: List<BotSheetUiState.Spending>?) {
+        val sortedSpendingList = list?.sortedBy { spending ->
+            if (spending.kind.name == "삭제된 지출") 1 else 0
+        }
+        super.submitList(sortedSpendingList)
+    }
+
 }
 
 

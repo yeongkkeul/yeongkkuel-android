@@ -5,7 +5,6 @@ import com.example.yeongkkuel.network.service.ExpenseApiService
 import com.google.gson.Gson
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 
 class ExpenseRepository(private val api: ExpenseApiService) {
@@ -14,22 +13,14 @@ class ExpenseRepository(private val api: ExpenseApiService) {
         Log.d("ExpenseRepository", "🚀 지출 내역 API 요청: $expenseRequest")
 
         return try {
-            // 1. expenseRequest의 텍스트 필드를 하나의 Map으로 묶어 JSON 문자열 생성
-            val expenseMap = mapOf(
-                "day" to expenseRequest.day,
-                "categoryId" to expenseRequest.categoryId,
-                "content" to expenseRequest.content,
-                "amount" to expenseRequest.amount,
-                "isExpense" to expenseRequest.isExpense,
-                "sendChatRoom" to expenseRequest.sendChatRoom
-            )
-            val json = Gson().toJson(expenseMap)
-            val requestBody = json.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+            // ✅ ExpenseRequest를 JSON 문자열로 변환
+            val gson = Gson()
+            val requestJson = gson.toJson(expenseRequest)
+            val requestBody = requestJson.toRequestBody("application/json".toMediaTypeOrNull()) // ✅ JSON 변환
 
-            // 2. API 호출 시 "request" 파트에 JSON, 이미지 파일은 별도로 전달
             val response = api.createExpense(
-                requestBody = requestBody,
-                expenseImage = imageFile
+                request = requestBody, // ✅ JSON 변환된 request 전달
+                expenseImage = imageFile // ✅ 선택적 이미지 첨부
             )
 
             if (response.isSuccessful) {
@@ -50,20 +41,12 @@ class ExpenseRepository(private val api: ExpenseApiService) {
         return try {
             Log.d("ExpenseRepository", "🚀 지출 내역 수정 요청: $request")
 
-            // 1. 수정할 필드를 하나의 JSON 객체로 생성
-            val updateMap = mapOf(
-                "day" to request.day,
-                "categoryId" to request.categoryId,
-                "content" to request.content,
-                "amount" to request.amount
-            )
-            val json = Gson().toJson(updateMap)
-            val requestBody = json.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
-
-            // 2. API 호출 (updateExpense 인터페이스가 JSON request를 받도록 수정되어 있어야 함)
             val response = api.updateExpense(
                 expenseId = expenseId,
-                requestBody = requestBody,
+                day = request.day.toRequestBody("text/plain".toMediaTypeOrNull()),
+                categoryId = request.categoryId.toString().toRequestBody(),
+                content = request.content.toRequestBody("text/plain".toMediaTypeOrNull()),
+                amount = request.amount.toString().toRequestBody(),
                 expenseImage = imageFile
             )
 

@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.Calendar
 
@@ -70,6 +69,8 @@ class BotSheetViewModel : ViewModel() {
             }
             prevState.copy(spendingList = updatedSpendingList)
         }
+
+        updateSpendingHistoryList() // ✅ 바텀시트 UI 즉시 반영
     }
 
     // 지출 내역 추가 기능
@@ -202,7 +203,41 @@ class BotSheetViewModel : ViewModel() {
     // 카테고리 삭제 연동 기능
     fun removeCategory(categoryName: String) {
         _uiState.update { prev ->
-            val updatedSpendingList = prev.spendingList.filter { it.kind.name != categoryName }
+            val updatedSpendingList = prev.spendingList.toMutableList()
+
+            // 삭제할 카테고리 찾기
+            val categoryToRemove = updatedSpendingList.find { it.kind.name == categoryName }
+
+            if (categoryToRemove != null) {
+                // ✅ 해당 카테고리를 제거
+                updatedSpendingList.remove(categoryToRemove)
+
+                // ✅ 삭제된 카테고리의 지출 내역을 별도로 저장
+                val removedExpenses = categoryToRemove.history
+
+                // ✅ 기존 리스트에 "삭제된 지출 내역" 섹션이 있는지 확인
+                val existingTrashCategory = updatedSpendingList.find { it.kind.name == "삭제된 지출" }
+
+                if (existingTrashCategory != null) {
+                    // 기존 "삭제된 지출" 카테고리가 있으면, 기존 리스트에 추가
+                    val newTrashCategory = existingTrashCategory.copy(
+                        history = existingTrashCategory.history + removedExpenses
+                    )
+                    updatedSpendingList[updatedSpendingList.indexOf(existingTrashCategory)] = newTrashCategory
+                } else {
+                    // "삭제된 지출" 카테고리가 없으면 새로 생성하여 추가
+                    updatedSpendingList.add(
+                        BotSheetUiState.Spending(
+                            categoryId = -1,  // 고유 ID 없음 (삭제된 지출 관리용)
+                            kind = SpendingCategory.CUSTOM("삭제된 지출"),
+                            color = Colors.BLACK1,  // 구분을 위한 색상
+                            plusIconResId = R.drawable.ic_plus_default,
+                            history = removedExpenses
+                        )
+                    )
+                }
+            }
+
             prev.copy(spendingList = updatedSpendingList)
         }
     }
@@ -312,58 +347,61 @@ class BotSheetViewModel : ViewModel() {
         }
     }
 
-    // 지출 내역 수정
-    suspend fun updateExpense(expenseId: Int, request: ExpenseUpdateRequest, imageFile: MultipartBody.Part?): ExpenseUpdateResponse? {
-        return try {
-            // 1. 수정할 필드들을 하나의 Map으로 묶어 JSON으로 변환
-            val updateMap = mapOf(
-                "day" to request.day,
-                "categoryId" to request.categoryId,
-                "content" to request.content,
-                "amount" to request.amount
-            )
-            val json = Gson().toJson(updateMap)
-            val requestBody = json.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
-
-            // 2. 수정 API 호출 (Retrofit 인터페이스는 수정된 버전을 사용)
-            val response = expenseApiService.updateExpense(expenseId, requestBody, imageFile)
-            if (response.isSuccessful) {
-                val updateResponse = response.body()
-                updateResponse?.let {
-                    if (it.isSuccess) {
-                        // 3. 성공 시 UI 상태 업데이트 (바텀시트 내 데이터 반영)
-                        _uiState.update { prevState ->
-                            val updatedSpendingList = prevState.spendingList.map { spending ->
-                                if (spending.history.any { it.id == expenseId }) {
-                                    val updatedHistory = spending.history.map { history ->
-                                        if (history.id == expenseId) {
-                                            history.copy(
-                                                name = request.content,
-                                                price = request.amount,
-                                                imgExist = imageFile != null
-                                            )
-                                        } else {
-                                            history
-                                        }
-                                    }
-                                    spending.copy(history = updatedHistory)
-                                } else {
-                                    spending
-                                }
-                            }
-                            prevState.copy(spendingList = updatedSpendingList)
-                        }
-                    }
-                }
-                updateResponse
-            } else {
-                null
-            }
-        } catch (e: Exception) {
-            null
-        }
-    }
-
+//    // 지출 내역 수정
+//    suspend fun updateExpense(expenseId: Int, request: ExpenseUpdateRequest): ExpenseUpdateResponse? {
+//        return try {
+//            // ✅ RequestBody 변환
+//            val dayPart = request.day.toRequestBody("text/plain".toMediaTypeOrNull())
+//            val categoryIdPart = request.categoryId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+//            val contentPart = request.content.toRequestBody("text/plain".toMediaTypeOrNull())
+//            val amountPart = request.amount.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+//
+//            // ✅ API 호출
+//            val response = expenseApiService.updateExpense(
+//                expenseId = expenseId,
+//                day = dayPart,
+//                categoryId = categoryIdPart,
+//                content = contentPart,
+//                amount = amountPart,
+//                expenseImage = request.expenseImage // 이미지 파라미터 그대로 전달
+//            )
+//
+//            if (response.isSuccessful) {
+//                val updateResponse = response.body()
+//
+//                updateResponse?.let {
+//                    if (it.isSuccess) {
+//                        // ✅ 업데이트 성공 시, 기존 데이터 변경
+//                        _uiState.update { prevState ->
+//                            val updatedSpendingList = prevState.spendingList.map { spending ->
+//                                if (spending.history.any { it.id == expenseId }) {
+//                                    val updatedHistory = spending.history.map { history ->
+//                                        if (history.id == expenseId) {
+//                                            history.copy(
+//                                                name = request.content,
+//                                                price = request.amount,
+//                                                imgExist = request.expenseImage != null // ✅ 이미지 여부 반영
+//                                            )
+//                                        } else {
+//                                            history
+//                                        }
+//                                    }
+//                                    spending.copy(history = updatedHistory)
+//                                } else {
+//                                    spending
+//                                }
+//                            }
+//                            prevState.copy(spendingList = updatedSpendingList)
+//                        }
+//                    }
+//                    return it
+//                }
+//            }
+//            null
+//        } catch (e: Exception) {
+//            null
+//        }
+//    }
 
 
 

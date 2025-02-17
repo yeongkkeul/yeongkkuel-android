@@ -13,19 +13,21 @@ interface ExpenseApiService {
     @Multipart
     @POST("/api/expense")
     suspend fun createExpense(
-        @Part("request") requestBody: RequestBody,
-        @Part expenseImage: MultipartBody.Part? = null
-    ): retrofit2.Response<ExpenseResponse>
+        @Part("request") request: RequestBody, // ✅ JSON 변환된 request 추가
+        @Part expenseImage: MultipartBody.Part? // ✅ 선택적 이미지 첨부
+    ): Response<ExpenseResponse>
 
 
     @Multipart
     @PATCH("/api/expense/{expenseId}")
     suspend fun updateExpense(
         @Path("expenseId") expenseId: Int,
-        @Part("request") requestBody: RequestBody,
-        @Part expenseImage: MultipartBody.Part? = null
+        @Part("day") day: RequestBody,
+        @Part("categoryId") categoryId: RequestBody,
+        @Part("content") content: RequestBody,
+        @Part("amount") amount: RequestBody,
+        @Part expenseImage: MultipartBody.Part? // 파일 첨부 (선택사항)
     ): Response<ExpenseUpdateResponse>
-
 
     @DELETE("/api/expense/{expenseId}")
     suspend fun deleteExpense(
