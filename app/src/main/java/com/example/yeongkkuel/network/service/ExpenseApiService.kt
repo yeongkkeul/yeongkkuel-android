@@ -1,5 +1,8 @@
-package com.example.yeongkkuel.presentation.home.entry.data
+package com.example.yeongkkuel.network.service
 
+import com.example.yeongkkuel.presentation.home.entry.data.ExpenseDeleteResponse
+import com.example.yeongkkuel.presentation.home.entry.data.ExpenseResponse
+import com.example.yeongkkuel.presentation.home.entry.data.ExpenseUpdateResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -10,14 +13,10 @@ interface ExpenseApiService {
     @Multipart
     @POST("/api/expense")
     suspend fun createExpense(
-        @Part("day") day: String,
-        @Part("categoryId") categoryId: RequestBody,
-        @Part("content") content: String,
-        @Part("amount") amount: RequestBody,
-        @Part("isExpense") isExpense: RequestBody,
-        @Part("sendChatRoom") sendChatRoom: RequestBody,
-        @Part expenseImage: MultipartBody.Part? // 파일 첨부 (선택사항)
+        @Part("request") request: RequestBody, // ✅ JSON 변환된 request 추가
+        @Part expenseImage: MultipartBody.Part? // ✅ 선택적 이미지 첨부
     ): Response<ExpenseResponse>
+
 
     @Multipart
     @PATCH("/api/expense/{expenseId}")

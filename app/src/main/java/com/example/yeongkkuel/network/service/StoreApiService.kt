@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.presentation.home.store
+package com.example.yeongkkuel.network.service
 
 import com.example.yeongkkuel.presentation.home.store.data.ShopResponse
 import com.example.yeongkkuel.presentation.home.store.data.SkinEquipRequest

@@ -1,7 +1,5 @@
 package com.example.yeongkkuel.presentation.home.entry
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,17 +17,15 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentExpenseViewBinding
-import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
-import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.client.utils.DateUtils.parseDate
+import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
+import com.example.yeongkkuel.presentation.home.entry.data.ExpenseViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import android.util.Base64
-import com.example.yeongkkuel.presentation.home.entry.data.ExpenseViewModel
 
 class ExpenseViewFragment : Fragment() {
 
@@ -170,11 +166,12 @@ class ExpenseViewFragment : Fragment() {
         btnConfirm.setOnClickListener {
             expenseViewModel.deleteExpense(expenseId!!)
 
-            // ✅ 삭제 결과 확인 & UI 업데이트
+            // ✅ 서버에서 삭제 요청 후 바텀시트 UI 업데이트
             expenseViewModel.deleteResult.observe(viewLifecycleOwner) { isDeleted ->
                 if (isDeleted) {
+                    botSheetViewModel.removeExpenseFromCategory(expenseId!!) // ✅ 바텀시트에서 삭제 반영
                     showToast("지출 내역이 삭제되었습니다.")
-                    findNavController().popBackStack(R.id.navigation_home, false)
+                    findNavController().popBackStack()
                 } else {
                     showToast("삭제 실패. 다시 시도해주세요.")
                 }

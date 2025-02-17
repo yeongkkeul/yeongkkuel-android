@@ -1,6 +1,8 @@
 package com.example.yeongkkuel.presentation.home.entry.data
 
 import android.util.Log
+import com.example.yeongkkuel.network.service.ExpenseApiService
+import com.google.gson.Gson
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -11,14 +13,14 @@ class ExpenseRepository(private val api: ExpenseApiService) {
         Log.d("ExpenseRepository", "🚀 지출 내역 API 요청: $expenseRequest")
 
         return try {
+            // ✅ ExpenseRequest를 JSON 문자열로 변환
+            val gson = Gson()
+            val requestJson = gson.toJson(expenseRequest)
+            val requestBody = requestJson.toRequestBody("application/json".toMediaTypeOrNull()) // ✅ JSON 변환
+
             val response = api.createExpense(
-                day = expenseRequest.day,  // ✅ 그냥 String 그대로 전달
-                categoryId = expenseRequest.categoryId.toString().toRequestBody(),
-                content = expenseRequest.content,
-                amount = expenseRequest.amount.toString().toRequestBody(),
-                isExpense = expenseRequest.isExpense.toString().toRequestBody(),
-                sendChatRoom = expenseRequest.sendChatRoom.toString().toRequestBody(),
-                expenseImage = imageFile
+                request = requestBody, // ✅ JSON 변환된 request 전달
+                expenseImage = imageFile // ✅ 선택적 이미지 첨부
             )
 
             if (response.isSuccessful) {

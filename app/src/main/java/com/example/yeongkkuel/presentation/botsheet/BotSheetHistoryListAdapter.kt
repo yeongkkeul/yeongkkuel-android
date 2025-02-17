@@ -1,14 +1,11 @@
 package com.example.yeongkkuel.presentation.botsheet
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.ItemBotsheetHistoryBinding
 import com.example.yeongkkuel.presentation.util.toMoneyString
 

@@ -21,6 +21,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
+import com.bumptech.glide.Glide
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.network.RetrofitClient
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
@@ -31,6 +32,7 @@ import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -238,11 +240,21 @@ class ExpenseEntryFragment : Fragment() {
 
         // 🔹 선택된 이미지 파일을 `MultipartBody.Part`로 변환
         val imagePart = selectedImageUri?.let { uri ->
-            val file = File(uri.path ?: "")
-            val requestFile = RequestBody.create("image/*".toMediaTypeOrNull(), file)
-            MultipartBody.Part.createFormData("expenseImage", file.name, requestFile)
-        }
+            try {
+                requireContext().contentResolver.openInputStream(uri)?.use { inputStream ->
+                    val tempFile = File.createTempFile("upload", ".jpg", requireContext().cacheDir)
+                    tempFile.outputStream().use { outputStream ->
+                        inputStream.copyTo(outputStream)
+                    }
 
+                    val requestFile = tempFile.asRequestBody("image/*".toMediaTypeOrNull())
+                    MultipartBody.Part.createFormData("expenseImage", tempFile.name, requestFile)
+                }
+            } catch (e: Exception) {
+                Log.e("ExpenseEntryFragment", "🚨 이미지 변환 실패: ${e.message}")
+                null
+            }
+        }
         val selectedCategoryName = arguments?.getString("selectedCategory") ?: "기본 카테고리"
         val matchingCategory = botSheetViewModel.uiState.value.spendingList.find {
             it.kind.name.equals(selectedCategoryName, ignoreCase = true)
@@ -420,14 +432,15 @@ class ExpenseEntryFragment : Fragment() {
             data?.data?.let { uri ->
                 selectedImageUri = uri // ✅ 선택한 이미지 URI 저장
 
-                // 🔹 미리보기 업데이트
+                // 🔹 Glide를 사용하여 미리보기 적용 가능
                 val imgPhotoFrame = view?.findViewById<ImageView>(R.id.img_photo_frame)
                 val ivPhotoIcon = view?.findViewById<ImageView>(R.id.iv_photo_icon)
-                imgPhotoFrame?.setImageURI(uri)
+                Glide.with(this).load(uri).into(imgPhotoFrame!!)
                 ivPhotoIcon?.visibility = View.GONE
             }
         }
     }
+
 //
 //    override fun onDestroyView() {
 //        super.onDestroyView()
