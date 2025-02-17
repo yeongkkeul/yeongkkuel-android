@@ -58,20 +58,29 @@ class StatWeeklyViewModel : ViewModel() {
                     result.run {
                         _uiState.update { prev ->
                             prev.copy(
-                                compareList = listOf(
-                                    StatWeeklyUiState.CompareData.OthersCompare(
-                                        target = "${Age.getEnToKor(age)} ${Job.getEnToKor(job)}",
-                                        targetSpending = averageExpenditure,
-                                        mySpending = myAverageExpenditure,
-                                        spendingUnit = SpendingUnit.WEEK,
-                                        percentile = topPercent
-                                    ),
-                                    StatWeeklyUiState.CompareData.PastCompare(
-                                        pastSpending = lastWeekExpenditure,
-                                        currentSpending = thisWeekExpenditure,
-                                        spendingUnit = SpendingUnit.WEEK
+                                compareList = mutableListOf<StatWeeklyUiState.CompareData>().apply {
+                                    // 조건에 맞는 경우에만 OthersCompare 추가
+                                    if (!age.isNullOrEmpty() && !job.isNullOrEmpty() && averageExpenditure != null && myAverageExpenditure != null && topPercent != null) {
+                                        add(
+                                            StatWeeklyUiState.CompareData.OthersCompare(
+                                                target = "${Age.getEnToKor(age!!)} ${Job.getEnToKor(job!!)}",
+                                                targetSpending = averageExpenditure ?: 0,
+                                                mySpending = myAverageExpenditure,
+                                                spendingUnit = SpendingUnit.WEEK,
+                                                percentile = topPercent ?: 0
+                                            )
+                                        )
+                                    }
+
+                                    // PastCompare는 항상 추가
+                                    add(
+                                        StatWeeklyUiState.CompareData.PastCompare(
+                                            pastSpending = lastWeekExpenditure ?: 0,
+                                            currentSpending = thisWeekExpenditure,
+                                            spendingUnit = SpendingUnit.WEEK
+                                        )
                                     )
-                                ),
+                                },
                                 pieChartList = categories.map {
                                     StatWeeklyUiState.PieChartData(
                                         category = SpendingCategory.fromName(it.categoryName),

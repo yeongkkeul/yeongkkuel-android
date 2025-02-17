@@ -114,8 +114,4 @@ dependencies {
 
     // JwtDecode
     implementation(libs.jwtdecode)
-
-    //rxjava
-    implementation("io.reactivex.rxjava3:rxjava:3.0.13")
-    implementation("io.reactivex.rxjava3:rxandroid:3.0.0")
 }

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.StyleSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -350,18 +351,16 @@ class StatWeeklyFragment(
     }
 
     override fun animate() {
-        val viewHolder1 = binding.rvCompare.findViewHolderForAdapterPosition(0) as? StatWeeklyCompareListAdapter.ViewHolder
-        val viewHolder2 = binding.rvCompare.findViewHolderForAdapterPosition(1) as? StatWeeklyCompareListAdapter.ViewHolder
+        val compareCnt = compareListAdapter.itemCount
 
-        viewHolder1?.let {
-            val item1 = compareListAdapter.currentList[0]
-            it.animateProgress(item1)
+        for (i in 0 until compareCnt) {
+            val viewHolder = binding.rvCompare.findViewHolderForAdapterPosition(i) as? StatWeeklyCompareListAdapter.ViewHolder
+            viewHolder?.let {
+                val item = compareListAdapter.currentList[i]  // 해당 인덱스의 아이템 가져오기
+                it.animateProgress(item)  // 애니메이션 적용
+            }
         }
 
-        viewHolder2?.let {
-            val item2 = compareListAdapter.currentList[1]
-            it.animateProgress(item2)
-        }
 
         // PieChart 애니메이션 추가
         binding.pieChart.apply {
