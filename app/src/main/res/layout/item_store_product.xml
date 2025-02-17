@@ -29,8 +29,8 @@
         android:id="@+id/ly_coin_price"
         android:layout_width="wrap_content"
         android:layout_height="20dp"
-        android:layout_marginStart="30dp"
         app:layout_constraintStart_toStartOf="@id/bg_product_box"
+        app:layout_constraintEnd_toEndOf="@id/bg_product_box"
         app:layout_constraintTop_toBottomOf="@id/img_store_product">
 
         <!-- 코인 아이콘 -->
@@ -47,7 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="16dp"
             android:layout_marginStart="4dp"
-            android:text="128"
+            android:text=" "
             android:textColor="@color/main1"
             android:textSize="12sp"
             android:textStyle="normal" />

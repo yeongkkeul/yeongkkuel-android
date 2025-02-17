@@ -3,12 +3,12 @@ package com.example.yeongkkuel.network.response.expenditure
 import com.google.gson.annotations.SerializedName
 
 data class WeekExpendituresAverage(
-    @SerializedName("age") val age: String,
-    @SerializedName("job") val job: String,
-    @SerializedName("topPercent") val topPercent: Int,
-    @SerializedName("averageExpenditure") val averageExpenditure: Int,
+    @SerializedName("age") val age: String?,
+    @SerializedName("job") val job: String?,
+    @SerializedName("topPercent") val topPercent: Int?,
+    @SerializedName("averageExpenditure") val averageExpenditure: Int?,
     @SerializedName("myAverageExpenditure") val myAverageExpenditure: Int,
-    @SerializedName("lastWeekExpenditure") val lastWeekExpenditure: Int,
+    @SerializedName("lastWeekExpenditure") val lastWeekExpenditure: Int?,
     @SerializedName("thisWeekExpenditure") val thisWeekExpenditure: Int,
     @SerializedName("categories") val categories: List<Category>
 ) {

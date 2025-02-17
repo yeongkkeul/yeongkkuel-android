@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.StyleSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,13 +18,12 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentStatWeeklyBinding
+import com.example.yeongkkuel.presentation.stat.StatAnimationListener
 import com.example.yeongkkuel.presentation.stat.weekly.adapter.StatWeeklyCompareListAdapter
 import com.example.yeongkkuel.presentation.stat.weekly.adapter.StatWeeklyPieChartCategoryListAdapter
 import com.example.yeongkkuel.presentation.stat.weekly.adapter.StatWeeklyWeekListAdapter
-import com.example.yeongkkuel.presentation.util.Week
 import com.example.yeongkkuel.presentation.util.toMoneyString
 import com.github.mikephil.charting.animation.Easing
-import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.data.PieData
@@ -37,11 +37,10 @@ import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Calendar
 import java.util.Locale
-import kotlin.math.exp
 
 class StatWeeklyFragment(
     private val viewModel: StatWeeklyViewModel
-) : Fragment() {
+) : Fragment(), StatAnimationListener {
     private var _binding: FragmentStatWeeklyBinding? = null
     private val binding: FragmentStatWeeklyBinding
         get() = requireNotNull(_binding) { "FragmentStatWeeklyBinding -> null" }
@@ -350,4 +349,25 @@ class StatWeeklyFragment(
         super.onDestroyView()
         _binding = null
     }
+
+    override fun animate() {
+        val compareCnt = compareListAdapter.itemCount
+
+        for (i in 0 until compareCnt) {
+            val viewHolder = binding.rvCompare.findViewHolderForAdapterPosition(i) as? StatWeeklyCompareListAdapter.ViewHolder
+            viewHolder?.let {
+                val item = compareListAdapter.currentList[i]  // 해당 인덱스의 아이템 가져오기
+                it.animateProgress(item)  // 애니메이션 적용
+            }
+        }
+
+
+        // PieChart 애니메이션 추가
+        binding.pieChart.apply {
+            animateY(1400, Easing.EaseInOutQuad) // 애니메이션 적용
+            invalidate() // 차트를 새로 그리기
+        }
+    }
+
+
 }

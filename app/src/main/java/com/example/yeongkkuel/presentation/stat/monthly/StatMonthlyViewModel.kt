@@ -15,22 +15,22 @@ import java.util.Calendar
 import java.util.Date
 
 class StatMonthlyViewModel : ViewModel() {
-    private val _uiState = MutableStateFlow(StatMonthlyUiState.init())
+    private val _uiState = MutableStateFlow<StatMonthlyUiState>(StatMonthlyUiState.Init)
     val uiState = _uiState.asStateFlow()
 
     private val yeongkkuelService = RetrofitClient.statService
-    private val dayOfWeekList: List<StatMonthlyUiState.CalendarData> =
+    private val dayOfWeekList: List<StatMonthlyUiState.StatMonthly.CalendarData> =
         Week.getListItem().map { week ->
-            StatMonthlyUiState.CalendarData.CalendarDayOfWeek(week)
+            StatMonthlyUiState.StatMonthly.CalendarData.CalendarDayOfWeek(week)
         }
 
     fun getCalender(year: Int, month: Int) = viewModelScope.launch {
-        suspend fun List<StatMonthlyUiState.CalendarData.CalendarDay>.getData(): List<StatMonthlyUiState.CalendarData.CalendarDay> {
+        suspend fun List<StatMonthlyUiState.StatMonthly.CalendarData.CalendarDay>.getData(): List<StatMonthlyUiState.StatMonthly.CalendarData.CalendarDay> {
             try {
                 yeongkkuelService.getExpendituresMonthCalendar(year = year, month = month).run {
                     if (isSuccess) {
-                        _uiState.update { prev ->
-                            prev.copy(
+                        _uiState.update {
+                            StatMonthlyUiState.StatMonthly.init().copy(
                                 targetExpenditure = result.dayTargetExpenditure,
                                 achieveDay = result.achieveDays,
                                 rewardsAmount = result.rewards,
@@ -39,17 +39,18 @@ class StatMonthlyViewModel : ViewModel() {
                         }
 
                         val dataList = result.selectedMonthExpenses.map { expense ->
-                            val pieDataList = result.dayTargetExpenditure?.let { targetExpenditure ->
-                                val rest = targetExpenditure - expense.expenditure
-                                mutableListOf<PieEntry>().apply {
-                                    add(PieEntry(expense.expenditure.toFloat(), "지출"))
-                                    if (rest > 0) {
-                                        add(PieEntry(rest.toFloat(), "나머지"))
+                            val pieDataList =
+                                result.dayTargetExpenditure?.let { targetExpenditure ->
+                                    val rest = targetExpenditure - expense.expenditure
+                                    mutableListOf<PieEntry>().apply {
+                                        add(PieEntry(expense.expenditure.toFloat(), "지출"))
+                                        if (rest > 0) {
+                                            add(PieEntry(rest.toFloat(), "나머지"))
+                                        }
                                     }
-                                }
-                            } ?: emptyList()
+                                } ?: emptyList()
 
-                            StatMonthlyUiState.CalendarData.CalendarDay(
+                            StatMonthlyUiState.StatMonthly.CalendarData.CalendarDay(
                                 targetMonth = Pair(year, month),
                                 day = expense.expenseDate.getDay(),
                                 pieDataList = pieDataList
@@ -83,7 +84,7 @@ class StatMonthlyViewModel : ViewModel() {
         suspend fun getDayList(
             year: Int,
             month: Int
-        ): List<StatMonthlyUiState.CalendarData.CalendarDay> {
+        ): List<StatMonthlyUiState.StatMonthly.CalendarData.CalendarDay> {
             val calendar = Calendar.getInstance().apply {
                 set(Calendar.YEAR, year)
                 set(Calendar.MONTH, month - 1)
@@ -112,7 +113,7 @@ class StatMonthlyViewModel : ViewModel() {
 
                 val rest = if (targetSpending - daySpending > 0) targetSpending - daySpending else 0
 
-                StatMonthlyUiState.CalendarData.CalendarDay(
+                StatMonthlyUiState.StatMonthly.CalendarData.CalendarDay(
                     targetMonth = Pair(year, month),
                     day = day,
                     pieDataList = listOf(
@@ -127,7 +128,7 @@ class StatMonthlyViewModel : ViewModel() {
         val dayList = getDayList(year, month)
 
         _uiState.update { prev ->
-            prev.copy(
+            (prev as StatMonthlyUiState.StatMonthly).copy(
                 targetMonth = Pair(year, month),
                 calendarList = dayOfWeekList + dayList
             )

@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.presentation.home.entry
+package com.example.yeongkkuel.presentation.home.entry.data
 
 data class EntryData(
     val noExpense: Boolean,

@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.yeongkkuel.databinding.ItemStoreProductBinding
 import kotlinx.android.parcel.Parcelize
 
@@ -13,8 +14,9 @@ data class Product(
     val id: Int, // ✅ id 추가
     val name: String,
     val price: Int,
-    val imageResId: Int,
+    val imageUrl: String, // ✅ 변경
     val category: ProductCategory,
+    val itemType: String, // ✅ 추가: itemType 필드
     var area: String? = null
 ) : Parcelable
 
@@ -37,6 +39,7 @@ class StoreAdapter(
         val product = products[position]
         holder.bind(product, position == selectedPosition)
 
+
         // 아이템 클릭 이벤트 처리
         holder.itemView.setOnClickListener {
             val previousPosition = selectedPosition
@@ -52,16 +55,28 @@ class StoreAdapter(
     }
 
     override fun getItemCount(): Int = products.size
-
-    inner class StoreViewHolder(private val binding: ItemStoreProductBinding) :
+    fun clearSelection() {
+        val previousPosition = selectedPosition
+        selectedPosition = RecyclerView.NO_POSITION
+        notifyItemChanged(previousPosition) // 선택 해제된 아이템만 업데이트
+    }
+    class StoreViewHolder(private val binding: ItemStoreProductBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(product: Product, isSelected: Boolean) {
-            binding.imgStoreProduct.setImageResource(product.imageResId)
+            // ✅ 서버에서 받은 이미지 URL을 Glide로 로드
+            Glide.with(binding.root.context)
+                .load(product.imageUrl) // ✅ 서버 이미지 URL 사용
+                .into(binding.imgStoreProduct) // ✅ 이미지 로드
+
             binding.tvStoreProductName.text = product.name
+            binding.tvProductPrice.text = product.price.toString()
 
-            binding.imgStoreCollect.visibility = if (isSelected) View.VISIBLE else View.GONE
-
+            if (!isSelected) {
+                binding.imgStoreCollect.visibility = View.GONE
+            } else {
+                binding.imgStoreCollect.visibility = View.VISIBLE
+            }
         }
     }
 }

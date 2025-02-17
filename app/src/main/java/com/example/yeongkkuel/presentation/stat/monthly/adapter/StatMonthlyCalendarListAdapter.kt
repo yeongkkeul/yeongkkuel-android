@@ -21,7 +21,7 @@ import timber.log.Timber
 
 class StatMonthlyCalendarListAdapter(
     private val viewModel: BotSheetViewModel
-) : ListAdapter<StatMonthlyUiState.CalendarData, StatMonthlyCalendarListAdapter.ViewHolder>(
+) : ListAdapter<StatMonthlyUiState.StatMonthly.CalendarData, StatMonthlyCalendarListAdapter.ViewHolder>(
     StatMonthlyCalendarDiffUtil()
 ) {
     private var targetExpenditure: Int? = null
@@ -33,7 +33,7 @@ class StatMonthlyCalendarListAdapter(
     abstract inner class ViewHolder(
         view: View
     ) : RecyclerView.ViewHolder(view) {
-        abstract fun bind(item: StatMonthlyUiState.CalendarData)
+        abstract fun bind(item: StatMonthlyUiState.StatMonthly.CalendarData)
     }
 
     enum class ViewType {
@@ -43,8 +43,8 @@ class StatMonthlyCalendarListAdapter(
     inner class DayOfWeekViewHolder(
         private val binding: ItemCalendarDayofweekBinding
     ) : ViewHolder(binding.root) {
-        override fun bind(item: StatMonthlyUiState.CalendarData)= with(binding) {
-            (item as StatMonthlyUiState.CalendarData.CalendarDayOfWeek).let{
+        override fun bind(item: StatMonthlyUiState.StatMonthly.CalendarData)= with(binding) {
+            (item as StatMonthlyUiState.StatMonthly.CalendarData.CalendarDayOfWeek).let{
                 tvDayOfWeek.text = it.dayOfWeek.kor
             }
         }
@@ -54,8 +54,8 @@ class StatMonthlyCalendarListAdapter(
     inner class DayViewHolder(
         private val binding: ItemCalendarDayBinding
     ) : ViewHolder(binding.root) {
-        override fun bind(item: StatMonthlyUiState.CalendarData): Unit = with(binding) {
-            (item as StatMonthlyUiState.CalendarData.CalendarDay).let { dayItem ->
+        override fun bind(item: StatMonthlyUiState.StatMonthly.CalendarData): Unit = with(binding) {
+            (item as StatMonthlyUiState.StatMonthly.CalendarData.CalendarDay).let { dayItem ->
                 fun initData() {
                     tvDay.text = dayItem.day.toString()
                     if(targetExpenditure == null){
@@ -111,13 +111,13 @@ class StatMonthlyCalendarListAdapter(
     inner class UnknownViewHolder(
         private val binding: ItemUnknownBinding
     ) : ViewHolder(binding.root) {
-        override fun bind(item: StatMonthlyUiState.CalendarData) {
+        override fun bind(item: StatMonthlyUiState.StatMonthly.CalendarData) {
         }
     }
 
     override fun getItemViewType(position: Int): Int = when (getItem(position)) {
-        is StatMonthlyUiState.CalendarData.CalendarDayOfWeek -> ViewType.DayOfWeeK.ordinal
-        is StatMonthlyUiState.CalendarData.CalendarDay -> ViewType.Day.ordinal
+        is StatMonthlyUiState.StatMonthly.CalendarData.CalendarDayOfWeek -> ViewType.DayOfWeeK.ordinal
+        is StatMonthlyUiState.StatMonthly.CalendarData.CalendarDay -> ViewType.Day.ordinal
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
@@ -154,17 +154,17 @@ class StatMonthlyCalendarListAdapter(
 }
 
 private class StatMonthlyCalendarDiffUtil :
-    DiffUtil.ItemCallback<StatMonthlyUiState.CalendarData>() {
+    DiffUtil.ItemCallback<StatMonthlyUiState.StatMonthly.CalendarData>() {
     override fun areItemsTheSame(
-        oldItem: StatMonthlyUiState.CalendarData,
-        newItem: StatMonthlyUiState.CalendarData
+        oldItem: StatMonthlyUiState.StatMonthly.CalendarData,
+        newItem: StatMonthlyUiState.StatMonthly.CalendarData
     ): Boolean {
         return oldItem == newItem
     }
 
     override fun areContentsTheSame(
-        oldItem: StatMonthlyUiState.CalendarData,
-        newItem: StatMonthlyUiState.CalendarData
+        oldItem: StatMonthlyUiState.StatMonthly.CalendarData,
+        newItem: StatMonthlyUiState.StatMonthly.CalendarData
     ): Boolean {
         return oldItem == newItem
     }
