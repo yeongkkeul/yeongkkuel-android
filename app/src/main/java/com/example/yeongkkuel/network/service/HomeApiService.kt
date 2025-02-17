@@ -1,5 +1,7 @@
-package com.example.yeongkkuel.presentation.home
+package com.example.yeongkkuel.network.service
 
+import com.example.yeongkkuel.presentation.home.HomeResponse
+import com.example.yeongkkuel.presentation.home.RewardResponse
 import retrofit2.Response // ✅ 올바른 Response import
 import retrofit2.http.GET
 

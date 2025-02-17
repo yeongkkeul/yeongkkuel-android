@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.Calendar
 
@@ -70,8 +71,6 @@ class BotSheetViewModel : ViewModel() {
             prevState.copy(spendingList = updatedSpendingList)
         }
     }
-
-
 
     // 지출 내역 추가 기능
     fun addExpenseToCategory(category: SpendingCategory, history: BotSheetUiState.Spending.History) {
@@ -314,30 +313,25 @@ class BotSheetViewModel : ViewModel() {
     }
 
     // 지출 내역 수정
-    suspend fun updateExpense(expenseId: Int, request: ExpenseUpdateRequest): ExpenseUpdateResponse? {
+    suspend fun updateExpense(expenseId: Int, request: ExpenseUpdateRequest, imageFile: MultipartBody.Part?): ExpenseUpdateResponse? {
         return try {
-            // ✅ RequestBody 변환
-            val dayPart = request.day.toRequestBody("text/plain".toMediaTypeOrNull())
-            val categoryIdPart = request.categoryId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
-            val contentPart = request.content.toRequestBody("text/plain".toMediaTypeOrNull())
-            val amountPart = request.amount.toString().toRequestBody("text/plain".toMediaTypeOrNull())
-
-            // ✅ API 호출
-            val response = expenseApiService.updateExpense(
-                expenseId = expenseId,
-                day = dayPart,
-                categoryId = categoryIdPart,
-                content = contentPart,
-                amount = amountPart,
-                expenseImage = request.expenseImage // 이미지 파라미터 그대로 전달
+            // 1. 수정할 필드들을 하나의 Map으로 묶어 JSON으로 변환
+            val updateMap = mapOf(
+                "day" to request.day,
+                "categoryId" to request.categoryId,
+                "content" to request.content,
+                "amount" to request.amount
             )
+            val json = Gson().toJson(updateMap)
+            val requestBody = json.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
 
+            // 2. 수정 API 호출 (Retrofit 인터페이스는 수정된 버전을 사용)
+            val response = expenseApiService.updateExpense(expenseId, requestBody, imageFile)
             if (response.isSuccessful) {
                 val updateResponse = response.body()
-
                 updateResponse?.let {
                     if (it.isSuccess) {
-                        // ✅ 업데이트 성공 시, 기존 데이터 변경
+                        // 3. 성공 시 UI 상태 업데이트 (바텀시트 내 데이터 반영)
                         _uiState.update { prevState ->
                             val updatedSpendingList = prevState.spendingList.map { spending ->
                                 if (spending.history.any { it.id == expenseId }) {
@@ -346,7 +340,7 @@ class BotSheetViewModel : ViewModel() {
                                             history.copy(
                                                 name = request.content,
                                                 price = request.amount,
-                                                imgExist = request.expenseImage != null // ✅ 이미지 여부 반영
+                                                imgExist = imageFile != null
                                             )
                                         } else {
                                             history
@@ -360,14 +354,16 @@ class BotSheetViewModel : ViewModel() {
                             prevState.copy(spendingList = updatedSpendingList)
                         }
                     }
-                    return it
                 }
+                updateResponse
+            } else {
+                null
             }
-            null
         } catch (e: Exception) {
             null
         }
     }
+
 
 
 

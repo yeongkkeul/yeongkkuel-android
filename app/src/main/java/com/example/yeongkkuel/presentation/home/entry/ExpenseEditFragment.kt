@@ -198,8 +198,7 @@ class ExpenseEditFragment : Fragment() {
             day = formattedDate,
             categoryId = selectedCategoryId ?: return,
             content = newDetail,
-            amount = newAmount,
-            expenseImage = imagePart
+            amount = newAmount
         )
 
         viewLifecycleOwner.lifecycleScope.launch {

@@ -1,14 +1,11 @@
 package com.example.yeongkkuel.presentation.botsheet
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.ItemBotsheetHistoryBinding
 import com.example.yeongkkuel.presentation.util.toMoneyString
 
@@ -85,22 +82,5 @@ class BotSheetHistoryListAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.onBind(getItem(position))
-    }
-}
-
-private class SpendingHistoryListDiffUtil : DiffUtil.ItemCallback<BotSheetUiState.Spending.History>() {
-
-    override fun areItemsTheSame(
-        oldItem: BotSheetUiState.Spending.History,
-        newItem: BotSheetUiState.Spending.History
-    ): Boolean {
-        return oldItem == newItem
-    }
-
-    override fun areContentsTheSame(
-        oldItem: BotSheetUiState.Spending.History,
-        newItem: BotSheetUiState.Spending.History
-    ): Boolean {
-        return oldItem.name == newItem.name && oldItem.price == newItem.price
     }
 }
