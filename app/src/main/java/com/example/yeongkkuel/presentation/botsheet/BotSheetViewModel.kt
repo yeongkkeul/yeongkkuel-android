@@ -96,7 +96,7 @@ class BotSheetViewModel : ViewModel() {
                     BotSheetUiState.Spending(
                         categoryId = history.id,
                         kind = category,
-                        color = prev.spendingList.find { it.kind == category }?.color ?: Colors.BLACK1,
+                        color = prev.spendingList.find { it.kind == category }?.color ?: Colors.RED1,
                         plusIconResId = R.drawable.ic_plus_default,
                         history = listOf(history)
                     )
@@ -121,7 +121,10 @@ class BotSheetViewModel : ViewModel() {
             )
         }
         _uiState.update { prevState ->
-            prevState.copy(spendingList = updatedSpendingList)
+            val sortedList = updatedSpendingList.sortedBy { spending ->
+                if (spending.kind.name == "trash") 1 else 0  // ✅ "trash" 카테고리를 항상 마지막으로 이동
+            }
+            prevState.copy(spendingList = sortedList)
         }
     }
 
@@ -160,6 +163,8 @@ class BotSheetViewModel : ViewModel() {
                         history = emptyList()
                     )
                 )
+            }.sortedBy { spending ->
+                if (spending.kind.name == "trash") 1 else 0 // ✅ Trash 카테고리를 항상 마지막으로 이동
             }
             prev.copy(spendingList = updatedList)
         }
@@ -205,42 +210,45 @@ class BotSheetViewModel : ViewModel() {
         _uiState.update { prev ->
             val updatedSpendingList = prev.spendingList.toMutableList()
 
-            // 삭제할 카테고리 찾기
             val categoryToRemove = updatedSpendingList.find { it.kind.name == categoryName }
 
             if (categoryToRemove != null) {
-                // ✅ 해당 카테고리를 제거
                 updatedSpendingList.remove(categoryToRemove)
-
-                // ✅ 삭제된 카테고리의 지출 내역을 별도로 저장
                 val removedExpenses = categoryToRemove.history
 
-                // ✅ 기존 리스트에 "삭제된 지출 내역" 섹션이 있는지 확인
-                val existingTrashCategory = updatedSpendingList.find { it.kind.name == "삭제된 지출" }
+                val existingTrashCategory = updatedSpendingList.find { it.kind.name == "trash" }
 
                 if (existingTrashCategory != null) {
-                    // 기존 "삭제된 지출" 카테고리가 있으면, 기존 리스트에 추가
                     val newTrashCategory = existingTrashCategory.copy(
                         history = existingTrashCategory.history + removedExpenses
                     )
                     updatedSpendingList[updatedSpendingList.indexOf(existingTrashCategory)] = newTrashCategory
                 } else {
-                    // "삭제된 지출" 카테고리가 없으면 새로 생성하여 추가
                     updatedSpendingList.add(
                         BotSheetUiState.Spending(
-                            categoryId = -1,  // 고유 ID 없음 (삭제된 지출 관리용)
-                            kind = SpendingCategory.CUSTOM("삭제된 지출"),
-                            color = Colors.BLACK1,  // 구분을 위한 색상
+                            categoryId = -1,
+                            kind = SpendingCategory.CUSTOM("trash"),
+                            color = Colors.RED1,
                             plusIconResId = R.drawable.ic_plus_default,
                             history = removedExpenses
                         )
                     )
                 }
             }
+            // Trash 카테고리에 지출 내역이 없으면 리스트에서 제거
+            val cleanedList = updatedSpendingList.filterNot { spending ->
+                spending.kind.name == "trash" && spending.history.isEmpty()
+            }
 
-            prev.copy(spendingList = updatedSpendingList)
+            // 정렬: Trash 카테고리는 항상 마지막으로 이동
+            val sortedList = cleanedList.sortedBy { spending ->
+                if (spending.kind.name == "trash") 1 else 0
+            }
+
+            prev.copy(spendingList = sortedList) // 최종 업데이트
         }
     }
+
 
     // 일일 목표 지출 가져오기
     fun getDayTargetSpending() = viewModelScope.launch {
@@ -331,6 +339,8 @@ class BotSheetViewModel : ViewModel() {
                                         )
                                     }
                                 )
+                            }.sortedBy { spending ->
+                                if (spending.kind.name == "trash") 1 else 0 // ✅ Trash 카테고리 항상 마지막
                             }
                             prev.copy(
                                 spendingList = updatedSpendingList,
@@ -379,7 +389,7 @@ class BotSheetViewModel : ViewModel() {
                     BotSheetUiState.Spending(
                         categoryId = -1, // 기본값
                         kind = SpendingCategory.fromName("기타"),
-                        color = Colors.BLACK1,
+                        color = Colors.RED1,
                         plusIconResId = R.drawable.ic_plus_default,
                         history = listOf(updatedHistory)
                     )

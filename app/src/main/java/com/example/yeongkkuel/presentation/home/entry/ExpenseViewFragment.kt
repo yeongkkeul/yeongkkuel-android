@@ -20,6 +20,7 @@ import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentExpenseViewBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
+import com.example.yeongkkuel.presentation.home.Expense
 import com.example.yeongkkuel.presentation.home.entry.data.ExpenseViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -102,6 +103,14 @@ class ExpenseViewFragment : Fragment() {
             binding.ivPhotoIcon.visibility = View.VISIBLE
         }
 
+        // "trash" 카테고리인지 확인 후 숨김 처리
+        if (categoryName.lowercase() == "trash") {
+            binding.tvExpenseCategory.visibility = View.GONE
+            binding.tvCategoryInput.visibility = View.GONE
+        } else {
+            binding.tvExpenseCategory.visibility = View.VISIBLE
+            binding.tvCategoryInput.visibility = View.VISIBLE
+        }
 
         // 날짜 및 UI 설정
         binding.tvDateInput.text = expenseDateString ?: "날짜 없음"
@@ -190,7 +199,6 @@ class ExpenseViewFragment : Fragment() {
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.show()
     }
-
 
     private fun formatDate(date: Date?): String {
         return if (date != null) {

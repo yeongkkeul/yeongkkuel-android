@@ -1,6 +1,7 @@
 package com.example.yeongkkuel.presentation.home.category.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
@@ -47,9 +48,19 @@ class CategoryAdapter(
     }
 
     override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
-        val category = getItem(position) // `getItem(position)`으로 아이템 가져오기
+        val category = getItem(position)
+
+        // ✅ Trash 카테고리는 어댑터에서도 숨김
+        if (category.name.lowercase() == "trash") {
+            holder.itemView.visibility = View.GONE
+            holder.itemView.layoutParams = RecyclerView.LayoutParams(0, 0) // 완전히 제거
+        } else {
+            holder.itemView.visibility = View.VISIBLE
+        }
+
         holder.bind(category)
     }
+
 
     override fun getItemCount(): Int = currentList.size // ListAdapter에서는 currentList 사용
 

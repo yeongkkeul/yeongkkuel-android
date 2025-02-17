@@ -69,7 +69,7 @@ data class StatWeeklyUiState(
                 PieChartData(
                     category = SpendingCategory.CUSTOM(""),
                     expenditure = 15800,
-                    Colors.BLACK1
+                    Colors.BLUE6
                 ),
             ),
             totalSpending = 56700

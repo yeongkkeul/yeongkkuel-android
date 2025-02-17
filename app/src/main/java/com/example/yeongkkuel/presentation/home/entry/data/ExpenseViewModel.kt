@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
+import com.example.yeongkkuel.presentation.home.CategoryResponse
+import com.example.yeongkkuel.presentation.home.Expense
 import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
 
@@ -60,6 +62,7 @@ class ExpenseViewModel(private val repository: ExpenseRepository) : ViewModel() 
             }
         }
     }
+
 
     // ViewModelProvider.Factory 추가
     class Factory(private val repository: ExpenseRepository) : ViewModelProvider.Factory {

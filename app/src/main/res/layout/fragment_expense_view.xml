@@ -36,29 +36,6 @@
                 android:layout_height="wrap_content"
                 android:text="지출 내역"
                 style="@style/pageTitle"
-                android:visibility="visible"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/btn_back"
-                android:layout_marginStart="12dp" />
-            <TextView
-                android:id="@+id/tv_expense_title_edit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="지출 내역 수정"
-                style="@style/pageTitle"
-                android:visibility="gone"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/btn_back"
-                android:layout_marginStart="12dp" />
-            <TextView
-                android:id="@+id/tv_expense_view_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="지출 내역"
-                style="@style/pageTitle"
-                android:visibility="gone"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/btn_back"
@@ -75,19 +52,6 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/btn_back"
                 android:layout_marginStart="12dp" />
-
-            <TextView
-                android:id="@+id/tv_entry_complete"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="완료"
-                android:textSize="15dp"
-                android:textColor="@color/main1"
-                android:layout_marginStart="185dp"
-                android:visibility="gone"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
 
             <ImageView
                 android:id="@+id/ic_more"
@@ -197,7 +161,9 @@
                 android:layout_marginTop="35dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_expense_date"
-                app:layout_constraintBaseline_toBaselineOf="@id/tv_category_input" />
+                app:layout_constraintBaseline_toBaselineOf="@id/tv_category_input"
+                android:visibility="gone"
+                tools:visibility="visible"/>
 
             <TextView
                 android:id="@+id/tv_category_input"
@@ -216,7 +182,9 @@
                 android:layout_marginStart="17dp"
                 android:gravity="center"
                 app:layout_constraintStart_toEndOf="@id/tv_expense_category"
-                app:layout_constraintTop_toBottomOf="@id/tv_date_input" />
+                app:layout_constraintTop_toBottomOf="@id/tv_date_input"
+                android:visibility="gone"
+                tools:visibility="visible"/>
 
             <!-- 지출 내용 -->
             <TextView

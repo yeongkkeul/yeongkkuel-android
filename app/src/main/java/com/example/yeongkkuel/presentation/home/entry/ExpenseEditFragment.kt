@@ -71,9 +71,9 @@ class ExpenseEditFragment : Fragment() {
 
         setupPhotoFrame()
 
-        // ✅ 기존 지출 내역 불러오기
+        // 기존 지출 내역 불러오기
         val selectedExpenseId = arguments?.getInt("expenseId") ?: return
-        val imageUrl = arguments?.getString("imageUrl") // 🔹 기존 이미지 URL 가져오기
+        val imageUrl = arguments?.getString("imageUrl")
 
         viewLifecycleOwner.lifecycleScope.launch {
             botSheetViewModel.spendingHistoryList.collectLatest { historyList ->
@@ -85,11 +85,22 @@ class ExpenseEditFragment : Fragment() {
                     val category = getCategoryForExpense(selectedExpense.id)
                     selectedCategoryId = category?.categoryId
 
-                    binding.tvCategoryInput.text = category?.kind?.name ?: "기타"
+                    val categoryName = category?.kind?.name ?: "기타"
+
+                    // "trash" 카테고리일 경우 UI 숨기기
+                    if (categoryName.lowercase() == "trash") {
+                        binding.tvExpenseCategory.visibility = View.GONE
+                        binding.tvCategoryInput.visibility = View.GONE
+                    } else {
+                        binding.tvExpenseCategory.visibility = View.VISIBLE
+                        binding.tvCategoryInput.visibility = View.VISIBLE
+                        binding.tvCategoryInput.text = categoryName
+                    }
+
                     binding.etDetailInput.setText(selectedExpense.name)
                     binding.etAmountInput.setText(selectedExpense.price.toString())
 
-                    val updatedColor = getCategoryTextColor(category?.kind?.name ?: "기타")
+                    val updatedColor = getCategoryTextColor(categoryName)
                     binding.tvCategoryInput.setTextColor(updatedColor)
 
                     loadExistingImage(imageUrl)
@@ -101,6 +112,7 @@ class ExpenseEditFragment : Fragment() {
         setupDetailInput()
         setupAmountInput()
     }
+
 
     private fun setupPhotoFrame() {
         binding.flPhotoFrame.setOnClickListener {
