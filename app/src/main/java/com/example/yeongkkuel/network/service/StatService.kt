@@ -14,32 +14,32 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface StatService {
-    @GET("/api/expenditures/day")
+    @GET("/api/expense/day")
     suspend fun getExpendituresDay(
     ): retrofit2.Response<Response<DayExpenditureResponse>>
 
-    @GET("/api/expenditures/week/expenses")
+    @GET("/api/expense/week/expenses")
     suspend fun getExpendituresWeekExpenses(
     ): Response<WeekExpenditureExpensesResponse>
 
-    @GET("/api/expenditures/week/average")
+    @GET("/api/expense/week/average")
     suspend fun getExpendituresWeekAverage(
     ): Response<WeekExpendituresAverage>
 
-    @GET("/api/expenditures/month/{year}/{month}")
+    @GET("/api/expense/month/{year}/{month}")
     suspend fun getExpendituresMonthCalendar(
         @Path("year") year: Int,
         @Path("month") month: Int
     ): Response<MonthExpendituresCalendar>
 
-    @GET("/api/expenditures/{year}/{month}/{day}")
+    @GET("/api/expense/{year}/{month}/{day}")
     suspend fun getExpendituresMonthCategory(
         @Path("year") year: Int,
         @Path("month") month: Int,
         @Path("day") day: Int,
     ): Response<MonthExpendituresCategory>
 
-    @POST("/api/expenditures/target")
+    @POST("/api/expense/target")
     suspend fun postExpendituresTarget(
         @Body request: ExpenditureTargetRequest
     )

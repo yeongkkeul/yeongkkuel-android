@@ -82,8 +82,6 @@ class HomeFragment : Fragment() {
 
         navController = Navigation.findNavController(view)
 
-        botSheetViewModel.getSpendingList()
-
         (activity as? MainActivity)?.resetBottomSheetState()
 
         // 홈 탭에 진입할 때 바텀시트 상태(피크 높이)를 재설정

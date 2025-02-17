@@ -1,6 +1,7 @@
 package com.example.yeongkkuel.presentation.botsheet
 
 import android.content.res.ColorStateList
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -35,6 +36,8 @@ class BotSheetCategoryListAdapter(
                 hist.name.isBlank() && hist.price == 0
             }
 
+            Log.e("histories2", originalHistories.toString())
+
             // onBind() 안에서 새로 Adapter 생성
             val localHistoryListAdapter = BotSheetHistoryListAdapter { selectedHistory ->
                 botSheetListener.navigateToExpenseView(
@@ -61,9 +64,11 @@ class BotSheetCategoryListAdapter(
             tvCategory.text = item.kind.name
             val context = root.context
             tvCategory.setTextColor(ContextCompat.getColor(context, categoryColor))
-            ivBtnAdd.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, categoryColor))
+            ivBtnAdd.backgroundTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(context, categoryColor))
             ivBtnAdd.setImageResource(R.drawable.ic_plus_default)
-            ivBtnAdd.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(context, categoryColor))
+            ivBtnAdd.imageTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(context, categoryColor))
 
             // 카테고리 추가 버튼 클릭 리스너
             ivBtnAdd.setOnClickListener {
@@ -124,6 +129,13 @@ class SpendingCategoryListDiffUtil : DiffUtil.ItemCallback<BotSheetUiState.Spend
         oldItem: BotSheetUiState.Spending,
         newItem: BotSheetUiState.Spending
     ): Boolean {
-        return oldItem.kind == newItem.kind && oldItem.color == newItem.color
+        return oldItem.kind == newItem.kind &&
+                oldItem.color == newItem.color &&
+                oldItem.plusIconResId == newItem.plusIconResId &&
+                oldItem.history.size == newItem.history.size &&
+                oldItem.history.zip(newItem.history).all { (old, new) ->
+                    old == new
+                }
     }
+
 }
