@@ -66,14 +66,19 @@ class StatMonthlyFragment(
     }
 
     private fun onBind(uiState: StatMonthlyUiState)= with(binding){
-        calendarViewPagerAdapter.getCurrentFragment(vpCalendar)?.setTargetExpenditure(uiState.targetExpenditure)
+        when(uiState){
+            StatMonthlyUiState.Init -> {}
+            is StatMonthlyUiState.StatMonthly -> {
+                calendarViewPagerAdapter.getCurrentFragment(vpCalendar)?.setTargetExpenditure(uiState.targetExpenditure)
 
-        tvCurrentMonth.text = uiState.targetMonth.first.toString() + "년 " + uiState.targetMonth.second.toString() + "월"
+                tvCurrentMonth.text = uiState.targetMonth.first.toString() + "년 " + uiState.targetMonth.second.toString() + "월"
 
-        tvTotalSpending.text = uiState.totalSpending.toMoneyString() + "원"
+                tvTotalSpending.text = uiState.totalSpending.toMoneyString() + "원"
 
-        tvAchievementDay.text = (uiState.achieveDay?.toString() ?: "-") + "일"
-        tvRewardAmount.text = "+" + uiState.rewardsAmount.toString()
+                tvAchievementDay.text = (uiState.achieveDay?.toString() ?: "-") + "일"
+                tvRewardAmount.text = "+" + uiState.rewardsAmount.toString()
+            }
+        }
     }
 
     override fun onDestroyView() {

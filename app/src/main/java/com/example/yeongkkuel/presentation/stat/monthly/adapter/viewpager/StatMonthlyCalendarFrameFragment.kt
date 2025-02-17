@@ -86,7 +86,7 @@ class StatMonthlyCalendarFrameFragment(
     }
 
     private fun onBind(uiState: StatMonthlyUiState) = with(binding) {
-        listAdapter.submitList(uiState.calendarList)
+        if(uiState is StatMonthlyUiState.StatMonthly) listAdapter.submitList(uiState.calendarList)
     }
 
     fun setTargetExpenditure(targetExpenditure: Int?){

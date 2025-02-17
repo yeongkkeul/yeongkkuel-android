@@ -30,4 +30,10 @@ class StatViewPagerAdapter(
     }
 
     fun getTitle(position: Int): Int = fragments[position].title
+
+    fun animate(position: Int){
+        (fragments[position]?.fragment as? StatAnimationListener)?.animate()
+    }
+
+
 }

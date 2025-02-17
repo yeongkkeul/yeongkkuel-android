@@ -17,13 +17,12 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentStatWeeklyBinding
+import com.example.yeongkkuel.presentation.stat.StatAnimationListener
 import com.example.yeongkkuel.presentation.stat.weekly.adapter.StatWeeklyCompareListAdapter
 import com.example.yeongkkuel.presentation.stat.weekly.adapter.StatWeeklyPieChartCategoryListAdapter
 import com.example.yeongkkuel.presentation.stat.weekly.adapter.StatWeeklyWeekListAdapter
-import com.example.yeongkkuel.presentation.util.Week
 import com.example.yeongkkuel.presentation.util.toMoneyString
 import com.github.mikephil.charting.animation.Easing
-import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.data.PieData
@@ -37,11 +36,10 @@ import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Calendar
 import java.util.Locale
-import kotlin.math.exp
 
 class StatWeeklyFragment(
     private val viewModel: StatWeeklyViewModel
-) : Fragment() {
+) : Fragment(), StatAnimationListener {
     private var _binding: FragmentStatWeeklyBinding? = null
     private val binding: FragmentStatWeeklyBinding
         get() = requireNotNull(_binding) { "FragmentStatWeeklyBinding -> null" }
@@ -350,4 +348,27 @@ class StatWeeklyFragment(
         super.onDestroyView()
         _binding = null
     }
+
+    override fun animate() {
+        val viewHolder1 = binding.rvCompare.findViewHolderForAdapterPosition(0) as? StatWeeklyCompareListAdapter.ViewHolder
+        val viewHolder2 = binding.rvCompare.findViewHolderForAdapterPosition(1) as? StatWeeklyCompareListAdapter.ViewHolder
+
+        viewHolder1?.let {
+            val item1 = compareListAdapter.currentList[0]
+            it.animateProgress(item1)
+        }
+
+        viewHolder2?.let {
+            val item2 = compareListAdapter.currentList[1]
+            it.animateProgress(item2)
+        }
+
+        // PieChart 애니메이션 추가
+        binding.pieChart.apply {
+            animateY(1400, Easing.EaseInOutQuad) // 애니메이션 적용
+            invalidate() // 차트를 새로 그리기
+        }
+    }
+
+
 }

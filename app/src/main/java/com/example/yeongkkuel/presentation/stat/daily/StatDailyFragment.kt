@@ -14,6 +14,7 @@ import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentStatDailyBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
+import com.example.yeongkkuel.presentation.stat.StatAnimationListener
 import com.example.yeongkkuel.presentation.util.toMoneyString
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.data.PieData
@@ -28,7 +29,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class StatDailyFragment : Fragment() {
+class StatDailyFragment : Fragment(), StatAnimationListener {
     private var _binding: FragmentStatDailyBinding? = null
     private val binding: FragmentStatDailyBinding
         get() = requireNotNull(_binding) { "FragmentStatBinding -> null" }
@@ -181,5 +182,12 @@ class StatDailyFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun animate() {
+        binding.pieChart.apply {
+            animateY(1400, Easing.EaseInOutQuad) // 애니메이션 적용
+            invalidate() // 차트를 새로 그리기
+        }
     }
 }
