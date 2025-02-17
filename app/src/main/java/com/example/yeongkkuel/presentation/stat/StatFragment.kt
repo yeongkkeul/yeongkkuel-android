@@ -35,7 +35,8 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
         StatViewPagerAdapter(
             fragment = this@StatFragment,
             weeklyViewModel = weeklyViewModel,
-            monthlyViewModel = monthlyViewModel)
+            monthlyViewModel = monthlyViewModel
+        )
     }
 
     private var botSheetListener: BotSheetListener? = null
@@ -92,6 +93,8 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
                 registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                     override fun onPageSelected(position: Int) {
                         super.onPageSelected(position)
+
+                        (adapter as StatViewPagerAdapter).animate(position)
 
                         when (position) {
                             0 -> { // 첫 번째 페이지 (StatDailyFragment)
