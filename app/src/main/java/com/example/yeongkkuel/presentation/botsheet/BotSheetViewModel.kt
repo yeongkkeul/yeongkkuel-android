@@ -347,63 +347,6 @@ class BotSheetViewModel : ViewModel() {
         }
     }
 
-//    // 지출 내역 수정
-//    suspend fun updateExpense(expenseId: Int, request: ExpenseUpdateRequest): ExpenseUpdateResponse? {
-//        return try {
-//            // ✅ RequestBody 변환
-//            val dayPart = request.day.toRequestBody("text/plain".toMediaTypeOrNull())
-//            val categoryIdPart = request.categoryId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
-//            val contentPart = request.content.toRequestBody("text/plain".toMediaTypeOrNull())
-//            val amountPart = request.amount.toString().toRequestBody("text/plain".toMediaTypeOrNull())
-//
-//            // ✅ API 호출
-//            val response = expenseApiService.updateExpense(
-//                expenseId = expenseId,
-//                day = dayPart,
-//                categoryId = categoryIdPart,
-//                content = contentPart,
-//                amount = amountPart,
-//                expenseImage = request.expenseImage // 이미지 파라미터 그대로 전달
-//            )
-//
-//            if (response.isSuccessful) {
-//                val updateResponse = response.body()
-//
-//                updateResponse?.let {
-//                    if (it.isSuccess) {
-//                        // ✅ 업데이트 성공 시, 기존 데이터 변경
-//                        _uiState.update { prevState ->
-//                            val updatedSpendingList = prevState.spendingList.map { spending ->
-//                                if (spending.history.any { it.id == expenseId }) {
-//                                    val updatedHistory = spending.history.map { history ->
-//                                        if (history.id == expenseId) {
-//                                            history.copy(
-//                                                name = request.content,
-//                                                price = request.amount,
-//                                                imgExist = request.expenseImage != null // ✅ 이미지 여부 반영
-//                                            )
-//                                        } else {
-//                                            history
-//                                        }
-//                                    }
-//                                    spending.copy(history = updatedHistory)
-//                                } else {
-//                                    spending
-//                                }
-//                            }
-//                            prevState.copy(spendingList = updatedSpendingList)
-//                        }
-//                    }
-//                    return it
-//                }
-//            }
-//            null
-//        } catch (e: Exception) {
-//            null
-//        }
-//    }
-
-
 
     fun moveExpenseToNewDate(expense: BotSheetUiState.Spending.History, newDate: String) {
         _uiState.update { prevState ->

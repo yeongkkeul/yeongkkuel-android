@@ -1,7 +1,5 @@
 package com.example.yeongkkuel.presentation.home.entry.data
 
-import okhttp3.MultipartBody
-
 data class ExpenseRequest(
     val day: String,          // 지출 날짜 (YYYY-MM-DD)
     val categoryId: Int,      // 카테고리 ID

@@ -1,6 +1,7 @@
 package com.example.yeongkkuel.presentation.home.entry
 
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
@@ -10,11 +11,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentExpenseEditBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
@@ -25,6 +28,7 @@ import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -40,7 +44,9 @@ class ExpenseEditFragment : Fragment() {
 
     private var selectedCategoryId: Int? = null
     private var selectedDate: Date? = null
-    private var selectedImageUri: Uri? = null  // 🔹 선택된 이미지 저장
+    private var selectedImageUri: Uri? = null  // 선택된 이미지 저장
+    private val PICK_IMAGE_REQUEST = 1 // 갤러리 요청 코드
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -63,8 +69,11 @@ class ExpenseEditFragment : Fragment() {
 
         binding.tvDateInput.setOnClickListener { showDatePickerDialog() }
 
+        setupPhotoFrame()
+
         // ✅ 기존 지출 내역 불러오기
         val selectedExpenseId = arguments?.getInt("expenseId") ?: return
+        val imageUrl = arguments?.getString("imageUrl") // 🔹 기존 이미지 URL 가져오기
 
         viewLifecycleOwner.lifecycleScope.launch {
             botSheetViewModel.spendingHistoryList.collectLatest { historyList ->
@@ -83,6 +92,7 @@ class ExpenseEditFragment : Fragment() {
                     val updatedColor = getCategoryTextColor(category?.kind?.name ?: "기타")
                     binding.tvCategoryInput.setTextColor(updatedColor)
 
+                    loadExistingImage(imageUrl)
                     enableEditing()
                 }
             }
@@ -90,6 +100,55 @@ class ExpenseEditFragment : Fragment() {
 
         setupDetailInput()
         setupAmountInput()
+    }
+
+    private fun setupPhotoFrame() {
+        binding.flPhotoFrame.setOnClickListener {
+            openGallery()
+        }
+
+        binding.imgPhotoFrame.setOnClickListener {
+            openGallery()
+        }
+    }
+
+
+    // 이미지 불러오기
+    private fun loadExistingImage(imageUrl: String?) {
+        if (!imageUrl.isNullOrEmpty()) {
+            Glide.with(this)
+                .load(imageUrl)
+                .into(binding.imgPhotoFrame)
+            binding.ivPhotoIcon.visibility = View.GONE
+        } else {
+            binding.imgPhotoFrame.setImageResource(R.drawable.bg_photo_input) // 기본 이미지 설정
+            binding.ivPhotoIcon.visibility = View.VISIBLE
+        }
+    }
+
+    // 갤러리 열기
+    private fun openGallery() {
+        val intent = Intent(Intent.ACTION_PICK).apply {
+            type = "image/*"
+        }
+        startActivityForResult(intent, PICK_IMAGE_REQUEST)
+    }
+
+    // 갤러리에서 이미지 선택 후 처리
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == AppCompatActivity.RESULT_OK) {
+            data?.data?.let { uri ->
+                selectedImageUri = uri // 선택한 이미지 저장
+
+                // 🔹 Glide를 사용하여 이미지 미리보기 업데이트
+                Glide.with(this)
+                    .load(uri)
+                    .into(binding.imgPhotoFrame)
+
+                binding.ivPhotoIcon.visibility = View.GONE
+            }
+        }
     }
 
     private fun enableEditing() {
@@ -162,7 +221,7 @@ class ExpenseEditFragment : Fragment() {
         })
     }
 
-    // ✅ 수정 API 호출
+    // 수정 API 호출
     private fun saveExpense() {
         val newDetail = binding.etDetailInput.text.toString().trim()
         val newAmount = binding.etAmountInput.text.toString().trim().replace(",", "").toIntOrNull() ?: 0
@@ -174,22 +233,24 @@ class ExpenseEditFragment : Fragment() {
 
         val selectedExpenseId = arguments?.getInt("expenseId") ?: return
         val selectedExpense = botSheetViewModel.spendingHistoryList.value.find { it.id == selectedExpenseId } ?: return
-        val category = getCategoryForExpense(selectedExpense.id)
-
         val formattedDate = selectedDate?.let { formatDateToApiFormat(it) }
             ?: formatDateToApiFormat(botSheetViewModel.uiState.value.date)
 
-        // ✅ 기존 날짜 찾기 (selectedExpense가 속한 spendingList에서 찾기)
         val originalDate = botSheetViewModel.uiState.value.spendingList.find { spending ->
             spending.history.any { it.id == selectedExpense.id }
         }?.let { formatDateToApiFormat(botSheetViewModel.uiState.value.date) } ?: formattedDate
-        // 🚀 만약 기존 날짜를 찾지 못하면 기본값으로 `formattedDate` 사용!
 
         // 🔹 선택된 이미지 파일을 `MultipartBody.Part`로 변환
         val imagePart = selectedImageUri?.let { uri ->
-            val file = File(uri.path ?: "")
-            val requestFile = RequestBody.create("image/*".toMediaTypeOrNull(), file)
-            MultipartBody.Part.createFormData("expenseImage", file.name, requestFile)
+            requireContext().contentResolver.openInputStream(uri)?.use { inputStream ->
+                val tempFile = File.createTempFile("upload", ".jpg", requireContext().cacheDir)
+                tempFile.outputStream().use { outputStream ->
+                    inputStream.copyTo(outputStream)
+                }
+
+                val requestFile = tempFile.asRequestBody("image/*".toMediaTypeOrNull())
+                MultipartBody.Part.createFormData("expenseImage", tempFile.name, requestFile)
+            }
         }
 
         Log.d("ExpenseEditFragment", "✅ 기존 날짜: $originalDate, 수정된 날짜: $formattedDate")

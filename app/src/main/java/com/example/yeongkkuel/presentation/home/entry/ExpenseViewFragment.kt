@@ -2,6 +2,7 @@ package com.example.yeongkkuel.presentation.home.entry
 
 import android.graphics.Rect
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.TouchDelegate
 import android.view.View
@@ -68,10 +69,9 @@ class ExpenseViewFragment : Fragment() {
         binding.clMore.findViewById<TextView>(R.id.tv_delete).setOnClickListener {
             val expenseId = arguments?.getInt("expenseId") ?: return@setOnClickListener // ✅ null이면 실행 안 함
             botSheetViewModel.deleteExpense(expenseId)
+            deleteExpense()
             binding.clMore.visibility = View.GONE
         }
-
-
 
 //        // 무지출이면 `ic_more` 버튼 숨기기
 //        if (expensePrice == 0) {
@@ -90,15 +90,18 @@ class ExpenseViewFragment : Fragment() {
         val imageUrl = arguments?.getString("imageUrl") ?: ""
 
         // 이미지 로드
-        if (imageUrl.isNotEmpty()) {
+        if (!imageUrl.isNullOrEmpty()) {
+            Log.d("ExpenseViewFragment", "✅ 서버에서 받은 이미지 URL: $imageUrl")
             Glide.with(binding.imgPhotoFrame.context)
                 .load(imageUrl)
                 .into(binding.imgPhotoFrame)
             binding.ivPhotoIcon.visibility = View.GONE
         } else {
+            Log.d("ExpenseViewFragment", "🚨 이미지 URL이 없음, 기본 이미지 표시")
             binding.imgPhotoFrame.setImageResource(R.drawable.bg_photo_input)
             binding.ivPhotoIcon.visibility = View.VISIBLE
         }
+
 
         // 날짜 및 UI 설정
         binding.tvDateInput.text = expenseDateString ?: "날짜 없음"
@@ -117,6 +120,7 @@ class ExpenseViewFragment : Fragment() {
         // 카테고리 탐색할 때 필요
         val matchedCategory = expenseId?.let { getCategoryForExpense(it) }
         selectedCategoryId = matchedCategory?.categoryId
+
     }
 
     private fun getCategoryForExpense(expenseId: Int): BotSheetUiState.Spending? {
@@ -166,10 +170,10 @@ class ExpenseViewFragment : Fragment() {
         btnConfirm.setOnClickListener {
             expenseViewModel.deleteExpense(expenseId!!)
 
-            // ✅ 서버에서 삭제 요청 후 바텀시트 UI 업데이트
+            // 서버에서 삭제 요청 후 바텀시트 UI 업데이트
             expenseViewModel.deleteResult.observe(viewLifecycleOwner) { isDeleted ->
                 if (isDeleted) {
-                    botSheetViewModel.removeExpenseFromCategory(expenseId!!) // ✅ 바텀시트에서 삭제 반영
+                    botSheetViewModel.removeExpenseFromCategory(expenseId!!) // 바텀시트에서 삭제 반영
                     showToast("지출 내역이 삭제되었습니다.")
                     findNavController().popBackStack()
                 } else {
