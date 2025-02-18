@@ -91,9 +91,11 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
             }.attach()
 
 
+
             // ViewPager2의 페이지가 변경될 때마다 호출되는 콜백
             botSheetListener?.let { listner ->
                 registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                    var isFirst = true
                     override fun onPageSelected(position: Int) {
                         super.onPageSelected(position)
 
@@ -108,7 +110,8 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
                                     (displayHeight - 430.dpToPx(requireContext()))
                                 listner.setPeekHeight(peekHeight)
 
-                                botSheetViewModel.getSpendingList()
+                                if(!isFirst) botSheetViewModel.getSpendingList()
+                                else isFirst = false
                             }
 
                             1 -> { // 두 번째 페이지 (StatWeeklyFragment)

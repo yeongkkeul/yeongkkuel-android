@@ -290,7 +290,7 @@ class StatWeeklyFragment(
                 }?.category
 
             if (mostSpendingKind != null) {
-                val mostSpendingKindKor = mostSpendingKind.name
+                val mostSpendingKindKor = if(mostSpendingKind.name == "trash") "기타" else mostSpendingKind.name
                 val message = "${mostSpendingKindKor}에 가장 많이 썼어요"
 
                 if (mostSpendingKindKor == "")

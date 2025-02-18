@@ -29,7 +29,6 @@ class StatWeeklyPieChartCategoryListAdapter(
                 ivStartPoint.setColorFilter(item.color.rgb)
                 if (item.color == Colors.TRASH) {
                     tvSpendingCategory.visibility = View.GONE
-                    tvSpendingCategory.text = "기타"
                 }
             }
         }
