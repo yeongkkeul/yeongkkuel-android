@@ -29,7 +29,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class StatDailyFragment : Fragment(), StatAnimationListener {
+class StatDailyFragment : Fragment(){
     private var _binding: FragmentStatDailyBinding? = null
     private val binding: FragmentStatDailyBinding
         get() = requireNotNull(_binding) { "FragmentStatBinding -> null" }
@@ -52,10 +52,6 @@ class StatDailyFragment : Fragment(), StatAnimationListener {
     }
 
     private fun initView() = with(binding) {
-        fun initBotSheet() {
-            viewModel.getSpendingList()
-        }
-
         fun initDate() {
             val currentDate = Date()
             val dateFormatChart = SimpleDateFormat("MM월 dd일 (E)", Locale.KOREAN)
@@ -79,7 +75,6 @@ class StatDailyFragment : Fragment(), StatAnimationListener {
             }
         }
 
-        initBotSheet()
         initDate()
         initErrorListener()
     }
@@ -178,16 +173,9 @@ class StatDailyFragment : Fragment(), StatAnimationListener {
         showErrorMessage()
     }
 
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
-    override fun animate() {
-        binding.pieChart.apply {
-            animateY(1400, Easing.EaseInOutQuad) // 애니메이션 적용
-            invalidate() // 차트를 새로 그리기
-        }
-    }
 }

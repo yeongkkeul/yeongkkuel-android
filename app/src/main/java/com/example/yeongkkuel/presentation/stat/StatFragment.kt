@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -17,6 +18,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentStatBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
+import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import com.example.yeongkkuel.presentation.stat.monthly.StatMonthlyViewModel
 import com.example.yeongkkuel.presentation.stat.weekly.StatWeeklyViewModel
 import com.example.yeongkkuel.presentation.util.dpToPx
@@ -30,6 +32,7 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
 
     private val weeklyViewModel: StatWeeklyViewModel by viewModels()
     private val monthlyViewModel: StatMonthlyViewModel by viewModels()
+    private val botSheetViewModel : BotSheetViewModel by activityViewModels()
 
     private val viewPagerAdapter: StatViewPagerAdapter by lazy {
         StatViewPagerAdapter(
@@ -104,6 +107,8 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
                                 val peekHeight =
                                     (displayHeight - 430.dpToPx(requireContext()))
                                 listner.setPeekHeight(peekHeight)
+
+                                botSheetViewModel.getSpendingList()
                             }
 
                             1 -> { // 두 번째 페이지 (StatWeeklyFragment)
