@@ -1,6 +1,9 @@
 package com.example.yeongkkuel.presentation.auth
 
 import android.content.Context
+import com.example.yeongkkuel.YeongKkuelApplication
+import kotlin.contracts.contract
+
 //import androidx.security.crypto.EncryptedSharedPreferences
 //import androidx.security.crypto.MasterKey
 //import timber.log.Timber
@@ -16,11 +19,11 @@ object TokenManager {
     private const val KEY_KAKAO_TOKEN = "kakao_token"
     private const val KEY_GOOGLE_ID_TOKEN = "google_id_token"
 
+    private const val CATEGORY_ORDER = "category_order"
+
     enum class SocialType {
         KAKAO, GOOGLE, NONE
     }
-
-
 
     fun saveTokens(context: Context, accessToken: String, refreshToken: String) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -50,6 +53,7 @@ object TokenManager {
         prefs.edit()
             .remove(KEY_ACCESS_TOKEN)
             .remove(KEY_REFRESH_TOKEN)
+            .remove(CATEGORY_ORDER)
             .apply()
     }
 
@@ -116,6 +120,20 @@ object TokenManager {
         clearKaKaoToken(context)
         clearGoogleIdToken(context)
         clearTokens(context)
+    }
+
+    fun setCategoryOrder(context: Context = YeongKkuelApplication.applicationContext(), categoryOrderList: List<Int>) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val stringList = categoryOrderList.joinToString(",") { it.toString() }
+        val editor = prefs.edit()
+        editor.putString(CATEGORY_ORDER, stringList)
+        editor.apply()
+    }
+
+    fun getCategoryOrder(context: Context = YeongKkuelApplication.applicationContext()): List<Int> {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val stringList = prefs.getString(CATEGORY_ORDER, "") ?: return emptyList()
+        return stringList.split(",").map { it.toIntOrNull() ?: 0 }
     }
 }
 
