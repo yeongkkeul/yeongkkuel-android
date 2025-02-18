@@ -10,7 +10,7 @@ import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.ItemChatRoomBinding
 import com.example.yeongkkuel.presentation.chat.dialog.ChatRoomExitDialog
 import com.example.yeongkkuel.presentation.chat.ChatRoom
-import com.example.yeongkkuel.presentation.chat.ChatRoomClickListener
+import com.example.yeongkkuel.presentation.chat.room.ChatRoomClickListener
 import com.example.yeongkkuel.utils.SwipeToDelete
 
 class ChatRoomAdapter(

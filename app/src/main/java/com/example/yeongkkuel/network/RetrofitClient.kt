@@ -5,6 +5,9 @@ import com.example.yeongkkuel.network.data.AuthInterceptor
 import com.example.yeongkkuel.network.service.CategoryApiService
 import com.example.yeongkkuel.network.service.ExpenseApiService
 
+import com.example.yeongkkuel.network.service.ChatService
+
+
 import com.example.yeongkkuel.network.service.HomeApiService
 import com.example.yeongkkuel.network.service.StoreApiService
 
@@ -71,7 +74,6 @@ object RetrofitClient {
         authRetrofit!!.create(StatService::class.java)
     }
 
-
     val categoryApiService: CategoryApiService by lazy {
         authRetrofit!!.create(CategoryApiService::class.java)
     }
@@ -88,8 +90,11 @@ object RetrofitClient {
         authRetrofit!!.create(MyPageService::class.java)
     }
 
+    val chatService: ChatService by lazy {
+        authRetrofit!!.create(ChatService::class.java)
+    }
+
     val expenseApiService: ExpenseApiService by lazy {
         authRetrofit!!.create(ExpenseApiService::class.java)
     }
-
 }

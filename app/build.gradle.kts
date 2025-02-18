@@ -114,4 +114,12 @@ dependencies {
 
     // JwtDecode
     implementation(libs.jwtdecode)
+
+    implementation(libs.stompprotocolandroid)
+
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
+
+    implementation(libs.rxjava)
+    implementation(libs.rxandroid)
 }

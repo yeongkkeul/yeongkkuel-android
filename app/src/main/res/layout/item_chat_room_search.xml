@@ -34,6 +34,7 @@
                 android:scaleType="centerCrop"
                 android:background="@drawable/bg_thumbnail_chat_room"
                 android:clipToOutline="true"
+                android:adjustViewBounds="true"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/guideline_iv_start__v" />

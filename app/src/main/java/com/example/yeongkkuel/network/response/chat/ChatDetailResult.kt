@@ -8,9 +8,11 @@ data class ChatDetailResult (
     @SerializedName("chatRoomAgeRange") val chatRoomAgeRange: String,
     @SerializedName("chatRoomJob") val chatRoomJob: String,
     @SerializedName("createdDaysElapsed") val createdDaysElapsed: String,
-    @SerializedName("participationCount") val participationCount: Int,
-    @SerializedName("chatRoomMaxUserCount") val chatRoomMaxUserCount: Int,
-    @SerializedName("chatRoomSpendingAmountGoal") val chatRoomSpendingAmountGoal: Int,
+    @SerializedName("chatRoomChallenger") val chatRoomChallenger: String,
+    @SerializedName("chatRoomSpendingAmountGoal") val chatRoomSpendingAmountGoal: String,
+    @SerializedName("chatRoomAchievedCount") val chatRoomAchievedCount: String,
+    @SerializedName("chatRoomAverageExpense") val chatRoomAverageExpense: String,
+    @SerializedName("chatRoomChallengerGroupRanking") val chatRoomChallengerGroupRanking: String,
     @SerializedName("chatRoomImageUrl") val chatRoomImageUrl: String,
     @SerializedName("isPassword") val isPassword: Boolean
 )

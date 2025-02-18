@@ -53,8 +53,12 @@ class MyFragment : Fragment() {
         observeViewModel()
         viewModel.fetchUserProfile()
         setupClickListeners()
+        initAppbar()
     }
 
+    private fun initAppbar(){
+        binding.includeTopbar.ivMore.visibility = View.GONE
+    }
     private fun observeViewModel() {
         viewModel.profileResponse.observe(viewLifecycleOwner) { response ->
             response.result?.let { result ->
@@ -98,7 +102,7 @@ class MyFragment : Fragment() {
         }
 
         // 알림 아이콘
-        binding.ivNoti.setOnClickListener {
+        binding.includeTopbar.ivNoti.setOnClickListener {
             // 이동: MyPage -> NotiFragment
             findNavController().navigate(R.id.action_myPageFragment_to_notificationFragment)
         }
