@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import java.time.LocalDate
 import java.util.Calendar
 
 
@@ -246,10 +247,26 @@ class BotSheetViewModel : ViewModel() {
     }
 
     // 카테고리 삭제 연동 기능
-    fun removeCategory(categoryName: String) {
-        _uiState.update { prev ->
-            val updatedSpendingList = prev.spendingList.filter { it.kind.name != categoryName }
-            prev.copy(spendingList = updatedSpendingList)
+    fun removeCategory(categoryName: String, isSuccess: ()-> Unit, isFalse: () -> Unit) {
+        val categoryToDelete = uiState.value.spendingList.find { it.kind.name == categoryName }
+        if (categoryToDelete != null) {
+            viewModelScope.launch {
+                try {
+                    val response = RetrofitClient.categoryApiService.deleteCategory(categoryToDelete.categoryId)
+
+                    if (response.isSuccess) {
+                        _uiState.update { prev ->
+                            val updatedSpendingList = prev.spendingList.filter { it.kind.name != categoryName }
+                            prev.copy(spendingList = updatedSpendingList)
+                        }
+
+                        isSuccess()
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    isFalse()
+                }
+            }
         }
     }
 
@@ -304,12 +321,16 @@ class BotSheetViewModel : ViewModel() {
     // 매개변수를 받는 기존 함수
     // 월별 지출 내역 가져오기
     fun getSpendingList(year: Int, month: Int, day: Int) = viewModelScope.launch {
-        val categoryList = TokenManager.getCategoryOrder()
+        val currentDate = LocalDate.now()
+        val inputDate = LocalDate.of(year, month, day)
+        if (inputDate.isAfter(currentDate)) return@launch
+
         try {
             // yeongkkuelService를 통해 데이터 요청
             statService.getExpendituresMonthCategory(year, month, day).run {
                 if (isSuccess) {
                     result.run {
+                        val categoryList = TokenManager.getCategoryOrder()
                         val categories = categories.map { category ->
                             Category(
                                 id = category.categoryId,
@@ -318,7 +339,7 @@ class BotSheetViewModel : ViewModel() {
                                     red = category.red,
                                     blue = category.blue,
                                     green = category.green
-                                ) ?: Colors.RED1
+                                )
                             )
                         }
 
@@ -330,7 +351,9 @@ class BotSheetViewModel : ViewModel() {
                         // categoryList에 없는 category들을 뒤에 추가
                         val remainingCategories = categories.filter { it.id !in categoryList }
 
-                        val finalCategories = sortedCategories + remainingCategories
+                        val (trashCategories, otherCategories) = remainingCategories.partition { it.color == Colors.TRASH }
+
+                        val finalCategories = sortedCategories + otherCategories + trashCategories
 
                         _uiState.update { prev ->
                             val updatedSpendingList = finalCategories.map { category ->

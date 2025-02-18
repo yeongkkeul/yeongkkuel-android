@@ -18,6 +18,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
@@ -25,10 +26,12 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.network.RetrofitClient
+import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import com.example.yeongkkuel.presentation.home.entry.data.*
 import com.example.yeongkkuel.presentation.util.SpendingCategory
+import com.example.yeongkkuel.presentation.util.dpToPx
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -40,13 +43,23 @@ import java.util.*
 
 class ExpenseEntryFragment : Fragment() {
 
-    private lateinit var expenseViewModel: ExpenseViewModel
+    private val expenseViewModel: ExpenseViewModel by activityViewModels()
     private val botSheetViewModel: BotSheetViewModel by activityViewModels()
     private var selectedImageUri: Uri? = null
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var navController: androidx.navigation.NavController
     private val PICK_IMAGE_REQUEST = 1
     private var expenseDate: String = ""
+
+    private var botSheetListener: BotSheetListener? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        if (context is BotSheetListener) {
+            botSheetListener = context
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,10 +73,10 @@ class ExpenseEntryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         navController = Navigation.findNavController(view)
-        sharedPreferences = requireContext().getSharedPreferences("ExpensePrefs", Context.MODE_PRIVATE)
+        sharedPreferences =
+            requireContext().getSharedPreferences("ExpensePrefs", Context.MODE_PRIVATE)
 
         val repository = ExpenseRepository(RetrofitClient.expenseApiService)
-        expenseViewModel = ViewModelProvider(this, ExpenseViewModel.Factory(repository)).get(ExpenseViewModel::class.java)
 
         setupCategory(view)
         initializeViews(view)
@@ -116,7 +129,8 @@ class ExpenseEntryFragment : Fragment() {
                 requireContext(),
                 { _, selectedYear, selectedMonth, selectedDay ->
                     val dayOfWeek = getDayOfWeek(selectedYear, selectedMonth, selectedDay)
-                    expenseDate= "${selectedYear}년 ${selectedMonth + 1}월 ${selectedDay}일 $dayOfWeek"
+                    expenseDate =
+                        "${selectedYear}년 ${selectedMonth + 1}월 ${selectedDay}일 $dayOfWeek"
                     tvDateInput.text = expenseDate
 
                 },
@@ -140,6 +154,7 @@ class ExpenseEntryFragment : Fragment() {
                 tvCharacterCount.text = "$length/24"
                 if (length > 24) etDetailInput.error = "최대 24자까지 입력 가능합니다."
             }
+
             override fun afterTextChanged(s: Editable?) {}
         })
     }
@@ -285,7 +300,7 @@ class ExpenseEntryFragment : Fragment() {
             expenseViewModel.createExpense(expenseRequest, imagePart) { response ->
                 if (response?.isSuccess == true) {
                     Toast.makeText(requireContext(), "지출 내역이 저장되었습니다.", Toast.LENGTH_SHORT).show()
-                    navController.navigate(R.id.navigation_home)
+                    handleNavigationAfterSave(view)
                 } else {
                     Toast.makeText(requireContext(), "지출 내역 저장 실패.", Toast.LENGTH_SHORT).show()
                 }
@@ -304,8 +319,10 @@ class ExpenseEntryFragment : Fragment() {
         val amount = amountString.toIntOrNull() ?: 0
         val isNoExpenseChecked = ivCircleExpenseChecked.visibility == View.VISIBLE
 
-        val errorBackground = ContextCompat.getDrawable(requireContext(), R.drawable.bg_edit_text_error) // 지출 내용 에러
-        val errorBackground2 = ContextCompat.getDrawable(requireContext(), R.drawable.bg_edit_text_error2) // 지출액 에러
+        val errorBackground =
+            ContextCompat.getDrawable(requireContext(), R.drawable.bg_edit_text_error) // 지출 내용 에러
+        val errorBackground2 =
+            ContextCompat.getDrawable(requireContext(), R.drawable.bg_edit_text_error2) // 지출액 에러
         val normalBackground = ContextCompat.getDrawable(requireContext(), R.drawable.bg_edit_text)
 
         var hasError = false
@@ -340,7 +357,7 @@ class ExpenseEntryFragment : Fragment() {
         // 선택된 카테고리 값 확인
         val expenseHistory = BotSheetUiState.Spending.History(
             id = 1,
-            name =  detail,
+            name = detail,
             price = if (isNoExpenseChecked) 0 else amount,
             imgExist = false
         )
@@ -381,6 +398,11 @@ class ExpenseEntryFragment : Fragment() {
 
             // StatFragment로 이동하며 Bundle 전달
             navController.navigate(R.id.action_expenseEntryFragment_to_navigation_stat, bundle)
+
+            val displayHeight = resources.displayMetrics.heightPixels
+            val peekHeight =
+                (displayHeight - 528.dpToPx(requireContext()))
+            botSheetListener?.setPeekHeight(peekHeight)
         } else {
             navController.navigate(R.id.navigation_home)
         }
