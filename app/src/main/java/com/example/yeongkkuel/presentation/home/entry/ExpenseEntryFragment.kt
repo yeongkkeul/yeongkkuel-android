@@ -26,10 +26,12 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.network.RetrofitClient
+import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import com.example.yeongkkuel.presentation.home.entry.data.*
 import com.example.yeongkkuel.presentation.util.SpendingCategory
+import com.example.yeongkkuel.presentation.util.dpToPx
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -48,6 +50,16 @@ class ExpenseEntryFragment : Fragment() {
     private lateinit var navController: androidx.navigation.NavController
     private val PICK_IMAGE_REQUEST = 1
     private var expenseDate: String = ""
+
+    private var botSheetListener: BotSheetListener? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        if (context is BotSheetListener) {
+            botSheetListener = context
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -288,7 +300,7 @@ class ExpenseEntryFragment : Fragment() {
             expenseViewModel.createExpense(expenseRequest, imagePart) { response ->
                 if (response?.isSuccess == true) {
                     Toast.makeText(requireContext(), "지출 내역이 저장되었습니다.", Toast.LENGTH_SHORT).show()
-                    navController.navigate(R.id.navigation_home)
+                    handleNavigationAfterSave(view)
                 } else {
                     Toast.makeText(requireContext(), "지출 내역 저장 실패.", Toast.LENGTH_SHORT).show()
                 }
@@ -386,6 +398,11 @@ class ExpenseEntryFragment : Fragment() {
 
             // StatFragment로 이동하며 Bundle 전달
             navController.navigate(R.id.action_expenseEntryFragment_to_navigation_stat, bundle)
+
+            val displayHeight = resources.displayMetrics.heightPixels
+            val peekHeight =
+                (displayHeight - 528.dpToPx(requireContext()))
+            botSheetListener?.setPeekHeight(peekHeight)
         } else {
             navController.navigate(R.id.navigation_home)
         }
