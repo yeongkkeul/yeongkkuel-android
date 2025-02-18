@@ -124,6 +124,8 @@ class ChatFragment : Fragment(), ChatRoomClickListener {
 
         (requireActivity() as MainActivity).hideBottomNavigation(false)
 
+        viewModel.fetchChatRooms()
+
 //        setupStompClient()
 
         // 기존 FAB 클릭 리스너
@@ -142,7 +144,7 @@ class ChatFragment : Fragment(), ChatRoomClickListener {
         setupRecyclerView()
 
         viewModel.chatRooms.observe(viewLifecycleOwner) { chatRooms ->
-            chatRoomAdapter.updateData(ArrayList(chatRooms))
+            chatRoomAdapter.updateData(ArrayList(chatRooms.reversed()))
         }
     }
 

@@ -17,7 +17,7 @@ class ChatRoomViewModel : ViewModel() {
         fetchChatRooms()
     }
 
-    private fun fetchChatRooms() {
+    fun fetchChatRooms() {
         viewModelScope.launch {
             try {
                 val response = RetrofitClient.chatService.getChatList()
