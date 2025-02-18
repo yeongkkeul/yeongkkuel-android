@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.presentation.chat
+package com.example.yeongkkuel.presentation.chat.network
 
 import com.example.yeongkkuel.presentation.chat.data.ChatRequest
 import com.example.yeongkkuel.presentation.chat.data.ChatResponse

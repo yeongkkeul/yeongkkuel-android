@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.presentation.chat
+package com.example.yeongkkuel.presentation.chat.room
 
 import android.os.Bundle
 import android.view.LayoutInflater

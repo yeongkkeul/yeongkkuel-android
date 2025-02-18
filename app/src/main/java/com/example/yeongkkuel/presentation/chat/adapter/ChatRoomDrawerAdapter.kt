@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.yeongkkuel.databinding.ItemChatRoomDrawerBinding
-import com.example.yeongkkuel.presentation.chat.data.ChatRoomRank
+import com.example.yeongkkuel.network.response.chat.ChatRoomRank
 
 class ChatRoomDrawerAdapter(
     private val chatRoomRank: ArrayList<ChatRoomRank>

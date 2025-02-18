@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.presentation.chat
+package com.example.yeongkkuel.presentation.chat.search
 
 import android.graphics.Typeface
 import android.os.Bundle
@@ -10,21 +10,20 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentFilterJobDialogBinding
+import com.example.yeongkkuel.presentation.chat.data.Job
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class FilterJobDialogFragment : BottomSheetDialogFragment() {
 
     private var _binding: FragmentFilterJobDialogBinding? = null
     private val binding: FragmentFilterJobDialogBinding
-        get() = requireNotNull(_binding){"FragmentFilterJobDialogBinding -> null"}
-
-    private var selectedJobOption: String? = null
+        get() = requireNotNull(_binding) { "FragmentFilterJobDialogBinding -> null" }
 
     private val viewModel: ChatSearchViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentFilterJobDialogBinding.inflate(inflater, container, false)
         return binding.root
@@ -37,25 +36,42 @@ class FilterJobDialogFragment : BottomSheetDialogFragment() {
             binding.btnStatusStudent,
             binding.btnStatusHousewife,
             binding.btnStatusWorker,
-            binding.btnStatusSelfemployed,
+            binding.btnStatusSelfemployed
         )
+
+        // 다이얼로그가 열릴 때 이미 선택된 옵션이 있다면 해당 버튼 활성화 처리
+        viewModel.selectedJobOption.value?.let { selectedJob ->
+            val selectedButton = options.find { it.text.toString() == selectedJob }
+            updateOptionSelection(selectedButton, options)
+        } ?: updateOptionSelection(null, options)
 
         options.forEach { option ->
             option.setOnClickListener {
-                selectedJobOption = option.text.toString()
-                viewModel.selectedJobOption.value = selectedJobOption
-
-                updateOptionSelection(selectedOption = option, options = options)
+                val selectedJob = option.text.toString()
+                // 이미 선택된 상태라면 선택 해제
+                if (viewModel.selectedJobOption.value == selectedJob) {
+                    viewModel.selectedJobOption.value = null
+                    updateOptionSelection(null, options)
+                } else {
+                    viewModel.selectedJobOption.value = selectedJob
+                    updateOptionSelection(option, options)
+                }
+                dismiss() // 선택 후 다이얼로그 닫기
             }
         }
     }
 
-    private fun updateOptionSelection(selectedOption: TextView, options: List<TextView>) {
+    private fun updateOptionSelection(selectedOption: TextView?, options: List<TextView>) {
         val selectedColor = ContextCompat.getColor(requireContext(), R.color.main1)
         val defaultColor = ContextCompat.getColor(requireContext(), R.color.black)
         options.forEach { option ->
-            option.setTextColor(if (option == selectedOption) selectedColor else defaultColor)
-            option.setTypeface(null, if (option == selectedOption) Typeface.BOLD else Typeface.NORMAL)
+            if (option == selectedOption) {
+                option.setTextColor(selectedColor)
+                option.setTypeface(null, Typeface.BOLD)
+            } else {
+                option.setTextColor(defaultColor)
+                option.setTypeface(null, Typeface.NORMAL)
+            }
         }
     }
 

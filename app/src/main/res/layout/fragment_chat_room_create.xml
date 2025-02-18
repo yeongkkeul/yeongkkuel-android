@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/btn_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/btn_back"
+            android:layout_marginStart="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <TextView
+            android:id="@+id/btn_create"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="생성"
+            android:textColor="@color/main1"
+            android:textStyle="bold"
+            style="@style/body_semibo"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.9"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/app_bar"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_chat_room_thumbnail"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:background="@drawable/bg_chat_room_create_camera"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/iv_chat_room_thumbnail"
+                    android:layout_width="65dp"
+                    android:layout_height="62dp"
+                    android:layout_marginTop="15dp"
+                    android:scaleType="centerCrop"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_camera"
+                    android:layout_marginBottom="11dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/tv_title_chat_room_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="채팅방 이름"
+                android:textColor="@color/black"
+                style="@style/body_medium"
+                android:layout_marginTop="32dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cl_chat_room_thumbnail" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="*"
+                android:textColor="@color/main1"
+                style="@style/body_medium"
+                android:layout_marginTop="32dp"
+                android:layout_marginStart="4dp"
+                app:layout_constraintStart_toEndOf="@+id/tv_title_chat_room_name"
+                app:layout_constraintTop_toBottomOf="@+id/cl_chat_room_thumbnail" />
+
+            <TextView
+                android:id="@+id/tv_warning_chat_room_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="채팅방 이름을 입력해주세요."
+                android:textColor="@color/error"
+                android:textStyle="bold"
+                style="@style/small_semib"
+                android:visibility="invisible"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_title_chat_room_name" />
+
+            <EditText
+                android:id="@+id/et_chat_room_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                style="@style/body_regula"
+                android:maxLength="18"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:imeOptions="actionNext"
+                android:inputType="text"
+                android:background="@drawable/bg_edittext_pw"
+                android:layout_marginTop="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_chat_room_name" />
+
+            <TextView
+                android:id="@+id/tv_count_chat_room_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0/18"
+                android:textColor="@color/black4"
+                style="@style/small_regul"
+                android:layout_marginEnd="11dp"
+                app:layout_constraintEnd_toEndOf="@+id/et_chat_room_name"
+                app:layout_constraintTop_toTopOf="@+id/et_chat_room_name"
+                app:layout_constraintBottom_toBottomOf="@+id/et_chat_room_name" />
+
+            <TextView
+                android:id="@+id/tv_title_chat_room_pw"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="비밀번호"
+                android:textColor="@color/black"
+                style="@style/body_medium"
+                android:layout_marginTop="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/et_chat_room_name" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="(선택)"
+                android:textColor="@color/black2"
+                style="@style/body_medium"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="4dp"
+                app:layout_constraintStart_toEndOf="@+id/tv_title_chat_room_pw"
+                app:layout_constraintTop_toBottomOf="@+id/et_chat_room_name" />
+
+            <EditText
+                android:id="@+id/et_chat_room_pw"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                style="@style/body_regula"
+                android:hint="숫자 4자리를 입력하세요"
+                android:textColorHint="@color/black2"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:imeOptions="actionNext"
+                android:inputType="numberPassword"
+                android:background="@drawable/bg_edittext_pw"
+                android:layout_marginTop="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_chat_room_pw" />
+
+            <ImageView
+                android:id="@+id/btn_show_off_pw"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/btn_eye_off"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintEnd_toEndOf="@+id/et_chat_room_pw"
+                app:layout_constraintTop_toTopOf="@+id/et_chat_room_pw"
+                app:layout_constraintBottom_toBottomOf="@+id/et_chat_room_pw" />
+
+            <TextView
+                android:id="@+id/tv_title_chat_room_pw_check"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="비밀번호 확인"
+                android:textColor="@color/black"
+                style="@style/body_medium"
+                android:layout_marginTop="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/et_chat_room_pw" />
+
+            <TextView
+                android:id="@+id/tv_warning_chat_room_pw_check"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="비밀번호가 일치하지 않습니다."
+                android:textColor="@color/error"
+                android:textStyle="bold"
+                style="@style/small_semib"
+                android:visibility="invisible"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_title_chat_room_pw_check" />
+
+            <EditText
+                android:id="@+id/et_chat_room_pw_check"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                style="@style/body_regula"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:imeOptions="actionNext"
+                android:inputType="numberPassword"
+                android:background="@drawable/bg_edittext_pw"
+                android:layout_marginTop="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_chat_room_pw_check" />
+
+            <TextView
+                android:id="@+id/tv_title_daily_goal_expense"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="하루 목표 지출액"
+                android:textColor="@color/black"
+                style="@style/body_medium"
+                android:layout_marginTop="20dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/et_chat_room_pw_check" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="*"
+                android:textColor="@color/main1"
+                style="@style/body_medium"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="4dp"
+                app:layout_constraintStart_toEndOf="@+id/tv_title_daily_goal_expense"
+                app:layout_constraintTop_toBottomOf="@+id/et_chat_room_pw_check" />
+
+            <TextView
+                android:id="@+id/btn_daily_goal_expense"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="설정"
+                android:textColor="@color/main1"
+                style="@style/body_medium"
+                android:layout_marginTop="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/et_chat_room_pw_check" />
+
+            <TextView
+                android:id="@+id/tv_title_amount_people"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="모집 인원"
+                android:textColor="@color/black"
+                style="@style/body_medium"
+                android:layout_marginTop="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_daily_goal_expense" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="*"
+                android:textColor="@color/main1"
+                style="@style/body_medium"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="4dp"
+                app:layout_constraintStart_toEndOf="@+id/tv_title_amount_people"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_daily_goal_expense" />
+
+            <TextView
+                android:id="@+id/btn_amount_people"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="설정"
+                android:textColor="@color/main1"
+                style="@style/body_medium"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_daily_goal_expense" />
+
+            <TextView
+                android:id="@+id/tv_title_age"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="연령대"
+                android:textColor="@color/black"
+                style="@style/body_medium"
+                android:layout_marginTop="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_amount_people" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="(선택)"
+                android:textColor="@color/black2"
+                style="@style/body_medium"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="4dp"
+                app:layout_constraintStart_toEndOf="@+id/tv_title_age"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_amount_people" />
+
+            <TextView
+                android:id="@+id/btn_age"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="설정"
+                android:textColor="@color/main1"
+                style="@style/body_medium"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_amount_people" />
+
+            <TextView
+                android:id="@+id/tv_title_job"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="직업"
+                android:textColor="@color/black"
+                style="@style/body_medium"
+                android:layout_marginTop="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_age" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="(선택)"
+                android:textColor="@color/black2"
+                style="@style/body_medium"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="4dp"
+                app:layout_constraintStart_toEndOf="@+id/tv_title_job"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_age" />
+
+            <TextView
+                android:id="@+id/btn_job"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="설정"
+                android:textColor="@color/main1"
+                style="@style/body_medium"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_age" />
+
+            <EditText
+                android:id="@+id/et_chat_room_rule"
+                android:layout_width="0dp"
+                android:layout_height="91dp"
+                android:textColor="@color/black"
+                style="@style/body_regula"
+                android:hint="채팅방 규칙을 설명해주세요."
+                android:textColorHint="@color/black2"
+                android:maxLength="200"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:imeOptions="actionDone"
+                android:inputType="text"
+                android:gravity="top"
+                android:background="@drawable/bg_edittext_pw"
+                android:layout_marginTop="25dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btn_job" />
+
+            <TextView
+                android:id="@+id/tv_count_chat_room_rule"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0/200"
+                android:textColor="@color/black4"
+                style="@style/small_regul"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="16dp"
+                app:layout_constraintEnd_toEndOf="@+id/et_chat_room_rule"
+                app:layout_constraintBottom_toBottomOf="@+id/et_chat_room_rule" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

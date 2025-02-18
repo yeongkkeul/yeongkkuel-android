@@ -1,7 +1,7 @@
 package com.example.yeongkkuel.presentation.chat
 
 data class ChatRoom(
-    val id: String,
+    val id: Int,
     val title: String,
     val thumbnailUrl: String,
     val recentMessage: String,
