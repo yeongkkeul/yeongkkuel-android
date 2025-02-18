@@ -371,7 +371,7 @@ class BotSheetViewModel : ViewModel() {
                                             id = expense.expenseId,
                                             name = expense.expenseName,
                                             price = expense.expenseAmount,
-                                            imgExist = expense.imgExist
+                                            imgExist = expense.imgExist ?: ""
                                         )
                                     }
                                 )

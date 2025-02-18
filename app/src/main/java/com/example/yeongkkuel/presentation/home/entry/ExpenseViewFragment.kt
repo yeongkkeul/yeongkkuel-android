@@ -18,6 +18,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentExpenseViewBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
@@ -98,12 +99,17 @@ class ExpenseViewFragment : Fragment() {
         if (imageUrl.isNotEmpty()) {
             Glide.with(binding.imgPhotoFrame.context)
                 .load(imageUrl)
+                .override(1000, 1000) // ✅ 크기 조정 (너비 1000px, 높이 600px)
+                .centerCrop() // ✅ 꽉 차게 표시
+                .transform(RoundedCorners(50)) // ✅ 모서리를 둥글게
                 .into(binding.imgPhotoFrame)
-            binding.ivPhotoIcon.visibility = View.GONE
+
+            binding.ivPhotoIcon.visibility = View.GONE // ✅ 아이콘 숨김
         } else {
             binding.imgPhotoFrame.setImageResource(R.drawable.bg_photo_input)
             binding.ivPhotoIcon.visibility = View.VISIBLE
         }
+
 
         // "trash" 카테고리인지 확인 후 숨김 처리
         if (categoryName.lowercase() == "trash") {

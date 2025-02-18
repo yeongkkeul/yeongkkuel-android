@@ -359,7 +359,7 @@ class ExpenseEntryFragment : Fragment() {
             id = 1,
             name = detail,
             price = if (isNoExpenseChecked) 0 else amount,
-            imgExist = false
+            imgExist = selectedImageUri?.toString() ?: ""
         )
 
         botSheetViewModel.addExpenseHistory(expenseHistory)
@@ -454,9 +454,9 @@ class ExpenseEntryFragment : Fragment() {
             data?.data?.let { uri ->
                 selectedImageUri = uri // ✅ 선택한 이미지 URI 저장
 
-                // 🔹 Glide를 사용하여 미리보기 적용 가능
                 val imgPhotoFrame = view?.findViewById<ImageView>(R.id.img_photo_frame)
                 val ivPhotoIcon = view?.findViewById<ImageView>(R.id.iv_photo_icon)
+
                 Glide.with(this)
                     .load(uri)
                     .override(500, 500) // ✅ 크기 조정 (236x236)
@@ -468,7 +468,6 @@ class ExpenseEntryFragment : Fragment() {
             }
         }
     }
-
 //
 //    override fun onDestroyView() {
 //        super.onDestroyView()

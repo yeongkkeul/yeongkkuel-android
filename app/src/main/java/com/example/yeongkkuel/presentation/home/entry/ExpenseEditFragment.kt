@@ -18,6 +18,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentExpenseEditBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
@@ -125,18 +126,23 @@ class ExpenseEditFragment : Fragment() {
     }
 
 
-    // 이미지 불러오기
+    // 기존 이미지를 불러오는 함수 수정
     private fun loadExistingImage(imageUrl: String?) {
         if (!imageUrl.isNullOrEmpty()) {
             Glide.with(this)
                 .load(imageUrl)
+                .override(1000, 1000) // ✅ 크기 조정 (너비 1000px, 높이 600px)
+                .centerCrop() // ✅ 꽉 차게 표시
+                .transform(RoundedCorners(50)) // ✅ 모서리를 둥글게
                 .into(binding.imgPhotoFrame)
-            binding.ivPhotoIcon.visibility = View.GONE
+
+            binding.ivPhotoIcon.visibility = View.GONE // ✅ 아이콘 숨김
         } else {
             binding.imgPhotoFrame.setImageResource(R.drawable.bg_photo_input) // 기본 이미지 설정
             binding.ivPhotoIcon.visibility = View.VISIBLE
         }
     }
+
 
     // 갤러리 열기
     private fun openGallery() {
@@ -151,17 +157,21 @@ class ExpenseEditFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == AppCompatActivity.RESULT_OK) {
             data?.data?.let { uri ->
-                selectedImageUri = uri // 선택한 이미지 저장
+                selectedImageUri = uri // ✅ 선택한 이미지 저장
 
                 // 🔹 Glide를 사용하여 이미지 미리보기 업데이트
                 Glide.with(this)
                     .load(uri)
+                    .override(500, 500) // ✅ 크기 조정
+                    .centerCrop() // ✅ 중앙 정렬
+                    .transform(RoundedCorners(50)) // ✅ 모서리 둥글게
                     .into(binding.imgPhotoFrame)
 
-                binding.ivPhotoIcon.visibility = View.GONE
+                binding.ivPhotoIcon.visibility = View.GONE // ✅ 아이콘 숨김
             }
         }
     }
+
 
     private fun enableEditing() {
         binding.etDetailInput.isEnabled = true
@@ -188,6 +198,9 @@ class ExpenseEditFragment : Fragment() {
         val etDetailInput = binding.etDetailInput
         val tvCharacterCount = binding.tvCharacterCount
 
+        val initialTextLength = etDetailInput.text?.length ?: 0
+        tvCharacterCount.text = "$initialTextLength/24"
+
         etDetailInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -205,13 +218,22 @@ class ExpenseEditFragment : Fragment() {
 
     // 쉼표 처리
     private fun setupAmountInput() {
-        binding.etAmountInput.addTextChangedListener(object : TextWatcher {
+        val etAmountInput = binding.etAmountInput
+
+        // 초기 값이 있을 경우 쉼표 추가
+        val initialText = etAmountInput.text.toString().trim().replace(",", "")
+        if (initialText.isNotEmpty()) {
+            val formatted = NumberFormat.getInstance(Locale.KOREAN).format(initialText.toLongOrNull() ?: 0)
+            etAmountInput.setText(formatted)
+        }
+
+        etAmountInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
             override fun afterTextChanged(s: Editable?) {
-                binding.etAmountInput.removeTextChangedListener(this)
+                etAmountInput.removeTextChangedListener(this)
 
                 val rawInput = s?.toString()?.replace(",", "") ?: ""
                 val input = rawInput.toLongOrNull() ?: 0
@@ -224,14 +246,15 @@ class ExpenseEditFragment : Fragment() {
                 val formatted = NumberFormat.getInstance(Locale.KOREAN).format(limitedValue)
 
                 if (formatted != s.toString()) {
-                    binding.etAmountInput.setText(formatted)
-                    binding.etAmountInput.setSelection(formatted.length)
+                    etAmountInput.setText(formatted)
+                    etAmountInput.setSelection(formatted.length)
                 }
 
-                binding.etAmountInput.addTextChangedListener(this)
+                etAmountInput.addTextChangedListener(this)
             }
         })
     }
+
 
     // 수정 API 호출
     private fun saveExpense() {

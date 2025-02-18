@@ -438,7 +438,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         expensePrice: Int,
         categoryColor: Int,
         categoryName: String,
-        imageUrl: Boolean
+        imageUrl: String
     ) {
         Log.d(
             "MainActivity",
@@ -455,6 +455,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             putInt("expensePrice", expensePrice)
             putInt("categoryColor", categoryColor)
             putString("categoryName", categoryName)
+            putString("imageUrl", imageUrl)
         }
 
         navController.navigate(R.id.navigation_expense_view, bundle)
