@@ -21,17 +21,6 @@ class FilterJobDialogFragment : BottomSheetDialogFragment() {
 
     private val viewModel: ChatSearchViewModel by activityViewModels()
 
-    private fun getJobFromButton(option: TextView): Job {
-        return when (option.text.toString()) {
-            "학생" -> Job.STUDENT
-            "직장인" -> Job.EMPLOYEE
-            "주부" -> Job.HOMEMAKER
-            "자영업자" -> Job.SELF_EMPLOYED
-            "미선택" -> Job.UNDECIDED
-            else -> Job.UNDECIDED
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
@@ -52,21 +41,22 @@ class FilterJobDialogFragment : BottomSheetDialogFragment() {
 
         // 다이얼로그가 열릴 때 이미 선택된 옵션이 있다면 해당 버튼 활성화 처리
         viewModel.selectedJobOption.value?.let { selectedJob ->
-            val selectedButton = options.find { getJobFromButton(it) == selectedJob }
+            val selectedButton = options.find { it.text.toString() == selectedJob }
             updateOptionSelection(selectedButton, options)
         } ?: updateOptionSelection(null, options)
 
         options.forEach { option ->
             option.setOnClickListener {
-                val selectedJob = getJobFromButton(option)
+                val selectedJob = option.text.toString()
+                // 이미 선택된 상태라면 선택 해제
                 if (viewModel.selectedJobOption.value == selectedJob) {
-                    // 이미 선택된 상태라면 선택 해제
                     viewModel.selectedJobOption.value = null
                     updateOptionSelection(null, options)
                 } else {
                     viewModel.selectedJobOption.value = selectedJob
                     updateOptionSelection(option, options)
                 }
+                dismiss() // 선택 후 다이얼로그 닫기
             }
         }
     }

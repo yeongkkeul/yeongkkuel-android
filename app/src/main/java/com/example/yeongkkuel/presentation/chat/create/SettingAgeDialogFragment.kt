@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.presentation.chat.search
+package com.example.yeongkkuel.presentation.chat.create
 
 import android.graphics.Typeface
 import android.os.Bundle
@@ -10,15 +10,16 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentFilterAgeDialogBinding
+import com.example.yeongkkuel.presentation.chat.data.Age
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class FilterAgeDialogFragment : BottomSheetDialogFragment() {
+class SettingAgeDialogFragment : BottomSheetDialogFragment() {
 
     private var _binding: FragmentFilterAgeDialogBinding? = null
     private val binding: FragmentFilterAgeDialogBinding
         get() = requireNotNull(_binding) { "FragmentFilterAgeDialogBinding -> null" }
 
-    private val viewModel: ChatSearchViewModel by activityViewModels()
+    private val viewModel: ChatRoomCreateViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,24 +41,23 @@ class FilterAgeDialogFragment : BottomSheetDialogFragment() {
             binding.btnAge60
         )
 
-        // 다이얼로그가 열릴 때, 이미 선택된 텍스트와 일치하는 버튼 활성화 처리
-        viewModel.selectedAgeOption.value?.let { selectedText ->
-            val selectedButton = options.find { it.text.toString() == selectedText }
+        // 다이얼로그가 열릴 때, 이미 선택되어 있는 옵션에 맞게 버튼 활성화 처리
+        viewModel.selectedAgeOption.value?.let { selectedAge ->
+            val selectedButton = options.find { it.text.toString() == selectedAge }
             updateOptionSelection(selectedButton, options)
         } ?: updateOptionSelection(null, options)
 
         options.forEach { option ->
             option.setOnClickListener {
-                val selectedText = option.text.toString()
+                val selectedAge = option.text.toString()
                 // 이미 선택된 상태라면 해제 (toggle off)
-                if (viewModel.selectedAgeOption.value == selectedText) {
+                if (viewModel.selectedAgeOption.value == selectedAge) {
                     viewModel.selectedAgeOption.value = null
                     updateOptionSelection(null, options)
                 } else {
-                    viewModel.selectedAgeOption.value = selectedText
+                    viewModel.selectedAgeOption.value = selectedAge
                     updateOptionSelection(option, options)
                 }
-                dismiss() // 선택 후 다이얼로그 닫기
             }
         }
     }

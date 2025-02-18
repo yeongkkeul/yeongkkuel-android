@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.presentation.chat.search
+package com.example.yeongkkuel.presentation.chat.create
 
 import android.graphics.Typeface
 import android.os.Bundle
@@ -9,22 +9,23 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import com.example.yeongkkuel.R
-import com.example.yeongkkuel.databinding.FragmentFilterAgeDialogBinding
+import com.example.yeongkkuel.databinding.FragmentFilterJobDialogBinding
+import com.example.yeongkkuel.presentation.chat.data.Job
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class FilterAgeDialogFragment : BottomSheetDialogFragment() {
+class SettingJobDialogFragment : BottomSheetDialogFragment() {
 
-    private var _binding: FragmentFilterAgeDialogBinding? = null
-    private val binding: FragmentFilterAgeDialogBinding
-        get() = requireNotNull(_binding) { "FragmentFilterAgeDialogBinding -> null" }
+    private var _binding: FragmentFilterJobDialogBinding? = null
+    private val binding: FragmentFilterJobDialogBinding
+        get() = requireNotNull(_binding) { "FragmentFilterJobDialogBinding -> null" }
 
-    private val viewModel: ChatSearchViewModel by activityViewModels()
+    private val viewModel: ChatRoomCreateViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
-        _binding = FragmentFilterAgeDialogBinding.inflate(inflater, container, false)
+        _binding = FragmentFilterJobDialogBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -32,32 +33,29 @@ class FilterAgeDialogFragment : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val options = listOf(
-            binding.btnAge1419,
-            binding.btnAge30,
-            binding.btnAge50,
-            binding.btnAge20,
-            binding.btnAge40,
-            binding.btnAge60
+            binding.btnStatusStudent,
+            binding.btnStatusHousewife,
+            binding.btnStatusWorker,
+            binding.btnStatusSelfemployed
         )
 
-        // 다이얼로그가 열릴 때, 이미 선택된 텍스트와 일치하는 버튼 활성화 처리
-        viewModel.selectedAgeOption.value?.let { selectedText ->
-            val selectedButton = options.find { it.text.toString() == selectedText }
+        // 다이얼로그가 열릴 때 이미 선택된 옵션이 있다면 해당 버튼 활성화 처리
+        viewModel.selectedJobOption.value?.let { selectedJob ->
+            val selectedButton = options.find { it.text.toString() == selectedJob }
             updateOptionSelection(selectedButton, options)
         } ?: updateOptionSelection(null, options)
 
         options.forEach { option ->
             option.setOnClickListener {
-                val selectedText = option.text.toString()
-                // 이미 선택된 상태라면 해제 (toggle off)
-                if (viewModel.selectedAgeOption.value == selectedText) {
-                    viewModel.selectedAgeOption.value = null
+                val selectedJob = option.text.toString()
+                if (viewModel.selectedJobOption.value == selectedJob) {
+                    // 이미 선택된 상태라면 선택 해제
+                    viewModel.selectedJobOption.value = null
                     updateOptionSelection(null, options)
                 } else {
-                    viewModel.selectedAgeOption.value = selectedText
+                    viewModel.selectedJobOption.value = selectedJob
                     updateOptionSelection(option, options)
                 }
-                dismiss() // 선택 후 다이얼로그 닫기
             }
         }
     }
