@@ -9,6 +9,7 @@ import com.example.yeongkkuel.R
 import com.example.yeongkkuel.network.RetrofitClient
 import com.example.yeongkkuel.network.response.Response
 import com.example.yeongkkuel.network.response.expenditure.DayExpenditureResponse
+import com.example.yeongkkuel.presentation.auth.TokenManager
 import com.example.yeongkkuel.presentation.home.category.data.Category
 import com.example.yeongkkuel.presentation.home.entry.data.ExpenseListResponse
 import com.example.yeongkkuel.presentation.util.Colors
@@ -69,11 +70,17 @@ class BotSheetViewModel : ViewModel() {
 
         // ✅ 최신 지출 내역 반영
         updateSpendingHistoryList()
-        Log.d("BotSheetViewModel", "📌 삭제됨: expenseId=$expenseId, 남은 지출 개수=${_spendingHistoryList.value.size}")
+        Log.d(
+            "BotSheetViewModel",
+            "📌 삭제됨: expenseId=$expenseId, 남은 지출 개수=${_spendingHistoryList.value.size}"
+        )
     }
 
     // 🔹 지출 내역 추가 기능
-    fun addExpenseToCategory(category: SpendingCategory, history: BotSheetUiState.Spending.History) {
+    fun addExpenseToCategory(
+        category: SpendingCategory,
+        history: BotSheetUiState.Spending.History
+    ) {
         _uiState.update { prev ->
             val updatedList = prev.spendingList.toMutableList()
 
@@ -95,7 +102,8 @@ class BotSheetViewModel : ViewModel() {
                     BotSheetUiState.Spending(
                         categoryId = history.id,
                         kind = category,
-                        color = prev.spendingList.find { it.kind == category }?.color ?: Colors.BLACK1,
+                        color = prev.spendingList.find { it.kind == category }?.color
+                            ?: Colors.BLACK1,
                         plusIconResId = R.drawable.ic_plus_default,
                         history = listOf(history)
                     )
@@ -153,7 +161,10 @@ class BotSheetViewModel : ViewModel() {
     fun updateBotSheetData(response: ExpenseListResponse) {
         _uiState.update { prevState ->
             val updatedSpendingList = response.result.map { expense ->
-                Log.d("BotSheetViewModel", "🚀 updateBotSheetData(): expenseId=${expense.id}, category=${expense.content}")
+                Log.d(
+                    "BotSheetViewModel",
+                    "🚀 updateBotSheetData(): expenseId=${expense.id}, category=${expense.content}"
+                )
 
                 BotSheetUiState.Spending(
                     categoryId = expense.id,
@@ -188,6 +199,8 @@ class BotSheetViewModel : ViewModel() {
         val updateList = uiState.value.spendingList.toMutableList()
         val item = updateList.removeAt(fromPosition)
         updateList.add(toPosition, item)
+
+        TokenManager.setCategoryOrder(categoryOrderList = updateList.map { it.categoryId })
 
         _uiState.update { prev ->
             prev.copy(spendingList = updateList)
@@ -288,8 +301,10 @@ class BotSheetViewModel : ViewModel() {
             } else {
                 // HTTP 400 에러 응답을 직접 처리
                 val errorBody = response.errorBody()?.string() ?: "{}"
-                val errorResponseType = object : TypeToken<Response<DayExpenditureResponse>>() {}.type
-                val errorResponse = Gson().fromJson<Response<DayExpenditureResponse>>(errorBody, errorResponseType)
+                val errorResponseType =
+                    object : TypeToken<Response<DayExpenditureResponse>>() {}.type
+                val errorResponse =
+                    Gson().fromJson<Response<DayExpenditureResponse>>(errorBody, errorResponseType)
 
 
                 if (errorResponse.code == "EXPENSE4005") { // 목표 지출액이 없을 경우
@@ -298,7 +313,7 @@ class BotSheetViewModel : ViewModel() {
                     }
                 }
             }
-        }catch (e:Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
@@ -317,6 +332,7 @@ class BotSheetViewModel : ViewModel() {
     // 매개변수를 받는 기존 함수
     // 월별 지출 내역 가져오기
     fun getSpendingList(year: Int, month: Int, day: Int) = viewModelScope.launch {
+        val categoryList = TokenManager.getCategoryOrder()
         try {
             // yeongkkuelService를 통해 데이터 요청
             statService.getExpendituresMonthCategory(year, month, day).run {
@@ -334,9 +350,18 @@ class BotSheetViewModel : ViewModel() {
                             )
                         }
 
+                        // categoryList에 있는 categoryId 순서대로 정렬
+                        val sortedCategories = categoryList.mapNotNull { id ->
+                            categories.find { it.id == id }
+                        }
+
+                        // categoryList에 없는 category들을 뒤에 추가
+                        val remainingCategories = categories.filter { it.id !in categoryList }
+
+                        val finalCategories = sortedCategories + remainingCategories
 
                         _uiState.update { prev ->
-                            val updatedSpendingList = categories.map { category ->
+                            val updatedSpendingList = finalCategories.map { category ->
                                 // ✅ 카테고리 ID 기반으로 해당 카테고리의 지출 내역 찾기
                                 val expenses = result.categories
                                     .find { it.categoryId == category.id }?.expenses ?: emptyList()
@@ -371,7 +396,6 @@ class BotSheetViewModel : ViewModel() {
             Log.e("BotSheetViewModel", "🚨 getSpendingList() 오류: ${e.message}")
         }
     }
-
 
 
 //    fun updateExpense(updatedExpense: BotSheetUiState.Spending.History) {

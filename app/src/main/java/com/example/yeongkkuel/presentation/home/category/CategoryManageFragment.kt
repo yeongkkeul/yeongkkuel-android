@@ -68,7 +68,7 @@ class CategoryManageFragment : Fragment() {
                 val toPosition = target.bindingAdapterPosition
                 Log.d("CategoryManageFragment", "📌 아이템 이동: $fromPosition -> $toPosition")
 
-                categoryAdapter.moveItem(fromPosition, toPosition) // UI 순서 변경
+                botSheetViewModel.moveCategory(fromPosition, toPosition)
                 return true
             }
 
