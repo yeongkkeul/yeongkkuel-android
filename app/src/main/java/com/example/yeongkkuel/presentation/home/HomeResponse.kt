@@ -39,7 +39,8 @@ data class Expense(
     val expenseId: Int,
     val content: String,
     val amount: Int,
-    val imgExist: Boolean
+    val imgExist: Boolean,
+    val imgUrl: String
 )
 
 fun CategoryResponse.toCategory(categoryViewModel: CategoryViewModel): Category {

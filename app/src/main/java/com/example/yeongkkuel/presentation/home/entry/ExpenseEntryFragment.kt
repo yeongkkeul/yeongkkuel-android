@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.network.RetrofitClient
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
@@ -434,8 +435,14 @@ class ExpenseEntryFragment : Fragment() {
                 // 🔹 Glide를 사용하여 미리보기 적용 가능
                 val imgPhotoFrame = view?.findViewById<ImageView>(R.id.img_photo_frame)
                 val ivPhotoIcon = view?.findViewById<ImageView>(R.id.iv_photo_icon)
-                Glide.with(this).load(uri).into(imgPhotoFrame!!)
-                ivPhotoIcon?.visibility = View.GONE
+                Glide.with(this)
+                    .load(uri)
+                    .override(500, 500) // ✅ 크기 조정 (236x236)
+                    .centerCrop() // ✅ 중앙 정렬하여 크기 맞춤
+                    .transform(RoundedCorners(50)) // ✅ 모서리를 둥글게 (50px)
+                    .into(imgPhotoFrame!!)
+
+                ivPhotoIcon?.visibility = View.GONE // 아이콘 숨김
             }
         }
     }
