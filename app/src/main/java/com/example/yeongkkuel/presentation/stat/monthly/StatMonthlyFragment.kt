@@ -22,9 +22,6 @@ class StatMonthlyFragment(
     private val binding: FragmentStatMonthlyBinding
         get() = requireNotNull(_binding) { "FragmentStatMonthlyBinding -> null" }
 
-
-    private val botViewModel: BotSheetViewModel by activityViewModels()
-
     private val calendarViewPagerAdapter by lazy {
         StatMonthlyCalenderViewPagerAdapter(requireActivity(), viewModel = viewModel)
     }
@@ -69,16 +66,19 @@ class StatMonthlyFragment(
     }
 
     private fun onBind(uiState: StatMonthlyUiState)= with(binding){
-        tvCurrentMonth.text = uiState.targetMonth.first.toString() + "년 " + uiState.targetMonth.second.toString() + "월"
+        when(uiState){
+            StatMonthlyUiState.Init -> {}
+            is StatMonthlyUiState.StatMonthly -> {
+                calendarViewPagerAdapter.getCurrentFragment(vpCalendar)?.setTargetExpenditure(uiState.targetExpenditure)
 
-        tvTotalSpending.text = uiState.totalSpending.toMoneyString() + "원"
+                tvCurrentMonth.text = uiState.targetMonth.first.toString() + "년 " + uiState.targetMonth.second.toString() + "월"
 
-        tvAchievementDay.text = uiState.achieveDay.toString() + "일"
-        tvRewardAmount.text = "+" + uiState.rewardsAmount.toString()
-    }
+                tvTotalSpending.text = uiState.totalSpending.toMoneyString() + "원"
 
-    override fun onResume() {
-        super.onResume()
+                tvAchievementDay.text = (uiState.achieveDay?.toString() ?: "-") + "일"
+                tvRewardAmount.text = "+" + uiState.rewardsAmount.toString()
+            }
+        }
     }
 
     override fun onDestroyView() {

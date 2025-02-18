@@ -35,7 +35,8 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
         StatViewPagerAdapter(
             fragment = this@StatFragment,
             weeklyViewModel = weeklyViewModel,
-            monthlyViewModel = monthlyViewModel)
+            monthlyViewModel = monthlyViewModel
+        )
     }
 
     private var botSheetListener: BotSheetListener? = null
@@ -93,6 +94,8 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
                     override fun onPageSelected(position: Int) {
                         super.onPageSelected(position)
 
+                        (adapter as StatViewPagerAdapter).animate(position)
+
                         when (position) {
                             0 -> { // 첫 번째 페이지 (StatDailyFragment)
                                 listner.setBotSheetVisible()
@@ -112,7 +115,7 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
 
                                 val displayHeight = resources.displayMetrics.heightPixels
                                 val peekHeight =
-                                    (displayHeight - 520.dpToPx(requireContext()))
+                                    (displayHeight - 528.dpToPx(requireContext()))
                                 listner.setPeekHeight(peekHeight)
                             }
                         }

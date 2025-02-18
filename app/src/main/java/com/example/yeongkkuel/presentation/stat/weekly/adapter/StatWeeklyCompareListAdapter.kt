@@ -1,11 +1,15 @@
 package com.example.yeongkkuel.presentation.stat.weekly.adapter
 
+import android.animation.ValueAnimator
 import android.graphics.Typeface
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StyleSpan
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
+import android.widget.ProgressBar
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -76,9 +80,9 @@ class StatWeeklyCompareListAdapter(
                     }
 
                     val descriptionText = if (spendingDiff >= 0) {
-                        "${tvComparedTarget.text}보다 ${spendingDiff.toMoneyString()} 원 덜 썼어요"
+                        "${tvComparedTarget.text}보다 ${spendingDiff.toMoneyString()} 원 더 썼어요"
                     } else {
-                        "${tvComparedTarget.text}보다 ${(-spendingDiff).toMoneyString()} 원 더 썼어요"
+                        "${tvComparedTarget.text}보다 ${(-spendingDiff).toMoneyString()} 원 덜 썼어요"
                     }
 
                     val boldText = if (spendingDiff >= 0) "${spendingDiff.toMoneyString()} 원"
@@ -104,6 +108,41 @@ class StatWeeklyCompareListAdapter(
                 }
             }
         }
+
+        fun animateProgress(item: StatWeeklyUiState.CompareData) = with(binding){
+            fun animateProgress(progressBar: ProgressBar, targetValue: Int){
+                val animator = ValueAnimator.ofInt(0, targetValue)
+                animator.duration = 2000 // 1초 동안 애니메이션
+                animator.interpolator = DecelerateInterpolator() // 부드러운 감속 효과
+                animator.addUpdateListener {
+                    progressBar.progress = it.animatedValue as Int
+                }
+                animator.start()
+            }
+
+            when(item){
+                is StatWeeklyUiState.CompareData.OthersCompare ->{
+                    val maxValue = maxOf(item.mySpending, item.targetSpending).takeIf { it > 0 } ?: 1
+                    progressComparedTarget.max = 100
+                    progressMyTarget.max = 100
+
+                    animateProgress(progressComparedTarget, (item.targetSpending * 100 / maxValue))
+                    animateProgress(progressMyTarget, (item.mySpending * 100 / maxValue))
+                }
+                is StatWeeklyUiState.CompareData.PastCompare -> {
+                    val maxValue = maxOf(item.currentSpending, item.pastSpending).takeIf { it > 0 } ?: 1
+                    progressComparedTarget.max = 100
+                    progressMyTarget.max = 100
+
+                    animateProgress(progressComparedTarget, (item.pastSpending * 100 / maxValue))
+                    animateProgress(progressMyTarget, (item.currentSpending * 100 / maxValue))
+                }
+            }
+        }
+    }
+
+    fun animateProgressOnViewHolder(holder: ViewHolder, item: StatWeeklyUiState.CompareData) {
+        holder.animateProgress(item)
     }
 
 

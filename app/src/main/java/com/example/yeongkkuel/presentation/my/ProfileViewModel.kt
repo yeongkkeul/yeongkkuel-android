@@ -3,140 +3,153 @@ package com.example.yeongkkuel.presentation.my
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.yeongkkuel.network.RetrofitClient
 import com.example.yeongkkuel.network.request.my.UserProfileRequest
+import com.example.yeongkkuel.network.request.mypage.PatchMyPageRequest
+import com.example.yeongkkuel.network.response.Response
+import com.example.yeongkkuel.network.response.login.ReferralResponse
 import com.example.yeongkkuel.network.response.my.UserProfileResponse
 import com.example.yeongkkuel.network.response.my.UserProfileResult
+import com.example.yeongkkuel.network.response.mypage.MyPageResult
+import com.example.yeongkkuel.network.service.MyPageService
+import com.example.yeongkkuel.presentation.my.repository.ProfileRepository
+import kotlinx.coroutines.launch
+import java.io.File
 
-class ProfileViewModel : ViewModel()  {
+class ProfileViewModel : ViewModel() {
 
-    private val _userProfileRequest = MutableLiveData<UserProfileRequest>()
-    val userProfileRequest: LiveData<UserProfileRequest> get() = _userProfileRequest
-
-    private val _updateStatus = MutableLiveData<Result<Boolean>>()
-    val updateStatus: LiveData<Result<Boolean>> get() = _updateStatus
-
-    private val _profileResponse = MutableLiveData<UserProfileResponse>()
-    val profileResponse: LiveData<UserProfileResponse> get() = _profileResponse
-
-    fun setUserProfile(profile: UserProfileRequest) {
-        _userProfileRequest.value = profile
-    }
-
-    fun updateNickname(newNickname: String) {
-        _userProfileRequest.value = _userProfileRequest.value?.copy(nickname = newNickname)
-    }
-
-    fun updateGender(newGender: String) {
-        _userProfileRequest.value = _userProfileRequest.value?.copy(gender = newGender)
-    }
-
-    fun updateAgeGroup(newAgeGroup: String) {
-        _userProfileRequest.value = _userProfileRequest.value?.copy(age_group = newAgeGroup)
-    }
-
-    fun updateJob(newJob: String) {
-        _userProfileRequest.value = _userProfileRequest.value?.copy(job = newJob)
-    }
-
-    fun updateProfileImageUrl(url: String) {
-        _userProfileRequest.value = _userProfileRequest.value?.copy(profileImageUrl = url)
-    }
+    private val repository: ProfileRepository
 
     init {
-        // 초기화 시 더미 데이터를 로드
-        loadDummyProfile()
+        repository = ProfileRepository(RetrofitClient.myPageService)
+        fetchUserProfile()
+        getReferralCode()
     }
 
-    private fun loadDummyProfile() {
-        val dummyResponse = UserProfileResponse(
-            isSuccess = true,
-            code = "2000",
-            message = "마이페이지 프로필 조회",
-            result = UserProfileResult(
-                nickname = "0끌해서 집산다",
-                gender = "여자",
-                job = "직장인",
-                ageGroup = "20대",
-                email = "dlfkscigs@naver.com",
-                profileImageUrl = "https://via.placeholder.com/100", // 예제 이미지 URL
-                dayTargetExpenditure = 35000,
-                rewardBalance = 3122,
-                weeklyAchievementRate = 28.5
-            )
-        )
-        _profileResponse.value = dummyResponse
+    private val _profileResponse = MutableLiveData<Response<MyPageResult>>()
+    val profileResponse: LiveData<Response<MyPageResult>> get() = _profileResponse
 
-        _userProfileRequest.value = UserProfileRequest(
-            nickname = dummyResponse.result!!.nickname,
-            gender = dummyResponse.result.gender,
-            age_group = dummyResponse.result.ageGroup,
-            job = dummyResponse.result.job,
-            profileImageUrl = dummyResponse.result.profileImageUrl
-        )
-    }
 
+
+
+
+    private val _updateStatus = MutableLiveData<Result<Unit>>()
+    val updateStatus: LiveData<Result<Unit>> get() = _updateStatus
+
+
+    private val _nickname = MutableLiveData<String>()
+    val nickname: LiveData<String> get() = _nickname
+
+    private val _gender = MutableLiveData<String>()
+    val gender: LiveData<String> get() = _gender
+
+    private val _ageGroup = MutableLiveData<String>()
+    val ageGroup: LiveData<String> get() = _ageGroup
+
+    private val _job = MutableLiveData<String>()
+    val job: LiveData<String> get() = _job
+
+    private val _profileImageUrl = MutableLiveData<String>()
+    val profileImageUrl: LiveData<String> get() = _profileImageUrl
+
+    // 추천인 코드 응답
+    private val _referralCode = MutableLiveData<String>()
+    val referralCode: LiveData<String> get() = _referralCode
+
+
+
+    // setter
+    fun updateNickname(newNickname: String) { _nickname.value = newNickname }
+    fun updateGender(newGender: String) { _gender.value = newGender }
+    fun updateAgeGroup(newAgeGroup: String) { _ageGroup.value = newAgeGroup }
+    fun updateJob(newJob: String) { _job.value = newJob }
+    fun updateProfileImageUrl(newUrl: String) { _profileImageUrl.value = newUrl }
+    fun updateReferralCode(newCode: String) { _referralCode.value = newCode }
+
+
+    // 프로필 조회
     fun fetchUserProfile() {
-        /*viewModelScope.launch {
+        viewModelScope.launch {
+            val response = repository.getProfile()
+            response?.let {
+                if (it.isSuccess) {
+                    val result = it.result
+                    _nickname.value = result.nickname
+                    _gender.value = result.gender
+                    _ageGroup.value = result.ageGroup
+                    _job.value = result.job
+                    _profileImageUrl.value = result.profileImageUrl
 
-            try {
-                val response = ApiService.getUserProfileRequest()
-                if (response.isSuccess) {
-                    _profileResponse.postValue(response)
-                } else {
-                    _profileResponse.postValue(response)
+                    _profileResponse.value = it
                 }
-            } catch (e: Exception) {
-                _profileResponse.postValue(
-                    UserProfileResponse(false, "5000", e.message ?: "Unknown Error", null)
-                )
             }
-
-
-        }*/
-
-        // 테스트용 더미데이터 사용
-        loadDummyProfile()
+        }
     }
 
-    fun saveUserProfile() {
+    // 추천인 코드 조회
+    fun getReferralCode() {
+        viewModelScope.launch {
+            val response = repository.getReferralCode()
+            response?.let {
+                if (it.isSuccess) {
+                    val result = it.result
+                    _referralCode.value = result.userReferralCode
+                }
+            }
+        }
+    }
 
-        _profileResponse.value = UserProfileResponse(
-            isSuccess = true,
-            code = "2000",
-            message = "프로필 수정 완료",
-            result = UserProfileResult(
-                nickname = _userProfileRequest.value!!.nickname,
-                gender = _userProfileRequest.value!!.gender,
-                job = _userProfileRequest.value!!.job,
-                ageGroup = _userProfileRequest.value!!.age_group,
-                email = "example@naver.com",
-                profileImageUrl = _userProfileRequest.value!!.profileImageUrl,
-                dayTargetExpenditure = 35000,
-                rewardBalance = 3122,
-                weeklyAchievementRate = 28.5
-            )
+    fun saveUserProfile(selectedImageFile: File? = null) {
+        val patchRequest = PatchMyPageRequest(
+            nickname = nickname.value ?: "",
+            gender = gender.value ?: "",
+            ageGroup = ageGroup.value ?: "",
+            job = job.value ?: ""
         )
 
+        updateProfile(patchRequest, selectedImageFile)
     }
 
-    fun saveChangesToServer() {
-        // api 호출 주석 처리
-        /*_userProfileRequest.value?.let { profile ->
-            viewModelScope.launch {
-                try {
-                    val response = ApiService.updateUserProfile(profile)
-                    if (response.isSuccess) {
-                        _updateStatus.postValue(Result.success(true))
-                    } else {
-                        _updateStatus.postValue(Result.failure(Exception(response.message)))
-                    }
-                } catch (e: Exception) {
-                    _updateStatus.postValue(Result.failure(e))
-                }
+    private fun convertAgeGroup(apiAge: String): String {
+        return when(apiAge.uppercase()) {
+            "TEENAGER" -> "10대"
+            "TWENTIES" -> "20대"
+            "THIRTIES" -> "30대"
+            "FORTIES" -> "40대"
+            "FIFTIES" -> "50대"
+            "SIXTIES_AND_ABOVE" -> "60대"
+            else -> " 대"  // 알 수 없는 경우 원본 문자열 그대로 사용
+        }
+    }
+
+    private fun convertJob(apiJob: String): String {
+        return when(apiJob.uppercase()) {
+            "STUDENT" -> "학생"
+            "EMPLOYEE" -> "직장인"
+            "SELF_EMPLOYED" -> "자영업자"
+            "HOMEMAKER" -> "주부"
+            "UNDECIDED" -> "무직"
+            else -> "무직"  // 알 수 없는 경우 원본 문자열 그대로 사용
+        }
+    }
+
+
+
+
+    fun updateProfile(info: PatchMyPageRequest, profileImageFile: File? = null ) {
+        viewModelScope.launch {
+            val patchResult = repository.updateProfile(info, profileImageFile)
+            if (patchResult != null && patchResult.isSuccess) {
+                // 수정 성공
+                // profileResponse도 갱신할 수 있음
+                _profileResponse.value = patchResult as Response<MyPageResult>
+                _updateStatus.value = Result.success(Unit)
+            } else {
+                // 수정 실패
+                _updateStatus.value = Result.failure(Exception("프로필 수정 실패"))
             }
-        }*/
-
-        _updateStatus.postValue(Result.success(true)) // 성공 시
-        // _updateStatus.postValue(Result.failure(Exception("닉네임을 입력해주세요."))) // 실패 시
+        }
     }
+
 }

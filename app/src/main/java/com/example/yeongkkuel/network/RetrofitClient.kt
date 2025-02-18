@@ -9,6 +9,7 @@ import com.example.yeongkkuel.presentation.home.store.StoreApiService
 
 import com.example.yeongkkuel.network.service.MyPageService
 import com.example.yeongkkuel.network.service.StatService
+import com.example.yeongkkuel.presentation.home.entry.data.ExpenseApiService
 
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -88,5 +89,9 @@ object RetrofitClient {
 
     val chatService: ChatService by lazy {
         authRetrofit!!.create(ChatService::class.java)
+    }
+
+    val expenseApiService: ExpenseApiService by lazy {
+        authRetrofit!!.create(ExpenseApiService::class.java)
     }
 }

@@ -10,66 +10,67 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.Calendar
 import java.util.Date
 
 class StatMonthlyViewModel : ViewModel() {
-    private val _uiState = MutableStateFlow(StatMonthlyUiState.init())
+    private val _uiState = MutableStateFlow<StatMonthlyUiState>(StatMonthlyUiState.Init)
     val uiState = _uiState.asStateFlow()
 
     private val yeongkkuelService = RetrofitClient.statService
-    private val dayOfWeekList: List<StatMonthlyUiState.CalendarData> =
+    private val dayOfWeekList: List<StatMonthlyUiState.StatMonthly.CalendarData> =
         Week.getListItem().map { week ->
-            StatMonthlyUiState.CalendarData.CalendarDayOfWeek(week)
+            StatMonthlyUiState.StatMonthly.CalendarData.CalendarDayOfWeek(week)
         }
 
-    init {
-        val date = Date()
-        val year = date.year + 1900  // 현재 연도
-        val month = date.month + 1   // 현재 월 (0부터 시작하므로 +1)
-
-        getCalender(year = year, month = month)
-    }
-
     fun getCalender(year: Int, month: Int) = viewModelScope.launch {
-        suspend fun List<StatMonthlyUiState.CalendarData.CalendarDay>.getData(): List<StatMonthlyUiState.CalendarData.CalendarDay> {
+        suspend fun List<StatMonthlyUiState.StatMonthly.CalendarData.CalendarDay>.getData(): List<StatMonthlyUiState.StatMonthly.CalendarData.CalendarDay> {
             try {
                 yeongkkuelService.getExpendituresMonthCalendar(year = year, month = month).run {
                     if (isSuccess) {
-                        _uiState.update { prev->
-                            prev.copy(
-                                achieveDay = result.achievedDays,
-                                rewardsAmount = result.rewards
+                        _uiState.update {
+                            StatMonthlyUiState.StatMonthly.init().copy(
+                                targetExpenditure = result.dayTargetExpenditure,
+                                achieveDay = result.achieveDays,
+                                rewardsAmount = result.rewards,
+                                totalSpending = result.totalMonthExpenditure
                             )
                         }
 
-                        val dataList = result.selectedMonthExpenses.map {
-                            StatMonthlyUiState.CalendarData.CalendarDay(
+                        val dataList = result.selectedMonthExpenses.map { expense ->
+                            val pieDataList =
+                                result.dayTargetExpenditure?.let { targetExpenditure ->
+                                    val rest = targetExpenditure - expense.expenditure
+                                    mutableListOf<PieEntry>().apply {
+                                        add(PieEntry(expense.expenditure.toFloat(), "지출"))
+                                        if (rest > 0) {
+                                            add(PieEntry(rest.toFloat(), "나머지"))
+                                        }
+                                    }
+                                } ?: emptyList()
+
+                            StatMonthlyUiState.StatMonthly.CalendarData.CalendarDay(
                                 targetMonth = Pair(year, month),
-                                day = it.expenseDate.getDay(),
-                                pieDataList = listOf(
-                                    PieEntry(
-                                        maxOf(
-                                            (result.dayTargetExpenditure - it.expenditure).toFloat(),
-                                            0f
-                                        ), "나머지"
-                                    ),
-                                    PieEntry(it.expenditure.toFloat(), "지출")
-                                )
+                                day = expense.expenseDate.getDay(),
+                                pieDataList = pieDataList
                             )
                         }
+
                         val mergedList = this@getData.toMutableList()
-                        dataList.forEach { data ->
-                            val existingIndex = mergedList.indexOfFirst { it.day == data.day }
+
+                        dataList.forEach { newData ->
+                            val existingIndex = mergedList.indexOfFirst { it.day == newData.day }
                             if (existingIndex != -1) {
                                 val existingDay = mergedList[existingIndex]
                                 mergedList[existingIndex] = existingDay.copy(
-                                    pieDataList = existingDay.pieDataList + data.pieDataList
+                                    pieDataList = newData.pieDataList
                                 )
                             } else {
-                                mergedList.add(data)
+                                mergedList.add(newData)
                             }
                         }
+
                         return mergedList
                     }
                 }
@@ -83,7 +84,7 @@ class StatMonthlyViewModel : ViewModel() {
         suspend fun getDayList(
             year: Int,
             month: Int
-        ): List<StatMonthlyUiState.CalendarData.CalendarDay> {
+        ): List<StatMonthlyUiState.StatMonthly.CalendarData.CalendarDay> {
             val calendar = Calendar.getInstance().apply {
                 set(Calendar.YEAR, year)
                 set(Calendar.MONTH, month - 1)
@@ -112,7 +113,7 @@ class StatMonthlyViewModel : ViewModel() {
 
                 val rest = if (targetSpending - daySpending > 0) targetSpending - daySpending else 0
 
-                StatMonthlyUiState.CalendarData.CalendarDay(
+                StatMonthlyUiState.StatMonthly.CalendarData.CalendarDay(
                     targetMonth = Pair(year, month),
                     day = day,
                     pieDataList = listOf(
@@ -124,10 +125,10 @@ class StatMonthlyViewModel : ViewModel() {
             return resultList.getData()
         }
 
-        val dayList = getDayList(year, month).getData()
+        val dayList = getDayList(year, month)
 
         _uiState.update { prev ->
-            prev.copy(
+            (prev as StatMonthlyUiState.StatMonthly).copy(
                 targetMonth = Pair(year, month),
                 calendarList = dayOfWeekList + dayList
             )
