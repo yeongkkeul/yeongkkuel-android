@@ -69,9 +69,9 @@ class BotSheetViewModel : ViewModel() {
             }
             prevState.copy(spendingList = updatedSpendingList)
         }
+
+        updateSpendingHistoryList() // ✅ 바텀시트 UI 즉시 반영
     }
-
-
 
     // 지출 내역 추가 기능
     fun addExpenseToCategory(category: SpendingCategory, history: BotSheetUiState.Spending.History) {
@@ -121,7 +121,10 @@ class BotSheetViewModel : ViewModel() {
             )
         }
         _uiState.update { prevState ->
-            prevState.copy(spendingList = updatedSpendingList)
+            val sortedList = updatedSpendingList.sortedBy { spending ->
+                if (spending.kind.name == "trash") 1 else 0  // ✅ "trash" 카테고리를 항상 마지막으로 이동
+            }
+            prevState.copy(spendingList = sortedList)
         }
     }
 
@@ -160,6 +163,8 @@ class BotSheetViewModel : ViewModel() {
                         history = emptyList()
                     )
                 )
+            }.sortedBy { spending ->
+                if (spending.kind.name == "trash") 1 else 0 // ✅ Trash 카테고리를 항상 마지막으로 이동
             }
             prev.copy(spendingList = updatedList)
         }
@@ -203,10 +208,47 @@ class BotSheetViewModel : ViewModel() {
     // 카테고리 삭제 연동 기능
     fun removeCategory(categoryName: String) {
         _uiState.update { prev ->
-            val updatedSpendingList = prev.spendingList.filter { it.kind.name != categoryName }
-            prev.copy(spendingList = updatedSpendingList)
+            val updatedSpendingList = prev.spendingList.toMutableList()
+
+            val categoryToRemove = updatedSpendingList.find { it.kind.name == categoryName }
+
+            if (categoryToRemove != null) {
+                updatedSpendingList.remove(categoryToRemove)
+                val removedExpenses = categoryToRemove.history
+
+                val existingTrashCategory = updatedSpendingList.find { it.kind.name == "trash" }
+
+                if (existingTrashCategory != null) {
+                    val newTrashCategory = existingTrashCategory.copy(
+                        history = existingTrashCategory.history + removedExpenses
+                    )
+                    updatedSpendingList[updatedSpendingList.indexOf(existingTrashCategory)] = newTrashCategory
+                } else {
+                    updatedSpendingList.add(
+                        BotSheetUiState.Spending(
+                            categoryId = -1,
+                            kind = SpendingCategory.CUSTOM("trash"),
+                            color = Colors.RED1,
+                            plusIconResId = R.drawable.ic_plus_default,
+                            history = removedExpenses
+                        )
+                    )
+                }
+            }
+            // Trash 카테고리에 지출 내역이 없으면 리스트에서 제거
+            val cleanedList = updatedSpendingList.filterNot { spending ->
+                spending.kind.name == "trash" && spending.history.isEmpty()
+            }
+
+            // 정렬: Trash 카테고리는 항상 마지막으로 이동
+            val sortedList = cleanedList.sortedBy { spending ->
+                if (spending.kind.name == "trash") 1 else 0
+            }
+
+            prev.copy(spendingList = sortedList) // 최종 업데이트
         }
     }
+
 
     // 일일 목표 지출 가져오기
     fun getDayTargetSpending() = viewModelScope.launch {
@@ -297,6 +339,8 @@ class BotSheetViewModel : ViewModel() {
                                         )
                                     }
                                 )
+                            }.sortedBy { spending ->
+                                if (spending.kind.name == "trash") 1 else 0 // ✅ Trash 카테고리 항상 마지막
                             }
                             prev.copy(
                                 spendingList = updatedSpendingList,
@@ -312,63 +356,6 @@ class BotSheetViewModel : ViewModel() {
         } catch (_: Exception) {
         }
     }
-
-    // 지출 내역 수정
-    suspend fun updateExpense(expenseId: Int, request: ExpenseUpdateRequest): ExpenseUpdateResponse? {
-        return try {
-            // ✅ RequestBody 변환
-            val dayPart = request.day.toRequestBody("text/plain".toMediaTypeOrNull())
-            val categoryIdPart = request.categoryId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
-            val contentPart = request.content.toRequestBody("text/plain".toMediaTypeOrNull())
-            val amountPart = request.amount.toString().toRequestBody("text/plain".toMediaTypeOrNull())
-
-            // ✅ API 호출
-            val response = expenseApiService.updateExpense(
-                expenseId = expenseId,
-                day = dayPart,
-                categoryId = categoryIdPart,
-                content = contentPart,
-                amount = amountPart,
-                expenseImage = request.expenseImage // 이미지 파라미터 그대로 전달
-            )
-
-            if (response.isSuccessful) {
-                val updateResponse = response.body()
-
-                updateResponse?.let {
-                    if (it.isSuccess) {
-                        // ✅ 업데이트 성공 시, 기존 데이터 변경
-                        _uiState.update { prevState ->
-                            val updatedSpendingList = prevState.spendingList.map { spending ->
-                                if (spending.history.any { it.id == expenseId }) {
-                                    val updatedHistory = spending.history.map { history ->
-                                        if (history.id == expenseId) {
-                                            history.copy(
-                                                name = request.content,
-                                                price = request.amount,
-                                                imgExist = request.expenseImage != null // ✅ 이미지 여부 반영
-                                            )
-                                        } else {
-                                            history
-                                        }
-                                    }
-                                    spending.copy(history = updatedHistory)
-                                } else {
-                                    spending
-                                }
-                            }
-                            prevState.copy(spendingList = updatedSpendingList)
-                        }
-                    }
-                    return it
-                }
-            }
-            null
-        } catch (e: Exception) {
-            null
-        }
-    }
-
 
 
     fun moveExpenseToNewDate(expense: BotSheetUiState.Spending.History, newDate: String) {

@@ -1,5 +1,6 @@
 package com.example.yeongkkuel.presentation.botsheet
 
+import android.content.Context
 import android.content.res.ColorStateList
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.ItemBotsheetCategoryBinding
 import android.view.View
+import com.example.yeongkkuel.presentation.util.dpToPx
 
 
 class BotSheetCategoryListAdapter(
@@ -21,7 +23,7 @@ class BotSheetCategoryListAdapter(
 ) {
 
     inner class ViewHolder(
-        private val binding: ItemBotsheetCategoryBinding
+        val binding: ItemBotsheetCategoryBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun onBind(item: BotSheetUiState.Spending) = with(binding) {
@@ -79,7 +81,7 @@ class BotSheetCategoryListAdapter(
 
 
         private fun updateNoSpendAndMoreVisibility(histories: List<BotSheetUiState.Spending.History>) {
-            // ⚠ 인자로 '원본 목록'을 받음 (blank+0원 항목도 포함)
+            // 인자로 '원본 목록'을 받음 (blank+0원 항목도 포함)
             if (histories.isEmpty()) {
                 // 내역이 전혀 없으면 → 무지출 문구 안 보임
                 binding.tvNoSpend.visibility = View.GONE
@@ -100,7 +102,6 @@ class BotSheetCategoryListAdapter(
         }
     }
 
-
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -113,9 +114,71 @@ class BotSheetCategoryListAdapter(
     )
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = getItem(position) // 리스트 아이템을 가져옴
-        holder.onBind(item)         // 아이템을 뷰홀더에 바인딩
+        val item = getItem(position)
+        val layoutParams = holder.itemView.layoutParams as RecyclerView.LayoutParams
+
+        if (item.kind.name == "trash") {
+            if (item.history.isEmpty()) {
+                // Trash 카테고리에 지출 내역이 없으면 완전히 숨김
+                holder.itemView.visibility = View.GONE
+                layoutParams.height = 0
+                layoutParams.topMargin = 0
+                layoutParams.bottomMargin = 0
+            } else {
+                // Trash 카테고리에 지출 내역이 있으면 가장 하단에 위치 (카테고리명과 +버튼 숨김)
+                holder.itemView.visibility = View.VISIBLE
+                layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+
+                // 기존 간격 유지하면서 하단 여백 추가
+                layoutParams.topMargin = 8.dpToPx(holder.itemView.context)
+                layoutParams.bottomMargin = 8.dpToPx(holder.itemView.context)
+
+                // Trash 카테고리 내부의 UI 요소 숨기기 (공간 완전 제거)
+                holder.binding.tvCategory.visibility = View.GONE
+                holder.binding.ivBtnAdd.visibility = View.GONE
+                holder.binding.ivPlus.visibility = View.GONE
+
+                // rvHistory에 하단 마진 추가
+                val rvParams = holder.binding.rvHistory.layoutParams as ViewGroup.MarginLayoutParams
+                rvParams.bottomMargin = 5.dpToPx(holder.itemView.context)  // ✅ 내부 간격 조정!!
+                holder.binding.rvHistory.layoutParams = rvParams
+            }
+        } else {
+            // 일반 카테고리는 기존과 동일하게 표시됨
+            holder.itemView.visibility = View.VISIBLE
+            layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+
+            // 기존 간격 유지
+            layoutParams.topMargin = 8.dpToPx(holder.itemView.context)
+            layoutParams.bottomMargin = 8.dpToPx(holder.itemView.context)
+
+            holder.binding.tvCategory.visibility = View.VISIBLE
+            holder.binding.ivBtnAdd.visibility = View.VISIBLE
+            holder.binding.ivPlus.visibility = View.VISIBLE
+
+            // 일반 카테고리는 `rvHistory` 하단 마진 원래대로 (기본값 유지)
+            val rvParams = holder.binding.rvHistory.layoutParams as ViewGroup.MarginLayoutParams
+            rvParams.bottomMargin = 0 // 기존 값 유지
+            holder.binding.rvHistory.layoutParams = rvParams
+        }
+
+        holder.itemView.layoutParams = layoutParams
+        holder.onBind(item)
     }
+
+
+    fun Int.dpToPx(context: Context): Int {
+        return (this * context.resources.displayMetrics.density).toInt()
+    }
+
+
+    override fun submitList(list: List<BotSheetUiState.Spending>?) {
+        val sortedSpendingList = list?.sortedBy { spending ->
+            if (spending.kind.name == "삭제된 지출") 1 else 0
+        }
+        super.submitList(sortedSpendingList)
+    }
+
 }
 
 

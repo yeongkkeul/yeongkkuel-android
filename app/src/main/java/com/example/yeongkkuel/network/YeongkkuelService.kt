@@ -56,29 +56,4 @@ interface YeongkkuelService {
     ): Response<MonthlyAverageExpenditureResponse>
 
 
-    // Category
-    @GET("/api/category/categories")
-    suspend fun getCategories(): Response<List<CategoryResponse>>
-
-    @GET("/api/category/{category_id}")
-    suspend fun getCategoryDetail(
-        @Path("category_id") categoryId: Int
-    ): Response<CategoryResponse>
-
-    @POST("/api/category")
-    suspend fun addCategory(
-        @Body request: CategoryRequest
-    ): Response<Unit>
-
-    @PATCH("/api/category/{category_id}")
-    suspend fun updateCategory(
-        @Path("category_id") categoryId: Int,
-        @Body request: CategoryRequest
-    ): Response<Unit>
-
-    @DELETE("/api/category/{category_id}")
-    suspend fun deleteCategory(
-        @Path("category_id") categoryId: Int
-    ): Response<Unit>
-
 }

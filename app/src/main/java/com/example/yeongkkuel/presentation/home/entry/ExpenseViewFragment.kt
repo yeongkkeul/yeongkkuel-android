@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Rect
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.TouchDelegate
 import android.view.View
@@ -19,9 +20,10 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentExpenseViewBinding
-import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
-import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.client.utils.DateUtils.parseDate
+import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
+import com.example.yeongkkuel.presentation.home.Expense
+import com.example.yeongkkuel.presentation.home.entry.data.ExpenseViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
@@ -72,6 +74,7 @@ class ExpenseViewFragment : Fragment() {
         binding.clMore.findViewById<TextView>(R.id.tv_delete).setOnClickListener {
             val expenseId = arguments?.getInt("expenseId") ?: return@setOnClickListener // ✅ null이면 실행 안 함
             botSheetViewModel.deleteExpense(expenseId)
+            deleteExpense()
             binding.clMore.visibility = View.GONE
         }
 
@@ -102,6 +105,15 @@ class ExpenseViewFragment : Fragment() {
         } else {
             binding.imgPhotoFrame.setImageResource(R.drawable.bg_photo_input)
             binding.ivPhotoIcon.visibility = View.VISIBLE
+        }
+
+        // "trash" 카테고리인지 확인 후 숨김 처리
+        if (categoryName.lowercase() == "trash") {
+            binding.tvExpenseCategory.visibility = View.GONE
+            binding.tvCategoryInput.visibility = View.GONE
+        } else {
+            binding.tvExpenseCategory.visibility = View.VISIBLE
+            binding.tvCategoryInput.visibility = View.VISIBLE
         }
 
         // 날짜 및 UI 설정
@@ -170,9 +182,10 @@ class ExpenseViewFragment : Fragment() {
         btnConfirm.setOnClickListener {
             expenseViewModel.deleteExpense(expenseId!!)
 
-            // ✅ 삭제 결과 확인 & UI 업데이트
+            // 서버에서 삭제 요청 후 바텀시트 UI 업데이트
             expenseViewModel.deleteResult.observe(viewLifecycleOwner) { isDeleted ->
                 if (isDeleted) {
+                    botSheetViewModel.removeExpenseFromCategory(expenseId!!) // 바텀시트에서 삭제 반영
                     showToast("지출 내역이 삭제되었습니다.")
                     findNavController().popBackStack(R.id.navigation_home, false)
                 } else {
@@ -189,7 +202,6 @@ class ExpenseViewFragment : Fragment() {
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.show()
     }
-
 
     private fun formatDate(date: Date?): String {
         return if (date != null) {

@@ -3,7 +3,6 @@ package com.example.yeongkkuel.presentation.home
 import com.example.yeongkkuel.presentation.home.category.CategoryViewModel
 import com.example.yeongkkuel.presentation.util.Colors
 import com.example.yeongkkuel.presentation.home.category.data.Category // 기존 Category 클래스 사용
-//import com.example.yeongkkuel.presentation.home.store.data.MySkin
 
 data class HomeResponse(
     val isSuccess: Boolean,

@@ -246,22 +246,22 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                 }
             }
             navController.addOnDestinationChangedListener { _, destination, _ ->
+                // Trash 제외한 실제 카테고리 개수 확인
+                val visibleCategories = categoryViewModel.categories.value.orEmpty()
+                    .filter { it.name.lowercase() != "trash" } // "trash" 카테고리는 제외
+
+                val isCategoryEmpty = visibleCategories.isEmpty()
+
                 when (destination.id) {
                     R.id.categoryAddFragment -> {
                         binding.tvAddCategory.visibility = View.GONE // 카테고리 추가 화면에서는 숨기기
                     }
-                    R.id.navigation_home -> {
-                        // 홈 화면 복귀 시 카테고리 개수 조건 확인
-                        val isCategoryEmpty = categoryViewModel.categories.value.orEmpty().size < 1
-                        if (isCategoryEmpty) {
-                            binding.tvAddCategory.visibility = View.VISIBLE // 카테고리 없을 때 보이기
-                        } else {
-                            binding.tvAddCategory.visibility = View.GONE // 카테고리 있을 때 숨기기
-                        }
+                    R.id.navigation_home, R.id.navigation_stat -> {
+                        // ✅ Trash 제외하고 카테고리가 하나도 없을 때만 "카테고리 추가" 버튼 보이기
+                        binding.tvAddCategory.visibility = if (isCategoryEmpty) View.VISIBLE else View.GONE
                     }
                     else -> {
                         binding.tvAddCategory.visibility = View.GONE // 다른 화면에서는 숨기기
-                        // TODO - * 지출 화면일 때 카테고리 추가 안 한 상태는 VISIBLE 상태로 만들기 *
                     }
                 }
             }

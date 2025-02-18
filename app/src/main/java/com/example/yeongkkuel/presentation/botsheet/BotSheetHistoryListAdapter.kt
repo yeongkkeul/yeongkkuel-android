@@ -84,20 +84,3 @@ class BotSheetHistoryListAdapter(
         holder.onBind(getItem(position))
     }
 }
-
-private class SpendingHistoryListDiffUtil : DiffUtil.ItemCallback<BotSheetUiState.Spending.History>() {
-
-    override fun areItemsTheSame(
-        oldItem: BotSheetUiState.Spending.History,
-        newItem: BotSheetUiState.Spending.History
-    ): Boolean {
-        return oldItem == newItem
-    }
-
-    override fun areContentsTheSame(
-        oldItem: BotSheetUiState.Spending.History,
-        newItem: BotSheetUiState.Spending.History
-    ): Boolean {
-        return oldItem.name == newItem.name && oldItem.price == newItem.price
-    }
-}

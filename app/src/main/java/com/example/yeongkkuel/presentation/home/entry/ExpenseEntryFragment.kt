@@ -263,8 +263,7 @@ class ExpenseEntryFragment : Fragment() {
             content = detail,
             amount = if (isNoExpenseChecked) 0 else amount,
             isExpense = isNoExpenseChecked,
-            sendChatRoom = isSendChatRoomChecked,
-            expenseImage = null
+            sendChatRoom = isSendChatRoomChecked
         )
 
 
