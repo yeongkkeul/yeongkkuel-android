@@ -18,8 +18,9 @@ import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentChatRoomSearchBinding
 import com.example.yeongkkuel.network.response.chat.ChatRoomDetailDto
 import com.example.yeongkkuel.presentation.base.MainActivity
-import com.example.yeongkkuel.presentation.chat.ChatGroupViewModel
+import com.example.yeongkkuel.presentation.chat.room.ChatGroupViewModel
 import com.example.yeongkkuel.presentation.chat.adapter.ChatRoomSearchAdapter
+import timber.log.Timber
 
 class ChatRoomSearchFragment : Fragment(), ChatRoomSearchClickListener {
     private lateinit var navController: NavController
@@ -94,7 +95,7 @@ class ChatRoomSearchFragment : Fragment(), ChatRoomSearchClickListener {
         }
 
         viewModel.selectedAgeOption.observe(viewLifecycleOwner) { selectedAge ->
-            binding.tvSearchTagAge.text = selectedAge?.displayName ?: "전체"
+            binding.tvSearchTagAge.text = selectedAge?: "전체"
             viewModel.chatRoomList.value?.let { list ->
                 applyFiltersAndUpdateAdapter(list)
             }
@@ -105,7 +106,7 @@ class ChatRoomSearchFragment : Fragment(), ChatRoomSearchClickListener {
         }
 
         viewModel.selectedJobOption.observe(viewLifecycleOwner) { selectedJob ->
-            binding.tvSearchTagJob.text = selectedJob?.displayName ?: "전체"
+            binding.tvSearchTagJob.text = selectedJob ?: "전체"
             viewModel.chatRoomList.value?.let { list ->
                 applyFiltersAndUpdateAdapter(list)
             }
@@ -132,12 +133,14 @@ class ChatRoomSearchFragment : Fragment(), ChatRoomSearchClickListener {
     private fun applyFiltersAndUpdateAdapter(list: MutableList<ChatRoomDetailDto>) {
         val selectedAge = viewModel.selectedAgeOption.value
         val selectedJob = viewModel.selectedJobOption.value
+        Timber.d("selectedAge: $selectedAge, selectedJob: $selectedJob")
 
         val filteredList = list.filter { chatRoom ->
-            val matchesAge = selectedAge?.let { chatRoom.chatRoomAgeRange == it.name } ?: true
-            val matchesJob = selectedJob?.let { chatRoom.chatRoomJob == it.name } ?: true
+            val matchesAge = selectedAge?.let { chatRoom.chatRoomAgeRange == it } ?: true
+            val matchesJob = selectedJob?.let { chatRoom.chatRoomJob == it } ?: true
             matchesAge && matchesJob
         }
+        Timber.d("filteredList: $filteredList")
         chatRoomSearchAdapter.updateList(filteredList.toMutableList())
     }
 

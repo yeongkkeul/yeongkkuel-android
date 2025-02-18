@@ -9,9 +9,15 @@ import com.example.yeongkkuel.network.response.chat.ChatMessageResponse
 import com.example.yeongkkuel.network.response.chat.ChatRoomInfoResult
 import com.example.yeongkkuel.network.response.chat.ChatSearchResult
 import com.example.yeongkkuel.network.response.chat.ReceiptResult
+import com.example.yeongkkuel.network.response.chat.ChatRoomRankResponse
+import com.example.yeongkkuel.network.response.chat.ChatRoomUserResult
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -21,9 +27,11 @@ interface ChatService {
     suspend fun getChatList(): Response<List<ChatRoomInfoResult>>
 
     // 채팅방 만들기
+    @Multipart
     @POST("/api/chats")
     suspend fun postChat(
-        @Body request: ChatsRequest
+        @Part("chatRoomInfo") chatRoomInfo: RequestBody, // ChatsRequest 객체의 JSON 문자열
+        @Part chatRoomImage: MultipartBody.Part? // 선택한 이미지 (없으면 null)
     ): Response<Int> // 생성한 채팅방의 ID -> 클라이언트 로직에 따라 클라이언트 정보를 응답할 수도 있습니다.
 
     // 채팅방 패스워드 확인
@@ -98,12 +106,25 @@ interface ChatService {
     ): Response<ReceiptResult>
 
     // 채팅방 둘러보기
-    @GET("/api/chats/expore")
+    @GET("/api/chats/explore")
     suspend fun getChatroomExplore(
         @Query("age") age:String? = null,
         @Query("minAmount") minAmount: Int? = null,
         @Query("maxAmount") maxAmount:Int? = null,
         @Query("job") job :String? = null,
-        @Query("page") page:Int,
+        @Query("page") page:Int
     ): ChatSearchResult
+
+    // 채팅방 랭킹 조회
+    @GET("/api/chats/{chatRoomId}/ranks")
+    suspend fun getChatroomRanks(
+        @Path("chatRoomId") chatRoomId:Int
+    ): Response<ChatRoomRankResponse>
+
+    // 채팅방 사용자 프로필 조회
+    @GET("/api/chats/{chatRoomId}/user/{userId}")
+    suspend fun getChatroomUser(
+        @Path("chatRoomId") chatRoomId:Int,
+        @Path("userId") userId:Int
+    ): Response<ChatRoomUserResult>
 }

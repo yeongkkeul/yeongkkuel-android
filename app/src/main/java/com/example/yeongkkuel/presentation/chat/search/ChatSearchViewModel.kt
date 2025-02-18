@@ -13,11 +13,11 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class ChatSearchViewModel : ViewModel() {
-    val selectedAgeOption: MutableLiveData<Age?> = MutableLiveData(null)
+    val selectedAgeOption: MutableLiveData<String?> = MutableLiveData(null)
 
     val selectedExpenseOption: MutableLiveData<String> = MutableLiveData()
 
-    val selectedJobOption: MutableLiveData<Job?> = MutableLiveData(null)
+    val selectedJobOption: MutableLiveData<String?> = MutableLiveData(null)
 
     private val _chatRoomList = MutableLiveData<MutableList<ChatRoomDetailDto>>()
     val chatRoomList: LiveData<MutableList<ChatRoomDetailDto>> get() = _chatRoomList
@@ -25,8 +25,8 @@ class ChatSearchViewModel : ViewModel() {
     fun fetchChatRooms() {
         viewModelScope.launch {
             try {
-                val age: String? = selectedAgeOption.value?.name
-                val job: String? = selectedJobOption.value?.name
+                val age: String? = selectedAgeOption.value
+                val job: String? = selectedJobOption.value
                 val minAmount = 0
                 val maxAmount = 1000000
                 val page = 0

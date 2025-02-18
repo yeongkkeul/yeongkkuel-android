@@ -9,7 +9,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.ItemChatRoomRankBinding
 import com.example.yeongkkuel.network.response.chat.ChatRoomRank
-import com.example.yeongkkuel.presentation.chat.ChatRoomRankClickListener
+import com.example.yeongkkuel.presentation.chat.rank.ChatRoomRankClickListener
 
 class ChatRoomRankAdapter(
     private var chatRoomRank: List<ChatRoomRank>,

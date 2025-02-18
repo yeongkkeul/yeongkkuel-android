@@ -9,12 +9,8 @@ import com.bumptech.glide.Glide
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.ItemChatRoomSearchBinding
 import com.example.yeongkkuel.network.response.chat.ChatRoomDetailDto
-import com.example.yeongkkuel.presentation.chat.data.Age
-import com.example.yeongkkuel.presentation.chat.data.Job
 import com.example.yeongkkuel.presentation.chat.search.ChatRoomSearchClickListener
 import timber.log.Timber
-import java.text.NumberFormat
-import java.util.Locale
 
 class ChatRoomSearchAdapter(
     private var chatRoomDetail: MutableList<ChatRoomDetailDto>,
@@ -48,17 +44,9 @@ class ChatRoomSearchAdapter(
 
                 tvTitleChatRoom.text = chatRoomDetailDto.chatRoomTitle
 
-                tvChatRoomTagAge.text = try {
-                    Age.valueOf(chatRoomDetailDto.chatRoomAgeRange).displayName
-                } catch (e: Exception) {
-                    chatRoomDetailDto.chatRoomAgeRange
-                }
+                tvChatRoomTagAge.text = chatRoomDetailDto.chatRoomAgeRange
 
-                tvChatRoomTagStatus.text = try {
-                    Job.valueOf(chatRoomDetailDto.chatRoomJob).displayName
-                } catch (e: Exception) {
-                    chatRoomDetailDto.chatRoomJob
-                }
+                tvChatRoomTagStatus.text = chatRoomDetailDto.chatRoomJob
 
                 tvChatRoomTagDays.text = chatRoomDetailDto.chatRoomDDay
 

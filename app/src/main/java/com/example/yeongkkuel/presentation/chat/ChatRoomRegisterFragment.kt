@@ -12,11 +12,13 @@ import com.bumptech.glide.Glide
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentChatRoomRegisterBinding
 import com.example.yeongkkuel.network.response.chat.ChatDetailResult
+import com.example.yeongkkuel.presentation.base.MainActivity
 import com.example.yeongkkuel.presentation.chat.data.Age
 import com.example.yeongkkuel.presentation.chat.data.Job
 import com.example.yeongkkuel.presentation.chat.dialog.ChatRoomExpelDialog
 import com.example.yeongkkuel.presentation.chat.dialog.ChatRoomExpenseAutoSendDialog
 import com.example.yeongkkuel.presentation.chat.dialog.ChatRoomPwDialog
+import com.example.yeongkkuel.presentation.chat.room.ChatGroupViewModel
 import com.example.yeongkkuel.presentation.chat.search.ChatSearchViewModel
 import java.text.NumberFormat
 import java.util.Locale
@@ -50,6 +52,8 @@ class ChatRoomRegisterFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         navController = Navigation.findNavController(view)
+
+        (requireActivity() as MainActivity).hideBottomNavigation(true)
 
         chatGroupViewModel.selectedChatRoomId.value?.let { chatRoomId ->
             viewModel.fetchChatDetail(chatRoomId) { detail ->
@@ -89,6 +93,9 @@ class ChatRoomRegisterFragment : Fragment() {
         // 채팅방 제목
         binding.tvTitleChatRoom.text = detail.chatRoomTitle
 
+        // 비밀번호 표시
+        binding.ivLock.visibility = if (detail.isPassword) View.VISIBLE else View.GONE
+
         // 마지막 활동 시간 (예: "30분 전 활동")
         binding.tvTimeLastMessage.text = detail.lastActivity
 
@@ -104,16 +111,23 @@ class ChatRoomRegisterFragment : Fragment() {
             detail.chatRoomJob
         }
 
-        // 생성된 일수(혹은 경과일) 태그
+        // 경과일
         binding.tvTagDays.text = detail.createdDaysElapsed
 
-        // 참여 현황: 예를 들어 "현재 참여수 / 최대 참여수"
-        binding.tvDataChallenger.text = "${detail.participationCount}/${detail.chatRoomMaxUserCount}"
+        // 챌린저
+        binding.tvDataChallenger.text = detail.chatRoomChallenger
 
-        // 하루 목표 지출액: 3자리마다 콤마 처리 후 "원" 추가
-        val formattedExpense = NumberFormat.getNumberInstance(Locale.getDefault())
-            .format(detail.chatRoomSpendingAmountGoal) + "원"
-        binding.tvDataDailyExpense.text = formattedExpense
+        // 하루 목표 지출액
+        binding.tvDataDailyExpense.text = detail.chatRoomSpendingAmountGoal
+
+        // 목표 달성 챌린저
+        binding.tvDataGoalSuccessChallenger.text = detail.chatRoomAchievedCount
+
+        // 지출 평균
+        binding.tvDataExpenseAverage.text = detail.chatRoomAverageExpense
+
+        // 챌린지 그룹 랭킹
+        binding.tvDataChallengerGroupRank.text = detail.chatRoomChallengerGroupRanking
     }
 
     private fun expenseAutoSendDialogShow() {
