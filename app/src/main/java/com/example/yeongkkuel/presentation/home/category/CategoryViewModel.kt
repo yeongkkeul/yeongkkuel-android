@@ -36,16 +36,23 @@ class CategoryViewModel : ViewModel() {
             try {
                 val response = RetrofitClient.categoryApiService.getCategories()
                 if (response.isSuccess) {
-                    val categoryListResponse = response.result
-                    _categories.postValue(categoryListResponse.categoryList.map { it.toCategory() }) // ✅ postValue()로 변경
+                    val categoryListResponse = response.result.categoryList
 
-                    Log.d("CategoryViewModel", "✅ LiveData postValue() 업데이트 완료!")
+                    // ✅ "trash" 카테고리 제외하고 리스트 업데이트
+                    val filteredCategories = categoryListResponse
+                        .filter { it.name.lowercase() != "trash" } // "trash" 제외
+                        .map { it.toCategory() } // Category 객체로 변환
+
+                    _categories.postValue(filteredCategories) // ✅ postValue()로 변경
+
+                    Log.d("CategoryViewModel", "✅ Trash 카테고리 제외 후 업데이트 완료! 카테고리 개수: ${filteredCategories.size}")
                 }
             } catch (e: Exception) {
                 _errorMessage.postValue("Error: ${e.message}") // ✅ postValue() 사용
             }
         }
     }
+
 
 
     fun updateCategoryOrderLocally(updatedList: List<Category>) {
@@ -90,20 +97,19 @@ class CategoryViewModel : ViewModel() {
         if (categoryToDelete != null) {
             viewModelScope.launch {
                 try {
-                    // 삭제하려는 카테고리 ID 로그 출력
-                    println("Deleting Category ID: ${categoryToDelete.id}")
-
                     val response = RetrofitClient.categoryApiService.deleteCategory(categoryToDelete.id)
 
-                    // 서버 응답 확인
-                    println("Delete Category Response: $response")
-
-                    if (response.isSuccess) { // 커스텀 Response의 isSuccess 확인
+                    if (response.isSuccess) {
                         val updatedList = _categories.value.orEmpty().filterNot { it.name == categoryName }
                         _categories.value = updatedList
-                        fetchCategories() // 삭제 후 최신 데이터 다시 불러오기
 
-                        botSheetViewModel.removeCategory(categoryName) // 바텀시트 ViewModel에도 삭제 반영
+                        // ✅ 카테고리가 모두 삭제되었으면 빈 리스트 반영 (즉시 반영)
+                        if (updatedList.isEmpty()) {
+                            _categories.postValue(emptyList())
+                        }
+
+                        // ✅ 삭제 후 최신 데이터 다시 불러오기 → 즉시 반영!
+                        fetchCategories()
                     } else {
                         _errorMessage.value = "Failed to delete category: ${response.message}"
                     }
@@ -113,6 +119,7 @@ class CategoryViewModel : ViewModel() {
             }
         }
     }
+
 
     // 카테고리 수정 (서버와 동기화)
     fun updateCategory(originalName: String, updatedCategory: Category) {

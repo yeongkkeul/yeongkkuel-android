@@ -74,11 +74,6 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             botSheetViewModel.getSpendingList()
         }
 
-        // 스플래시 화면 종료 조건: 데이터가 로드되지 않았다면 계속 유지
-//        splashScreen.setKeepOnScreenCondition {
-//            !isDataLoaded()  // 데이터가 아직 로드되지 않았다면 true를 반환해서 스플래시 유지
-//        }
-
         setupHamburgerClickListener() // 카테고리 더보기 기능 추가
 
         val navHostFragment =
@@ -91,6 +86,12 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+
+        categoryViewModel.categories.observe(this) { categories ->
+            val visibleCategories = categories.filter { it.name.lowercase() != "trash" }
+            val categoryCount = visibleCategories.size
+            binding.tvAddCategory.visibility = if (categoryCount >= 1) View.GONE else View.VISIBLE
         }
 
         initView()
@@ -250,26 +251,27 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     else -> setBotSheetGone()
                 }
             }
+
             navController.addOnDestinationChangedListener { _, destination, _ ->
+                val visibleCategories = categoryViewModel.categories.value.orEmpty()
+                    .filter { it.name.lowercase() != "trash" } // trash 제외
+                val categoryCount = visibleCategories.size
+
+                // TODO - 최초로 빌드했을 때만 뜸 (카테고리 개수에 상관없이..)
                 when (destination.id) {
                     R.id.categoryAddFragment -> {
                         binding.tvAddCategory.visibility = View.GONE // 카테고리 추가 화면에서는 숨기기
                     }
-                    R.id.navigation_home -> {
-                        // 홈 화면 복귀 시 카테고리 개수 조건 확인
-                        val isCategoryEmpty = categoryViewModel.categories.value.orEmpty().size < 1
-                        if (isCategoryEmpty) {
-                            binding.tvAddCategory.visibility = View.VISIBLE // 카테고리 없을 때 보이기
-                        } else {
-                            binding.tvAddCategory.visibility = View.GONE // 카테고리 있을 때 숨기기
-                        }
+                    R.id.navigation_home, R.id.navigation_stat -> {
+                        // trash 제외하고 카테고리가 1개 이상이면 버튼 숨기기, 없으면 보이기
+                        binding.tvAddCategory.visibility = if (categoryCount >= 1) View.GONE else View.VISIBLE
                     }
                     else -> {
                         binding.tvAddCategory.visibility = View.GONE // 다른 화면에서는 숨기기
-                        // TODO - * 지출 화면일 때 카테고리 추가 안 한 상태는 VISIBLE 상태로 만들기 *
                     }
                 }
             }
+
 
 
             // 바텀네비게이션 뷰 숨김 처리 - 스플래시, 로그인
@@ -431,7 +433,8 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         expenseName: String,
         expensePrice: Int,
         categoryColor: Int,
-        categoryName: String
+        categoryName: String,
+        imageUrl: Boolean
     ) {
         Log.d("MainActivity", "navigateToExpenseView() 호출됨 - id=$expenseId, name=$expenseName, price=$expensePrice, color=$categoryColor")
 
@@ -444,6 +447,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             putInt("expensePrice", expensePrice)
             putInt("categoryColor", categoryColor)
             putString("categoryName", categoryName)
+            putString("imageUrl", imageUrl.toString())
         }
 
         navController.navigate(R.id.navigation_expense_view, bundle)

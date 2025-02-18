@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.network
+package com.example.yeongkkuel.network.service
 
 import com.example.yeongkkuel.network.response.Response
 import com.example.yeongkkuel.presentation.home.category.data.CategoryListResponse

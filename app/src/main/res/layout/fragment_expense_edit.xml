@@ -30,7 +30,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>
 
-
             <TextView
                 android:id="@+id/tv_expense_title_edit"
                 android:layout_width="wrap_content"
