@@ -247,10 +247,26 @@ class BotSheetViewModel : ViewModel() {
     }
 
     // 카테고리 삭제 연동 기능
-    fun removeCategory(categoryName: String) {
-        _uiState.update { prev ->
-            val updatedSpendingList = prev.spendingList.filter { it.kind.name != categoryName }
-            prev.copy(spendingList = updatedSpendingList)
+    fun removeCategory(categoryName: String, isSuccess: ()-> Unit, isFalse: () -> Unit) {
+        val categoryToDelete = uiState.value.spendingList.find { it.kind.name == categoryName }
+        if (categoryToDelete != null) {
+            viewModelScope.launch {
+                try {
+                    val response = RetrofitClient.categoryApiService.deleteCategory(categoryToDelete.categoryId)
+
+                    if (response.isSuccess) {
+                        _uiState.update { prev ->
+                            val updatedSpendingList = prev.spendingList.filter { it.kind.name != categoryName }
+                            prev.copy(spendingList = updatedSpendingList)
+                        }
+
+                        isSuccess()
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    isFalse()
+                }
+            }
         }
     }
 

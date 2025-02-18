@@ -15,10 +15,6 @@ import retrofit2.HttpException
 
 class CategoryViewModel : ViewModel() {
 
-    private val botSheetViewModel: BotSheetViewModel by lazy {
-        BotSheetViewModel() // BotSheetViewModel 인스턴스 생성
-    }
-
     // 초기 카테고리 데이터 없음
     private val _categories = MutableLiveData<List<Category>>(emptyList())
     val categories: LiveData<List<Category>> get() = _categories
