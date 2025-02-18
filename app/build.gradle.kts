@@ -25,7 +25,7 @@ android {
         manifestPlaceholders["NATIVE_APP_KEY"] = nativeAppKey
 
         applicationId = "com.example.yeongkkuel"
-        minSdk = 29
+        minSdk = 30
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"

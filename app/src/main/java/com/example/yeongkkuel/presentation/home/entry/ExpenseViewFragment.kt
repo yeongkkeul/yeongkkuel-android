@@ -30,8 +30,6 @@ import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import android.util.Base64
-import com.example.yeongkkuel.presentation.home.entry.data.ExpenseViewModel
 
 class ExpenseViewFragment : Fragment() {
 

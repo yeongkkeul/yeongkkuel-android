@@ -96,7 +96,7 @@ class BotSheetViewModel : ViewModel() {
                     BotSheetUiState.Spending(
                         categoryId = history.id,
                         kind = category,
-                        color = prev.spendingList.find { it.kind == category }?.color ?: Colors.BLACK1,
+                        color = prev.spendingList.find { it.kind == category }?.color ?: Colors.RED1,
                         plusIconResId = R.drawable.ic_plus_default,
                         history = listOf(history)
                     )
@@ -163,8 +163,6 @@ class BotSheetViewModel : ViewModel() {
                         history = emptyList()
                     )
                 )
-            }.sortedBy { spending ->
-                if (spending.kind.name == "trash") 1 else 0 // ✅ Trash 카테고리를 항상 마지막으로 이동
             }
             prev.copy(spendingList = updatedList)
         }
@@ -389,7 +387,7 @@ class BotSheetViewModel : ViewModel() {
                     BotSheetUiState.Spending(
                         categoryId = -1, // 기본값
                         kind = SpendingCategory.fromName("기타"),
-                        color = Colors.BLACK1,
+                        color = Colors.RED1,
                         plusIconResId = R.drawable.ic_plus_default,
                         history = listOf(updatedHistory)
                     )
