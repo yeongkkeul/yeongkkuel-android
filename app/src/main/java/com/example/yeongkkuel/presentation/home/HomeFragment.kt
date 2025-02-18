@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentHomeBinding
 import com.example.yeongkkuel.network.response.expenditure.MonthExpendituresCategory
@@ -152,6 +153,17 @@ class HomeFragment : Fragment() {
                     Log.d("HomeFragment", "Received selected product: ${it.name}")
                     applySelectedProductToHome(it)
                 }
+            }
+        }
+
+        initAppBar()
+    }
+
+    private fun initAppBar(){
+        binding.includeTopbar.run {
+            ivMore.visibility = View.GONE
+            ivNoti.setOnClickListener {
+                findNavController().navigate(R.id.navigation_notification)
             }
         }
     }
