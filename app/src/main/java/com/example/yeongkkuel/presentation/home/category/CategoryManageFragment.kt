@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -21,13 +22,13 @@ import com.example.yeongkkuel.databinding.FragmentCategoryManageBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import com.example.yeongkkuel.presentation.home.category.adapter.CategoryAdapter
 import com.example.yeongkkuel.presentation.home.category.data.Category
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class CategoryManageFragment : Fragment() {
 
     private var _binding: FragmentCategoryManageBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: CategoryViewModel by activityViewModels()
     private val botSheetViewModel: BotSheetViewModel by activityViewModels()
 
     private lateinit var categoryAdapter: CategoryAdapter
@@ -67,7 +68,7 @@ class CategoryManageFragment : Fragment() {
                 val toPosition = target.bindingAdapterPosition
                 Log.d("CategoryManageFragment", "📌 아이템 이동: $fromPosition -> $toPosition")
 
-                categoryAdapter.moveItem(fromPosition, toPosition) // UI 순서 변경
+                botSheetViewModel.moveCategory(fromPosition, toPosition)
                 return true
             }
 
@@ -79,8 +80,6 @@ class CategoryManageFragment : Fragment() {
                 super.clearView(recyclerView, viewHolder)
 
                 val updatedList = categoryAdapter.getCategoryList()
-                // ViewModel에 변경된 카테고리 순서 반영
-                viewModel.updateCategoryOrderLocally(updatedList)
 
                 // 변경된 리스트를 RecyclerView에 반영
                 categoryAdapter.submitList(updatedList)
@@ -93,13 +92,12 @@ class CategoryManageFragment : Fragment() {
 
         // 데이터 가져오기 및 UI 업데이트
         observeViewModel()
-        fetchCategoriesFromServer()
 
         Log.d("CategoryManageFragment", "✅ onViewCreated() 완료")
 
         // 추가 버튼 클릭 이벤트
         binding.tvCategoryAdd.setOnClickListener {
-            val categoryCount = viewModel.categories.value?.size ?: 0
+            val categoryCount = botSheetViewModel.uiState.value.spendingList.size
             if (categoryCount >= 6) {
                 showLimitReachedPopup()
             } else {
@@ -113,40 +111,20 @@ class CategoryManageFragment : Fragment() {
         }
     }
 
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.fetchCategories()
-
-        Handler(Looper.getMainLooper()).postDelayed({
-            viewModel.fetchCategories()
-        }, 500)
-    }
-
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
-            // 카테고리 데이터 관찰
-            viewModel.categories.observe(viewLifecycleOwner) { categories ->
-                if (categories.isNotEmpty()) {
+            botSheetViewModel.uiState.flowWithLifecycle(lifecycle)
+                .collectLatest { uiState ->
+                    val categories =  uiState.spendingList.map {
+                        Category(
+                            id = it.categoryId,
+                            name = it.kind.name,
+                            color = it.color
+                        )
+                    }
+
                     categoryAdapter.submitList(categories)
                 }
-            }
-
-            // 바텀시트 데이터 관찰
-            botSheetViewModel.categoryList.observe(viewLifecycleOwner) { categories ->
-                if (categories.isNotEmpty()) {
-                    categoryAdapter.submitList(categories)
-                    categoryAdapter.notifyDataSetChanged()
-                }
-            }
-
-            // 에러 메시지 관찰
-            viewModel.errorMessage.observe(viewLifecycleOwner) { errorMessage ->
-                errorMessage?.let {
-                    Log.e("CategoryManageFragment", "❌ ViewModel 에러 발생: $it") // ✅ 추가 로그
-                    android.widget.Toast.makeText(requireContext(), it, android.widget.Toast.LENGTH_SHORT).show()
-                }
-            }
         }
     }
 
@@ -167,10 +145,6 @@ class CategoryManageFragment : Fragment() {
                 }
             })
         }
-    }
-
-    private fun fetchCategoriesFromServer() {
-        viewModel.fetchCategories()
     }
 
     private fun navigateToCategoryDetail(category: Category) {

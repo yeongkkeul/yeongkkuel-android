@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentHomeBinding
 import com.example.yeongkkuel.network.response.expenditure.MonthExpendituresCategory
@@ -147,14 +148,10 @@ class HomeFragment : Fragment() {
                 updateCategoryExpenses(categories, expensesMap)
 
                 Log.d("HomeFragment", "🚀 updateBotSheetCategories 호출됨!")
-                botSheetViewModel.updateBotSheetCategories(categories)
-
-                botSheetViewModel.getSpendingList() // 홈 데이터 수신 후 즉시 지출 내역 갱신 API 호출함
             } else {
                 Log.e("HomeFragment", "🚨 홈 데이터 수신 실패 또는 응답 없음!")
             }
         }
-        setupSwipeToDismiss(binding.ivError)
 
         Log.d("HomeFragment", "🚀 fetchHomeData() 호출됨!")
 
@@ -171,6 +168,22 @@ class HomeFragment : Fragment() {
                 }
             }
         }
+
+        initAppBar()
+    }
+
+    private fun initAppBar(){
+        binding.includeTopbar.run {
+            ivMore.visibility = View.GONE
+            ivNoti.setOnClickListener {
+                findNavController().navigate(R.id.navigation_notification)
+            }
+
+            val layoutParams = ivNoti.layoutParams as ViewGroup.MarginLayoutParams
+            layoutParams.marginEnd = 0
+            ivNoti.layoutParams = layoutParams
+        }
+
     }
 
     // 변환된 Category 리스트를 받도록 변경

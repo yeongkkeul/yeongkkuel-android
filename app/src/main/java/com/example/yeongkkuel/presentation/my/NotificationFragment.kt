@@ -81,7 +81,7 @@ class NotificationFragment : Fragment() {
 
        binding.ivBack.setOnClickListener {
             // 뒤로가기 버튼 클릭 시 이전 화면으로 이동
-            findNavController().popBackStack()
+           activity?.onBackPressed()
         }
 
         // RecyclerView 설정

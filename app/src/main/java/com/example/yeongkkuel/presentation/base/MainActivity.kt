@@ -105,10 +105,11 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
 
     private fun setupAddCategoryClickListener(navController: NavController) {
         binding.tvAddCategory.setOnClickListener {
-            navController.navigate(R.id.categoryAddFragment, null, NavOptions.Builder()
-                .setLaunchSingleTop(true) // 이미 존재하면 새로 생성하지 않음
-                .setRestoreState(true) // 상태 복원
-                .build()
+            navController.navigate(
+                R.id.categoryAddFragment, null, NavOptions.Builder()
+                    .setLaunchSingleTop(true) // 이미 존재하면 새로 생성하지 않음
+                    .setRestoreState(true) // 상태 복원
+                    .build()
             )
         }
     }
@@ -245,13 +246,12 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                 when (destination.id) {
                     R.id.navigation_home,
                     R.id.navigation_stat,
-                    -> setBotSheetVisible()
+                        -> setBotSheetVisible()
 
 
                     else -> setBotSheetGone()
                 }
             }
-
             navController.addOnDestinationChangedListener { _, destination, _ ->
                 val visibleCategories = categoryViewModel.categories.value.orEmpty()
                     .filter { it.name.lowercase() != "trash" } // trash 제외
@@ -290,7 +290,6 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
 
 
 
-
             // 바텀네비게이션 뷰 숨김 처리 - 스플래시, 로그인
             navController.addOnDestinationChangedListener { _, destination, _ ->
                 when (destination.id) {
@@ -303,7 +302,9 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     R.id.navigation_term_1,
                     R.id.navigation_term_2,
                     R.id.navigation_term_3,
-                    R.id.navigation_term_4 -> hideBottomNavigation(
+                    R.id.navigation_term_4,
+                    R.id.navigation_store,
+                    R.id.navigation_notification -> hideBottomNavigation(
                         true
                     )
 
@@ -445,6 +446,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         navController.navigate(R.id.expenseEntryFragment, bundle)
     }
 
+
     override fun navigateToExpenseView(
         expenseId: Int,
         expenseName: String,
@@ -453,9 +455,13 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         categoryName: String,
         imageUrl: String
     ) {
-        Log.d("MainActivity", "navigateToExpenseView() 호출됨 - id=$expenseId, name=$expenseName, price=$expensePrice, color=$categoryColor, imageUrl=$imageUrl")
+        Log.d(
+            "MainActivity",
+            "navigateToExpenseView() 호출됨 - id=$expenseId, name=$expenseName, price=$expensePrice, color=$categoryColor"
+        )
 
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         val navController = navHostFragment.navController
 
         val bundle = Bundle().apply {
