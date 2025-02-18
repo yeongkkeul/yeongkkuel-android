@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.presentation.chat
+package com.example.yeongkkuel.presentation.chat.room
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

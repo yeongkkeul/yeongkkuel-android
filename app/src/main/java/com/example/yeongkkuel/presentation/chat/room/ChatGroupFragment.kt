@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.presentation.chat
+package com.example.yeongkkuel.presentation.chat.room
 
 import android.os.Bundle
 import android.transition.AutoTransition
@@ -19,19 +19,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentChatGroupBinding
-import com.example.yeongkkuel.network.response.chat.ChatDetailResult
 import com.example.yeongkkuel.presentation.base.MainActivity
+import com.example.yeongkkuel.presentation.chat.ChatMessageClickListener
 import com.example.yeongkkuel.presentation.chat.adapter.ChatGroupAdapter
 import com.example.yeongkkuel.presentation.chat.adapter.ChatRoomDrawerAdapter
-import com.example.yeongkkuel.presentation.chat.data.Age
-import com.example.yeongkkuel.presentation.chat.data.Job
 import com.example.yeongkkuel.presentation.chat.dialog.ChatRoomGroupExitDialog
-import com.example.yeongkkuel.presentation.chat.dialog.ChatRoomProfilePartyDialog
 import com.example.yeongkkuel.presentation.chat.search.ChatSearchViewModel
 import com.example.yeongkkuel.utils.ChatItemDecoration
 import timber.log.Timber
 import java.text.NumberFormat
-import java.util.Locale
 
 class ChatGroupFragment : Fragment(), ChatMessageClickListener {
     private lateinit var navController: NavController
@@ -74,10 +70,9 @@ class ChatGroupFragment : Fragment(), ChatMessageClickListener {
         chatGroupViewModel.selectedChatRoomId.value?.let { chatRoomId ->
             viewModel.fetchChatDetail(chatRoomId) { detail ->
                 detail ?.let {
-                    // 예: "6/6 명" 형태로 표시
-                    binding.tvDataGoalSuccessChallenger.text = "${it.participationCount}/${it.chatRoomMaxUserCount} 명"
+                    binding.tvDataGoalSuccessChallenger.text = detail.chatRoomChallenger
                     binding.tvTitleChatGroup.text = detail.chatRoomTitle
-                    binding.tvAmountPeopleChatGroup.text = detail.participationCount.toString()
+                    binding.tvAmountPeopleChatGroup.text = detail.chatRoomChallenger.substringBefore("/")
                 }
             }
         }
