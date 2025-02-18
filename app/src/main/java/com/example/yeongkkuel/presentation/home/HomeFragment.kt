@@ -134,9 +134,6 @@ class HomeFragment : Fragment() {
                 updateCategoryExpenses(categories, expensesMap)
 
                 Log.d("HomeFragment", "🚀 updateBotSheetCategories 호출됨!")
-                botSheetViewModel.updateBotSheetCategories(categories)
-
-                botSheetViewModel.getSpendingList() // 홈 데이터 수신 후 즉시 지출 내역 갱신 API 호출함
             } else {
                 Log.e("HomeFragment", "🚨 홈 데이터 수신 실패 또는 응답 없음!")
             }

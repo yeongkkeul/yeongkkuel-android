@@ -36,8 +36,6 @@ class BotSheetViewModel : ViewModel() {
         MutableStateFlow<List<BotSheetUiState.Spending.History>>(emptyList())
     val spendingHistoryList = _spendingHistoryList.asStateFlow()
 
-    private val _categoryList = MutableLiveData<List<Category>>(emptyList()) // ✅ MutableLiveData 선언 추가
-    val categoryList: LiveData<List<Category>> get() = _categoryList // ✅ LiveData로 접근
     private val _deleteResult = MutableLiveData<Boolean>()
     val deleteResult: LiveData<Boolean> get() = _deleteResult
 
@@ -151,26 +149,6 @@ class BotSheetViewModel : ViewModel() {
         )
     }
 
-    fun updateBotSheetCategories(categories: List<Category>) {
-        Log.d("BotSheetViewModel", "🚀 updateBotSheetCategories 실행됨! categories: $categories")
-
-        _categoryList.postValue(categories)
-
-        val updatedSpendingList = categories.map { category ->
-            BotSheetUiState.Spending(
-                categoryId = category.id,
-                kind = SpendingCategory.fromName(category.name),
-                color = category.color,
-                plusIconResId = R.drawable.ic_plus_default,
-                history = emptyList() // 기본값 (필요에 따라 업데이트 가능)
-            )
-        }
-
-        _uiState.update { prevState ->
-            Log.d("BotSheetViewModel", "✅ 바텀시트 UI 업데이트 완료! 카테고리 개수: ${updatedSpendingList.size}")
-            prevState.copy(spendingList = updatedSpendingList)
-        }
-    }
 
     fun updateBotSheetData(response: ExpenseListResponse) {
         _uiState.update { prevState ->
@@ -256,8 +234,6 @@ class BotSheetViewModel : ViewModel() {
             }
             prev.copy(spendingList = updatedList)
         }
-        // 추가된 카테고리를 _categoryList에 업데이트
-        _categoryList.value = _categoryList.value.orEmpty() + category
     }
 
     private fun mapCategoryToIcon(color: Colors): Int {
@@ -276,15 +252,6 @@ class BotSheetViewModel : ViewModel() {
                 )
             } else {
                 spending
-            }
-        }
-
-        // 기존 카테고리 리스트 업데이트
-        _categoryList.value = _categoryList.value?.map { category ->
-            if (category.name == originalCategoryName) {
-                updatedCategory
-            } else {
-                category
             }
         }
 
@@ -367,8 +334,6 @@ class BotSheetViewModel : ViewModel() {
                             )
                         }
 
-                        // ✅ 추가: 바텀시트 UI 업데이트
-                        updateBotSheetCategories(categories)
 
                         _uiState.update { prev ->
                             val updatedSpendingList = categories.map { category ->
@@ -428,7 +393,6 @@ class BotSheetViewModel : ViewModel() {
             )
         }
         Log.d("BotSheetViewModel", "getCategoryList() 반환: $categoryList")
-        Log.d("BotSheetViewModel", "📌 getCategoryList() 호출됨, 현재 카테고리 개수: ${_categoryList.value?.size ?: 0}")
         return categoryList
     }
 

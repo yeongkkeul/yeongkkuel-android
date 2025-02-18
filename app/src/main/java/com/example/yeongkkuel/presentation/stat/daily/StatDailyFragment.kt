@@ -2,11 +2,11 @@ package com.example.yeongkkuel.presentation.stat.daily
 
 import android.graphics.Color
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -14,7 +14,6 @@ import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentStatDailyBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
-import com.example.yeongkkuel.presentation.stat.StatAnimationListener
 import com.example.yeongkkuel.presentation.util.toMoneyString
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.data.PieData
@@ -24,7 +23,6 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
