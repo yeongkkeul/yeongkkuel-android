@@ -165,7 +165,12 @@ class HomeFragment : Fragment() {
             ivNoti.setOnClickListener {
                 findNavController().navigate(R.id.navigation_notification)
             }
+
+            val layoutParams = ivNoti.layoutParams as ViewGroup.MarginLayoutParams
+            layoutParams.marginEnd = 0
+            ivNoti.layoutParams = layoutParams
         }
+
     }
 
     // 변환된 Category 리스트를 받도록 변경
