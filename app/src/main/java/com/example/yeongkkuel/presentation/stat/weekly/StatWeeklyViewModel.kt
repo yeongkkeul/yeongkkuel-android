@@ -3,6 +3,7 @@ package com.example.yeongkkuel.presentation.stat.weekly
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yeongkkuel.network.RetrofitClient
+import com.example.yeongkkuel.presentation.auth.TokenManager
 import com.example.yeongkkuel.presentation.util.Age
 import com.example.yeongkkuel.presentation.util.Colors
 import com.example.yeongkkuel.presentation.util.Job
@@ -56,6 +57,21 @@ class StatWeeklyViewModel : ViewModel() {
             yeongkkuelService.getExpendituresWeekAverage().run {
                 if (isSuccess) {
                     result.run {
+                        val categoryList = TokenManager.getCategoryOrder()
+
+                        val categories = categories.map {
+                            StatWeeklyUiState.PieChartData(
+                                categoryId = it.categoryId,
+                                category = SpendingCategory.fromName(it.categoryName),
+                                expenditure = it.totalExpenditure,
+                                color = Colors.fromRGB(
+                                    red = it.red,
+                                    blue = it.blue,
+                                    green = it.green
+                                )
+                            )
+                        }.sortedByDescending { it.expenditure }
+
                         _uiState.update { prev ->
                             prev.copy(
                                 compareList = mutableListOf<StatWeeklyUiState.CompareData>().apply {
@@ -81,17 +97,7 @@ class StatWeeklyViewModel : ViewModel() {
                                         )
                                     )
                                 },
-                                pieChartList = categories.map {
-                                    StatWeeklyUiState.PieChartData(
-                                        category = SpendingCategory.fromName(it.categoryName),
-                                        expenditure = it.totalExpenditure,
-                                        color = Colors.fromRGB(
-                                            red = it.red,
-                                            blue = it.blue,
-                                            green = it.green
-                                        )
-                                    )
-                                }
+                                pieChartList = categories
                             )
                         }
                     }
