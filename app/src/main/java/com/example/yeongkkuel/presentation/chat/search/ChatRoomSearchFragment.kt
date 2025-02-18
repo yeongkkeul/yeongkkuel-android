@@ -49,7 +49,7 @@ class ChatRoomSearchFragment : Fragment(), ChatRoomSearchClickListener {
 
         navController = Navigation.findNavController(view)
 
-        (requireActivity() as MainActivity).hideBottomNavigation(false)
+        (requireActivity() as MainActivity).hideBottomNavigation(true)
 
         viewModel.fetchChatRooms()
 
