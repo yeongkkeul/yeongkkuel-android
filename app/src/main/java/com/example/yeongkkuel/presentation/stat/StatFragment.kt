@@ -141,8 +141,15 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
 
         }
 
+        fun initNoti(){
+            includeTopbar.ivNoti.setOnClickListener {
+                findNavController().navigate(R.id.navigation_notification)
+            }
+        }
+
         initVp()
         initMore()
+        initNoti()
     }
 
     // ViewPager의 터치 이벤트를 비활성화하는 함수
