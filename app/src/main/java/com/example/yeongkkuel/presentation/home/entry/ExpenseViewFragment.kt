@@ -76,15 +76,6 @@ class ExpenseViewFragment : Fragment() {
             binding.clMore.visibility = View.GONE
         }
 
-
-
-//        // 무지출이면 `ic_more` 버튼 숨기기
-//        if (expensePrice == 0) {
-//            binding.icMore.visibility = View.GONE // 더보기 버튼 숨기기
-//        } else {
-//            binding.icMore.visibility = View.VISIBLE // 더보기 버튼 보이기
-//        }
-
         // 번들에서 데이터 가져오기
         expenseId = arguments?.getInt("expenseId")
         val expenseName = arguments?.getString("expenseName") ?: ""
@@ -94,13 +85,17 @@ class ExpenseViewFragment : Fragment() {
         val expenseDateString = arguments?.getString("expenseDate")
         val imageUrl = arguments?.getString("imageUrl") ?: ""
 
+        Log.d("ExpenseViewFragment", "✅ 받은 데이터: expenseId=$expenseId, name=$expenseName, price=$expensePrice, category=$categoryName, imageUrl=$imageUrl") // ✅ 로그 추가
+
         // 이미지 로드
         if (imageUrl.isNotEmpty()) {
+            Log.d("ExpenseViewFragment", "✅ Glide로 이미지 로드: $imageUrl") // ✅ Glide 실행 전에 로그 추가
             Glide.with(binding.imgPhotoFrame.context)
                 .load(imageUrl)
                 .into(binding.imgPhotoFrame)
             binding.ivPhotoIcon.visibility = View.GONE
         } else {
+            Log.e("ExpenseViewFragment", "🚨 imageUrl이 비어있음!") // ✅ imageUrl이 없을 때 오류 로그
             binding.imgPhotoFrame.setImageResource(R.drawable.bg_photo_input)
             binding.ivPhotoIcon.visibility = View.VISIBLE
         }

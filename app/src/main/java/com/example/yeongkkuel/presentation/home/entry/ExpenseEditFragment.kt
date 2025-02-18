@@ -188,6 +188,9 @@ class ExpenseEditFragment : Fragment() {
         val etDetailInput = binding.etDetailInput
         val tvCharacterCount = binding.tvCharacterCount
 
+        val initialTextLength = etDetailInput.text?.length ?: 0
+        tvCharacterCount.text = "$initialTextLength/24"
+
         etDetailInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 

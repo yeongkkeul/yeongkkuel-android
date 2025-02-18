@@ -257,20 +257,37 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     .filter { it.name.lowercase() != "trash" } // trash 제외
                 val categoryCount = visibleCategories.size
 
-                // TODO - 최초로 빌드했을 때만 뜸 (카테고리 개수에 상관없이..)
                 when (destination.id) {
                     R.id.categoryAddFragment -> {
                         binding.tvAddCategory.visibility = View.GONE // 카테고리 추가 화면에서는 숨기기
+                        binding.tvEmptyMessage1.visibility = View.GONE
+                        binding.tvEmptyMessage2.visibility = View.GONE
+                        binding.imgAddCategory.visibility = View.GONE
                     }
                     R.id.navigation_home, R.id.navigation_stat -> {
-                        // trash 제외하고 카테고리가 1개 이상이면 버튼 숨기기, 없으면 보이기
-                        binding.tvAddCategory.visibility = if (categoryCount >= 1) View.GONE else View.VISIBLE
+                        if (categoryCount == 0) {
+                            // 카테고리가 없을 때 메시지 & 버튼 표시
+                            binding.tvEmptyMessage1.visibility = View.VISIBLE
+                            binding.tvEmptyMessage2.visibility = View.VISIBLE
+                            binding.imgAddCategory.visibility = View.VISIBLE
+                            binding.tvAddCategory.visibility = View.VISIBLE
+                        } else {
+                            // 카테고리가 있으면 메시지 & 버튼 숨기기
+                            binding.tvEmptyMessage1.visibility = View.GONE
+                            binding.tvEmptyMessage2.visibility = View.GONE
+                            binding.imgAddCategory.visibility = View.GONE
+                            binding.tvAddCategory.visibility = View.GONE
+                        }
                     }
                     else -> {
                         binding.tvAddCategory.visibility = View.GONE // 다른 화면에서는 숨기기
+                        binding.tvEmptyMessage1.visibility = View.GONE
+                        binding.tvEmptyMessage2.visibility = View.GONE
+                        binding.imgAddCategory.visibility = View.GONE
                     }
                 }
             }
+
 
 
 
@@ -434,9 +451,9 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         expensePrice: Int,
         categoryColor: Int,
         categoryName: String,
-        imageUrl: Boolean
+        imageUrl: String
     ) {
-        Log.d("MainActivity", "navigateToExpenseView() 호출됨 - id=$expenseId, name=$expenseName, price=$expensePrice, color=$categoryColor")
+        Log.d("MainActivity", "navigateToExpenseView() 호출됨 - id=$expenseId, name=$expenseName, price=$expensePrice, color=$categoryColor, imageUrl=$imageUrl")
 
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         val navController = navHostFragment.navController
@@ -447,7 +464,9 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             putInt("expensePrice", expensePrice)
             putInt("categoryColor", categoryColor)
             putString("categoryName", categoryName)
-            putString("imageUrl", imageUrl.toString())
+            if (!imageUrl.isNullOrEmpty()) {
+                putString("imageUrl", imageUrl) // ✅ imageUrl이 null이 아닐 때만 저장
+            }
         }
 
         navController.navigate(R.id.navigation_expense_view, bundle)

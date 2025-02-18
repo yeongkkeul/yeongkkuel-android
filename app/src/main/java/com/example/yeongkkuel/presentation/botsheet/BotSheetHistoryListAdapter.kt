@@ -43,7 +43,7 @@ class BotSheetHistoryListAdapter(
                  root.visibility = View.VISIBLE
              }
 
-            if (item.imgExist) {
+            if (!item.imgExist.isNullOrEmpty()) { // ✅ imageUrl 값이 있을 때만 아이콘 보이기
                 icPhotoIncluded.visibility = View.VISIBLE
             } else {
                 icPhotoIncluded.visibility = View.GONE
@@ -53,6 +53,7 @@ class BotSheetHistoryListAdapter(
             }
         }
     }
+
     private class SpendingHistoryListDiffUtil : DiffUtil.ItemCallback<BotSheetUiState.Spending.History>() {
         override fun areItemsTheSame(
             oldItem: BotSheetUiState.Spending.History,

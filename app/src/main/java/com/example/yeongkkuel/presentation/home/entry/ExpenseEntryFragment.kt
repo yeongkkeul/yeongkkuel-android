@@ -286,6 +286,7 @@ class ExpenseEntryFragment : Fragment() {
                 if (response?.isSuccess == true) {
                     Toast.makeText(requireContext(), "지출 내역이 저장되었습니다.", Toast.LENGTH_SHORT).show()
                     navController.navigate(R.id.navigation_home)
+                    handleNavigationAfterSave(view)
                 } else {
                     Toast.makeText(requireContext(), "지출 내역 저장 실패.", Toast.LENGTH_SHORT).show()
                 }
@@ -342,7 +343,7 @@ class ExpenseEntryFragment : Fragment() {
             id = 1,
             name =  detail,
             price = if (isNoExpenseChecked) 0 else amount,
-            imgExist = false
+            imgExist = ""
         )
 
         botSheetViewModel.addExpenseHistory(expenseHistory)

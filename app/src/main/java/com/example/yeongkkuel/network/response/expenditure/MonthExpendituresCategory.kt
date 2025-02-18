@@ -19,6 +19,6 @@ data class MonthExpendituresCategory(
         @SerializedName("expenseId") val expenseId: Int,       // 지출 ID
         @SerializedName("expenseName") val expenseName: String, // 지출 이름
         @SerializedName("expenseAmount") val expenseAmount: Int, // 금액
-        @SerializedName("imgExist") val imgExist: Boolean
+        @SerializedName("imgExist") val imgExist: String // image Url 값
     )
 }
