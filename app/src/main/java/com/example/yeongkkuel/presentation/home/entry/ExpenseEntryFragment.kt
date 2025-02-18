@@ -18,6 +18,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
@@ -40,7 +41,7 @@ import java.util.*
 
 class ExpenseEntryFragment : Fragment() {
 
-    private lateinit var expenseViewModel: ExpenseViewModel
+    private val expenseViewModel: ExpenseViewModel by activityViewModels()
     private val botSheetViewModel: BotSheetViewModel by activityViewModels()
     private var selectedImageUri: Uri? = null
     private lateinit var sharedPreferences: SharedPreferences
@@ -60,10 +61,10 @@ class ExpenseEntryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         navController = Navigation.findNavController(view)
-        sharedPreferences = requireContext().getSharedPreferences("ExpensePrefs", Context.MODE_PRIVATE)
+        sharedPreferences =
+            requireContext().getSharedPreferences("ExpensePrefs", Context.MODE_PRIVATE)
 
         val repository = ExpenseRepository(RetrofitClient.expenseApiService)
-        expenseViewModel = ViewModelProvider(this, ExpenseViewModel.Factory(repository)).get(ExpenseViewModel::class.java)
 
         setupCategory(view)
         initializeViews(view)
@@ -116,7 +117,8 @@ class ExpenseEntryFragment : Fragment() {
                 requireContext(),
                 { _, selectedYear, selectedMonth, selectedDay ->
                     val dayOfWeek = getDayOfWeek(selectedYear, selectedMonth, selectedDay)
-                    expenseDate= "${selectedYear}년 ${selectedMonth + 1}월 ${selectedDay}일 $dayOfWeek"
+                    expenseDate =
+                        "${selectedYear}년 ${selectedMonth + 1}월 ${selectedDay}일 $dayOfWeek"
                     tvDateInput.text = expenseDate
 
                 },
@@ -140,6 +142,7 @@ class ExpenseEntryFragment : Fragment() {
                 tvCharacterCount.text = "$length/24"
                 if (length > 24) etDetailInput.error = "최대 24자까지 입력 가능합니다."
             }
+
             override fun afterTextChanged(s: Editable?) {}
         })
     }
@@ -304,8 +307,10 @@ class ExpenseEntryFragment : Fragment() {
         val amount = amountString.toIntOrNull() ?: 0
         val isNoExpenseChecked = ivCircleExpenseChecked.visibility == View.VISIBLE
 
-        val errorBackground = ContextCompat.getDrawable(requireContext(), R.drawable.bg_edit_text_error) // 지출 내용 에러
-        val errorBackground2 = ContextCompat.getDrawable(requireContext(), R.drawable.bg_edit_text_error2) // 지출액 에러
+        val errorBackground =
+            ContextCompat.getDrawable(requireContext(), R.drawable.bg_edit_text_error) // 지출 내용 에러
+        val errorBackground2 =
+            ContextCompat.getDrawable(requireContext(), R.drawable.bg_edit_text_error2) // 지출액 에러
         val normalBackground = ContextCompat.getDrawable(requireContext(), R.drawable.bg_edit_text)
 
         var hasError = false
@@ -340,7 +345,7 @@ class ExpenseEntryFragment : Fragment() {
         // 선택된 카테고리 값 확인
         val expenseHistory = BotSheetUiState.Spending.History(
             id = 1,
-            name =  detail,
+            name = detail,
             price = if (isNoExpenseChecked) 0 else amount,
             imgExist = false
         )

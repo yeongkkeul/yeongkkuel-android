@@ -70,12 +70,12 @@ class ExpenseViewFragment : Fragment() {
         }
 
         binding.clMore.findViewById<TextView>(R.id.tv_delete).setOnClickListener {
-            val expenseId = arguments?.getInt("expenseId") ?: return@setOnClickListener // ✅ null이면 실행 안 함
+            val expenseId =
+                arguments?.getInt("expenseId") ?: return@setOnClickListener // ✅ null이면 실행 안 함
             botSheetViewModel.deleteExpense(expenseId)
             deleteExpense()
             binding.clMore.visibility = View.GONE
         }
-
 
 
 //        // 무지출이면 `ic_more` 버튼 숨기기
@@ -118,7 +118,12 @@ class ExpenseViewFragment : Fragment() {
         binding.tvDateInput.text = expenseDateString ?: "날짜 없음"
         binding.etDetailInput.setText(expenseName)
         binding.etAmountInput.setText(formatPrice(expensePrice))
-        binding.tvCategoryInput.setTextColor(ContextCompat.getColor(requireContext(), categoryColor))
+        binding.tvCategoryInput.setTextColor(
+            ContextCompat.getColor(
+                requireContext(),
+                categoryColor
+            )
+        )
         binding.tvCategoryInput.text = categoryName
 
         // UIState 데이터 갱신
@@ -146,8 +151,9 @@ class ExpenseViewFragment : Fragment() {
             return
         }
 
-        val selectedExpense = botSheetViewModel.spendingHistoryList.value.find { it.id == expenseId }
-            ?: return
+        val selectedExpense =
+            botSheetViewModel.spendingHistoryList.value.find { it.id == expenseId }
+                ?: return
 
         val bundle = Bundle().apply {
             putInt("expenseId", selectedExpense.id)
@@ -167,7 +173,8 @@ class ExpenseViewFragment : Fragment() {
             return
         }
 
-        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_expense_delete, null)
+        val dialogView =
+            LayoutInflater.from(requireContext()).inflate(R.layout.dialog_expense_delete, null)
         val dialog = AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .create()
@@ -178,18 +185,17 @@ class ExpenseViewFragment : Fragment() {
         val btnCancel = dialogView.findViewById<TextView>(R.id.tv_cancel_btn)
 
         btnConfirm.setOnClickListener {
-            expenseViewModel.deleteExpense(expenseId!!)
-
-            // 서버에서 삭제 요청 후 바텀시트 UI 업데이트
-            expenseViewModel.deleteResult.observe(viewLifecycleOwner) { isDeleted ->
-                if (isDeleted) {
+            expenseViewModel.deleteExpense(
+                expenseId!!,
+                isSuccess = {
                     botSheetViewModel.removeExpenseFromCategory(expenseId!!) // 바텀시트에서 삭제 반영
                     showToast("지출 내역이 삭제되었습니다.")
                     findNavController().popBackStack(R.id.navigation_home, false)
-                } else {
+                },
+                isFail = {
                     showToast("삭제 실패. 다시 시도해주세요.")
-                }
-            }
+                })
+
             dialog.dismiss()
         }
 
