@@ -88,6 +88,12 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             insets
         }
 
+        categoryViewModel.categories.observe(this) { categories ->
+            val visibleCategories = categories.filter { it.name.lowercase() != "trash" }
+            val categoryCount = visibleCategories.size
+            binding.tvAddCategory.visibility = if (categoryCount >= 1) View.GONE else View.VISIBLE
+        }
+
         initView()
         initViewModel()
         setupAddCategoryClickListener(navHostFragment.navController)
@@ -245,26 +251,27 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     else -> setBotSheetGone()
                 }
             }
+
             navController.addOnDestinationChangedListener { _, destination, _ ->
-                // Trash 제외한 실제 카테고리 개수 확인
                 val visibleCategories = categoryViewModel.categories.value.orEmpty()
-                    .filter { it.name.lowercase() != "trash" } // "trash" 카테고리는 제외
+                    .filter { it.name.lowercase() != "trash" } // trash 제외
+                val categoryCount = visibleCategories.size
 
-                val isCategoryEmpty = visibleCategories.isEmpty()
-
+                // TODO - 최초로 빌드했을 때만 뜸 (카테고리 개수에 상관없이..)
                 when (destination.id) {
                     R.id.categoryAddFragment -> {
                         binding.tvAddCategory.visibility = View.GONE // 카테고리 추가 화면에서는 숨기기
                     }
                     R.id.navigation_home, R.id.navigation_stat -> {
-                        // ✅ Trash 제외하고 카테고리가 하나도 없을 때만 "카테고리 추가" 버튼 보이기
-                        binding.tvAddCategory.visibility = if (isCategoryEmpty) View.VISIBLE else View.GONE
+                        // trash 제외하고 카테고리가 1개 이상이면 버튼 숨기기, 없으면 보이기
+                        binding.tvAddCategory.visibility = if (categoryCount >= 1) View.GONE else View.VISIBLE
                     }
                     else -> {
                         binding.tvAddCategory.visibility = View.GONE // 다른 화면에서는 숨기기
                     }
                 }
             }
+
 
 
             // 바텀네비게이션 뷰 숨김 처리 - 스플래시, 로그인
@@ -440,6 +447,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             putInt("expensePrice", expensePrice)
             putInt("categoryColor", categoryColor)
             putString("categoryName", categoryName)
+            putString("imageUrl", imageUrl.toString())
         }
 
         navController.navigate(R.id.navigation_expense_view, bundle)

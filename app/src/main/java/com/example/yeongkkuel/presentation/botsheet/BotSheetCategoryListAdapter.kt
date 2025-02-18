@@ -173,11 +173,21 @@ class BotSheetCategoryListAdapter(
 
 
     override fun submitList(list: List<BotSheetUiState.Spending>?) {
-        val sortedSpendingList = list?.sortedBy { spending ->
-            if (spending.kind.name == "삭제된 지출") 1 else 0
+        // 실제 노출될 카테고리만 전달 (trash 카테고리는 내역이 없으면 제외)
+        val filteredList = list?.filter { spending ->
+            // trash 카테고리는 내역이 있거나, 아니면 제거
+            if (spending.kind.name.lowercase() == "trash") {
+                spending.history.isNotEmpty()
+            } else {
+                true
+            }
+        }
+        val sortedSpendingList = filteredList?.sortedBy { spending ->
+            if (spending.kind.name.lowercase() == "trash") 1 else 0
         }
         super.submitList(sortedSpendingList)
     }
+
 
 }
 

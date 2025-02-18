@@ -41,6 +41,7 @@ class HomeViewModel(private val repository: HomeRepository) : ViewModel() {
             }
         }
     }
+
     fun fetchYesterdayReward() {
         viewModelScope.launch {
             try {

@@ -209,13 +209,12 @@ class BotSheetViewModel : ViewModel() {
             val updatedSpendingList = prev.spendingList.toMutableList()
 
             val categoryToRemove = updatedSpendingList.find { it.kind.name == categoryName }
-
             if (categoryToRemove != null) {
                 updatedSpendingList.remove(categoryToRemove)
                 val removedExpenses = categoryToRemove.history
 
-                val existingTrashCategory = updatedSpendingList.find { it.kind.name == "trash" }
-
+                // trash 카테고리가 이미 있으면 추가, 없으면 새로 생성
+                val existingTrashCategory = updatedSpendingList.find { it.kind.name.lowercase() == "trash" }
                 if (existingTrashCategory != null) {
                     val newTrashCategory = existingTrashCategory.copy(
                         history = existingTrashCategory.history + removedExpenses
@@ -233,19 +232,18 @@ class BotSheetViewModel : ViewModel() {
                     )
                 }
             }
-            // Trash 카테고리에 지출 내역이 없으면 리스트에서 제거
+            // trash 카테고리 내역이 없으면 제거 (노출하지 않도록)
             val cleanedList = updatedSpendingList.filterNot { spending ->
-                spending.kind.name == "trash" && spending.history.isEmpty()
+                spending.kind.name.lowercase() == "trash" && spending.history.isEmpty()
             }
-
-            // 정렬: Trash 카테고리는 항상 마지막으로 이동
+            // 정렬: trash 카테고리는 항상 마지막
             val sortedList = cleanedList.sortedBy { spending ->
-                if (spending.kind.name == "trash") 1 else 0
+                if (spending.kind.name.lowercase() == "trash") 1 else 0
             }
-
-            prev.copy(spendingList = sortedList) // 최종 업데이트
+            prev.copy(spendingList = sortedList)
         }
     }
+
 
 
     // 일일 목표 지출 가져오기

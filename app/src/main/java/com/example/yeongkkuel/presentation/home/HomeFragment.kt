@@ -44,7 +44,6 @@ import com.example.yeongkkuel.presentation.base.MainActivity
 import com.example.yeongkkuel.presentation.util.dpToPx
 import java.util.Calendar
 
-
 class HomeFragment : Fragment() {
     private lateinit var navController: NavController
     private var _binding: FragmentHomeBinding? = null
@@ -63,7 +62,7 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        botSheetViewModel.getSpendingList()
+//        botSheetViewModel.getSpendingList()
     }
 
     override fun onCreateView(
