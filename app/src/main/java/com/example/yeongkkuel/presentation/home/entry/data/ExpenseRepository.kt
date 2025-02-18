@@ -9,14 +9,18 @@ import okhttp3.RequestBody.Companion.toRequestBody
 
 class ExpenseRepository(private val api: ExpenseApiService) {
 
-    suspend fun createExpense(expenseRequest: ExpenseRequest, imageFile: MultipartBody.Part?): ExpenseResponse? {
+    suspend fun createExpense(
+        expenseRequest: ExpenseRequest,
+        imageFile: MultipartBody.Part?
+    ): ExpenseResponse? {
         Log.d("ExpenseRepository", "🚀 지출 내역 API 요청: $expenseRequest")
 
         return try {
             // ✅ ExpenseRequest를 JSON 문자열로 변환
             val gson = Gson()
             val requestJson = gson.toJson(expenseRequest)
-            val requestBody = requestJson.toRequestBody("application/json".toMediaTypeOrNull()) // ✅ JSON 변환
+            val requestBody =
+                requestJson.toRequestBody("application/json".toMediaTypeOrNull()) // ✅ JSON 변환
 
             val response = api.createExpense(
                 request = requestBody, // ✅ JSON 변환된 request 전달
@@ -37,16 +41,22 @@ class ExpenseRepository(private val api: ExpenseApiService) {
         }
     }
 
-    suspend fun updateExpense(expenseId: Int, request: ExpenseUpdateRequest, imageFile: MultipartBody.Part?): ExpenseUpdateResponse? {
+    suspend fun updateExpense(
+        expenseId: Int,
+        request: ExpenseUpdateRequest,
+        imageFile: MultipartBody.Part?
+    ): ExpenseUpdateResponse? {
         return try {
             Log.d("ExpenseRepository", "🚀 지출 내역 수정 요청: $request")
+            val gson = Gson()
+            val requestJson = gson.toJson(request)
+            val requestBody =
+                requestJson.toRequestBody("application/json".toMediaTypeOrNull()) // ✅ JSON 변환
+
 
             val response = api.updateExpense(
                 expenseId = expenseId,
-                day = request.day.toRequestBody("text/plain".toMediaTypeOrNull()),
-                categoryId = request.categoryId.toString().toRequestBody(),
-                content = request.content.toRequestBody("text/plain".toMediaTypeOrNull()),
-                amount = request.amount.toString().toRequestBody(),
+                request = requestBody,
                 expenseImage = imageFile
             )
 
