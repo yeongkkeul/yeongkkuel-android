@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.presentation.chat
+package com.example.yeongkkuel.presentation.chat.rank
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,6 +14,7 @@ import com.example.yeongkkuel.databinding.FragmentChatRoomRankBinding
 import com.example.yeongkkuel.presentation.base.MainActivity
 import com.example.yeongkkuel.presentation.chat.adapter.ChatRoomRankAdapter
 import com.example.yeongkkuel.network.response.chat.ChatRoomRank
+import com.example.yeongkkuel.presentation.chat.room.ChatGroupViewModel
 import com.example.yeongkkuel.presentation.chat.dialog.ChatRoomProfilePartyDialog
 import com.example.yeongkkuel.presentation.chat.dialog.ChatRoomRankPopup
 import com.example.yeongkkuel.utils.ChatItemDecoration

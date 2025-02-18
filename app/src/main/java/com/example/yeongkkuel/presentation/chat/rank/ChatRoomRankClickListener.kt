@@ -1,4 +1,4 @@
-package com.example.yeongkkuel.presentation.chat
+package com.example.yeongkkuel.presentation.chat.rank
 
 import com.example.yeongkkuel.network.response.chat.ChatRoomRank
 
