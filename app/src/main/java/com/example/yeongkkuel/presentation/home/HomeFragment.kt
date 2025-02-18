@@ -138,7 +138,6 @@ class HomeFragment : Fragment() {
                 Log.e("HomeFragment", "🚨 홈 데이터 수신 실패 또는 응답 없음!")
             }
         }
-        setupSwipeToDismiss(binding.ivError)
 
         Log.d("HomeFragment", "🚀 fetchHomeData() 호출됨!")
 
