@@ -68,7 +68,7 @@ class StoreFragment : Fragment() {
         }
 
         navController = Navigation.findNavController(view)
-        binding.imgGoHome.setOnClickListener {
+        binding.includeTopbar.imgGoHome.setOnClickListener {
             navController.navigate(R.id.action_storeFragment_to_homeFragment)
         }
 
