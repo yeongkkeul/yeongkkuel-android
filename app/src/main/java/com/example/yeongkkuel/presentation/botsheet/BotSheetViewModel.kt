@@ -11,7 +11,6 @@ import com.example.yeongkkuel.network.response.Response
 import com.example.yeongkkuel.network.response.expenditure.DayExpenditureResponse
 import com.example.yeongkkuel.presentation.auth.TokenManager
 import com.example.yeongkkuel.presentation.home.category.data.Category
-import com.example.yeongkkuel.presentation.home.entry.data.ExpenseListResponse
 import com.example.yeongkkuel.presentation.util.Colors
 import com.example.yeongkkuel.presentation.util.SpendingCategory
 import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.reflect.TypeToken
@@ -103,7 +102,7 @@ class BotSheetViewModel : ViewModel() {
                         categoryId = history.id,
                         kind = category,
                         color = prev.spendingList.find { it.kind == category }?.color
-                            ?: Colors.BLACK1,
+                            ?: Colors.RED1,
                         plusIconResId = R.drawable.ic_plus_default,
                         history = listOf(history)
                     )
@@ -157,33 +156,6 @@ class BotSheetViewModel : ViewModel() {
         )
     }
 
-
-    fun updateBotSheetData(response: ExpenseListResponse) {
-        _uiState.update { prevState ->
-            val updatedSpendingList = response.result.map { expense ->
-                Log.d(
-                    "BotSheetViewModel",
-                    "🚀 updateBotSheetData(): expenseId=${expense.id}, category=${expense.content}"
-                )
-
-                BotSheetUiState.Spending(
-                    categoryId = expense.id,
-                    kind = SpendingCategory.fromName(expense.content),
-                    color = Colors.RED1, // 서버에서 색상을 제공하는 경우 수정 필요
-                    plusIconResId = R.drawable.ic_plus_default,
-                    history = listOf(
-                        BotSheetUiState.Spending.History(
-                            id = expense.id,
-                            name = expense.content,
-                            price = expense.amount,
-                            imgExist = expense.imageUrl?.isNotEmpty() ?: false // ✅ 안전한 처리
-                        )
-                    )
-                )
-            }
-            prevState.copy(spendingList = updatedSpendingList)
-        }
-    }
 
     private fun updateSpendingHistoryList() {
         val historyList = _uiState.value.spendingList.flatMap { it.history }
@@ -424,4 +396,61 @@ class BotSheetViewModel : ViewModel() {
         _spendingHistoryList.value = _spendingHistoryList.value + history
     }
 
+    // 지출 내역 수정 페이지 - 날짜 수정시 그 날 카테고리에서 제거함
+    fun removeExpenseFromCategory(expenseId: Int) {
+        _uiState.update { prevState ->
+            val updatedSpendingList = prevState.spendingList.map { category ->
+                category.copy(
+                    history = category.history.filter { it.id != expenseId }
+                )
+            }
+            prevState.copy(spendingList = updatedSpendingList)
+        }
+
+        updateSpendingHistoryList() // ✅ 바텀시트 UI 즉시 반영
+    }
+
+    fun moveExpenseToNewDate(expense: BotSheetUiState.Spending.History, newDate: String) {
+        _uiState.update { prevState ->
+            val oldSpendingList = prevState.spendingList.toMutableList()
+
+            // ✅ 기존 날짜에서 해당 내역 제거 (새로운 리스트 생성)
+            val updatedSpendingList = prevState.spendingList.toMutableList()
+
+            // ✅ 기존 날짜에서 해당 내역 제거
+            updatedSpendingList.forEachIndexed { index, spending ->
+                if (spending.history.any { it.id == expense.id }) {
+                    val newHistory = spending.history.filterNot { it.id == expense.id }
+                    updatedSpendingList[index] = spending.copy(history = newHistory)
+                }
+            }
+
+            // ✅ 새로운 날짜의 Spending을 찾아서 추가 (없으면 새로 생성)
+            val targetSpendingIndex = updatedSpendingList.indexOfFirst { it.kind.name == "기타" }
+            val updatedHistory = expense.copy() // ✅ 기존 데이터 유지한 채 새로운 내역 추가
+
+            if (targetSpendingIndex != -1) {
+                // ✅ 기존 카테고리에 추가 (copy()로 새로운 객체 생성)
+                val updatedSpending = updatedSpendingList[targetSpendingIndex].copy(
+                    history = updatedSpendingList[targetSpendingIndex].history + updatedHistory
+                )
+                updatedSpendingList[targetSpendingIndex] = updatedSpending
+            } else {
+                // ✅ 새로운 카테고리 생성 후 추가
+                updatedSpendingList.add(
+                    BotSheetUiState.Spending(
+                        categoryId = -1, // 기본값
+                        kind = SpendingCategory.fromName("기타"),
+                        color = Colors.RED1,
+                        plusIconResId = R.drawable.ic_plus_default,
+                        history = listOf(updatedHistory)
+                    )
+                )
+            }
+
+            prevState.copy(spendingList = updatedSpendingList)
+        }
+
+        updateSpendingHistoryList() // ✅ 최신 데이터 반영
+    }
 }

@@ -431,12 +431,14 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         navController.navigate(R.id.expenseEntryFragment, bundle)
     }
 
+
     override fun navigateToExpenseView(
         expenseId: Int,
         expenseName: String,
         expensePrice: Int,
         categoryColor: Int,
-        categoryName: String
+        categoryName: String,
+        imageUrl: Boolean
     ) {
         Log.d(
             "MainActivity",

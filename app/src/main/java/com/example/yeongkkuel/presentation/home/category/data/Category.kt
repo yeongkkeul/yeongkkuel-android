@@ -14,7 +14,7 @@ fun CategoryResponse.toCategory(): Category {
     return Category(
         id = this.id,
         name = this.name,
-        color = Colors.fromRGB(this.red, this.green, this.blue) ?: Colors.BLACK1 // ✅ RGB 값을 기반으로 Colors 변환
+        color = Colors.fromRGB(this.red, this.green, this.blue) ?: Colors.RED1 // ✅ RGB 값을 기반으로 Colors 변환
     )
 }
 

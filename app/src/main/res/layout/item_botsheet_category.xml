@@ -10,6 +10,7 @@
     android:background="@drawable/bg_box_white">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_bot_category"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_box_white"
@@ -18,7 +19,8 @@
         android:paddingTop="@dimen/space_median"
         android:paddingBottom="@dimen/space_small"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible">
 
         <TextView
             android:id="@+id/tv_category"
@@ -28,7 +30,8 @@
             android:textColor="@color/blue"
             style="@style/body_semibo"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:visibility="visible"/>
 
         <TextView
             android:id="@+id/tv_no_spend"
@@ -49,7 +52,9 @@
             android:src="@drawable/ic_plus_blue"
             app:layout_constraintBottom_toBottomOf="@id/tv_category"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tv_category" />
+            app:layout_constraintTop_toTopOf="@id/tv_category"
+            android:visibility="visible" />
+
         <ImageView
             android:id="@+id/iv_plus"
             android:layout_width="wrap_content"
@@ -58,8 +63,8 @@
             android:layout_marginEnd="5.5dp"
             app:layout_constraintBottom_toBottomOf="@id/tv_category"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tv_category" />
-
+            app:layout_constraintTop_toTopOf="@id/tv_category"
+            android:visibility="visible" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_history"
@@ -69,7 +74,15 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_category"
             tools:itemCount="3"
-            tools:listitem="@layout/item_botsheet_history" />
+            tools:listitem="@layout/item_botsheet_history"
+            android:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+<!--    <View-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="8dp"-->
+<!--        android:background="@android:color/transparent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/cl_bot_category"/>-->
+
 </androidx.constraintlayout.widget.ConstraintLayout>
