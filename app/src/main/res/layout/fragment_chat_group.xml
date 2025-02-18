@@ -7,7 +7,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.example.yeongkkuel.presentation.chat.ChatGroupViewModel" />
+            type="com.example.yeongkkuel.presentation.chat.room.ChatGroupViewModel" />
     </data>
 
     <androidx.drawerlayout.widget.DrawerLayout
@@ -126,7 +126,7 @@
                     android:id="@+id/tv_amount_people_chat_group"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="10"
+                    android:text="1"
                     android:textColor="@color/main1"
                     style="@style/body_semibo"
                     android:layout_marginStart="6dp"
@@ -187,6 +187,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
+                    android:id="@+id/tv_created_at"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="12.29"
@@ -231,7 +232,7 @@
                     android:id="@+id/tv_data_goal_success_challenger"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="13/35 명"
+                    android:text="1/1 명"
                     android:textColor="@color/main1"
                     style="@style/body_medium"
                     android:layout_marginEnd="48dp"
@@ -242,7 +243,7 @@
                     android:id="@+id/tv_data_expense_average"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="9,213 원"
+                    android:text="0 원"
                     android:textColor="@color/main1"
                     style="@style/body_medium"
                     app:layout_constraintEnd_toEndOf="@+id/tv_data_goal_success_challenger"
@@ -252,7 +253,7 @@
                     android:id="@+id/tv_data_rank_group_age"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="상위 4%"
+                    android:text="상위 100%"
                     android:textColor="@color/main1"
                     style="@style/body_medium"
                     app:layout_constraintEnd_toEndOf="@+id/tv_data_goal_success_challenger"

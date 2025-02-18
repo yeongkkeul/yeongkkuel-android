@@ -3,14 +3,21 @@ package com.example.yeongkkuel.network.service
 import com.example.yeongkkuel.network.request.chat.ChatPwValidateRequest
 import com.example.yeongkkuel.network.request.chat.ChatsRequest
 import com.example.yeongkkuel.network.response.Response
+import com.example.yeongkkuel.network.response.chat.ChatBannerResult
 import com.example.yeongkkuel.network.response.chat.ChatDetailResult
 import com.example.yeongkkuel.network.response.chat.ChatMessageResponse
 import com.example.yeongkkuel.network.response.chat.ChatRoomInfoResult
 import com.example.yeongkkuel.network.response.chat.ChatSearchResult
 import com.example.yeongkkuel.network.response.chat.ReceiptResult
+import com.example.yeongkkuel.network.response.chat.ChatRoomRankResponse
+import com.example.yeongkkuel.network.response.chat.ChatRoomUserResult
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -20,9 +27,11 @@ interface ChatService {
     suspend fun getChatList(): Response<List<ChatRoomInfoResult>>
 
     // 채팅방 만들기
+    @Multipart
     @POST("/api/chats")
     suspend fun postChat(
-        @Body request: ChatsRequest
+        @Part("chatRoomInfo") chatRoomInfo: RequestBody, // ChatsRequest 객체의 JSON 문자열
+        @Part chatRoomImage: MultipartBody.Part? // 선택한 이미지 (없으면 null)
     ): Response<Int> // 생성한 채팅방의 ID -> 클라이언트 로직에 따라 클라이언트 정보를 응답할 수도 있습니다.
 
     // 채팅방 패스워드 확인
@@ -76,13 +85,19 @@ interface ChatService {
         @Path("chatRoomId") chatRoomId:Int
     ): Response<ChatDetailResult>
 
+    // 채팅방 배너 조회
+    @GET("/api/chats/{chatRoomId}/banner")
+    suspend fun getChatroomBanner(
+        @Path("chatRoomId") chatRoomId:Int
+    ): Response<ChatBannerResult>
+
     // 채팅방 검색
     // 키워드에 맞는 모든 채팅방을 페이징 단위로 조회
     @GET("/api/chats/search")
     suspend fun getChatroomSearch(
         @Query("keyword") keyword:String,
         @Query("page") page:Int
-    ): ChatSearchResult // swagger에 공통 Response 형식으로 감싸져 있지 않아 있습니다.
+    ): ChatSearchResult
 
     // 영수증 조회
     @GET("api/chats/receipts/{expenseId}")
@@ -91,13 +106,25 @@ interface ChatService {
     ): Response<ReceiptResult>
 
     // 채팅방 둘러보기
-    @GET("/api/chats/expore") // swagger에 expord이라 나와있는거 맞습니다.
+    @GET("/api/chats/explore")
     suspend fun getChatroomExplore(
-        @Query("age") age:String,
-        @Query("minAmount") minAmount: Int,
-        @Query("maxAmount") maxAmount:Int,
-        @Query("job") job :String,
-        @Query("page") page:Int,
-    ): Response<List<ChatSearchResult.PublicChatRoomDetailDto>>
+        @Query("age") age:String? = null,
+        @Query("minAmount") minAmount: Int? = null,
+        @Query("maxAmount") maxAmount:Int? = null,
+        @Query("job") job :String? = null,
+        @Query("page") page:Int
+    ): ChatSearchResult
 
+    // 채팅방 랭킹 조회
+    @GET("/api/chats/{chatRoomId}/ranks")
+    suspend fun getChatroomRanks(
+        @Path("chatRoomId") chatRoomId:Int
+    ): Response<ChatRoomRankResponse>
+
+    // 채팅방 사용자 프로필 조회
+    @GET("/api/chats/{chatRoomId}/user/{userId}")
+    suspend fun getChatroomUser(
+        @Path("chatRoomId") chatRoomId:Int,
+        @Path("userId") userId:Int
+    ): Response<ChatRoomUserResult>
 }
