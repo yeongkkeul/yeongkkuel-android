@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import java.time.LocalDate
 import java.util.Calendar
 
 
@@ -304,12 +305,16 @@ class BotSheetViewModel : ViewModel() {
     // 매개변수를 받는 기존 함수
     // 월별 지출 내역 가져오기
     fun getSpendingList(year: Int, month: Int, day: Int) = viewModelScope.launch {
-        val categoryList = TokenManager.getCategoryOrder()
+        val currentDate = LocalDate.now()
+        val inputDate = LocalDate.of(year, month, day)
+        if (inputDate.isAfter(currentDate)) return@launch
+
         try {
             // yeongkkuelService를 통해 데이터 요청
             statService.getExpendituresMonthCategory(year, month, day).run {
                 if (isSuccess) {
                     result.run {
+                        val categoryList = TokenManager.getCategoryOrder()
                         val categories = categories.map { category ->
                             Category(
                                 id = category.categoryId,
