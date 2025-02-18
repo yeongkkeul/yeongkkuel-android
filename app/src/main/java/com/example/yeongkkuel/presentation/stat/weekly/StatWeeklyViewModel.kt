@@ -57,9 +57,7 @@ class StatWeeklyViewModel : ViewModel() {
             yeongkkuelService.getExpendituresWeekAverage().run {
                 if (isSuccess) {
                     result.run {
-                        val categoryList = TokenManager.getCategoryOrder()
-
-                        val categories = categories.map {
+                        val sortedCategories = categories.map {
                             StatWeeklyUiState.PieChartData(
                                 categoryId = it.categoryId,
                                 category = SpendingCategory.fromName(it.categoryName),
@@ -71,6 +69,10 @@ class StatWeeklyViewModel : ViewModel() {
                                 )
                             )
                         }.sortedByDescending { it.expenditure }
+
+                        val (trashCategories, otherCategories) = sortedCategories.partition { it.color == Colors.TRASH }
+
+                        val finalCategories = otherCategories + trashCategories
 
                         _uiState.update { prev ->
                             prev.copy(
@@ -97,7 +99,7 @@ class StatWeeklyViewModel : ViewModel() {
                                         )
                                     )
                                 },
-                                pieChartList = categories
+                                pieChartList = finalCategories
                             )
                         }
                     }

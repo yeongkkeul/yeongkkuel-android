@@ -339,7 +339,7 @@ class BotSheetViewModel : ViewModel() {
                                     red = category.red,
                                     blue = category.blue,
                                     green = category.green
-                                ) ?: Colors.RED1
+                                )
                             )
                         }
 
@@ -351,7 +351,9 @@ class BotSheetViewModel : ViewModel() {
                         // categoryList에 없는 category들을 뒤에 추가
                         val remainingCategories = categories.filter { it.id !in categoryList }
 
-                        val finalCategories = sortedCategories + remainingCategories
+                        val (trashCategories, otherCategories) = remainingCategories.partition { it.color == Colors.TRASH }
+
+                        val finalCategories = sortedCategories + otherCategories + trashCategories
 
                         _uiState.update { prev ->
                             val updatedSpendingList = finalCategories.map { category ->
