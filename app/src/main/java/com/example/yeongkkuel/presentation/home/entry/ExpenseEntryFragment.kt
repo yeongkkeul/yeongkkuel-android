@@ -300,7 +300,7 @@ class ExpenseEntryFragment : Fragment() {
             expenseViewModel.createExpense(expenseRequest, imagePart) { response ->
                 if (response?.isSuccess == true) {
                     Toast.makeText(requireContext(), "지출 내역이 저장되었습니다.", Toast.LENGTH_SHORT).show()
-                    handleNavigationAfterSave(view)
+                    //handleNavigationAfterSave(view)
                 } else {
                     Toast.makeText(requireContext(), "지출 내역 저장 실패.", Toast.LENGTH_SHORT).show()
                 }
