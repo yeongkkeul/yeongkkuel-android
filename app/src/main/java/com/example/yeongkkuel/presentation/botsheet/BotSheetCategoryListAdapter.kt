@@ -81,7 +81,6 @@ class BotSheetCategoryListAdapter(
             ivBtnAdd.setImageResource(R.drawable.ic_plus_default)
             ivBtnAdd.imageTintList =
                 ColorStateList.valueOf(ContextCompat.getColor(context, categoryColor))
-
         }
 
 

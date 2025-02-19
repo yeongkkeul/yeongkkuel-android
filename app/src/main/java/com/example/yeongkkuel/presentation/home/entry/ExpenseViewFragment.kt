@@ -78,6 +78,8 @@ class ExpenseViewFragment : Fragment() {
             binding.clMore.visibility = View.GONE
         }
 
+        val fromTab = arguments?.getString("fromTab") ?: "home"
+
 
 //        // 무지출이면 `ic_more` 버튼 숨기기
 //        if (expensePrice == 0) {

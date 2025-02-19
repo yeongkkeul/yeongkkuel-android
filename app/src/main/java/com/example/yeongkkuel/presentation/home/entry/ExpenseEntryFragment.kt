@@ -30,6 +30,7 @@ import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import com.example.yeongkkuel.presentation.home.entry.data.*
+import com.example.yeongkkuel.presentation.stat.StatFragment
 import com.example.yeongkkuel.presentation.util.SpendingCategory
 import com.example.yeongkkuel.presentation.util.dpToPx
 import kotlinx.coroutines.launch
@@ -379,11 +380,38 @@ class ExpenseEntryFragment : Fragment() {
 
     private fun navigateAfterSavingExpense() {
         val fromTab = arguments?.getString("fromTab") ?: "home" // ✅ 기본값은 홈 탭
+        val tvDateInput = view?.findViewById<TextView>(R.id.tv_date_input)
 
-        when (fromTab) {
-            "home" -> navController.navigate(R.id.navigation_home) // ✅ 홈 탭으로 이동
-            "stat" -> navController.navigate(R.id.navigation_stat) // ✅ 지출 탭으로 이동
-            else -> navController.navigate(R.id.navigation_home) // ✅ 혹시나 값이 이상하면 홈 탭으로 이동
+        val selectedDateText = tvDateInput?.text.toString()
+        val today = Calendar.getInstance()
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.KOREAN)
+
+        val selectedDate = try {
+            dateFormat.parse(formatDateForServer(selectedDateText))
+        } catch (e: Exception) {
+            null
+        }
+
+        if (dateFormat.format(selectedDate) != dateFormat.format(today.time)) {
+            // ✅ 날짜가 다르면 지출 탭의 월간 탭으로 이동!
+            Log.d("ExpenseEntryFragment", "📌 날짜 다름 → 지출 탭 (월간 탭) 이동!")
+
+            val bundle = Bundle().apply {
+                putInt("selected_tab_index", 2) // ✅ 월간 탭의 인덱스 2
+            }
+            navController.navigate(R.id.navigation_stat, bundle) // ✅ 지출 탭 이동
+
+            val statFragment = parentFragmentManager.findFragmentById(R.id.fragment_container) as? StatFragment
+            statFragment?.moveToMonthlyTab()
+
+        } else {
+            // ✅ 기존 로직 유지 (홈 or 지출 탭으로 이동)
+            Log.d("ExpenseEntryFragment", "📌 날짜 같음 → 기존 탭으로 이동! (fromTab: $fromTab)")
+            when (fromTab) {
+                "home" -> navController.navigate(R.id.navigation_home)
+                "stat" -> navController.navigate(R.id.navigation_stat)
+                else -> navController.navigate(R.id.navigation_home)
+            }
         }
 
         // ✅ 바텀시트 높이를 원래대로 복귀
@@ -392,38 +420,6 @@ class ExpenseEntryFragment : Fragment() {
         botSheetListener?.setPeekHeight(peekHeight)
     }
 
-
-
-//    private fun handleNavigationAfterSave(view: View) {
-//        val tvDateInput = view.findViewById<TextView>(R.id.tv_date_input)
-//
-//        val selectedDateText = tvDateInput.text.toString()
-//        val today = Calendar.getInstance()
-//        val dateFormat = SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREAN)
-//
-//        val selectedDate = try {
-//            dateFormat.parse(selectedDateText.substring(0, 13))
-//        } catch (e: Exception) {
-//            null
-//        }
-//
-//        if (selectedDate != null && dateFormat.format(selectedDate) != dateFormat.format(today.time)) {
-//            // Bundle 생성 및 데이터 추가
-//            val bundle = Bundle().apply {
-//                putInt("selected_tab_index", 2) // 월간 탭(인덱스 2) 지정
-//            }
-//
-//            // StatFragment로 이동하며 Bundle 전달
-//            navController.navigate(R.id.action_expenseEntryFragment_to_navigation_stat, bundle)
-//
-//            val displayHeight = resources.displayMetrics.heightPixels
-//            val peekHeight =
-//                (displayHeight - 528.dpToPx(requireContext()))
-//            botSheetListener?.setPeekHeight(peekHeight)
-//        } else {
-//            navController.navigate(R.id.navigation_home)
-//        }
-//    }
 
     private fun getDayOfWeek(year: Int, month: Int, day: Int): String {
         val calendar = Calendar.getInstance()
