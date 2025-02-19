@@ -45,6 +45,7 @@
         android:layout_marginBottom="28dp"
         android:background="@drawable/rounded_nickname_background"
         android:hint="6자리 추천인 코드를 입력하세요."
+        android:maxLength="6"
         android:inputType="text"
         android:padding="12dp"
         android:textSize="14sp" />

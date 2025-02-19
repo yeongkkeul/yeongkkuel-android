@@ -157,6 +157,11 @@ class MyFragment : Fragment() {
             findNavController().navigate(R.id.action_myFragment_to_navigation_my_edit)
         }
 
+        binding.tvTerms.setOnClickListener {
+            // MyPage -> ServiceTermFragment 로 이동
+            findNavController().navigate(R.id.action_myFragment_to_serviceTermFragment)
+        }
+
         // 2. 하루목표 지출액 '수정'
         binding.tvDailyEdit.setOnClickListener {
             // MyPage -> DailyGoalEditFragment (가정)
@@ -601,8 +606,8 @@ class MyFragment : Fragment() {
             "EMPLOYEE" -> "직장인"
             "SELF_EMPLOYED" -> "자영업자"
             "HOMEMAKER" -> "주부"
-            "UNDECIDED" -> "무직"
-            else -> "무직"  // 알 수 없는 경우 원본 문자열 그대로 사용
+            "UNDECIDED" -> ""
+            else -> ""  // 알 수 없는 경우 원본 문자열 그대로 사용
         }
     }
 
@@ -614,7 +619,7 @@ class MyFragment : Fragment() {
             "FORTIES" -> "40대"
             "FIFTIES" -> "50대"
             "SIXTIES_AND_ABOVE" -> "60대"
-            else -> " 대"  // 알 수 없는 경우 원본 문자열 그대로 사용
+            else -> ""  // 알 수 없는 경우 원본 문자열 그대로 사용
         }
     }
 

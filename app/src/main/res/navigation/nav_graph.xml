@@ -66,9 +66,6 @@
         <action
         android:id="@+id/action_expenseEntryFragment_to_navigation_home"
         app:destination="@id/navigation_home" />
-        <action
-            android:id="@+id/action_expenseEntryFragment_to_navigation_stat"
-            app:destination="@id/navigation_stat" />
     </fragment>
 
     <fragment
@@ -313,7 +310,17 @@
             app:destination="@id/navigation_login"
             app:popUpTo="@id/navigation_my"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_myFragment_to_serviceTermFragment"
+            app:destination="@id/navigation_service_term" />
     </fragment>
+
+    <fragment
+        android:id="@+id/navigation_service_term"
+        android:name="com.example.yeongkkuel.presentation.my.ServiceTermFragment"
+        android:label="fragment_service_term"
+        tools:layout="@layout/fragment_service_term"/>
+
 
 
 

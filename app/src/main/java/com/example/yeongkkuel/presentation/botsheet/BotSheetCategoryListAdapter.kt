@@ -2,6 +2,7 @@ package com.example.yeongkkuel.presentation.botsheet
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.ItemBotsheetCategoryBinding
 import android.view.View
+import com.example.yeongkkuel.presentation.base.MainActivity
 import com.example.yeongkkuel.presentation.util.dpToPx
 
 
@@ -27,6 +29,13 @@ class BotSheetCategoryListAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun onBind(item: BotSheetUiState.Spending) = with(binding) {
+            val currentTab = (root.context as? MainActivity)?.getCurrentTab() ?: "home" // 기본값 home
+
+            ivBtnAdd.setOnClickListener {
+                // 지출 기입 페이지로 이동하면서 데이터 전달
+                botSheetListener.navigateToExpenseEntryWithTab(currentTab, item.kind.name, item.color.id)
+            }
+
             // 카테고리 색상 가져오기
             val categoryColor = item.color.id
 
@@ -72,11 +81,6 @@ class BotSheetCategoryListAdapter(
             ivBtnAdd.setImageResource(R.drawable.ic_plus_default)
             ivBtnAdd.imageTintList =
                 ColorStateList.valueOf(ContextCompat.getColor(context, categoryColor))
-
-            // 카테고리 추가 버튼 클릭 리스너
-            ivBtnAdd.setOnClickListener {
-                botSheetListener.navigateToExpenseEntry(item.kind.name, categoryColor)
-            }
         }
 
 
@@ -185,7 +189,9 @@ class BotSheetCategoryListAdapter(
         val sortedSpendingList = filteredList?.sortedBy { spending ->
             if (spending.kind.name.lowercase() == "trash") 1 else 0
         }
-        super.submitList(sortedSpendingList)
+        super.submitList(sortedSpendingList){
+            notifyDataSetChanged()
+        }
     }
 
 
