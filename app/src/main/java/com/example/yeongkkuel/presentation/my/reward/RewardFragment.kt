@@ -53,47 +53,7 @@ class RewardFragment : Fragment() {
         fetchRewardsFromServer()
 
 
-
-        /*// 구분선 적용
-        fun dpToPx(dp: Int): Int =
-            (dp * resources.displayMetrics.density).toInt()
-
-        val decoration = SectionDividerItemDecoration(
-            adapter = adapter,
-            dividerHeight = dpToPx(12).toFloat(),
-            dividerColor = ContextCompat.getColor(requireContext(), R.color.black0),
-            gapBetweenItemAndDivider = dpToPx(24),
-            gapBetweenHeaderAndDivider = dpToPx(24)
-        )
-        binding.rvNotification.addItemDecoration(decoration)*/
-
     }
-
-    /*private fun navigateToFragment(type: RewardType) {
-        // 예시로 Navigation Component를 사용했다고 가정
-        when (type) {
-            NotificationType.CHALLENGE_JOIN -> {
-                // 챌린지 방 가입 -> 나의 챌린지 그룹 화면으로 이동
-                findNavController().navigate(R.id.action_notificationFragment_to_myChallengeGroupFragment)
-            }
-            NotificationType.RANKING_REWARD -> {
-                // 랭킹 리워드 지급 -> 나의 리워드 화면으로 이동
-                findNavController().navigate(R.id.action_notificationFragment_to_myRewardFragment)
-            }
-            NotificationType.NO_SPEND_REWARD -> {
-                // 무지출 리워드 지급 -> 나의 리워드 화면
-                findNavController().navigate(R.id.action_notificationFragment_to_myRewardFragment)
-            }
-            NotificationType.DAILY_EXCEED -> {
-                // 하루 지출 목표액 초과 -> 지출/일지 화면
-                findNavController().navigate(R.id.action_notificationFragment_to_spendDiaryFragment)
-            }
-            NotificationType.CHALLENGE_RANKING_UPDATE -> {
-                // mm월 dd일 챌린지 그룹 랭킹 업데이트 -> 나의 챌린지 그룹 화면
-                findNavController().navigate(R.id.action_notificationFragment_to_myChallengeGroupFragment)
-            }
-        }
-    }*/
 
     private fun fetchRewardsFromServer() {
         viewLifecycleOwner.lifecycleScope.launch {
