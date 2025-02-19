@@ -48,6 +48,8 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
 
     private var rvBottomSheetCollapseStateHeight: Int = 0
 
+    private var currentTab: String = "home" // 기본값을 홈으로 설정
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // 스플래시 화면 설정
         val splashScreen = this.installSplashScreen()
@@ -116,6 +118,14 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     fun resetBottomSheetState() {
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.clItemBotSheet)
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+
+    fun setCurrentTab(tab: String) {
+        currentTab = tab
+    }
+
+    fun getCurrentTab(): String {
+        return currentTab
     }
 
     private fun initView() = with(binding) {
@@ -218,6 +228,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             binding.bottomNavi.setOnItemSelectedListener { item ->
                 when (item.itemId) {
                     R.id.navigation_home -> {
+                        setCurrentTab("home")
                         navController.navigate(R.id.navigation_home)
                         true
                     }
@@ -228,6 +239,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     }
 
                     R.id.navigation_stat -> {
+                        setCurrentTab("stat")
                         navController.navigate(R.id.navigation_stat)
                         true
                     }
@@ -415,22 +427,19 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
 
-    override fun navigateToExpenseEntry(selectedCategory: String, categoryColor: Int) {
-        // NavController를 이용해 지출 기입 페이지로 이동
+    override fun navigateToExpenseEntryWithTab(fromTab: String, selectedCategory: String, categoryColor: Int) {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         val navController = navHostFragment.navController
 
-        // 번들에 데이터를 담아 지출 기입 페이지로 전달
         val bundle = Bundle().apply {
+            putString("fromTab", fromTab)
             putString("selectedCategory", selectedCategory)
             putInt("categoryColor", categoryColor)
         }
 
-        // 지출 기입 페이지로 이동하면서 데이터 전달
         navController.navigate(R.id.expenseEntryFragment, bundle)
     }
-
 
     override fun navigateToExpenseView(
         expenseId: Int,

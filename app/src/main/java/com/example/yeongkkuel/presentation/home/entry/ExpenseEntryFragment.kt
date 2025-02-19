@@ -300,7 +300,7 @@ class ExpenseEntryFragment : Fragment() {
             expenseViewModel.createExpense(expenseRequest, imagePart) { response ->
                 if (response?.isSuccess == true) {
                     Toast.makeText(requireContext(), "지출 내역이 저장되었습니다.", Toast.LENGTH_SHORT).show()
-                    //handleNavigationAfterSave(view)
+                    navigateAfterSavingExpense()
                 } else {
                     Toast.makeText(requireContext(), "지출 내역 저장 실패.", Toast.LENGTH_SHORT).show()
                 }
@@ -377,36 +377,53 @@ class ExpenseEntryFragment : Fragment() {
 
     }
 
-    private fun handleNavigationAfterSave(view: View) {
-        val tvDateInput = view.findViewById<TextView>(R.id.tv_date_input)
+    private fun navigateAfterSavingExpense() {
+        val fromTab = arguments?.getString("fromTab") ?: "home" // ✅ 기본값은 홈 탭
 
-        val selectedDateText = tvDateInput.text.toString()
-        val today = Calendar.getInstance()
-        val dateFormat = SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREAN)
-
-        val selectedDate = try {
-            dateFormat.parse(selectedDateText.substring(0, 13))
-        } catch (e: Exception) {
-            null
+        when (fromTab) {
+            "home" -> navController.navigate(R.id.navigation_home) // ✅ 홈 탭으로 이동
+            "stat" -> navController.navigate(R.id.navigation_stat) // ✅ 지출 탭으로 이동
+            else -> navController.navigate(R.id.navigation_home) // ✅ 혹시나 값이 이상하면 홈 탭으로 이동
         }
 
-        if (selectedDate != null && dateFormat.format(selectedDate) != dateFormat.format(today.time)) {
-            // Bundle 생성 및 데이터 추가
-            val bundle = Bundle().apply {
-                putInt("selected_tab_index", 2) // 월간 탭(인덱스 2) 지정
-            }
-
-            // StatFragment로 이동하며 Bundle 전달
-            navController.navigate(R.id.action_expenseEntryFragment_to_navigation_stat, bundle)
-
-            val displayHeight = resources.displayMetrics.heightPixels
-            val peekHeight =
-                (displayHeight - 528.dpToPx(requireContext()))
-            botSheetListener?.setPeekHeight(peekHeight)
-        } else {
-            navController.navigate(R.id.navigation_home)
-        }
+        // ✅ 바텀시트 높이를 원래대로 복귀
+        val displayHeight = resources.displayMetrics.heightPixels
+        val peekHeight = (displayHeight - 528.dpToPx(requireContext()))
+        botSheetListener?.setPeekHeight(peekHeight)
     }
+
+
+
+//    private fun handleNavigationAfterSave(view: View) {
+//        val tvDateInput = view.findViewById<TextView>(R.id.tv_date_input)
+//
+//        val selectedDateText = tvDateInput.text.toString()
+//        val today = Calendar.getInstance()
+//        val dateFormat = SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREAN)
+//
+//        val selectedDate = try {
+//            dateFormat.parse(selectedDateText.substring(0, 13))
+//        } catch (e: Exception) {
+//            null
+//        }
+//
+//        if (selectedDate != null && dateFormat.format(selectedDate) != dateFormat.format(today.time)) {
+//            // Bundle 생성 및 데이터 추가
+//            val bundle = Bundle().apply {
+//                putInt("selected_tab_index", 2) // 월간 탭(인덱스 2) 지정
+//            }
+//
+//            // StatFragment로 이동하며 Bundle 전달
+//            navController.navigate(R.id.action_expenseEntryFragment_to_navigation_stat, bundle)
+//
+//            val displayHeight = resources.displayMetrics.heightPixels
+//            val peekHeight =
+//                (displayHeight - 528.dpToPx(requireContext()))
+//            botSheetListener?.setPeekHeight(peekHeight)
+//        } else {
+//            navController.navigate(R.id.navigation_home)
+//        }
+//    }
 
     private fun getDayOfWeek(year: Int, month: Int, day: Int): String {
         val calendar = Calendar.getInstance()
