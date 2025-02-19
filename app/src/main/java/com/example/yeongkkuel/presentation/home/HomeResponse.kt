@@ -26,7 +26,7 @@ data class CategoryResponse(
 data class MySkin(
     val itemName: String,
     val itemType: String,
-    val imgUrl: String
+    val imgUrl: String?
 )
 
 data class Category(
@@ -40,7 +40,7 @@ data class Expense(
     val content: String,
     val amount: Int,
     val imgExist: Boolean,
-    val imgUrl: String
+    val imgUrl: String?
 )
 
 fun CategoryResponse.toCategory(categoryViewModel: CategoryViewModel): Category {

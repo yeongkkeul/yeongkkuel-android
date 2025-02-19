@@ -72,4 +72,24 @@ class StoreRepository {
         }
     }
 
+    suspend fun equipSkin(requestBody: Map<String, List<Map<String, Int>>>): SkinEquipResponse? {
+        return try {
+            val response = api.saveEquippedSkins(SkinEquipRequest(userItem = requestBody["userItem"]?.map {
+                SkinEquipItem(it["purchaseId"] ?: 0)
+            } ?: emptyList()))
+
+            if (response.isSuccessful) {
+                Log.d("StoreRepository", "스킨 착용 성공: ${response.body()}")
+                response.body()
+            } else {
+                Log.e("StoreRepository", "스킨 착용 실패: ${response.errorBody()?.string()}")
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("StoreRepository", "스킨 착용 중 오류 발생: ${e.message}")
+            null
+        }
+    }
+
+
 }

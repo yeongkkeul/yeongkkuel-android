@@ -2,6 +2,7 @@ package com.example.yeongkkuel.presentation.home
 
 import android.util.Log
 import com.example.yeongkkuel.network.RetrofitClient
+import com.example.yeongkkuel.presentation.home.store.data.ShopResponse
 import com.example.yeongkkuel.presentation.home.store.data.SkinEquipItem
 import com.example.yeongkkuel.presentation.home.store.data.SkinEquipRequest
 import com.example.yeongkkuel.presentation.home.store.data.SkinEquipResponse
@@ -16,6 +17,23 @@ class HomeRepository {
     private var isFetching = false // API 중복 요청 방지
     private var isFetchingReward = false // 리워드 API 중복 요청 방지
 
+    suspend fun getShopData(itemType: String): ShopResponse? {
+        return try {
+            Log.d("HomeRepository", "🛒 API 요청: itemType = $itemType") // API 요청 로그 추가
+            val response = api2.getShopData(itemType)
+
+            if (response.isSuccessful) {
+                Log.d("HomeRepository", "✅ API 응답 성공: ${response.body()}") // 응답 성공 로그
+                response.body()
+            } else {
+                Log.e("HomeRepository", "❌ API 응답 실패: ${response.errorBody()?.string()}") // 응답 실패 로그
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("HomeRepository", "❌ API 요청 중 오류 발생: ${e.message}") // 예외 발생 로그
+            null
+        }
+    }
     suspend fun getHomeData(): HomeResult? {
         isFetching = false // 중복 요청 방지 해제
 

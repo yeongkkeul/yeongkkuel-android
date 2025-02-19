@@ -17,13 +17,13 @@ data class ShopResult(
 data class MySkin(
     val itemName: String,
     val itemType: String,
-    val imgUrl: String
+    val imgUrl: String?
 )
 
 data class ShopItem(
     val id: Int,
     val itemName: String,
     val price: Int,
-    val itemType: String?,
-    val itemImg: String
+    val itemType: String,
+    val itemImg: String?
 )
