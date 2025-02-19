@@ -69,7 +69,7 @@
             android:contentDescription="프로필"
             android:scaleType="centerCrop"
             android:background="@drawable/bg_whitecircle"
-            android:src="@drawable/ic_my_profile" />
+            android:src="@drawable/bg_whitecircle" />
 
 
         <ImageView

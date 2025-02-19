@@ -179,7 +179,6 @@ class ProfileViewModel : ViewModel() {
             }
         }
 
-        updateProfile(patchRequest, selectedImageFile)
     }
 
     private suspend fun downloadImageFile(context: Context, urlString: String): File? = withContext(

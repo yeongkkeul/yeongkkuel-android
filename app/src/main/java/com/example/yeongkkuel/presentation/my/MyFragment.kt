@@ -102,6 +102,13 @@ class MyFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.profileResponse.observe(viewLifecycleOwner) { response ->
             response.result?.let { result ->
+
+                if(result.ageGroup == "UNDECIDED" || result.job == "UNDECIDED"){
+                    binding.tvDot.visibility = View.GONE
+                } else {
+                    binding.tvDot.visibility = View.VISIBLE
+                }
+
                 binding.tvNickname.text = result.nickname
                 binding.tvAge.text = convertAgeGroup(result.ageGroup)
 
@@ -139,13 +146,6 @@ class MyFragment : Fragment() {
             }
         }
 
-        /*viewModel.unreadNotificationCount.observe(viewLifecycleOwner) { isUnread ->
-            if (isUnread) {
-                binding.ivNotiDot.visibility = View.VISIBLE
-            } else {
-                binding.ivNotiDot.visibility = View.INVISIBLE
-            }
-        }*/
 
     }
 

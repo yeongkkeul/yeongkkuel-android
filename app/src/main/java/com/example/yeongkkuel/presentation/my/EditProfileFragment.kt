@@ -253,7 +253,7 @@ class EditProfileFragment : Fragment() {
                             .load(result.profileImageUrl)
                             .diskCacheStrategy(DiskCacheStrategy.NONE) // 캐시 끔
                             .skipMemoryCache(true)
-                            .placeholder(null)
+                            .placeholder(R.drawable.bg_box_white)
                             .error(R.drawable.bg_box_white)
                             .circleCrop()
                             .into(binding.ivProfile)
