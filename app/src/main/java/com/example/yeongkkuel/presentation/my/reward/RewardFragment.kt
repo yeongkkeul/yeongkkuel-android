@@ -114,11 +114,9 @@ class RewardFragment : Fragment() {
     private fun getDummyRewardItem(): List<RewardItem> {
 
         val dummyRewardItem = mutableListOf<RewardItem>()
-        dummyRewardItem.add(RewardItem(RewardType.CHALLENGE_JOIN, "챌린지 참여", "1000", "오늘"))
-        dummyRewardItem.add(RewardItem(RewardType.RANKING_REWARD, "랭킹 리워드", "2000", "어제"))
-        dummyRewardItem.add(RewardItem(RewardType.NO_SPEND_REWARD, "지출 없음 리워드", "3000", "어제"))
-        dummyRewardItem.add(RewardItem(RewardType.DAILY_EXCEED, "일일 초과", "4000", "어제"))
-        dummyRewardItem.add(RewardItem(RewardType.CHALLENGE_RANKING_UPDATE, "챌린지 랭킹 업데이트", "5000", "최근 7일"))
+        dummyRewardItem.add(RewardItem(RewardType.GOAL, "식비에서 5일 연속 무지출 달성", "20", "오늘"))
+        dummyRewardItem.add(RewardItem(RewardType.GOAL, "간식/음료에서 5일 연속 무지출 달성", "20", "어제"))
+        dummyRewardItem.add(RewardItem(RewardType.TEAM_GOAL, "무지출이 대세다 방 20대 전체 상위 5% 달성", "20", "최근 7일"))
         return dummyRewardItem
     }
 

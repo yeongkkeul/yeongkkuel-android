@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.presentation.my.notification.NotificationAdapter.HeaderViewHolder
@@ -78,12 +79,16 @@ class RewardAdapter (
         fun bind(item: RewardItem) {
             // 아이콘은 NotificationType에 따라 다른 drawable을 설정
             val iconRes = when (item.type) {
-                RewardType.CHALLENGE_JOIN -> R.drawable.ic_challenge_join
-                RewardType.RANKING_REWARD -> R.drawable.ic_ranking_reward
-                RewardType.NO_SPEND_REWARD -> R.drawable.ic_no_spend_reward
-                RewardType.DAILY_EXCEED -> R.drawable.ic_daily_exceed
-                RewardType.CHALLENGE_RANKING_UPDATE -> R.drawable.ic_ranking_update
-                else -> R.drawable.ic_challenge_join
+                RewardType.TEAM_GOAL -> R.drawable.ic_team_goal
+                RewardType.GOAL -> R.drawable.ic_no_spend_reward
+                else -> R.drawable.ic_no_spend_reward
+            }
+            // type 에따라 tvmessage 색상 변경
+
+            when (item.type) {
+                RewardType.TEAM_GOAL -> reward.setTextColor(ContextCompat.getColor(itemView.context, R.color.sub1))
+                RewardType.GOAL -> reward.setTextColor(ContextCompat.getColor(itemView.context, R.color.main1))
+                else -> reward.setTextColor(ContextCompat.getColor(itemView.context, R.color.sub2))
             }
 
 

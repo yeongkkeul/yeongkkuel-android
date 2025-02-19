@@ -154,7 +154,7 @@ class NotificationFragment : Fragment() {
                 "오늘"
             ),
             NotificationItem(
-                NotificationType.NO_SPEND_REWARD,
+                NotificationType.CHALLENGE_JOIN,
                 "돈 모아서 차 사자 방 가입 완료",
                 "37분 전",
                 "오늘"

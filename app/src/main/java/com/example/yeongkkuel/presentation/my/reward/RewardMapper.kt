@@ -12,8 +12,8 @@ import java.time.temporal.ChronoUnit
 object RewardMapper {
 
     fun mapToRewardItem(rewardsResult: RewardsResult): RewardItem {
-        val rewardType = convertStringToRewardType(rewardsResult.type)
-        val message = rewardsResult.record
+        val rewardType = convertStringToRewardType(rewardsResult.record)
+        val message = rewardsResult.type
         val rewardText = rewardsResult.reward.toString()
 
         val section = convertDatetimeToSection(rewardsResult.datetime)
@@ -30,12 +30,9 @@ object RewardMapper {
 
 private fun convertStringToRewardType(typeString: String): RewardType {
     return when (typeString) {
-        "CHALLENGE_JOIN" -> RewardType.CHALLENGE_JOIN
-        "RANKING_REWARD" -> RewardType.RANKING_REWARD
-        "NO_SPEND_REWARD" -> RewardType.NO_SPEND_REWARD
-        "DAILY_EXCEED" -> RewardType.DAILY_EXCEED
-        "CHALLENGE_RANKING_UPDATE" -> RewardType.CHALLENGE_RANKING_UPDATE
-        else -> RewardType.CHALLENGE_JOIN // default (혹은 예외처리)
+        "개인 목표 달성" -> RewardType.GOAL
+        "팀 목표 달성" -> RewardType.TEAM_GOAL
+        else -> RewardType.DEFAULT // default (혹은 예외처리)
     }
 }
 
