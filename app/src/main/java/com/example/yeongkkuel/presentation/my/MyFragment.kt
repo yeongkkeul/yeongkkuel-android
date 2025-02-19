@@ -59,8 +59,22 @@ class MyFragment : Fragment() {
         observeViewModel()
         viewModel.fetchUserProfile()
         setupClickListeners()
+        initAppbar()
     }
 
+    private fun initAppbar(){
+        binding.includeTopbar.run {
+            ivMore.visibility = View.GONE
+            ivNoti.setOnClickListener {
+                findNavController().navigate(R.id.navigation_notification)
+            }
+
+            val layoutParams = ivNoti.layoutParams as ViewGroup.MarginLayoutParams
+            layoutParams.marginEnd = 0
+            ivNoti.layoutParams = layoutParams
+        }
+
+    }
     private fun observeViewModel() {
         viewModel.profileResponse.observe(viewLifecycleOwner) { response ->
             response.result?.let { result ->
@@ -103,12 +117,8 @@ class MyFragment : Fragment() {
             findNavController().navigate(R.id.action_myFragment_to_navigation_daily_expense_goal)
         }
 
-        // 알림 아이콘
-        binding.ivNoti.setOnClickListener {
-            // 이동: MyPage -> NotiFragment
-            findNavController().navigate(R.id.action_myPageFragment_to_notificationFragment)
-        }
-        binding.ivRewardMore.setOnClickListener {
+
+        binding.ivRewardMore.setOnClickListener{
             // 이동: MyPage -> RewardFragment
             findNavController().navigate(R.id.action_myPageFragment_to_rewardFragment)
         }

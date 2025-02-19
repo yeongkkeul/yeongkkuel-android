@@ -1,7 +1,6 @@
 package com.example.yeongkkuel.presentation.chat.network
 
 import com.example.yeongkkuel.BuildConfig
-import com.example.yeongkkuel.presentation.chat.ChatService
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request

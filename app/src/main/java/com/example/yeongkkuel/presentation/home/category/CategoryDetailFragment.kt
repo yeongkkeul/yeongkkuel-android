@@ -43,7 +43,8 @@ class CategoryDetailFragment : Fragment() {
 
         // Colors에서 id로 정확한 색상 값을 가져옴
         val categoryColor = categoryColorId?.let { Colors.fromId(it)?.id }
-        val textColor = categoryColor?.let { ContextCompat.getColor(requireContext(), it) } ?: android.graphics.Color.BLACK
+        val textColor = categoryColor?.let { ContextCompat.getColor(requireContext(), it) }
+            ?: android.graphics.Color.BLACK
 
         // 데이터 화면에 표시
         binding.tvCategoryDetailInput.setText(categoryName)
@@ -91,7 +92,8 @@ class CategoryDetailFragment : Fragment() {
     // 삭제 확인 다이얼로그 표시
     private fun showDeleteConfirmationDialog(categoryName: String) {
         // 다이얼로그 뷰 inflate
-        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_category_delete, null)
+        val dialogView =
+            LayoutInflater.from(requireContext()).inflate(R.layout.dialog_category_delete, null)
 
         val dialog = android.app.AlertDialog.Builder(requireContext())
             .setView(dialogView)
@@ -110,31 +112,41 @@ class CategoryDetailFragment : Fragment() {
 
         deleteBtn.setOnClickListener {
             // ViewModel을 통해 삭제 처리
-            removeCategory(categoryName)
+            botSheetViewModel.removeCategory(
+                categoryName = categoryName,
+                isSuccess = {
+                    val remainingCategories = botSheetViewModel.uiState.value.spendingList.size
+                    if (remainingCategories < 1) {
+                        // 홈 화면으로 이동
+                        findNavController().navigate(R.id.action_categoryDetailFragment_to_navigation_home)
+                        Toast.makeText(
+                            requireContext(),
+                            "모든 카테고리가 삭제되어 홈 화면으로 이동합니다.",
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
+                    } else {
+                        // 단순히 이전 화면으로 이동
+                        Toast.makeText(requireContext(), "카테고리가 삭제되었습니다.", Toast.LENGTH_SHORT)
+                            .show()
+                        findNavController().popBackStack() // 이전 화면으로 이동
+                    }
+                },
+                isFalse = {
+                    Toast.makeText(requireContext(), "오류 발생. 잠시 후 시도해주세요.", Toast.LENGTH_SHORT)
+                        .show()
+                    findNavController().popBackStack() // 이전 화면으로 이동
+                })
 
             // 다이얼로그 먼저 닫기
             dialog.dismiss()
 
             // 남아 있는 카테고리 확인
-            val remainingCategories = viewModel.categories.value?.size ?: 0
-            if (remainingCategories < 1) {
-                // 홈 화면으로 이동
-                findNavController().navigate(R.id.action_categoryDetailFragment_to_navigation_home)
-                Toast.makeText(requireContext(), "모든 카테고리가 삭제되어 홈 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
-            } else {
-                // 단순히 이전 화면으로 이동
-                Toast.makeText(requireContext(), "카테고리가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
-                findNavController().popBackStack() // 이전 화면으로 이동
-            }
         }
 
         dialog.show()
     }
 
-    private fun removeCategory(categoryName: String) {
-        categoryViewModel.removeCategory(categoryName) // 카테고리 관리 ViewModel 갱신
-        botSheetViewModel.removeCategory(categoryName) // 바텀시트 ViewModel 갱신
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()

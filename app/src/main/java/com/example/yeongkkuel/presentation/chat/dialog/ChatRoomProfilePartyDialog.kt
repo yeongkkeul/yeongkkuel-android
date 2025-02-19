@@ -8,9 +8,13 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.DialogChatRoomProfilePartyBinding
+import com.example.yeongkkuel.network.response.chat.ChatRoomUserResult
+import com.example.yeongkkuel.presentation.chat.data.Age
+import com.example.yeongkkuel.presentation.chat.data.Job
 
 class ChatRoomProfilePartyDialog(
     context: Context,
+    private val userData: ChatRoomUserResult,
     private val onCancelClick: () -> Unit
 ) : Dialog(context, R.style.CustomDialogDimmed) {
 
@@ -26,9 +30,15 @@ class ChatRoomProfilePartyDialog(
 
         binding.apply {
             Glide.with(ivProfileUser.context)
-                .load("https://helios-i.mashable.com/imagery/articles/04GeUVUQwZxpTYXdqbocKH2/hero-image.fill.size_1248x702.v1722586579.jpg")
+                .load(userData.profileImage)
                 .apply(RequestOptions.circleCropTransform())
                 .into(ivProfileUser)
+            tvNicknameUser.text = userData.nickname
+            val age = Age.valueOf(userData.age).displayName
+            val job = Job.valueOf(userData.job).displayName
+            tvStatusUser.text = "$age $job"
+            tvDataRankExpense.text = userData.rank.toString()
+            tvDataDateRegister.text = userData.createdAt
         }
     }
 

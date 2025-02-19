@@ -8,9 +8,15 @@ import android.view.LayoutInflater
 import android.view.View
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.DialogChatRoomPwBinding
+import com.example.yeongkkuel.network.RetrofitClient
+import com.example.yeongkkuel.network.request.chat.ChatPwValidateRequest
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ChatRoomPwDialog(
     context: Context,
+    private val chatRoomId: Int,
     private val onCancelClick: () -> Unit,
     private val onConfirmClick: () -> Unit
 ) : Dialog(context, R.style.CustomDialogDimmed) {
@@ -42,12 +48,23 @@ class ChatRoomPwDialog(
         }
 
         binding.btnConfirm.setOnClickListener {
-            if (binding.etPassword.text.toString() == "1234") {
-                dismiss()
-                onConfirmClick()
-            } else {
-                binding.etPassword.setBackgroundResource(R.drawable.bg_edittext_pw_error)
-                binding.tvWarningChatRoomPw.visibility = View.VISIBLE
+            val password = binding.etPassword.text.toString()
+            val request = ChatPwValidateRequest(password)
+            // API 호출을 위해 코루틴 사용
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
+                    val response = RetrofitClient.chatService.postChatroomPwValidate(chatRoomId, request)
+                    if (response.isSuccess && response.result) {
+                        dismiss()
+                        onConfirmClick()
+                    } else {
+                        binding.etPassword.setBackgroundResource(R.drawable.bg_edittext_pw_error)
+                        binding.tvWarningChatRoomPw.visibility = View.VISIBLE
+                    }
+                } catch (e: Exception) {
+                    binding.etPassword.setBackgroundResource(R.drawable.bg_edittext_pw_error)
+                    binding.tvWarningChatRoomPw.visibility = View.VISIBLE
+                }
             }
         }
 

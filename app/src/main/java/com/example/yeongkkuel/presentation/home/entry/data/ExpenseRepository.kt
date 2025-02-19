@@ -1,17 +1,35 @@
 package com.example.yeongkkuel.presentation.home.entry.data
 
 import android.util.Log
+import com.example.yeongkkuel.network.service.ExpenseApiService
+import com.google.gson.Gson
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 
 class ExpenseRepository(private val api: ExpenseApiService) {
 
-    suspend fun createExpense(expenseRequest: ExpenseRequest): ExpenseResponse? {
-        Log.d("ExpenseRepository", "🚀 지출 내역 API 요청: $expenseRequest") // ✅ 요청 데이터 로그 추가
+    suspend fun createExpense(
+        expenseRequest: ExpenseRequest,
+        imageFile: MultipartBody.Part?
+    ): ExpenseResponse? {
+        Log.d("ExpenseRepository", "🚀 지출 내역 API 요청: $expenseRequest")
 
         return try {
-            val response = api.createExpense(expenseRequest)
+            // ✅ ExpenseRequest를 JSON 문자열로 변환
+            val gson = Gson()
+            val requestJson = gson.toJson(expenseRequest)
+            val requestBody =
+                requestJson.toRequestBody("application/json".toMediaTypeOrNull()) // ✅ JSON 변환
+
+            val response = api.createExpense(
+                request = requestBody, // ✅ JSON 변환된 request 전달
+                expenseImage = imageFile // ✅ 선택적 이미지 첨부
+            )
+
             if (response.isSuccessful) {
                 val responseBody = response.body()
-                Log.d("ExpenseRepository", "✅ 지출 내역 저장 성공: $responseBody") // ✅ 응답 데이터 로그 추가
+                Log.d("ExpenseRepository", "✅ 지출 내역 저장 성공: $responseBody")
                 responseBody
             } else {
                 Log.e("ExpenseRepository", "🚨 API 요청 실패: ${response.errorBody()?.string()}")
@@ -23,10 +41,25 @@ class ExpenseRepository(private val api: ExpenseApiService) {
         }
     }
 
-    suspend fun updateExpense(expenseId: Int, request: ExpenseUpdateRequest): ExpenseUpdateResponse? {
+    suspend fun updateExpense(
+        expenseId: Int,
+        request: ExpenseUpdateRequest,
+        imageFile: MultipartBody.Part?
+    ): ExpenseUpdateResponse? {
         return try {
             Log.d("ExpenseRepository", "🚀 지출 내역 수정 요청: $request")
-            val response = api.updateExpense(expenseId, request)
+            val gson = Gson()
+            val requestJson = gson.toJson(request)
+            val requestBody =
+                requestJson.toRequestBody("application/json".toMediaTypeOrNull()) // ✅ JSON 변환
+
+
+            val response = api.updateExpense(
+                expenseId = expenseId,
+                request = requestBody,
+                expenseImage = imageFile
+            )
+
             if (response.isSuccessful) {
                 response.body() ?: run {
                     Log.e("ExpenseRepository", "🚨 응답이 null입니다.")
@@ -38,6 +71,19 @@ class ExpenseRepository(private val api: ExpenseApiService) {
             }
         } catch (e: Exception) {
             Log.e("ExpenseRepository", "🚨 네트워크 오류 발생: ${e.message}")
+            null
+        }
+    }
+
+    suspend fun deleteExpense(expenseId: Int): ExpenseDeleteResponse? {
+        return try {
+            val response = api.deleteExpense(expenseId)
+            if (response.isSuccessful) {
+                response.body()
+            } else {
+                null
+            }
+        } catch (e: Exception) {
             null
         }
     }

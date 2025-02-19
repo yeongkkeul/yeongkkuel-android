@@ -18,7 +18,8 @@ enum class Colors(val id: Int, val red: Int, val green: Int, val blue: Int) {
     YELLOW13(R.color.yellow13, 254, 229, 64), // #FEE540
     ORANGE14(R.color.orange14, 251, 136, 9), // #FB8809
     ORANGE15(R.color.orange15, 255, 99, 22), // #FF6316
-    BLACK1(R.color.black1, 238, 238, 238); // #EEEEEE
+    TRASH(R.color.black2, 153, 153, 153); // #999999
+//    BLACK1(R.color.black1, 238, 238, 238); // #EEEEEE
 
     // 추가: RGB 값을 계산해서 저장하는 프로퍼티
     val rgb: Int
@@ -32,7 +33,7 @@ enum class Colors(val id: Int, val red: Int, val green: Int, val blue: Int) {
 
         // RGB 값으로 Colors Enum 찾기
         fun fromRGB(red: Int, green: Int, blue: Int): Colors {
-            return entries.firstOrNull { it.red == red && it.green == green && it.blue == blue } ?: RED1
+            return entries.firstOrNull { it.red == red && it.green == green && it.blue == blue } ?: TRASH
         }
 
         // 서버에서 사용하는 Code로 Colors Enum 찾기

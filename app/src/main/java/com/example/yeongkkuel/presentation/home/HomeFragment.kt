@@ -5,6 +5,8 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -13,6 +15,7 @@ import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -21,6 +24,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentHomeBinding
 import com.example.yeongkkuel.network.response.expenditure.MonthExpendituresCategory
@@ -39,7 +43,7 @@ import java.util.Locale
 import com.bumptech.glide.Glide
 import com.example.yeongkkuel.presentation.base.MainActivity
 import com.example.yeongkkuel.presentation.util.dpToPx
-
+import java.util.Calendar
 
 class HomeFragment : Fragment() {
     private lateinit var navController: NavController
@@ -59,7 +63,7 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        botSheetViewModel.getSpendingList()
+//        botSheetViewModel.getSpendingList()
     }
 
     override fun onCreateView(
@@ -72,7 +76,11 @@ class HomeFragment : Fragment() {
 
         repository = HomeRepository()
         if (showRewardModal) {
-            showRewardDialog()
+            homeViewModel.fetchYesterdayReward() // ✅ API 호출
+
+            homeViewModel.yesterdayReward.observe(viewLifecycleOwner) { reward ->
+                showRewardDialog(reward ?: 0) // ✅ reward 값 전달
+            }
         }
         return binding.root
     }
@@ -82,6 +90,12 @@ class HomeFragment : Fragment() {
 
         navController = Navigation.findNavController(view)
 
+        botSheetViewModel.getSpendingList()
+        scheduleMidnightRewardDialog()
+        checkFirstLoginAfterMidnight()
+        homeViewModel.yesterdayReward.observe(viewLifecycleOwner) { reward ->
+            showRewardDialog(reward ?: 0) // ✅ null이면 기본값 0 전달
+        }
         (activity as? MainActivity)?.resetBottomSheetState()
 
         // 홈 탭에 진입할 때 바텀시트 상태(피크 높이)를 재설정
@@ -134,14 +148,10 @@ class HomeFragment : Fragment() {
                 updateCategoryExpenses(categories, expensesMap)
 
                 Log.d("HomeFragment", "🚀 updateBotSheetCategories 호출됨!")
-                botSheetViewModel.updateBotSheetCategories(categories)
-
-                botSheetViewModel.getSpendingList() // 홈 데이터 수신 후 즉시 지출 내역 갱신 API 호출함
             } else {
                 Log.e("HomeFragment", "🚨 홈 데이터 수신 실패 또는 응답 없음!")
             }
         }
-        setupSwipeToDismiss(binding.ivError)
 
         Log.d("HomeFragment", "🚀 fetchHomeData() 호출됨!")
 
@@ -158,6 +168,22 @@ class HomeFragment : Fragment() {
                 }
             }
         }
+
+        initAppBar()
+    }
+
+    private fun initAppBar(){
+        binding.includeTopbar.run {
+            ivMore.visibility = View.GONE
+            ivNoti.setOnClickListener {
+                findNavController().navigate(R.id.navigation_notification)
+            }
+
+            val layoutParams = ivNoti.layoutParams as ViewGroup.MarginLayoutParams
+            layoutParams.marginEnd = 0
+            ivNoti.layoutParams = layoutParams
+        }
+
     }
 
     // 변환된 Category 리스트를 받도록 변경
@@ -289,9 +315,8 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun showRewardDialog() {
+    private fun showRewardDialog(yesterdayReward: Int) {
         val dialog = Dialog(requireContext())
-        dialog.show()
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.window?.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
@@ -300,20 +325,39 @@ class HomeFragment : Fragment() {
         params?.dimAmount = 0.65f
         dialog.window?.attributes = params
 
-        dialog.setContentView(R.layout.dialog_reward)
+        dialog.setContentView(R.layout.dialog_reward_yesterday)
         dialog.setCancelable(true)
 
+        val tvRewardText = dialog.findViewById<TextView>(R.id.tv_recommend_code_error)
         val btnClose = dialog.findViewById<View>(R.id.tv_close)
         val btnReward = dialog.findViewById<View>(R.id.tv_reward)
+
+        tvRewardText.text = "어제 총 $yesterdayReward 리워드를 획득했어요."
 
         btnClose.setOnClickListener {
             dialog.dismiss()
         }
-        dialog.window?.apply {
-            setBackgroundDrawableResource(R.drawable.ic_store_topurchase) // VectorDrawable 설정
-            decorView.clipToOutline = true // 둥근 모서리 적용
+
+        btnReward.setOnClickListener {
+            navController.navigate(R.id.navigation_reward) // ✅ 클릭 시 fragment_reward로 이동
+            dialog.dismiss()
         }
         dialog.show()
+    }
+
+    private fun scheduleMidnightRewardDialog() {
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+        }
+        val delay = calendar.timeInMillis - System.currentTimeMillis()
+
+        if (delay > 0) {
+            Handler(Looper.getMainLooper()).postDelayed({
+                homeViewModel.fetchYesterdayReward()
+            }, delay)
+        }
     }
 
     /**
@@ -375,5 +419,17 @@ class HomeFragment : Fragment() {
             .putString(KEY_LAST_HIDDEN_DATE, todayDate)
             .apply()
     }
+    private fun checkFirstLoginAfterMidnight() {
+        val sharedPreferences = requireActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
+        val lastShownDate = sharedPreferences.getString("lastRewardDate", "")
+
+        val todayDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+
+        if (lastShownDate != todayDate) {
+            homeViewModel.fetchYesterdayReward()
+            sharedPreferences.edit().putString("lastRewardDate", todayDate).apply()
+        }
+    }
+
 
 }

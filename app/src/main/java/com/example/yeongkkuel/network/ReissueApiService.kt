@@ -8,7 +8,7 @@ import retrofit2.http.POST
 
 interface ReissueApiService {
 
-    @POST("/api/reissue")
+    @POST("/api/auth/reissue")
     suspend fun reissueToken(
         @Body request: ReissueRequest
     ): Call<ReissueResponse>
