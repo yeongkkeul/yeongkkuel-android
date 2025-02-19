@@ -194,12 +194,6 @@ class MyFragment : Fragment() {
             startActivity(intent)
 
         }
-        binding.tvTerms.setOnClickListener() {
-            val url = "https://sugared-college-51e.notion.site/0-191624a0a41b809c8e16d9a8cbf56c8e"
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-            startActivity(intent)
-
-        }
         binding.tvSupport.setOnClickListener() {
             val url = "https://sugared-college-51e.notion.site/0-190624a0a41b80d0ba16fa178c3acc40?pvs=73"
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))

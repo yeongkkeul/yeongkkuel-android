@@ -196,10 +196,9 @@ class EditProfileFragment : Fragment() {
 
             // ViewModel 메서드 호출 (PATCH)
 //            viewModel.saveUserProfile(selectedFile)
-            if (validateSelection()) {
 
                 viewModel.saveUserProfile(requireContext(),selectedFile)
-            }
+
         }
 
         // 뒤로가기
@@ -273,7 +272,8 @@ class EditProfileFragment : Fragment() {
                     updateInitialSelection(binding.glJobGroup, displayJob)
                 }
             } else {
-                Toast.makeText(requireContext(),
+                Toast.makeText(
+                    requireContext(),
                     "실패: ${response.message ?: "오류가 발생했습니다."}",
                     Toast.LENGTH_SHORT
                 ).show()
@@ -292,9 +292,9 @@ class EditProfileFragment : Fragment() {
                     // 실패
                     Toast.makeText(requireContext(), "프로필 수정 실패", Toast.LENGTH_SHORT).show()
                 }
-                }
             }
         }
+    }
         // 프로필 수정(PATCH) 결과
         /*viewModel.updateStatus.observe(viewLifecycleOwner) { result ->
             result.onSuccess {
