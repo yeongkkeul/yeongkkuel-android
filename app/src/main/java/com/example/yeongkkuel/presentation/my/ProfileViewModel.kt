@@ -118,17 +118,20 @@ class ProfileViewModel : ViewModel() {
         }
     }
 
-    //TODO
-    /*fun getUnreadNotificationCount() {
+
+    fun getUnreadNotificationCount() {
         viewModelScope.launch {
-            val response = repository.getUnreadNotificationCount()
-            response?.let {
-                if (it.isSuccess) {
-                    _unreadNotificationCount.value = it.result
+            try{
+                val response = RetrofitClient.notificationService.getUnreadNotificationCount()
+                if (response != null && response.isSuccess) {
+                    _unreadNotificationCount.value = response.result
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
+
             }
         }
-    }*/
+    }
     // 추천인 코드 조회
     fun getReferralCode() {
         viewModelScope.launch {

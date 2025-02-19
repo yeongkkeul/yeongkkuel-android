@@ -132,11 +132,12 @@ class MyFragment : Fragment() {
 
         /*viewModel.unreadNotificationCount.observe(viewLifecycleOwner) { isUnread ->
             if (isUnread) {
-                binding.icNotiDot.visibility = View.VISIBLE
+                binding.ivNotiDot.visibility = View.VISIBLE
             } else {
-                binding.icNotiDot.visibility = View.GONE
+                binding.ivNotiDot.visibility = View.INVISIBLE
             }
         }*/
+
     }
 
 
@@ -153,11 +154,6 @@ class MyFragment : Fragment() {
             findNavController().navigate(R.id.action_myFragment_to_navigation_daily_expense_goal)
         }
 
-        // 알림 아이콘
-        binding.ivNoti.setOnClickListener {
-            // 이동: MyPage -> NotiFragment
-            findNavController().navigate(R.id.action_myPageFragment_to_notificationFragment)
-        }
         binding.ivRewardMore.setOnClickListener{
             // 이동: MyPage -> RewardFragment
             findNavController().navigate(R.id.action_myPageFragment_to_rewardFragment)
