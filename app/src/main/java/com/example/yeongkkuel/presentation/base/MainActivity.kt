@@ -263,25 +263,23 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     else -> setBotSheetGone()
                 }
             }
+
+            categoryViewModel.categories.observe(this@MainActivity) { categories ->
+                val isCategoryEmpty = categories.isNullOrEmpty() // ✅ 카테고리가 비어 있는지 확인
+                binding.tvAddCategory.visibility = if (isCategoryEmpty) View.VISIBLE else View.GONE
+            }
+
+
             navController.addOnDestinationChangedListener { _, destination, _ ->
                 when (destination.id) {
                     R.id.categoryAddFragment -> {
-                        binding.tvAddCategory.visibility = View.GONE // 카테고리 추가 화면에서는 숨기기
+                        binding.tvAddCategory.visibility = View.GONE // ✅ 카테고리 추가 화면에서는 숨김
                     }
-
                     R.id.navigation_home -> {
-                        // 홈 화면 복귀 시 카테고리 개수 조건 확인
-                        val isCategoryEmpty = categoryViewModel.categories.value.orEmpty().size < 1
-                        if (isCategoryEmpty) {
-                            binding.tvAddCategory.visibility = View.VISIBLE // 카테고리 없을 때 보이기
-                        } else {
-                            binding.tvAddCategory.visibility = View.GONE // 카테고리 있을 때 숨기기
-                        }
+                        // ✅ 홈 화면 복귀 시 LiveData가 자동으로 감지됨 → 별도로 체크할 필요 없음
                     }
-
                     else -> {
-                        binding.tvAddCategory.visibility = View.GONE // 다른 화면에서는 숨기기
-                        // TODO - * 지출 화면일 때 카테고리 추가 안 한 상태는 VISIBLE 상태로 만들기 *
+                        binding.tvAddCategory.visibility = View.GONE // ✅ 다른 화면에서는 숨기기
                     }
                 }
             }
