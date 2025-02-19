@@ -164,6 +164,9 @@
                     android:paddingVertical="5dp"
                     android:textColor="@color/main1"
                     android:textSize="15sp"
+                    android:inputType="text"
+                    android:imeOptions="actionNext"
+                    android:singleLine="true"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/tv_character_count"
                     app:layout_constraintHorizontal_bias="0.0"
@@ -346,8 +349,8 @@
 
             <FrameLayout
                 android:id="@+id/fl_photo_frame"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
                 android:layout_marginTop="30dp"
                 android:layout_marginStart="50dp"
@@ -356,8 +359,11 @@
 
                 <ImageView
                     android:id="@+id/img_photo_frame"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scaleType="centerCrop"
+                    android:clipToOutline="true"
+                    android:background="@drawable/bg_rounded_image_photo"
                     android:src="@drawable/bg_photo_input"/>
 
                 <ImageView

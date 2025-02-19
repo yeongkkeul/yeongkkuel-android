@@ -48,6 +48,8 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
 
     private var rvBottomSheetCollapseStateHeight: Int = 0
 
+    private var currentTab: String = "home" // 기본값을 홈으로 설정
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // 스플래시 화면 설정
         val splashScreen = this.installSplashScreen()
@@ -116,6 +118,14 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     fun resetBottomSheetState() {
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.clItemBotSheet)
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+
+    fun setCurrentTab(tab: String) {
+        currentTab = tab
+    }
+
+    fun getCurrentTab(): String {
+        return currentTab
     }
 
     private fun initView() = with(binding) {
@@ -218,6 +228,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             binding.bottomNavi.setOnItemSelectedListener { item ->
                 when (item.itemId) {
                     R.id.navigation_home -> {
+                        setCurrentTab("home")
                         navController.navigate(R.id.navigation_home)
                         true
                     }
@@ -228,6 +239,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     }
 
                     R.id.navigation_stat -> {
+                        setCurrentTab("stat")
                         navController.navigate(R.id.navigation_stat)
                         true
                     }
@@ -251,25 +263,23 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     else -> setBotSheetGone()
                 }
             }
+
+            categoryViewModel.categories.observe(this@MainActivity) { categories ->
+                val isCategoryEmpty = categories.isNullOrEmpty() // ✅ 카테고리가 비어 있는지 확인
+                binding.tvAddCategory.visibility = if (isCategoryEmpty) View.VISIBLE else View.GONE
+            }
+
+
             navController.addOnDestinationChangedListener { _, destination, _ ->
                 when (destination.id) {
                     R.id.categoryAddFragment -> {
-                        binding.tvAddCategory.visibility = View.GONE // 카테고리 추가 화면에서는 숨기기
+                        binding.tvAddCategory.visibility = View.GONE // ✅ 카테고리 추가 화면에서는 숨김
                     }
-
                     R.id.navigation_home -> {
-                        // 홈 화면 복귀 시 카테고리 개수 조건 확인
-                        val isCategoryEmpty = categoryViewModel.categories.value.orEmpty().size < 1
-                        if (isCategoryEmpty) {
-                            binding.tvAddCategory.visibility = View.VISIBLE // 카테고리 없을 때 보이기
-                        } else {
-                            binding.tvAddCategory.visibility = View.GONE // 카테고리 있을 때 숨기기
-                        }
+                        // ✅ 홈 화면 복귀 시 LiveData가 자동으로 감지됨 → 별도로 체크할 필요 없음
                     }
-
                     else -> {
-                        binding.tvAddCategory.visibility = View.GONE // 다른 화면에서는 숨기기
-                        // TODO - * 지출 화면일 때 카테고리 추가 안 한 상태는 VISIBLE 상태로 만들기 *
+                        binding.tvAddCategory.visibility = View.GONE // ✅ 다른 화면에서는 숨기기
                     }
                 }
             }
@@ -415,22 +425,19 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
 
-    override fun navigateToExpenseEntry(selectedCategory: String, categoryColor: Int) {
-        // NavController를 이용해 지출 기입 페이지로 이동
+    override fun navigateToExpenseEntryWithTab(fromTab: String, selectedCategory: String, categoryColor: Int) {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         val navController = navHostFragment.navController
 
-        // 번들에 데이터를 담아 지출 기입 페이지로 전달
         val bundle = Bundle().apply {
+            putString("fromTab", fromTab)
             putString("selectedCategory", selectedCategory)
             putInt("categoryColor", categoryColor)
         }
 
-        // 지출 기입 페이지로 이동하면서 데이터 전달
         navController.navigate(R.id.expenseEntryFragment, bundle)
     }
-
 
     override fun navigateToExpenseView(
         expenseId: Int,
@@ -438,7 +445,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         expensePrice: Int,
         categoryColor: Int,
         categoryName: String,
-        imageUrl: Boolean
+        imageUrl: String
     ) {
         Log.d(
             "MainActivity",
@@ -455,6 +462,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             putInt("expensePrice", expensePrice)
             putInt("categoryColor", categoryColor)
             putString("categoryName", categoryName)
+            putString("imageUrl", imageUrl)
         }
 
         navController.navigate(R.id.navigation_expense_view, bundle)

@@ -165,6 +165,10 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
         binding.vpStat.isUserInputEnabled = true // 터치 활성화
     }
 
+    override fun moveToMonthlyTab() {
+        binding.vpStat.setCurrentItem(2, false) // 월간 탭(인덱스 2)으로 이동
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
