@@ -56,8 +56,8 @@
 
     <ImageView
         android:id="@+id/ivArrow"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
         android:src="@drawable/ic_my_look_foward"
         android:contentDescription="이동 아이콘"
         app:layout_constraintRight_toRightOf="parent"

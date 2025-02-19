@@ -21,6 +21,7 @@ import com.example.yeongkkuel.network.request.notification.NotificationSettingRe
 import com.example.yeongkkuel.network.response.notification.NotificationDetail
 import com.example.yeongkkuel.presentation.my.notification.NotificationAdapter
 import com.example.yeongkkuel.presentation.my.notification.data.NotificationItem
+import com.example.yeongkkuel.presentation.my.notification.data.NotificationListItem
 import com.example.yeongkkuel.presentation.my.notification.data.NotificationType
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -61,18 +62,19 @@ class NotificationFragment : Fragment() {
 
         binding.ivNoti.setImageResource(newIcon)
 
+        binding.rvNotification.layoutManager = LinearLayoutManager(requireContext())
+
+
 
         onselectedListener()
 //        checkAllNotificationRead()
         adapter = NotificationAdapter(
-            items = emptyList(),
-            onItemClick = { clickedItem ->
-                navigateToFragment(clickedItem.type)
-            }
-        )
-
+            emptyList()
+        ) { clickedItem ->
+            navigateToFragment(clickedItem.type)
+        }
         binding.rvNotification.adapter = adapter
-        binding.rvNotification.layoutManager = LinearLayoutManager(requireContext())
+//        binding.rvNotification.layoutManager = LinearLayoutManager(requireContext())
         fetchNotificationsFromServer()
 
     }
@@ -87,65 +89,20 @@ class NotificationFragment : Fragment() {
                     if (body != null) {
                         // 3) notificationDetails -> NotificationItem으로 변환
                         val detailList = body.notificationDetails
-                        val dummyData = listOf(
-                            NotificationItem(
-                                NotificationType.CHALLENGE_JOIN,
-                                "무지출이 대세다 방 가입 완료",
-                                "37분 전",
-                                "오늘"
-                            ),
-                            NotificationItem(
-                                NotificationType.NO_SPEND_REWARD,
-                                "돈 모아서 차 사자 방 가입 완료",
-                                "37분 전",
-                                "오늘"
-                            ),
-                            NotificationItem(
-                                NotificationType.RANKING_REWARD,
-                                "랭킹 리워드 지급",
-                                "37분 전",
-                                "오늘"
-                            ),
-                            NotificationItem(
-                                NotificationType.DAILY_EXCEED,
-                                "하루 지출 목표액 초과",
-                                "12:49",
-                                "어제"
-                            ),
-                            NotificationItem(
-                                NotificationType.NO_SPEND_REWARD,
-                                "무지출 리워드 지급",
-                                "12:49",
-                                "어제"
-                            ),
-                            NotificationItem(
-                                NotificationType.CHALLENGE_RANKING_UPDATE,
-                                "12월 31일 챌린지 그룹 랭킹 업데이트",
-                                "12:00",
-                                "어제"
-                            ),
-                            NotificationItem(
-                                NotificationType.CHALLENGE_JOIN,
-                                "무지출이 대세다 방 가입 완료",
-                                "12/12",
-                                "최근 7일"
-                            ),
-                            NotificationItem(
-                                NotificationType.NO_SPEND_REWARD,
-                                "돈 모아서 차 사자 방 가입 완료",
-                                "12/12",
-                                "오늘"
-                            )
-                        )
-
+                        val dummyData : List<NotificationItem> = getDummyNotifications()
+                        // notificationItem 으로 변환
                         val itemList = detailList.map { mapToNotificationItem(it) }
+
+
                         if(itemList.isEmpty()){
-                            adapter = NotificationAdapter(dummyData) { clickedItem ->
+                            val finalDisplayList = toDisplayList(dummyData)
+                            adapter = NotificationAdapter(finalDisplayList) { clickedItem ->
                                 navigateToFragment(clickedItem.type)
                             }
                             binding.rvNotification.adapter = adapter
                         } else {
-                            adapter = NotificationAdapter(itemList) { clickedItem ->
+                            val finalDisplayList = toDisplayList(itemList)
+                            adapter = NotificationAdapter(finalDisplayList) { clickedItem ->
                                 navigateToFragment(clickedItem.type)
                             }
                             binding.rvNotification.adapter = adapter
@@ -162,6 +119,87 @@ class NotificationFragment : Fragment() {
             }
         }
     }
+
+    // "오늘", "어제", "최근 7일" 순서대로 섹션화
+    private fun toDisplayList(originalItems: List<NotificationItem>): List<NotificationListItem> {
+        // 1) 섹션별 그룹화
+        val groupedMap = originalItems.groupBy { it.section }
+
+        // 2) 원하는 섹션 표시 순서 정의
+        val sectionOrder = listOf("오" +
+                "늘", "어제", "최근 7일")
+
+        // 3) 최종 표시 리스트 구성
+        val result = mutableListOf<NotificationListItem>()
+        sectionOrder.forEach { sectionName ->
+            val itemsInSection = groupedMap[sectionName]
+            if (!itemsInSection.isNullOrEmpty()) {
+                // -- 헤더 추가 --
+                result.add(NotificationListItem.HeaderItem(sectionName))
+                // -- 섹션 내 아이템들 추가 --
+                for (noti in itemsInSection) {
+                    result.add(NotificationListItem.NormalItem(noti))
+                }
+            }
+        }
+        return result
+    }
+
+    private fun getDummyNotifications(): List<NotificationItem> {
+        return listOf(
+            NotificationItem(
+                NotificationType.CHALLENGE_JOIN,
+                "무지출이 대세다 방 가입 완료",
+                "37분 전",
+                "오늘"
+            ),
+            NotificationItem(
+                NotificationType.NO_SPEND_REWARD,
+                "돈 모아서 차 사자 방 가입 완료",
+                "37분 전",
+                "오늘"
+            ),
+            NotificationItem(
+                NotificationType.RANKING_REWARD,
+                "랭킹 리워드 지급",
+                "37분 전",
+                "오늘"
+            ),
+            NotificationItem(
+                NotificationType.DAILY_EXCEED,
+                "하루 지출 목표액 초과",
+                "12:49",
+                "어제"
+            ),
+            NotificationItem(
+                NotificationType.NO_SPEND_REWARD,
+                "무지출 리워드 지급",
+                "12:49",
+                "어제"
+            ),
+            NotificationItem(
+                NotificationType.CHALLENGE_RANKING_UPDATE,
+                "12월 31일 챌린지 그룹 랭킹 업데이트",
+                "12:00",
+                "어제"
+            ),
+            NotificationItem(
+                NotificationType.CHALLENGE_JOIN,
+                "무지출이 대세다 방 가입 완료",
+                "12/12",
+                "최근 7일"
+            ),
+            // 일부러 "오늘" 섹션 하나 더
+            NotificationItem(
+                NotificationType.NO_SPEND_REWARD,
+                "아이템 중복 예시",
+                "어딘가 시간",
+                "오늘"
+            )
+        )
+    }
+
+
 
     private fun mapToNotificationItem(detail: NotificationDetail): NotificationItem {
         // 여기에서 server의 detail -> UI용 item
