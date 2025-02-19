@@ -20,7 +20,16 @@ import com.example.yeongkkuel.presentation.chat.room.ChatGroupViewModel
 import com.example.yeongkkuel.presentation.chat.room.ChatRoomClickListener
 import com.example.yeongkkuel.utils.SwipeToDelete
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
+import okhttp3.OkHttpClient
+import org.json.JSONObject
 import timber.log.Timber
+import ua.naiksoftware.stomp.Stomp
+import ua.naiksoftware.stomp.StompClient
+import ua.naiksoftware.stomp.dto.LifecycleEvent
+import java.util.concurrent.TimeUnit
 
 class ChatFragment : Fragment(), ChatRoomClickListener {
     private lateinit var navController: NavController
@@ -30,9 +39,9 @@ class ChatFragment : Fragment(), ChatRoomClickListener {
 
     private lateinit var chatRoomAdapter: ChatRoomAdapter
 
-//    private lateinit var stompClient: StompClient
-//
-//    private val compositeDisposable = CompositeDisposable()
+    private lateinit var stompClient: StompClient
+
+    private val compositeDisposable = CompositeDisposable()
 
     private val viewModel: ChatRoomViewModel by activityViewModels()
     private val chatGroupViewModel: ChatGroupViewModel by activityViewModels()
@@ -48,11 +57,11 @@ class ChatFragment : Fragment(), ChatRoomClickListener {
         return binding.root
     }
 
-//    private fun createOkHttpClient(): OkHttpClient {
-//        return OkHttpClient.Builder()
-//            .readTimeout(0, TimeUnit.MILLISECONDS)
-//            .build()
-//    }
+    private fun createOkHttpClient(): OkHttpClient {
+        return OkHttpClient.Builder()
+            .readTimeout(0, TimeUnit.MILLISECONDS)
+            .build()
+    }
 
 //    private fun setupStompClient() {
 //        val okHttpClient = createOkHttpClient()
@@ -84,7 +93,7 @@ class ChatFragment : Fragment(), ChatRoomClickListener {
 //        // 웹소켓 연결 시작
 //        stompClient.connect()
 //    }
-
+//
 //    private fun joinChatRoom(chatRoomId: Long, senderId: Long, password: String?) {
 //        // 채팅방 가입 URL 구성 (roomId 자리에 chatRoomId 값 삽입)
 //        val destination = "/pub/chat.enter.$chatRoomId"
@@ -109,9 +118,9 @@ class ChatFragment : Fragment(), ChatRoomClickListener {
 //            .subscribeOn(Schedulers.io())
 //            .observeOn(AndroidSchedulers.mainThread())
 //            .subscribe({
-//                Log.d("STOMP", "채팅방 가입 메시지 전송 성공")
+//                Timber.d("STOMP", "채팅방 가입 메시지 전송 성공")
 //            }, { error ->
-//                Log.e("STOMP", "채팅방 가입 메시지 전송 실패: ${error.message}")
+//                Timber.e("STOMP", "채팅방 가입 메시지 전송 실패: ${error.message}")
 //            })
 //
 //        compositeDisposable.add(sendDisposable)
@@ -257,7 +266,6 @@ class ChatFragment : Fragment(), ChatRoomClickListener {
 
     override fun onItemClicked(chatRoom: ChatRoom) {
         // 아이템 클릭 시 실행할 로직
-        showToast("Clicked: ${chatRoom.title}")
         chatGroupViewModel.setSelectedChatRoomId(chatRoom.id)
         navController.navigate(R.id.action_navigation_chat_to_navigation_chat_group)
     }

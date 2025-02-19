@@ -21,6 +21,7 @@ import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentChatGroupBinding
 import com.example.yeongkkuel.presentation.base.MainActivity
 import com.example.yeongkkuel.presentation.chat.ChatMessageClickListener
+import com.example.yeongkkuel.presentation.chat.ChatRoomViewModel
 import com.example.yeongkkuel.presentation.chat.adapter.ChatGroupAdapter
 import com.example.yeongkkuel.presentation.chat.adapter.ChatRoomDrawerAdapter
 import com.example.yeongkkuel.presentation.chat.dialog.ChatRoomGroupExitDialog
@@ -39,6 +40,7 @@ class ChatGroupFragment : Fragment(), ChatMessageClickListener {
 
     private val viewModel: ChatSearchViewModel by activityViewModels()
     private val chatGroupViewModel: ChatGroupViewModel by activityViewModels()
+    private val chatRoomViewModel: ChatRoomViewModel by activityViewModels()
 
     private var bannerOpen = false
 
@@ -93,6 +95,18 @@ class ChatGroupFragment : Fragment(), ChatMessageClickListener {
         chatGroupViewModel.selectedChatRoomId.observe(viewLifecycleOwner) { chatRoomId ->
             if (chatRoomId != null) {
                 chatGroupViewModel.fetchBanner(chatRoomId)
+
+                chatRoomViewModel.chatRooms.observe(viewLifecycleOwner) { chatRooms ->
+                    val targetChatRoom = chatRooms.find { it.id == chatRoomId }
+                    val chatRoomRule = targetChatRoom?.chatRoomRule
+
+                    chatRoomRule?.let {
+                        binding.tvDataGroupRule.text = it
+                        println("Chat Room Rule: $it")
+                    } ?: run {
+                        println("Chat Room with id 1 not found or rule is null")
+                    }
+                }
             }
         }
 
