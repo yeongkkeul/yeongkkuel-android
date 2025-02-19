@@ -111,6 +111,11 @@ class MyFragment : Fragment() {
             findNavController().navigate(R.id.action_myFragment_to_navigation_my_edit)
         }
 
+        binding.tvTerms.setOnClickListener {
+            // MyPage -> ServiceTermFragment 로 이동
+            findNavController().navigate(R.id.action_myFragment_to_serviceTermFragment)
+        }
+
         // 2. 하루목표 지출액 '수정'
         binding.tvDailyEdit.setOnClickListener {
             // MyPage -> DailyGoalEditFragment (가정)
