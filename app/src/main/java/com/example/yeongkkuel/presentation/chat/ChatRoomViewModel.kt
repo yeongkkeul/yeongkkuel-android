@@ -31,7 +31,8 @@ class ChatRoomViewModel : ViewModel() {
                                 thumbnailUrl = dto.chatRoomThumbnail,
                                 recentMessage = "", // API에 해당 값이 없다면 기본값 사용
                                 messageTime = "",
-                                participantCount = dto.participationCount
+                                participantCount = dto.participationCount,
+                                chatRoomRule = dto.chatRoomRule
                             )
                         }
                         _chatRooms.value = rooms

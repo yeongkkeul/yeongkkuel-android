@@ -105,8 +105,12 @@ class ChatRoomSearchFragment : Fragment(), ChatRoomSearchClickListener {
             }
         }
 
-        viewModel.selectedExpenseOption.observe(viewLifecycleOwner) { option ->
-            binding.tvSearchTagGoalExpense.text = option
+        viewModel.selectedMinExpenseOption.observe(viewLifecycleOwner) { optionMin ->
+            viewModel.selectedMaxExpenseOption.observe(viewLifecycleOwner) { optionMax ->
+                val displayMax = if (optionMax.toInt() == 100000) "100000+" else optionMax
+                binding.tvSearchTagGoalExpense.text = "$optionMin - $displayMax"
+                viewModel.fetchChatRooms()
+            }
         }
 
         viewModel.selectedJobOption.observe(viewLifecycleOwner) { selectedJob ->
@@ -158,7 +162,6 @@ class ChatRoomSearchFragment : Fragment(), ChatRoomSearchClickListener {
 
     override fun onItemClicked(chatRoomSearch: ChatRoomDetailDto) {
         // 아이템 클릭 시 실행할 로직
-        showToast("Clicked: ${chatRoomSearch.chatRoomTitle}")
         chatGroupViewModel.setSelectedChatRoomId(chatRoomSearch.chatRoomId)
         navController.navigate(R.id.action_navigation_chat_room_search_to_register)
     }
