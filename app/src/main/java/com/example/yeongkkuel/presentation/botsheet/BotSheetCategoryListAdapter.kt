@@ -189,7 +189,9 @@ class BotSheetCategoryListAdapter(
         val sortedSpendingList = filteredList?.sortedBy { spending ->
             if (spending.kind.name.lowercase() == "trash") 1 else 0
         }
-        super.submitList(sortedSpendingList)
+        super.submitList(sortedSpendingList){
+            notifyDataSetChanged()
+        }
     }
 
 

@@ -158,12 +158,8 @@ class BotSheetViewModel : ViewModel() {
     }
 
 
-    private fun updateSpendingHistoryList() {
+    fun updateSpendingHistoryList() {
         val historyList = _uiState.value.spendingList.flatMap { it.history }
-
-        Log.d("BotSheetViewModel", "📌 updateSpendingHistoryList() 실행됨")
-        Log.d("BotSheetViewModel", "📌 최신 spendingHistoryList: $historyList") // ✅ 최신 리스트 확인
-
         _spendingHistoryList.value = historyList // ✅ 최신 리스트로 갱신
     }
 
@@ -429,7 +425,6 @@ class BotSheetViewModel : ViewModel() {
             }
             prevState.copy(spendingList = updatedSpendingList)
         }
-
         updateSpendingHistoryList() // ✅ 바텀시트 UI 즉시 반영
     }
 

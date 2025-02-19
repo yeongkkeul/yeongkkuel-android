@@ -301,6 +301,21 @@ class ExpenseEntryFragment : Fragment() {
             expenseViewModel.createExpense(expenseRequest, imagePart) { response ->
                 if (response?.isSuccess == true) {
                     Toast.makeText(requireContext(), "지출 내역이 저장되었습니다.", Toast.LENGTH_SHORT).show()
+
+                    // ✅ 기존 날짜에서 삭제 (바로 사라지게!)
+                    botSheetViewModel.removeExpenseFromCategory(response.result.id)
+
+                    // ✅ 새로운 날짜에 추가
+                    botSheetViewModel.moveExpenseToNewDate(
+                        BotSheetUiState.Spending.History(
+                            id = response.result.id,
+                            name = detail,
+                            price = if (isNoExpenseChecked) 0 else amount,
+                            imgExist = selectedImageUri?.toString() ?: ""
+                        ),
+                        formattedDate
+                    )
+
                     navigateAfterSavingExpense()
                 } else {
                     Toast.makeText(requireContext(), "지출 내역 저장 실패.", Toast.LENGTH_SHORT).show()
@@ -379,7 +394,7 @@ class ExpenseEntryFragment : Fragment() {
     }
 
     private fun navigateAfterSavingExpense() {
-        val fromTab = arguments?.getString("fromTab") ?: "home" // ✅ 기본값은 홈 탭
+        val fromTab = arguments?.getString("fromTab") ?: "home" // 기본값은 홈 탭
         val tvDateInput = view?.findViewById<TextView>(R.id.tv_date_input)
 
         val selectedDateText = tvDateInput?.text.toString()
@@ -393,8 +408,7 @@ class ExpenseEntryFragment : Fragment() {
         }
 
         if (dateFormat.format(selectedDate) != dateFormat.format(today.time)) {
-            // ✅ 날짜가 다르면 지출 탭의 월간 탭으로 이동!
-            Log.d("ExpenseEntryFragment", "📌 날짜 다름 → 지출 탭 (월간 탭) 이동!")
+            // 날짜가 다르면 지출 탭의 월간 탭으로 이동
 
             val bundle = Bundle().apply {
                 putInt("selected_tab_index", 2) // ✅ 월간 탭의 인덱스 2
@@ -405,8 +419,7 @@ class ExpenseEntryFragment : Fragment() {
             statFragment?.moveToMonthlyTab()
 
         } else {
-            // ✅ 기존 로직 유지 (홈 or 지출 탭으로 이동)
-            Log.d("ExpenseEntryFragment", "📌 날짜 같음 → 기존 탭으로 이동! (fromTab: $fromTab)")
+            // 기존 로직 유지 (홈 or 지출 탭으로 이동)
             when (fromTab) {
                 "home" -> navController.navigate(R.id.navigation_home)
                 "stat" -> navController.navigate(R.id.navigation_stat)
@@ -414,7 +427,7 @@ class ExpenseEntryFragment : Fragment() {
             }
         }
 
-        // ✅ 바텀시트 높이를 원래대로 복귀
+        // 바텀시트 높이를 원래대로 복귀
         val displayHeight = resources.displayMetrics.heightPixels
         val peekHeight = (displayHeight - 528.dpToPx(requireContext()))
         botSheetListener?.setPeekHeight(peekHeight)
