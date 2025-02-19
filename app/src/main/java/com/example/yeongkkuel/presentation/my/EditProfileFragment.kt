@@ -168,15 +168,7 @@ class EditProfileFragment : Fragment() {
         binding.tvEdit.setOnClickListener {
             if (validateSelection()) {
 
-                // 이미지 파일이 null 이 아닌 경우
-                if (selectedFile != null) {
-                    viewModel.saveUserProfile(selectedFile)
-                } else {
-                    // 이미지 파일이 null 인 경우
-                    val existingImageUrl = viewModel.profileResponse.value?.result?.profileImageUrl
-                    viewModel.saveUserProfile(existingImageUrl?.let { File(it) })
-
-                }
+                viewModel.saveUserProfile(requireContext(),selectedFile)
             }
         }
 

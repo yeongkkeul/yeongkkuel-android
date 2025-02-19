@@ -1,5 +1,6 @@
 package com.example.yeongkkuel.presentation.my
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -16,18 +17,20 @@ import com.example.yeongkkuel.network.response.my.UserProfileResult
 import com.example.yeongkkuel.network.response.mypage.MyPageResult
 import com.example.yeongkkuel.network.service.MyPageService
 import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
+import java.net.HttpURLConnection
+import java.net.URL
 
 class ProfileViewModel : ViewModel() {
 
     private val apiService = RetrofitClient.myPageService
-
-
 
     init {
 
@@ -147,7 +150,7 @@ class ProfileViewModel : ViewModel() {
         }
     }
 
-    fun saveUserProfile(selectedImageFile: File? = null) {
+    fun saveUserProfile(context: Context, selectedImageFile: File? = null) {
         val patchRequest = PatchMyPageRequest(
             nickname = nickname.value ?: "",
             gender = gender.value ?: "",
@@ -155,8 +158,57 @@ class ProfileViewModel : ViewModel() {
             job = job.value ?: ""
         )
 
+        viewModelScope.launch {
+            try {
+                // 1) 만약 사용자가 새 이미지를 선택했으면 그걸 사용
+                val finalImageFile = if (selectedImageFile != null) {
+                    selectedImageFile
+                } else {
+                    // 2) 새 이미지를 선택하지 않았으니, 기존 URL을 파일로 만들어야 함
+                    val url = profileImageUrl.value
+                    if (!url.isNullOrEmpty()) {
+                        downloadImageFile(context, url)
+                    } else {
+                        null
+                    }
+                }
+
+                updateProfile(patchRequest, finalImageFile)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
         updateProfile(patchRequest, selectedImageFile)
     }
+
+    private suspend fun downloadImageFile(context: Context, urlString: String): File? = withContext(
+        Dispatchers.IO) {
+        try {
+            val url = URL(urlString)
+            val connection = url.openConnection() as HttpURLConnection
+            connection.connect()
+
+            // 정상 응답인지 체크
+            if (connection.responseCode != HttpURLConnection.HTTP_OK) {
+                connection.disconnect()
+                return@withContext null
+            }
+
+            val inputStream = connection.inputStream
+            // 캐시 디렉토리에 임시 파일 생성
+            val tempFile = File.createTempFile("profile_", ".jpg", context.cacheDir)
+            tempFile.outputStream().use { output ->
+                inputStream.copyTo(output)
+            }
+            connection.disconnect()
+            tempFile
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
 
     fun updateProfile(info: PatchMyPageRequest, profileImageFile: File? = null) {
         viewModelScope.launch {
