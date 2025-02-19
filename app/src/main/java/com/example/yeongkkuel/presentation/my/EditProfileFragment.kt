@@ -55,15 +55,12 @@ class EditProfileFragment : Fragment() {
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val uri = result.data?.data ?: return@registerForActivityResult
-            // Uri -> File 변환
             val compressedFile = UriUtil.toFile(requireContext(), uri)
             selectedFile = compressedFile
-
-            // 미리보기 업데이트
+            // 미리보기
             val bitmap = BitmapFactory.decodeFile(compressedFile.absolutePath)
             binding.ivProfile.setImageBitmap(bitmap)
-
-            // ViewModel에 파일 경로 업데이트(필요하다면)
+            // ViewModel에 경로 업데이트 (필요하다면)
             viewModel.updateProfileImageUrl(compressedFile.absolutePath)
         }
     }
@@ -85,17 +82,16 @@ class EditProfileFragment : Fragment() {
     }
 
     /**
-     * 성별/나이/직업 각 그룹에 대해 '단일 선택 + 토글 해제' 가능하도록 설정
+     * 성별/나이/직업 각 그룹에 대해 '단일 선택 + 토글 해제'가 가능하도록 설정
      */
     private fun setupSelectableViews() {
         setupSingleSelection(binding.glGenderGroup) { view, isSelected ->
-            // 뷰모델에 반영
             if (isSelected && view is TextView) {
                 selectedGender = view
                 val displayValue = view.text.toString()
                 viewModel.updateGender(convertBackGender(displayValue))
             } else {
-                // 해제 상태 -> UNDECIDED
+                // 선택 해제 -> UNDECIDED
                 selectedGender = null
                 viewModel.updateGender("UNDECIDED")
             }
@@ -125,14 +121,13 @@ class EditProfileFragment : Fragment() {
     }
 
     /**
-     * 단일 선택 로직 + 이미 선택된 항목 클릭 시 선택 해제
-     * onSelectionChanged: (선택된 뷰 or null, isSelected 여부)
+     * 단일 선택 로직 + 이미 선택된 항목 클릭 시 '해제' 처리
      */
     private fun setupSingleSelection(group: ViewGroup, onSelectionChanged: (View?, Boolean) -> Unit) {
         for (i in 0 until group.childCount) {
             val child = group.getChildAt(i)
             child.setOnClickListener {
-                // 이미 선택된 항목을 다시 누르면 -> 해제
+                // 이미 선택되어 있다면 -> 해제
                 if (child.isSelected) {
                     child.isSelected = false
                     (child as? TextView)?.apply {
@@ -142,7 +137,7 @@ class EditProfileFragment : Fragment() {
                     onSelectionChanged(null, false)
 
                 } else {
-                    // 새 항목 선택하기 전에, 기존 항목들 전부 해제
+                    // 새 항목 선택하기 전에, 기존 항목들 해제
                     for (j in 0 until group.childCount) {
                         val sibling = group.getChildAt(j)
                         sibling.isSelected = false
@@ -183,11 +178,13 @@ class EditProfileFragment : Fragment() {
 
         // 저장 버튼
         binding.tvEdit.setOnClickListener {
-            // 여기서 성별/나이/직업을 꼭 선택해야 한다면 validateSelection()을 수행
-            // 만약 선택 안 함을 허용하면 체크를 스킵하거나 조건을 수정
-            // 예: if (!validateSelection()) return@setOnClickListener
+            // 1) 닉네임이 비었는지 검사
+            if (!validateNickname()) return@setOnClickListener
 
-            // ViewModel 메서드 (PATCH 등) 호출
+            // 2) 필요하다면 '모두 필수 선택' 체크 or 스킵
+            // if (!validateSelection()) return@setOnClickListener
+
+            // ViewModel 메서드 호출 (PATCH)
             viewModel.saveUserProfile(selectedFile)
         }
 
@@ -198,14 +195,27 @@ class EditProfileFragment : Fragment() {
     }
 
     /**
-     * 만약 선택이 필수가 아니라면, 조건을 완화하거나 제거하면 됨
+     * 닉네임이 비어있는지 검사 (필수)
+     */
+    private fun validateNickname(): Boolean {
+        val nickname = binding.etNickname.text.toString().trim()
+        return if (nickname.isEmpty()) {
+            Toast.makeText(requireContext(), "닉네임을 입력해 주세요.", Toast.LENGTH_SHORT).show()
+            false
+        } else {
+            true
+        }
+    }
+
+    /**
+     * 만약 성별/나이/직업도 필수라면 별도 메서드로 검사
+     * 여기서는 '선택 안 해도 OK'라고 가정하여 생략. 필요 시 아래 로직 이용
      */
     private fun validateSelection(): Boolean {
         val gender = (selectedGender as? TextView)?.text?.toString() ?: ""
         val ageGroup = (selectedAge as? TextView)?.text?.toString() ?: ""
         val job = (selectedJob as? TextView)?.text?.toString() ?: ""
 
-        // 만약 "모두 필수"라면
         if (gender.isEmpty() || ageGroup.isEmpty() || job.isEmpty()) {
             Toast.makeText(requireContext(), "모든 항목을 선택해주세요.", Toast.LENGTH_SHORT).show()
             return false
@@ -222,7 +232,7 @@ class EditProfileFragment : Fragment() {
                     binding.etNickname.setText(result.nickname)
                     binding.tvNicknameCount.text = "${result.nickname.length}/10"
 
-                    // 이미지 로딩
+                    // 프로필 이미지
                     if (!result.profileImageUrl.isNullOrEmpty()) {
                         Glide.with(this)
                             .load(result.profileImageUrl)
@@ -230,11 +240,10 @@ class EditProfileFragment : Fragment() {
                             .error(R.drawable.ic_my_profile)
                             .into(binding.ivProfile)
                     } else {
-                        // 기본 이미지
                         binding.ivProfile.setImageResource(R.drawable.ic_my_profile)
                     }
 
-                    // 서버 값(예: "FEMALE") -> 화면 표시값( "여자" ) 매핑
+                    // 서버에서 받은 성별/나이/직업 -> 화면 표기용으로 변환
                     val displayAgeGroup = convertAgeGroup(result.ageGroup)
                     val displayGender = convertGender(result.gender)
                     val displayJob = convertJob(result.job)
@@ -263,22 +272,23 @@ class EditProfileFragment : Fragment() {
         }
     }
 
-
+    /**
+     * 조회된 값에 따라 초기 선택 상태를 업데이트
+     */
     private fun updateInitialSelection(group: ViewGroup, value: String) {
         for (i in 0 until group.childCount) {
             val child = group.getChildAt(i) as? TextView
-            // 매칭되는 텍스트라면 선택
             if (child?.text?.toString() == value) {
                 child.isSelected = true
                 child.setTextColor(ContextCompat.getColor(requireContext(), R.color.main1))
                 child.setTextAppearance(R.style.body_semibo)
+                // 기록
                 when (group.id) {
                     R.id.gl_gender_group -> selectedGender = child
                     R.id.gl_age_group -> selectedAge = child
                     R.id.gl_job_group -> selectedJob = child
                 }
             } else {
-                // 나머지는 해제
                 child?.isSelected = false
                 child?.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
                 child?.setTextAppearance(R.style.body_regula)
@@ -302,7 +312,7 @@ class EditProfileFragment : Fragment() {
         return when (apiGender.uppercase()) {
             "FEMALE" -> "여자"
             "MALE" -> "남자"
-            else -> "" // UNDECIDED -> "" 로 표시
+            else -> "" // UNDECIDED -> ""
         }
     }
     private fun convertJob(apiJob: String): String {
@@ -349,3 +359,4 @@ class EditProfileFragment : Fragment() {
         _binding = null
     }
 }
+
