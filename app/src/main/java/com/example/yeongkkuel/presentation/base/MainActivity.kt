@@ -104,10 +104,11 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
 
     private fun setupAddCategoryClickListener(navController: NavController) {
         binding.tvAddCategory.setOnClickListener {
-            navController.navigate(R.id.categoryAddFragment, null, NavOptions.Builder()
-                .setLaunchSingleTop(true) // 이미 존재하면 새로 생성하지 않음
-                .setRestoreState(true) // 상태 복원
-                .build()
+            navController.navigate(
+                R.id.categoryAddFragment, null, NavOptions.Builder()
+                    .setLaunchSingleTop(true) // 이미 존재하면 새로 생성하지 않음
+                    .setRestoreState(true) // 상태 복원
+                    .build()
             )
         }
     }
@@ -244,7 +245,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                 when (destination.id) {
                     R.id.navigation_home,
                     R.id.navigation_stat,
-                    -> setBotSheetVisible()
+                        -> setBotSheetVisible()
 
 
                     else -> setBotSheetGone()
@@ -255,6 +256,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     R.id.categoryAddFragment -> {
                         binding.tvAddCategory.visibility = View.GONE // 카테고리 추가 화면에서는 숨기기
                     }
+
                     R.id.navigation_home -> {
                         // 홈 화면 복귀 시 카테고리 개수 조건 확인
                         val isCategoryEmpty = categoryViewModel.categories.value.orEmpty().size < 1
@@ -264,6 +266,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                             binding.tvAddCategory.visibility = View.GONE // 카테고리 있을 때 숨기기
                         }
                     }
+
                     else -> {
                         binding.tvAddCategory.visibility = View.GONE // 다른 화면에서는 숨기기
                         // TODO - * 지출 화면일 때 카테고리 추가 안 한 상태는 VISIBLE 상태로 만들기 *
@@ -284,7 +287,9 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     R.id.navigation_term_1,
                     R.id.navigation_term_2,
                     R.id.navigation_term_3,
-                    R.id.navigation_term_4 -> hideBottomNavigation(
+                    R.id.navigation_term_4,
+                    R.id.navigation_store,
+                    R.id.navigation_notification -> hideBottomNavigation(
                         true
                     )
 
@@ -426,16 +431,22 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         navController.navigate(R.id.expenseEntryFragment, bundle)
     }
 
+
     override fun navigateToExpenseView(
         expenseId: Int,
         expenseName: String,
         expensePrice: Int,
         categoryColor: Int,
-        categoryName: String
+        categoryName: String,
+        imageUrl: Boolean
     ) {
-        Log.d("MainActivity", "navigateToExpenseView() 호출됨 - id=$expenseId, name=$expenseName, price=$expensePrice, color=$categoryColor")
+        Log.d(
+            "MainActivity",
+            "navigateToExpenseView() 호출됨 - id=$expenseId, name=$expenseName, price=$expensePrice, color=$categoryColor"
+        )
 
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         val navController = navHostFragment.navController
 
         val bundle = Bundle().apply {
@@ -448,7 +459,6 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
 
         navController.navigate(R.id.navigation_expense_view, bundle)
     }
-
 
 
     override fun onNoExpenseChanged(isNoExpense: Boolean) {

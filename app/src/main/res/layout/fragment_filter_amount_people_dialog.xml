@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottomSheetLayout"
+    android:layout_width="match_parent"
+    android:layout_height="144dp"
+    android:background="@drawable/bg_chat_modal_bottom_sheet"
+    android:orientation="vertical"
+    android:paddingTop="32dp"
+    android:paddingBottom="13dp">
+
+    <TextView
+        android:id="@+id/tv_title_filter_amount_people"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="모집 인원"
+        android:textColor="@color/main1"
+        android:textStyle="bold"
+        style="@style/humm_semibo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/et_amount_people"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black3"
+        style="@style/title_semib"
+        android:textColorHint="@color/black2"
+        android:hint="0"
+        android:imeOptions="actionDone"
+        android:inputType="number"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/bg_edittext_pw"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_title_filter_amount_people" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="명"
+        android:textColor="@color/black"
+        style="@style/body_regula"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toEndOf="@+id/et_amount_people"
+        app:layout_constraintBottom_toBottomOf="@+id/et_amount_people" />
+
+    <TextView
+        android:id="@+id/tv_guide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="최소 5명이 모여야 채팅방 간 랭킹에 참여할 수 있어요."
+        android:textColor="@color/main1"
+        style="@style/small_semib"
+        android:layout_marginTop="7dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/et_amount_people" />
+
+    <TextView
+        android:id="@+id/tv_warning"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="최대 모집인원은 100명이에요."
+        android:textColor="@color/error"
+        style="@style/small_semib"
+        android:visibility="gone"
+        android:layout_marginTop="7dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/et_amount_people" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -22,12 +22,17 @@ interface LoginApiService {
         @Query("accessToken") Token: String
     ) : Call<KakaoLoginResponse>
 
+    @GET("/api/auth/google-login/")
+    fun googleLogin(
+        @Query("idToken") Token: String
+    ) : Call<KakaoLoginResponse>
+
     @PUT("/api/auth/user-info")
     suspend fun postUserInfo(
         @Body request: UserInfoRequest
     ): UserInfoResponse
 
-    @POST("/api/api/recommend-code")
+    @POST("/api/recommend-code")
     suspend fun validateRecommendCode(
         @Body request: ReferralRequest
     ): ReferralResponse

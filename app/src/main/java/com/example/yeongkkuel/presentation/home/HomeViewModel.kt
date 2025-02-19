@@ -14,6 +14,9 @@ class HomeViewModel(private val repository: HomeRepository) : ViewModel() {
     private val _homeResult = MutableLiveData<HomeResult?>() // ✅ HomeResult로 변경
     val homeResult: LiveData<HomeResult?> get() = _homeResult
 
+    private val _yesterdayReward = MutableLiveData<Int?>() // ✅ HomeResult로 변경
+    val yesterdayReward: LiveData<Int?> get() = _yesterdayReward
+
     fun fetchHomeData() {
         viewModelScope.launch {
             try {
@@ -35,6 +38,24 @@ class HomeViewModel(private val repository: HomeRepository) : ViewModel() {
             } catch (e: Exception) {
                 Log.e("HomeViewModel", "❌ 홈 데이터 불러오기 실패: ${e.message}")
                 _homeResult.postValue(null)
+            }
+        }
+    }
+
+    fun fetchYesterdayReward() {
+        viewModelScope.launch {
+            try {
+                val response = repository.getYesterdayReward()
+                if (response != null && response.isSuccess) {
+                    Log.d("HomeViewModel", "✅ 어제 리워드 데이터 업데이트 완료! ${response.result.yesterdayReward}")
+                    _yesterdayReward.postValue(response.result.yesterdayReward)
+                } else {
+                    Log.e("HomeViewModel", "🚨 어제 리워드 데이터 null 반환됨, 기본값 0 설정")
+                    _yesterdayReward.postValue(0)
+                }
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "❌ 어제 리워드 데이터 불러오기 실패: ${e.message}")
+                _yesterdayReward.postValue(0)
             }
         }
     }

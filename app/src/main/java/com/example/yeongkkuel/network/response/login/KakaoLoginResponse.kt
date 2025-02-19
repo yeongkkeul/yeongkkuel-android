@@ -11,5 +11,6 @@ data class KakaoLoginResult(
     val accessToken: String,
     val refreshToken: String,
     val email: String,
-    val redirectUrl: String
+    val redirectUrl: String,
+    val userId: Int
 )

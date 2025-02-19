@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -17,6 +18,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentStatBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
+import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import com.example.yeongkkuel.presentation.stat.monthly.StatMonthlyViewModel
 import com.example.yeongkkuel.presentation.stat.weekly.StatWeeklyViewModel
 import com.example.yeongkkuel.presentation.util.dpToPx
@@ -30,6 +32,7 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
 
     private val weeklyViewModel: StatWeeklyViewModel by viewModels()
     private val monthlyViewModel: StatMonthlyViewModel by viewModels()
+    private val botSheetViewModel : BotSheetViewModel by activityViewModels()
 
     private val viewPagerAdapter: StatViewPagerAdapter by lazy {
         StatViewPagerAdapter(
@@ -88,9 +91,11 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
             }.attach()
 
 
+
             // ViewPager2의 페이지가 변경될 때마다 호출되는 콜백
             botSheetListener?.let { listner ->
                 registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                    var isFirst = true
                     override fun onPageSelected(position: Int) {
                         super.onPageSelected(position)
 
@@ -104,6 +109,9 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
                                 val peekHeight =
                                     (displayHeight - 430.dpToPx(requireContext()))
                                 listner.setPeekHeight(peekHeight)
+
+                                if(!isFirst) botSheetViewModel.getSpendingList()
+                                else isFirst = false
                             }
 
                             1 -> { // 두 번째 페이지 (StatWeeklyFragment)
@@ -136,8 +144,15 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
 
         }
 
+        fun initNoti(){
+            includeTopbar.ivNoti.setOnClickListener {
+                findNavController().navigate(R.id.navigation_notification)
+            }
+        }
+
         initVp()
         initMore()
+        initNoti()
     }
 
     // ViewPager의 터치 이벤트를 비활성화하는 함수

@@ -200,8 +200,7 @@ class NotificationFragment : Fragment() {
     fun onselectedListener() {
         binding.ivBack.setOnClickListener {
             // 뒤로가기 버튼 클릭 시 이전 화면으로 이동
-            findNavController().popBackStack()
-
+           activity?.onBackPressed()
         }
         binding.ivNoti.setOnClickListener() {
             //  수신 설정 변경 - patchNotificationSettings API 호출

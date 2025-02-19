@@ -76,6 +76,17 @@
                 app:layout_constraintStart_toStartOf="@+id/gl_chat_room_detail_sheet"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <ImageView
+                android:id="@+id/iv_lock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_chat_room_lock"
+                android:visibility="gone"
+                android:layout_marginStart="10dp"
+                app:layout_constraintStart_toEndOf="@+id/tv_title_chat_room"
+                app:layout_constraintTop_toTopOf="@+id/tv_title_chat_room"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_title_chat_room" />
+
             <TextView
                 android:id="@+id/tv_time_last_message"
                 android:layout_width="wrap_content"

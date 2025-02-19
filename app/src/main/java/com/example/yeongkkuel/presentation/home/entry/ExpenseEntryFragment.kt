@@ -4,6 +4,7 @@ import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -11,44 +12,54 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavController
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
-import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.network.RetrofitClient
+import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
-import com.example.yeongkkuel.presentation.home.entry.data.ExpenseRepository
-import com.example.yeongkkuel.presentation.home.entry.data.ExpenseRequest
-import com.example.yeongkkuel.presentation.home.entry.data.ExpenseViewModel
+import com.example.yeongkkuel.presentation.home.entry.data.*
 import com.example.yeongkkuel.presentation.util.SpendingCategory
+import com.example.yeongkkuel.presentation.util.dpToPx
+import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import java.io.File
 import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
 class ExpenseEntryFragment : Fragment() {
 
-    private lateinit var navController: NavController
+    private val expenseViewModel: ExpenseViewModel by activityViewModels()
+    private val botSheetViewModel: BotSheetViewModel by activityViewModels()
+    private var selectedImageUri: Uri? = null
     private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var navController: androidx.navigation.NavController
     private val PICK_IMAGE_REQUEST = 1
     private var expenseDate: String = ""
-    private var expensePhotoUrl: String = ""
 
-    private val botSheetViewModel: BotSheetViewModel by activityViewModels()
-    private lateinit var expenseViewModel: ExpenseViewModel
+    private var botSheetListener: BotSheetListener? = null
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        if (context is BotSheetListener) {
+            botSheetListener = context
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -62,11 +73,10 @@ class ExpenseEntryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         navController = Navigation.findNavController(view)
-        sharedPreferences = requireContext().getSharedPreferences("ExpensePrefs", Context.MODE_PRIVATE)
+        sharedPreferences =
+            requireContext().getSharedPreferences("ExpensePrefs", Context.MODE_PRIVATE)
 
         val repository = ExpenseRepository(RetrofitClient.expenseApiService)
-        expenseViewModel = ViewModelProvider(this, ExpenseViewModel.Factory(repository)).get(ExpenseViewModel::class.java)
-
 
         setupCategory(view)
         initializeViews(view)
@@ -80,15 +90,22 @@ class ExpenseEntryFragment : Fragment() {
         setupPhotoFrame(view)
     }
 
+    // ✅ 완료 버튼 클릭 시 데이터 저장 및 API 호출
+    private fun setupCompleteButton(view: View) {
+        val tvEntryComplete = view.findViewById<TextView>(R.id.tv_entry_complete)
+        tvEntryComplete.setOnClickListener {
+            if (validateAndSaveEntry(view)) {
+                saveExpense(view)
+            }
+        }
+    }
+
     // 카테고리 관련 초기화
     private fun setupCategory(view: View) {
         val selectedCategory = arguments?.getString("selectedCategory") ?: "기본 카테고리"
         val categoryColor = arguments?.getInt("categoryColor") ?: R.color.black2
         val tvCategoryInput = view.findViewById<TextView>(R.id.tv_category_input)
         tvCategoryInput.text = selectedCategory
-
-        Log.d("ExpenseEntryFragment", "setupCategory - selectedCategory: $selectedCategory, categoryColor: $categoryColor")
-
         tvCategoryInput.setTextColor(requireContext().getColor(categoryColor))
     }
 
@@ -112,7 +129,8 @@ class ExpenseEntryFragment : Fragment() {
                 requireContext(),
                 { _, selectedYear, selectedMonth, selectedDay ->
                     val dayOfWeek = getDayOfWeek(selectedYear, selectedMonth, selectedDay)
-                    expenseDate= "${selectedYear}년 ${selectedMonth + 1}월 ${selectedDay}일 $dayOfWeek"
+                    expenseDate =
+                        "${selectedYear}년 ${selectedMonth + 1}월 ${selectedDay}일 $dayOfWeek"
                     tvDateInput.text = expenseDate
 
                 },
@@ -136,6 +154,7 @@ class ExpenseEntryFragment : Fragment() {
                 tvCharacterCount.text = "$length/24"
                 if (length > 24) etDetailInput.error = "최대 24자까지 입력 가능합니다."
             }
+
             override fun afterTextChanged(s: Editable?) {}
         })
     }
@@ -146,17 +165,27 @@ class ExpenseEntryFragment : Fragment() {
 
         etAmountInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
             override fun afterTextChanged(s: Editable?) {
-                val input = s?.toString()?.replace(",", "")?.toLongOrNull() ?: return
-                val limitedValue = if (input > 99_999_999) 99_999_999 else input
+                etAmountInput.removeTextChangedListener(this)
+
+                val rawInput = s?.toString()?.replace(",", "") ?: ""
+                val input = rawInput.toLongOrNull() ?: 0
+
+                // 🔹 최대 8자리까지만 입력 가능하도록 제한
+                val trimmedInput = if (rawInput.length > 8) rawInput.substring(0, 8) else rawInput
+                val limitedValue = trimmedInput.toLongOrNull()?.coerceAtMost(99_999_999) ?: 0
+
                 val formatted = String.format("%,d", limitedValue)
+
                 if (formatted != s.toString()) {
-                    etAmountInput.removeTextChangedListener(this)
                     etAmountInput.setText(formatted)
                     etAmountInput.setSelection(formatted.length)
-                    etAmountInput.addTextChangedListener(this)
                 }
+
+                etAmountInput.addTextChangedListener(this)
             }
         })
     }
@@ -210,15 +239,6 @@ class ExpenseEntryFragment : Fragment() {
         }
     }
 
-    // 완료 버튼 로직
-    private fun setupCompleteButton(view: View) {
-        val tvEntryComplete = view.findViewById<View>(R.id.tv_entry_complete)
-        tvEntryComplete.setOnClickListener {
-            if (validateAndSaveEntry(view)) {
-                saveExpense(view) // API 요청 및 저장
-            }
-        }
-    }
     private fun saveExpense(view: View) {
         val tvDateInput = view.findViewById<TextView>(R.id.tv_date_input)
         val etDetailInput = view.findViewById<EditText>(R.id.et_detail_input)
@@ -229,62 +249,67 @@ class ExpenseEntryFragment : Fragment() {
         val detail = etDetailInput.text.toString().trim()
         val amountString = etAmountInput.text.toString().replace(",", "").trim()
         val amount = amountString.toIntOrNull() ?: 0
-        val isNoExpenseChecked = ivCircleExpenseChecked.visibility == View.VISIBLE // ✅ 무지출 체크 여부 확인
+        val isNoExpenseChecked = ivCircleExpenseChecked.visibility == View.VISIBLE
         val isSendChatRoomChecked = ivCircleSendChecked.visibility == View.VISIBLE
 
+        val formattedDate = formatDateForServer(tvDateInput.text.toString())
 
-        // 유효한 카테고리 ID를 가져옴 (API 요청 오류 방지)
+        // 🔹 선택된 이미지 파일을 `MultipartBody.Part`로 변환
+        val imagePart = selectedImageUri?.let { uri ->
+            try {
+                requireContext().contentResolver.openInputStream(uri)?.use { inputStream ->
+                    val tempFile = File.createTempFile("upload", ".jpg", requireContext().cacheDir)
+                    tempFile.outputStream().use { outputStream ->
+                        inputStream.copyTo(outputStream)
+                    }
+
+                    val requestFile = tempFile.asRequestBody("image/*".toMediaTypeOrNull())
+                    MultipartBody.Part.createFormData("expenseImage", tempFile.name, requestFile)
+                }
+            } catch (e: Exception) {
+                Log.e("ExpenseEntryFragment", "🚨 이미지 변환 실패: ${e.message}")
+                null
+            }
+        }
         val selectedCategoryName = arguments?.getString("selectedCategory") ?: "기본 카테고리"
         val matchingCategory = botSheetViewModel.uiState.value.spendingList.find {
             it.kind.name.equals(selectedCategoryName, ignoreCase = true)
-        }
-        if(matchingCategory == null) {
-            Log.e("ExpenseEntryFragment", "선택된 카테고리에 해당하는 항목이 없습니다.")
+        } ?: run {
             Toast.makeText(requireContext(), "사용 가능한 카테고리가 없습니다.", Toast.LENGTH_SHORT).show()
             return
         }
+
         val validCategoryId = matchingCategory.categoryId
-
-
         if (validCategoryId == -1) {
             Toast.makeText(requireContext(), "사용 가능한 카테고리가 없습니다.", Toast.LENGTH_SHORT).show()
             return
         }
 
         val expenseRequest = ExpenseRequest(
-            day = formatDateForServer(tvDateInput.text.toString()), // 날짜 포맷 변환
-            categoryId = validCategoryId, // 유효한 카테고리 ID
+            day = formattedDate,
+            categoryId = validCategoryId,
             content = detail,
             amount = if (isNoExpenseChecked) 0 else amount,
             isExpense = isNoExpenseChecked,
-            expenseImg = expensePhotoUrl.takeIf { it.isNotEmpty() },
             sendChatRoom = isSendChatRoomChecked
         )
 
-        Log.d("ExpenseEntryFragment", "지출 내역 요청 데이터: $expenseRequest")
-        expenseViewModel.createExpense(expenseRequest) { response ->
-            if (response?.isSuccess == true) {
-                Log.d("ExpenseEntryFragment", "지출 내역 저장 완료: ${response.result}")
-                Toast.makeText(requireContext(), "지출 내역이 저장되었습니다.", Toast.LENGTH_SHORT).show()
-                navController.navigate(R.id.navigation_home)
-            } else {
-                Log.e("ExpenseEntryFragment", "지출 내역 저장 실패: ${response?.message}")
-                Toast.makeText(requireContext(), "지출 내역 저장 실패.", Toast.LENGTH_SHORT).show()
+
+        // ✅ API 호출
+        viewLifecycleOwner.lifecycleScope.launch {
+            expenseViewModel.createExpense(expenseRequest, imagePart) { response ->
+                if (response?.isSuccess == true) {
+                    Toast.makeText(requireContext(), "지출 내역이 저장되었습니다.", Toast.LENGTH_SHORT).show()
+                    handleNavigationAfterSave(view)
+                } else {
+                    Toast.makeText(requireContext(), "지출 내역 저장 실패.", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
 
-    private fun formatDateForServer(date: String): String {
-        val regex = """(\d{4})년 (\d{1,2})월 (\d{1,2})일""".toRegex()
-        val matchResult = regex.find(date)
-        return matchResult?.let {
-            val (year, month, day) = it.destructured
-            "%04d-%02d-%02d".format(year.toInt(), month.toInt(), day.toInt())
-        } ?: SimpleDateFormat("yyyy-MM-dd", Locale.KOREAN).format(Date())
-    }
-
-
     private fun validateAndSaveEntry(view: View): Boolean {
+        val clDetailInput = view.findViewById<ConstraintLayout>(R.id.cl_detail_input)
         val etDetailInput = view.findViewById<EditText>(R.id.et_detail_input)
         val etAmountInput = view.findViewById<EditText>(R.id.et_amount_input)
         val ivCircleExpenseChecked = view.findViewById<ImageView>(R.id.iv_circle_expense_checked)
@@ -294,23 +319,28 @@ class ExpenseEntryFragment : Fragment() {
         val amount = amountString.toIntOrNull() ?: 0
         val isNoExpenseChecked = ivCircleExpenseChecked.visibility == View.VISIBLE
 
-        val errorBackground = ContextCompat.getDrawable(requireContext(), R.drawable.bg_edit_text_error)
+        val errorBackground =
+            ContextCompat.getDrawable(requireContext(), R.drawable.bg_edit_text_error) // 지출 내용 에러
+        val errorBackground2 =
+            ContextCompat.getDrawable(requireContext(), R.drawable.bg_edit_text_error2) // 지출액 에러
         val normalBackground = ContextCompat.getDrawable(requireContext(), R.drawable.bg_edit_text)
 
         var hasError = false
 
         // 지출 내용 확인
         if (detail.isBlank() && !isNoExpenseChecked) {
-            etDetailInput.background = errorBackground
+            clDetailInput.background = errorBackground
+            etDetailInput.setBackgroundResource(android.R.color.transparent)
             hasError = true
             Toast.makeText(requireContext(), "지출 내용을 입력하세요.", Toast.LENGTH_SHORT).show()
         } else {
-            etDetailInput.background = normalBackground
+            clDetailInput.background = normalBackground
+            etDetailInput.setBackgroundResource(android.R.color.transparent)
         }
 
         // 지출액 확인
         if (amount <= 0 && !isNoExpenseChecked) {
-            etAmountInput.background = errorBackground
+            etAmountInput.background = errorBackground2
             hasError = true
             Toast.makeText(requireContext(), "지출액을 입력하세요.", Toast.LENGTH_SHORT).show()
         } else {
@@ -325,27 +355,23 @@ class ExpenseEntryFragment : Fragment() {
         // ViewModel에 저장
         val selectedCategory = arguments?.getString("selectedCategory") ?: "기타"
         // 선택된 카테고리 값 확인
-        Log.d("ExpenseEntryFragment", "validateAndSaveEntry - selectedCategory: '$selectedCategory'")
         val expenseHistory = BotSheetUiState.Spending.History(
             id = 1,
-            name =  detail,
+            name = detail,
             price = if (isNoExpenseChecked) 0 else amount,
             imgExist = false
         )
 
         botSheetViewModel.addExpenseHistory(expenseHistory)
 
-
         // SpendingCategory 처리
         return try {
             val categoryEnum = SpendingCategory.fromName(selectedCategory)
-            Log.d("ExpenseEntryFragment", "SpendingCategory.fromName 결과: $categoryEnum")
             botSheetViewModel.addExpenseToCategory(categoryEnum, expenseHistory)
             Toast.makeText(requireContext(), "지출 내역이 저장되었습니다.", Toast.LENGTH_SHORT).show()
             true
         } catch (e: Exception) {
             Toast.makeText(requireContext(), "카테고리가 유효하지 않습니다.", Toast.LENGTH_SHORT).show()
-            Log.e("ExpenseEntryFragment", "Error saving data: ${e.message}", e)
             false
         }
 
@@ -372,36 +398,13 @@ class ExpenseEntryFragment : Fragment() {
 
             // StatFragment로 이동하며 Bundle 전달
             navController.navigate(R.id.action_expenseEntryFragment_to_navigation_stat, bundle)
+
+            val displayHeight = resources.displayMetrics.heightPixels
+            val peekHeight =
+                (displayHeight - 528.dpToPx(requireContext()))
+            botSheetListener?.setPeekHeight(peekHeight)
         } else {
             navController.navigate(R.id.navigation_home)
-        }
-    }
-
-    // 사진 첨부 버튼 로직
-    private fun setupPhotoFrame(view: View) {
-        val flPhotoFrame = view.findViewById<FrameLayout>(R.id.fl_photo_frame)
-        flPhotoFrame.setOnClickListener {
-            openGallery()
-        }
-    }
-
-    private fun openGallery() {
-        val intent = Intent(Intent.ACTION_PICK).apply {
-            type = "image/*" // 이미지 파일만 선택
-        }
-        startActivityForResult(intent, PICK_IMAGE_REQUEST)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == AppCompatActivity.RESULT_OK) {
-            data?.data?.let { uri ->
-                val imgPhotoFrame = view?.findViewById<ImageView>(R.id.img_photo_frame)
-                val ivPhotoIcon = view?.findViewById<ImageView>(R.id.iv_photo_icon)
-                imgPhotoFrame?.setImageURI(uri)
-                ivPhotoIcon?.visibility = View.GONE
-                expensePhotoUrl = uri.toString()
-            }
         }
     }
 
@@ -420,5 +423,55 @@ class ExpenseEntryFragment : Fragment() {
         }
     }
 
+    // 🔹 날짜 포맷 변환 함수 (YYYY-MM-DD로 변경)
+    private fun formatDateForServer(date: String): String {
+        val regex = """(\d{4})년 (\d{1,2})월 (\d{1,2})일""".toRegex()
+        val matchResult = regex.find(date)
+        return matchResult?.let {
+            val (year, month, day) = it.destructured
+            "%04d-%02d-%02d".format(year.toInt(), month.toInt(), day.toInt())
+        } ?: SimpleDateFormat("yyyy-MM-dd", Locale.KOREAN).format(Date())
+    }
 
+    // 갤러리에서 이미지 선택
+    private fun setupPhotoFrame(view: View) {
+        val flPhotoFrame = view.findViewById<FrameLayout>(R.id.fl_photo_frame)
+        flPhotoFrame.setOnClickListener {
+            openGallery()
+        }
+    }
+
+    private fun openGallery() {
+        val intent = Intent(Intent.ACTION_PICK).apply {
+            type = "image/*" // 이미지 파일만 선택
+        }
+        startActivityForResult(intent, PICK_IMAGE_REQUEST)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == AppCompatActivity.RESULT_OK) {
+            data?.data?.let { uri ->
+                selectedImageUri = uri // ✅ 선택한 이미지 URI 저장
+
+                // 🔹 Glide를 사용하여 미리보기 적용 가능
+                val imgPhotoFrame = view?.findViewById<ImageView>(R.id.img_photo_frame)
+                val ivPhotoIcon = view?.findViewById<ImageView>(R.id.iv_photo_icon)
+                Glide.with(this)
+                    .load(uri)
+                    .override(500, 500) // ✅ 크기 조정 (236x236)
+                    .centerCrop() // ✅ 중앙 정렬하여 크기 맞춤
+                    .transform(RoundedCorners(50)) // ✅ 모서리를 둥글게 (50px)
+                    .into(imgPhotoFrame!!)
+
+                ivPhotoIcon?.visibility = View.GONE // 아이콘 숨김
+            }
+        }
+    }
+
+//
+//    override fun onDestroyView() {
+//        super.onDestroyView()
+//        _binding = null
+//    }
 }

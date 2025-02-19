@@ -98,11 +98,7 @@ class StatRecommendationFragment : Fragment() {
                     }
 
                     2 -> {
-                        viewModel.setTargetSpending(
-                            isSuccess = {
-                                findNavController().toNaviStat()
-                            }
-                        )
+                        viewPagerAdapter.setTargetSpending()
                     }
                 }
             }

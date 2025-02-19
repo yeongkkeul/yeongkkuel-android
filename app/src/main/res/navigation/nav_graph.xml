@@ -209,11 +209,15 @@
             android:id="@+id/action_navigation_chat_to_navigation_chat_room_search"
             app:destination="@id/navigation_chat_room_search"
             app:popUpTo="@id/navigation_chat_room_search"/>
+        <action
+            android:id="@+id/action_navigation_chat_to_navigation_chat_room_create"
+            app:destination="@id/navigation_chat_room_create"
+            app:popUpTo="@id/navigation_chat_room_create"/>
     </fragment>
 
     <fragment
         android:id="@+id/navigation_chat_room_search"
-        android:name="com.example.yeongkkuel.presentation.chat.ChatRoomSearchFragment"
+        android:name="com.example.yeongkkuel.presentation.chat.search.ChatRoomSearchFragment"
         tools:layout="@layout/fragment_chat_room_search">
         <action
             android:id="@+id/action_navigation_chat_room_search_to_register"
@@ -232,8 +236,18 @@
     </fragment>
 
     <fragment
+        android:id="@+id/navigation_chat_room_create"
+        android:name="com.example.yeongkkuel.presentation.chat.create.ChatRoomCreateFragment"
+        tools:layout="@layout/fragment_chat_room_create">
+        <action
+            android:id="@+id/action_navigation_chat_room_create_to_group"
+            app:destination="@id/navigation_chat_group"
+            app:popUpTo="@id/navigation_chat_group" />
+    </fragment>
+
+    <fragment
         android:id="@+id/navigation_chat_group"
-        android:name="com.example.yeongkkuel.presentation.chat.ChatGroupFragment"
+        android:name="com.example.yeongkkuel.presentation.chat.room.ChatGroupFragment"
         tools:layout="@layout/fragment_chat_group">
         <action
             android:id="@+id/action_navigation_chat_room_group_to_rank"
@@ -243,7 +257,7 @@
 
     <fragment
         android:id="@+id/navigation_chat_room_rank"
-        android:name="com.example.yeongkkuel.presentation.chat.ChatRoomRankFragment"
+        android:name="com.example.yeongkkuel.presentation.chat.rank.ChatRoomRankFragment"
         tools:layout="@layout/fragment_chat_room_rank">
     </fragment>
 
@@ -253,6 +267,12 @@
         android:name="com.example.yeongkkuel.presentation.stat.StatFragment"
         android:label="fragment_stat"
         tools:layout="@layout/fragment_stat">
+    </fragment>
+    <fragment
+        android:id="@+id/navigation_stat_monthly"
+        android:name="com.example.yeongkkuel.presentation.stat.monthly.StatMonthlyFragment"
+        android:label="fragment_stat_monthly"
+        tools:layout="@layout/fragment_stat_monthly">
     </fragment>
 
     <fragment

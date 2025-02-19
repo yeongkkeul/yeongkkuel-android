@@ -34,6 +34,7 @@ data class StatWeeklyUiState(
     }
 
     data class PieChartData(
+        val categoryId: Int,
         val category: SpendingCategory,
         val expenditure: Int,
         val color: Colors
@@ -67,9 +68,10 @@ data class StatWeeklyUiState(
             ),
             pieChartList = listOf(
                 PieChartData(
+                    categoryId = 0,
                     category = SpendingCategory.CUSTOM(""),
                     expenditure = 15800,
-                    Colors.BLACK1
+                    Colors.BLUE6
                 ),
             ),
             totalSpending = 56700

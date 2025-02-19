@@ -127,7 +127,7 @@
 
             <TextView
                 android:id="@+id/tv_mostSpending"
-                style="@style/humm_semibo"
+                style="@style/humm_medium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
