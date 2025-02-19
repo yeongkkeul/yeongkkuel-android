@@ -27,27 +27,27 @@ import timber.log.Timber
 
 class SignupFragment : Fragment() {
 
-    // View Binding
     private var _binding: FragmentSignupBinding? = null
     private val binding get() = _binding!!
 
-
+    // 선택된 항목 (없으면 null)
     private var selectedGender: View? = null
     private var selectedAge: View? = null
     private var selectedJob: View? = null
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        // 바인딩 객체 초기화
         _binding = FragmentSignupBinding.inflate(inflater, container, false)
         val rootView = binding.root
-        // ic back 클릭 시 뒤로가기
+
+        // 뒤로가기
         binding.ivBack.setOnClickListener { findNavController().navigateUp() }
-        // 입력 값 검증
+
+        // 닉네임 입력 글자 수 검증
         setupNicknameValidation()
-        // 그룹에 대한 선택 처리
+
+        // 성별/나이/직업 단일 선택 설정
         setupSelectableViews()
 
         // 완료 버튼
@@ -57,7 +57,6 @@ class SignupFragment : Fragment() {
     }
 
     private fun setupNicknameValidation() {
-        // etNickname: 바인딩 객체를 통해 접근
         binding.etNickname.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -70,7 +69,7 @@ class SignupFragment : Fragment() {
                 // 글자 수 표시
                 binding.tvCharCount.text = "${s?.length ?: 0}/10"
 
-                // 입력 중 에러 메시지 및 테두리 초기화
+                // 에러 UI 초기화
                 binding.clNickname.setBackgroundResource(R.drawable.rounded_nickname_background)
                 binding.tvNicknameError.visibility = View.INVISIBLE
             }
@@ -80,41 +79,51 @@ class SignupFragment : Fragment() {
     }
 
     private fun setupSelectableViews() {
-        // GridLayout 등을 바인딩으로 접근
-        val genderGroup = binding.glGenderGroup
-        val ageGroup = binding.glAgeGroup
-        val jobGroup = binding.glJobGroup
-
-        setupSingleSelection(genderGroup)
-        setupSingleSelection(ageGroup)
-        setupSingleSelection(jobGroup)
+        // 각각의 GridLayout(또는 ViewGroup)에 대해 단일 선택 처리
+        setupSingleSelection(binding.glGenderGroup) { view, isSelected ->
+            // 클릭 후에 selectedGender 를 설정 / 해제
+            selectedGender = if (isSelected) view else null
+        }
+        setupSingleSelection(binding.glAgeGroup) { view, isSelected ->
+            selectedAge = if (isSelected) view else null
+        }
+        setupSingleSelection(binding.glJobGroup) { view, isSelected ->
+            selectedJob = if (isSelected) view else null
+        }
     }
 
-    private fun setupSingleSelection(group: ViewGroup) {
+    /**
+     * 단일 선택이지만, 이미 선택된 뷰를 다시 탭하면 '해제' 가능한 로직
+     */
+    private fun setupSingleSelection(group: ViewGroup, onSelectionChanged: (View?, Boolean) -> Unit) {
         for (i in 0 until group.childCount) {
             val child = group.getChildAt(i)
             child.setOnClickListener {
-                // 기존 선택 초기화
-                for (j in 0 until group.childCount) {
-                    val sibling = group.getChildAt(j)
-                    sibling.isSelected = false
-                    (sibling as? TextView)?.apply {
+                if (child.isSelected) {
+                    // 이미 선택된 항목을 다시 누르면 -> 해제
+                    child.isSelected = false
+                    (child as? TextView)?.apply {
                         setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
                         setTextAppearance(R.style.body_regula)
                     }
-                }
-                // 현재 선택
-                child.isSelected = true
-                (child as? TextView)?.apply {
-                    setTextColor(ContextCompat.getColor(requireContext(), R.color.main1))
-                    setTextAppearance(R.style.body_semibo)
-                }
-
-                // 어떤 그룹인지 식별
-                when (group.id) {
-                    R.id.gl_gender_group -> selectedGender = child
-                    R.id.gl_age_group -> selectedAge = child
-                    R.id.gl_job_group -> selectedJob = child
+                    onSelectionChanged(child, false)
+                } else {
+                    // 새로운 항목을 누르면, 기존 모두 해제
+                    for (j in 0 until group.childCount) {
+                        val sibling = group.getChildAt(j)
+                        sibling.isSelected = false
+                        (sibling as? TextView)?.apply {
+                            setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+                            setTextAppearance(R.style.body_regula)
+                        }
+                    }
+                    // 현재 뷰 선택
+                    child.isSelected = true
+                    (child as? TextView)?.apply {
+                        setTextColor(ContextCompat.getColor(requireContext(), R.color.main1))
+                        setTextAppearance(R.style.body_semibo)
+                    }
+                    onSelectionChanged(child, true)
                 }
             }
         }
@@ -130,25 +139,18 @@ class SignupFragment : Fragment() {
             return
         }
 
-        // 선택 검증
-        if (selectedGender == null || selectedAge == null || selectedJob == null) {
-            Toast.makeText(requireContext(), "모든 항목을 선택해주세요.", Toast.LENGTH_SHORT).show()
-            return
-        }
+        // 성별/나이/직업 텍스트 추출 (없으면 "")
+        val genderText = (selectedGender as? TextView)?.text?.toString() ?: ""
+        val ageText = (selectedAge as? TextView)?.text?.toString() ?: ""
+        val jobText = (selectedJob as? TextView)?.text?.toString() ?: ""
 
-        // 서버 전송
-        val genderText = (selectedGender as TextView).text.toString()
-        val ageText = (selectedAge as TextView).text.toString()
-        val jobText = (selectedJob as TextView).text.toString()
-
+        // 서버 전송용으로 매핑
         val serverGender = mapGenderToServer(genderText)
         val serverAgeGroup = mapAgeToServer(ageText)
         val serverJob = mapJobToServer(jobText)
 
         sendSignupDataToBackend(nickname, serverGender, serverAgeGroup, serverJob)
-
     }
-
 
     private fun sendSignupDataToBackend(nickname: String, gender: String, ageGroup: String, job: String) {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -175,14 +177,12 @@ class SignupFragment : Fragment() {
         }
     }
 
-
     private fun showRecommendCodeDialog() {
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.show()
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.window?.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-        // 어두워지는 정도 설정 (0.0 ~ 1.0)
         val params = dialog.window?.attributes
         params?.dimAmount = 0.65f
         dialog.window?.attributes = params
@@ -204,51 +204,41 @@ class SignupFragment : Fragment() {
         btnConfirm.setOnClickListener {
             val code = etRecommendCode.text.toString().trim()
 
-            if(code.isEmpty()) {
+            if (code.isEmpty()) {
                 errorTextView.visibility = View.VISIBLE
                 errorTextView.text = "코드를 입력해주세요."
                 return@setOnClickListener
             }
-
             if (code.length != 6) {
                 errorTextView.visibility = View.VISIBLE
                 errorTextView.text = "코드는 6자리여야 합니다."
                 return@setOnClickListener
             }
 
-            verifyReferralCodeApi(code,dialog,errorTextView)
+            verifyReferralCodeApi(code, dialog, errorTextView)
         }
-
-//        dialog.show()
     }
 
     // 초대 코드 검증
-    private fun verifyReferralCodeApi(
-        referralCode: String,
-        dialog: Dialog,
-        errorTextView: TextView
-    ) {
+    private fun verifyReferralCodeApi(referralCode: String, dialog: Dialog, errorTextView: TextView) {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val request = ReferralRequest(referralCode)
                 val response = RetrofitClient.loginApiService.validateRecommendCode(request)
-                //로그추가
-                Timber.d("Referral code validation response: $response")
 
                 if (!response.isSuccess) {
                     // 서버 응답 자체가 실패
                     errorTextView.visibility = View.VISIBLE
-                    errorTextView.text = response.message // 예: "존재하지 않는 추천인 코드입니다."
+                    errorTextView.text = response.message
                 } else {
-                        // 코드 유효 → 다음 화면 이동
-                        dialog.dismiss()
-                        navigateToTermsAgree(showRewardModal = true)
+                    // 코드 유효 → 다음 화면 이동
+                    dialog.dismiss()
+                    navigateToTermsAgree(showRewardModal = true)
                 }
 
             } catch (e: Exception) {
                 // 네트워크 장애, 예외 발생 등
-                // 만약 예외가 404 에러라면 "존재하지 않는 추천인 코드입니다." 메시지 출력
-                if(e.message?.contains("404") == true) {
+                if (e.message?.contains("404") == true) {
                     errorTextView.visibility = View.VISIBLE
                     errorTextView.text = "존재하지 않는 추천인 코드입니다."
                 } else {
@@ -269,7 +259,7 @@ class SignupFragment : Fragment() {
         return when (uiText) {
             "남자" -> "Male"
             "여자" -> "Female"
-            else -> "UNDECIDED"
+            else -> "UNDECIDED"  // 아무것도 선택 안 했거나, 기타
         }
     }
     private fun mapAgeToServer(uiText: String): String {

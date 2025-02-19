@@ -17,38 +17,7 @@ class MyPageTest {
 
     private val accessToken: String? = null
 
-    @Test
-    fun test(){
-        runBlocking {
-            patchMyPage()
-        }
-    }
 
-    suspend fun patchMyPage(){
-        try {
-            myPageService.patchMyPage(
-                request = PatchMyPageRequest(
-                    nickname = "dd",
-                    gender = "Female",
-                    ageGroup = "20s",
-                    job = "직장인"
-                ),
-                profileImage = null
-            ).let {
-                Log.d("test", it.toString())
-            }
-        }catch (e:Exception){
-            e.printStackTrace()
-        }
-
-        try {
-            myPageService.getMyPage().let {
-                Log.d("test", it.toString())
-            }
-        }catch (e:Exception){
-            e.printStackTrace()
-        }
-    }
 
     fun encodeImageToBase64(file: File): String {
         val byteArray = file.readBytes()
