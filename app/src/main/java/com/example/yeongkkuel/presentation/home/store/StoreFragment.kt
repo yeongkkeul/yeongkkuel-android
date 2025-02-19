@@ -82,7 +82,7 @@ class StoreFragment : Fragment() {
 
         binding.imgPurchaseIcon.setOnClickListener {
             selectedProduct?.let { product ->
-                if (viewModel.currentReward < product.price) {
+                if (viewModel.shopResponse.value?.result?.myReward ?: 0 < product.price) {
                     showPurchaseFailureDialog()
                 } else {
                     showPurchaseDialog(product) // 다이얼로그 먼저 띄우기
