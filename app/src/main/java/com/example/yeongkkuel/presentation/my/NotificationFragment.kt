@@ -67,7 +67,7 @@ class NotificationFragment : Fragment() {
 
 
         onselectedListener()
-//        checkAllNotificationRead()
+        checkAllNotificationRead()
         adapter = NotificationAdapter(
             emptyList()
         ) { clickedItem ->
@@ -247,7 +247,7 @@ class NotificationFragment : Fragment() {
     fun checkAllNotificationRead() {
         // 모든 알림 읽음 처리 - patchAllNotificationRead API 호출
         viewLifecycleOwner.lifecycleScope.launch {
-            val response = RetrofitClient.notificationService.patchAllNotificationRead()
+            val response = notificationService.patchAllNotificationRead()
             if (response?.isSuccess == true) {
                 // 성공 시
                 Log.d("NotificationFragment", "모든 알림 읽음 처리 성공")

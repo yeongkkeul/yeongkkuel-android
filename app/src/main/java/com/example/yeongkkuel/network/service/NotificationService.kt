@@ -38,7 +38,7 @@ interface NotificationService {
     suspend fun getUnreadNotificationCount(
     ): Response<Boolean>
 
-    @PATCH("api/notifications/read-all")
+    @POST("api/notifications/read-all")
     suspend fun patchAllNotificationRead(
     ): Response<Int>
 
