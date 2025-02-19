@@ -1,5 +1,6 @@
 package com.example.yeongkkuel.presentation.my
 
+import android.content.Context
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.os.Bundle
 import android.util.Log
@@ -29,6 +30,11 @@ import java.util.Locale
 
 class NotificationFragment : Fragment() {
 
+    private val PREFS_NAME = "my_prefs"
+    private val KEY_NOTIFICATION_ON = "is_notification_on"
+
+    private var isNotificationOn = false
+
     private lateinit var binding: FragmentNotificationBinding  // viewBinding 사용하는 경우
 
     private lateinit var adapter: NotificationAdapter
@@ -44,6 +50,17 @@ class NotificationFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val prefs = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+
+        // 1. SharedPreferences 에서 저장된 알림 상태 불러오기 (기본값 false)
+        isNotificationOn = prefs.getBoolean(KEY_NOTIFICATION_ON, false)
+
+        // 2. 불러온 상태에 따라 아이콘 초기화
+        val newIcon = if (isNotificationOn) R.drawable.ic_bell else R.drawable.ic_bell_off
+
+        binding.ivNoti.setImageResource(newIcon)
+
 
         onselectedListener()
 //        checkAllNotificationRead()
@@ -112,6 +129,12 @@ class NotificationFragment : Fragment() {
                                 "무지출이 대세다 방 가입 완료",
                                 "12/12",
                                 "최근 7일"
+                            ),
+                            NotificationItem(
+                                NotificationType.NO_SPEND_REWARD,
+                                "돈 모아서 차 사자 방 가입 완료",
+                                "12/12",
+                                "오늘"
                             )
                         )
 
@@ -127,6 +150,7 @@ class NotificationFragment : Fragment() {
                             }
                             binding.rvNotification.adapter = adapter
                         }
+
                     }
                 } else {
                     // 실패 처리: response.errorBody()?.string() 등
@@ -197,34 +221,36 @@ class NotificationFragment : Fragment() {
         }
     }
 
+
+
     fun onselectedListener() {
         binding.ivBack.setOnClickListener {
             // 뒤로가기 버튼 클릭 시 이전 화면으로 이동
            activity?.onBackPressed()
         }
-        binding.ivNoti.setOnClickListener() {
-            //  수신 설정 변경 - patchNotificationSettings API 호출
+
+        binding.ivNoti.setOnClickListener {
+            val newSetting = !isNotificationOn
+            val request = NotificationSettingRequest(newSetting)
+
             viewLifecycleOwner.lifecycleScope.launch {
-                val isBellOff = binding.ivNoti.drawable.constantState == ContextCompat.getDrawable(
-                    requireContext(),
-                    R.drawable.ic_bell_off
-                )?.constantState
-
-                val request = NotificationSettingRequest(isBellOff)
-                val response = RetrofitClient.notificationService.patchNotificationSettings(request)
-
+                // API 호출
+                val response = notificationService.patchNotificationSettings(request)
                 if (response?.isSuccess == true) {
-                    val newIcon = if (response.result) R.drawable.ic_bell else R.drawable.ic_bell_off
-                    binding.ivNoti.setImageDrawable(
-                        ContextCompat.getDrawable(
-                            requireContext(),
-                            newIcon
-                        )
-                    )
+                    // 서버에서 온 결과로 최종 상태를 갱신
+                    isNotificationOn = response.result
+
+                    // UI 아이콘 바꾸기
+                    val updatedIcon = if (isNotificationOn) R.drawable.ic_bell else R.drawable.ic_bell_off
+                    binding.ivNoti.setImageResource(updatedIcon)
+
+
+                    // SharedPreferences 에도 갱신된 상태 저장
+                    val prefs = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                    prefs.edit().putBoolean(KEY_NOTIFICATION_ON, isNotificationOn).apply()
+
                 } else {
                     Toast.makeText(requireContext(), "알림 수신 설정 변경 실패", Toast.LENGTH_SHORT).show()
-
-
                 }
             }
         }
