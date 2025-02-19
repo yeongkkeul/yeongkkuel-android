@@ -46,6 +46,7 @@ class MyFragment : Fragment() {
     private val binding get() = _binding!!
     private var pressedTime = 0L
 
+    private val notificationViewModel: NotificationViewModel by viewModels()
     private val viewModel: ProfileViewModel by viewModels({ requireActivity() })
 
     override fun onCreateView(
@@ -85,9 +86,17 @@ class MyFragment : Fragment() {
             }
 
             val layoutParams = ivNoti.layoutParams as ViewGroup.MarginLayoutParams
-            layoutParams.marginEnd = 0
+            layoutParams.marginEnd = 12
             ivNoti.layoutParams = layoutParams
+
+            notificationViewModel.checkUnreadNotifications()
+            notificationViewModel.unreadNotification.observe(viewLifecycleOwner) { hasUnread ->
+                binding.includeTopbar.ivNotiDot.visibility =
+                    if (hasUnread) View.VISIBLE else View.INVISIBLE
+            }
         }
+
+
 
     }
     private fun observeViewModel() {
