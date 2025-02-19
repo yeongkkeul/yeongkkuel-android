@@ -351,8 +351,8 @@ class EditProfileFragment : Fragment() {
             "EMPLOYEE" -> "직장인"
             "SELF_EMPLOYED" -> "자영업자"
             "HOMEMAKER" -> "주부"
-            "UNDECIDED" -> "무직"
-            else -> apiJob // 추가 케이스가 있으면 여기에 추가
+            "UNDECIDED" -> ""
+            else -> "" // 추가 케이스가 있으면 여기에 추가
         }
     }
 
