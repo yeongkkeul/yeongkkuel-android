@@ -10,36 +10,36 @@ import okhttp3.RequestBody.Companion.toRequestBody
 class ExpenseRepository(private val api: ExpenseApiService) {
 
     suspend fun createExpense(expenseRequest: ExpenseRequest, imageFile: MultipartBody.Part?): ExpenseResponse? {
-        Log.d("ExpenseRepository", "🚀 지출 내역 API 요청: $expenseRequest")
+        Log.d("ExpenseRepository", "지출 내역 API 요청: $expenseRequest")
 
         return try {
-            // ✅ ExpenseRequest를 JSON 문자열로 변환
+            // ExpenseRequest를 JSON 문자열로 변환
             val gson = Gson()
             val requestJson = gson.toJson(expenseRequest)
             val requestBody = requestJson.toRequestBody("application/json".toMediaTypeOrNull()) // ✅ JSON 변환
 
             val response = api.createExpense(
-                request = requestBody, // ✅ JSON 변환된 request 전달
-                expenseImage = imageFile // ✅ 선택적 이미지 첨부
+                request = requestBody, //  JSON 변환된 request 전달
+                expenseImage = imageFile //  선택적 이미지 첨부
             )
 
             if (response.isSuccessful) {
                 val responseBody = response.body()
-                Log.d("ExpenseRepository", "✅ 지출 내역 저장 성공: $responseBody")
+                Log.d("ExpenseRepository", " 지출 내역 저장 성공: $responseBody")
                 responseBody
             } else {
-                Log.e("ExpenseRepository", "🚨 API 요청 실패: ${response.errorBody()?.string()}")
+                Log.e("ExpenseRepository", " API 요청 실패: ${response.errorBody()?.string()}")
                 null
             }
         } catch (e: Exception) {
-            Log.e("ExpenseRepository", "🚨 네트워크 오류 발생: ${e.message}")
+            Log.e("ExpenseRepository", " 네트워크 오류 발생: ${e.message}")
             null
         }
     }
 
     suspend fun updateExpense(expenseId: Int, request: ExpenseUpdateRequest, imageFile: MultipartBody.Part?): ExpenseUpdateResponse? {
         return try {
-            Log.d("ExpenseRepository", "🚀 지출 내역 수정 요청: $request")
+            Log.d("ExpenseRepository", " 지출 내역 수정 요청: $request")
 
             val response = api.updateExpense(
                 expenseId = expenseId,
@@ -52,15 +52,15 @@ class ExpenseRepository(private val api: ExpenseApiService) {
 
             if (response.isSuccessful) {
                 response.body() ?: run {
-                    Log.e("ExpenseRepository", "🚨 응답이 null입니다.")
+                    Log.e("ExpenseRepository", " 응답이 null입니다.")
                     null
                 }
             } else {
-                Log.e("ExpenseRepository", "🚨 API 요청 실패: ${response.errorBody()?.string()}")
+                Log.e("ExpenseRepository", " API 요청 실패: ${response.errorBody()?.string()}")
                 null
             }
         } catch (e: Exception) {
-            Log.e("ExpenseRepository", "🚨 네트워크 오류 발생: ${e.message}")
+            Log.e("ExpenseRepository", " 네트워크 오류 발생: ${e.message}")
             null
         }
     }

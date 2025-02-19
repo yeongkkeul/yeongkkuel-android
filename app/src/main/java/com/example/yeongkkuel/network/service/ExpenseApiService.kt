@@ -13,8 +13,8 @@ interface ExpenseApiService {
     @Multipart
     @POST("/api/expense")
     suspend fun createExpense(
-        @Part("request") request: RequestBody, // ✅ JSON 변환된 request 추가
-        @Part expenseImage: MultipartBody.Part? // ✅ 선택적 이미지 첨부
+        @Part("request") request: RequestBody, // JSON 변환된 request 추가
+        @Part expenseImage: MultipartBody.Part? // 선택적 이미지 첨부
     ): Response<ExpenseResponse>
 
 

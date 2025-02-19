@@ -18,6 +18,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentExpenseEditBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
@@ -33,6 +34,7 @@ import java.io.File
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.min
 
 class ExpenseEditFragment : Fragment() {
 
@@ -151,17 +153,25 @@ class ExpenseEditFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == AppCompatActivity.RESULT_OK) {
             data?.data?.let { uri ->
-                selectedImageUri = uri // 선택한 이미지 저장
+                selectedImageUri = uri // 선택한 이미지 URI 저장
 
-                // 🔹 Glide를 사용하여 이미지 미리보기 업데이트
+                // 🔹 핸드폰 화면 크기 가져오기
+                val displayMetrics = requireContext().resources.displayMetrics
+                val screenWidth = displayMetrics.widthPixels // 화면 너비
+                val imageSize = min(screenWidth - 100, 650) // 화면보다 크지 않도록 조정 (최대 650px)
+
                 Glide.with(this)
                     .load(uri)
+                    .override(imageSize, imageSize) // 🔹 크기를 화면보다 크지 않게 설정
+                    .fitCenter() // 🔹 이미지가 너무 커지지 않도록 자동 조정
+                    .transform(RoundedCorners(50)) // 🔹 모서리를 둥글게 (50px)
                     .into(binding.imgPhotoFrame)
 
-                binding.ivPhotoIcon.visibility = View.GONE
+                binding.ivPhotoIcon.visibility = View.GONE // 아이콘 숨김
             }
         }
     }
+
 
     private fun enableEditing() {
         binding.etDetailInput.isEnabled = true
@@ -187,9 +197,6 @@ class ExpenseEditFragment : Fragment() {
     private fun setupDetailInput() {
         val etDetailInput = binding.etDetailInput
         val tvCharacterCount = binding.tvCharacterCount
-
-        val initialTextLength = etDetailInput.text?.length ?: 0
-        tvCharacterCount.text = "$initialTextLength/24"
 
         etDetailInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}

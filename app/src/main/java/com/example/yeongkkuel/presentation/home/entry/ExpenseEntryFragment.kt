@@ -37,6 +37,7 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.min
 
 class ExpenseEntryFragment : Fragment() {
 
@@ -252,7 +253,7 @@ class ExpenseEntryFragment : Fragment() {
                     MultipartBody.Part.createFormData("expenseImage", tempFile.name, requestFile)
                 }
             } catch (e: Exception) {
-                Log.e("ExpenseEntryFragment", "🚨 이미지 변환 실패: ${e.message}")
+                Log.e("ExpenseEntryFragment", " 이미지 변환 실패: ${e.message}")
                 null
             }
         }
@@ -279,8 +280,6 @@ class ExpenseEntryFragment : Fragment() {
             sendChatRoom = isSendChatRoomChecked
         )
 
-
-        // ✅ API 호출
         viewLifecycleOwner.lifecycleScope.launch {
             expenseViewModel.createExpense(expenseRequest, imagePart) { response ->
                 if (response?.isSuccess == true) {
@@ -433,13 +432,18 @@ class ExpenseEntryFragment : Fragment() {
             data?.data?.let { uri ->
                 selectedImageUri = uri // ✅ 선택한 이미지 URI 저장
 
-                // 🔹 Glide를 사용하여 미리보기 적용 가능
                 val imgPhotoFrame = view?.findViewById<ImageView>(R.id.img_photo_frame)
                 val ivPhotoIcon = view?.findViewById<ImageView>(R.id.iv_photo_icon)
+
+                // ✅ 핸드폰 화면 크기 가져오기
+                val displayMetrics = requireContext().resources.displayMetrics
+                val screenWidth = displayMetrics.widthPixels // 화면 너비
+                val imageSize = min(screenWidth - 100, 650) // 화면보다 크지 않도록 조정 (최대 236px)
+
                 Glide.with(this)
                     .load(uri)
-                    .override(500, 500) // ✅ 크기 조정 (236x236)
-                    .centerCrop() // ✅ 중앙 정렬하여 크기 맞춤
+                    .override(imageSize, imageSize) // ✅ 크기를 화면보다 크지 않게 설정
+                    .fitCenter() // ✅ 이미지가 너무 커지지 않도록 자동 조정
                     .transform(RoundedCorners(50)) // ✅ 모서리를 둥글게 (50px)
                     .into(imgPhotoFrame!!)
 
@@ -447,7 +451,6 @@ class ExpenseEntryFragment : Fragment() {
             }
         }
     }
-
 //
 //    override fun onDestroyView() {
 //        super.onDestroyView()

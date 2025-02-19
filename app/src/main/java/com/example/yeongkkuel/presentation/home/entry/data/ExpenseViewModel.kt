@@ -30,11 +30,11 @@ class ExpenseViewModel(private val repository: ExpenseRepository) : ViewModel() 
         viewModelScope.launch {
             val response = repository.createExpense(expenseRequest, imageFile)
             if (response != null && response.isSuccess) {
-                Log.d("ExpenseViewModel", "✅ 지출 내역 저장 성공: $response")
+                Log.d("ExpenseViewModel", " 지출 내역 저장 성공: $response")
 
                 botSheetViewModel.getSpendingList()
             } else {
-                Log.e("ExpenseViewModel", "🚨 지출 내역 저장 실패 또는 응답 없음")
+                Log.e("ExpenseViewModel", " 지출 내역 저장 실패 또는 응답 없음")
             }
             onResult(response)
         }

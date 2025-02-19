@@ -4,5 +4,6 @@ enum class ProductCategory {
     SWING,
     TOY,
     BOWL,
-    NEST
+    NEST,
+    MY
 }

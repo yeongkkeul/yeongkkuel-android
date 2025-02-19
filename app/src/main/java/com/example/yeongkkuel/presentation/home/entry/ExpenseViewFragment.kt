@@ -70,7 +70,7 @@ class ExpenseViewFragment : Fragment() {
         }
 
         binding.clMore.findViewById<TextView>(R.id.tv_delete).setOnClickListener {
-            val expenseId = arguments?.getInt("expenseId") ?: return@setOnClickListener // ✅ null이면 실행 안 함
+            val expenseId = arguments?.getInt("expenseId") ?: return@setOnClickListener //  null이면 실행 안 함
             botSheetViewModel.deleteExpense(expenseId)
             deleteExpense()
             binding.clMore.visibility = View.GONE
@@ -85,17 +85,17 @@ class ExpenseViewFragment : Fragment() {
         val expenseDateString = arguments?.getString("expenseDate")
         val imageUrl = arguments?.getString("imageUrl") ?: ""
 
-        Log.d("ExpenseViewFragment", "✅ 받은 데이터: expenseId=$expenseId, name=$expenseName, price=$expensePrice, category=$categoryName, imageUrl=$imageUrl") // ✅ 로그 추가
+        Log.d("ExpenseViewFragment", " 받은 데이터: expenseId=$expenseId, name=$expenseName, price=$expensePrice, category=$categoryName, imageUrl=$imageUrl") // ✅ 로그 추가
 
         // 이미지 로드
         if (imageUrl.isNotEmpty()) {
-            Log.d("ExpenseViewFragment", "✅ Glide로 이미지 로드: $imageUrl") // ✅ Glide 실행 전에 로그 추가
+            Log.d("ExpenseViewFragment", " Glide로 이미지 로드: $imageUrl") //  Glide 실행 전에 로그 추가
             Glide.with(binding.imgPhotoFrame.context)
                 .load(imageUrl)
                 .into(binding.imgPhotoFrame)
             binding.ivPhotoIcon.visibility = View.GONE
         } else {
-            Log.e("ExpenseViewFragment", "🚨 imageUrl이 비어있음!") // ✅ imageUrl이 없을 때 오류 로그
+            Log.e("ExpenseViewFragment", " imageUrl이 비어있음!") //  imageUrl이 없을 때 오류 로그
             binding.imgPhotoFrame.setImageResource(R.drawable.bg_photo_input)
             binding.ivPhotoIcon.visibility = View.VISIBLE
         }

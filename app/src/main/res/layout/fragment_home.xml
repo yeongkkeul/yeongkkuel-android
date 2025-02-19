@@ -48,7 +48,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/img_home_swing1" />
+                    android:src="@drawable/transparent_background" />
             </FrameLayout>
 
             <FrameLayout
@@ -62,7 +62,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/img_home_nest1"
+                    android:src="@drawable/transparent_background"
                     app:layout_column="1"
                     app:layout_row="0" />
             </FrameLayout>
@@ -90,7 +90,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/img_home_toy1" />
+                    android:src="@drawable/transparent_background" />
             </FrameLayout>
 
             <FrameLayout
@@ -104,7 +104,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/img_home_bowl1" />
+                    android:src="@drawable/transparent_background" />
             </FrameLayout>
         </androidx.gridlayout.widget.GridLayout>
 

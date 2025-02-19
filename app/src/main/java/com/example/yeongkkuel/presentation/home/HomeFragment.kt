@@ -76,10 +76,10 @@ class HomeFragment : Fragment() {
 
         repository = HomeRepository()
         if (showRewardModal) {
-            homeViewModel.fetchYesterdayReward() // ✅ API 호출
+            homeViewModel.fetchYesterdayReward() //API 호출
 
             homeViewModel.yesterdayReward.observe(viewLifecycleOwner) { reward ->
-                showRewardDialog(reward ?: 0) // ✅ reward 값 전달
+                showRewardDialog(reward ?: 0) //reward 값 전달
             }
         }
         return binding.root
@@ -94,7 +94,7 @@ class HomeFragment : Fragment() {
         scheduleMidnightRewardDialog()
         checkFirstLoginAfterMidnight()
         homeViewModel.yesterdayReward.observe(viewLifecycleOwner) { reward ->
-            showRewardDialog(reward ?: 0) // ✅ null이면 기본값 0 전달
+            showRewardDialog(reward ?: 0) // null이면 기본값 0 전달
         }
         (activity as? MainActivity)?.resetBottomSheetState()
 
@@ -107,9 +107,9 @@ class HomeFragment : Fragment() {
         parentFragmentManager.setFragmentResultListener("selectedProductKey", this) { _, bundle ->
             val selectedProduct = bundle.getParcelable<Product>("selectedProduct")
             selectedProduct?.let {
-                Log.d("HomeFragment", "✅ StoreFragment에서 받은 상품: ${it.name}, area: ${it.area}, imageUrl: ${it.imageUrl}")
+                Log.d("HomeFragment", "StoreFragment에서 받은 상품: ${it.name}, area: ${it.itemType}, imageUrl: ${it.imageUrl}")
                 applySelectedProductToHome(it)
-            } ?: Log.e("HomeFragment", "❌ StoreFragment에서 받은 상품이 null입니다!")
+            } ?: Log.e("HomeFragment", "StoreFragment에서 받은 상품이 null입니다!")
         }
 
         setupSwipeToDismiss(binding.ivError)
@@ -136,24 +136,24 @@ class HomeFragment : Fragment() {
         }
         homeViewModel.homeResult.observe(viewLifecycleOwner) { result ->
             if (result != null) {
-                Log.d("HomeFragment", "✅ 홈 데이터 수신 완료: $result")
+                Log.d("HomeFragment", " 홈 데이터 수신 완료: $result")
 
                 // 수정된 데이터 바인딩 방식
-                binding.tvCoin.text = result.myReward.toString() // ✅ 숫자만 표시
-                updateMySkins(result.mySkin) // ✅ 변경된 데이터 클래스 반영
+                binding.tvCoin.text = result.myReward.toString() // 숫자만 표시
+                updateMySkins(result.mySkin) // 변경된 데이터 클래스 반영
 
                 // 카테고리 정보 업데이트
                 val categories = result.categories.map { it.toCategory(categoryViewModel) }
                 val expensesMap = result.categories.associate { it.categoryId to it.expenses }
                 updateCategoryExpenses(categories, expensesMap)
 
-                Log.d("HomeFragment", "🚀 updateBotSheetCategories 호출됨!")
+                Log.d("HomeFragment", " updateBotSheetCategories 호출됨!")
             } else {
-                Log.e("HomeFragment", "🚨 홈 데이터 수신 실패 또는 응답 없음!")
+                Log.e("HomeFragment", " 홈 데이터 수신 실패 또는 응답 없음!")
             }
         }
 
-        Log.d("HomeFragment", "🚀 fetchHomeData() 호출됨!")
+        Log.d("HomeFragment", "fetchHomeData() 호출됨!")
 
         // 중복 실행 방지: 최초 실행 여부 체크
         if (savedInstanceState == null) {
@@ -192,7 +192,7 @@ class HomeFragment : Fragment() {
             val expenses = expensesMap[category.id] ?: emptyList() // 카테고리에 해당하는 지출 내역 가져오기
 
             expenses.forEach { expense ->
-                Log.d("HomeFragment", "📌 카테고리: ${category.name}, 지출: ${expense.content}, 금액: ${expense.amount}")
+                Log.d("HomeFragment", " 카테고리: ${category.name}, 지출: ${expense.content}, 금액: ${expense.amount}")
             }
         }
     }
@@ -210,17 +210,27 @@ class HomeFragment : Fragment() {
 
     private fun updateMySkins(mySkins: List<MySkin>) {
         mySkins.forEach { skin ->
-            val imageResId = getDrawableFromUrl(skin.imgUrl)
+            Log.d("HomeFragment", "🔍 mySkin 적용 - name: ${skin.itemName}, type: ${skin.itemType}, imgUrl: ${skin.imgUrl}")
 
             when (skin.itemType) {
-                "SWING" -> binding.imgHomeSwing.setImageResource(imageResId)
-                "TOY" -> binding.imgHomeToy.setImageResource(imageResId)
-                "BOWL" -> binding.imgHomeBowl.setImageResource(imageResId)
-                "NEST" -> binding.imgHomeNest.setImageResource(imageResId)
+                "SWING" -> Glide.with(binding.imgHomeSwing.context)
+                    .load(skin.imgUrl)
+                    .into(binding.imgHomeSwing)
+
+                "TOY" -> Glide.with(binding.imgHomeToy.context)
+                    .load(skin.imgUrl)
+                    .into(binding.imgHomeToy)
+
+                "BOWL" -> Glide.with(binding.imgHomeBowl.context)
+                    .load(skin.imgUrl)
+                    .into(binding.imgHomeBowl)
+
+                "NEST" -> Glide.with(binding.imgHomeNest.context)
+                    .load(skin.imgUrl)
+                    .into(binding.imgHomeNest)
             }
         }
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -270,7 +280,7 @@ class HomeFragment : Fragment() {
                             .setDuration(300)
                             .withEndAction {
                                 v.visibility = View.GONE
-                                saveHiddenDate()  // 🔹 숨긴 날짜 저장
+                                saveHiddenDate()  // 숨긴 날짜 저장
                             }
                             .start()
                     } else {
@@ -284,34 +294,34 @@ class HomeFragment : Fragment() {
     }
 
     private fun applySelectedProductToHome(product: Product) {
-        Log.d("HomeFragment", "🎨 applySelectedProductToHome 호출 - 상품: ${product.name}, area: ${product.area}, imageUrl: ${product.imageUrl}")
+        Log.d("HomeFragment", " applySelectedProductToHome 호출 - 상품: ${product.name}, area: ${product.itemType}, imageUrl: ${product.imageUrl}")
 
-        when (product.area) {
-            "Swing Area" -> binding.imgHomeSwing.post {
+        when (product.itemType) {
+            "Swing" -> binding.imgHomeSwing.post {
                 Glide.with(binding.imgHomeSwing.context)
                     .load(product.imageUrl)
                     .into(binding.imgHomeSwing)
-                Log.d("HomeFragment", "✅ Swing Image 업데이트 완료: ${product.imageUrl}")
+                Log.d("HomeFragment", "Swing Image 업데이트 완료: ${product.imageUrl}")
             }
-            "Toy Area" -> binding.imgHomeToy.post {
+            "Toy" -> binding.imgHomeToy.post {
                 Glide.with(binding.imgHomeToy.context)
                     .load(product.imageUrl)
                     .into(binding.imgHomeToy)
-                Log.d("HomeFragment", "✅ Toy Image 업데이트 완료: ${product.imageUrl}")
+                Log.d("HomeFragment", "Toy Image 업데이트 완료: ${product.imageUrl}")
             }
-            "Bowl Area" -> binding.imgHomeBowl.post {
+            "Bowl" -> binding.imgHomeBowl.post {
                 Glide.with(binding.imgHomeBowl.context)
                     .load(product.imageUrl)
                     .into(binding.imgHomeBowl)
-                Log.d("HomeFragment", "✅ Bowl Image 업데이트 완료: ${product.imageUrl}")
+                Log.d("HomeFragment", "Bowl Image 업데이트 완료: ${product.imageUrl}")
             }
-            "Nest Area" -> binding.imgHomeNest.post {
+            "Nest" -> binding.imgHomeNest.post {
                 Glide.with(binding.imgHomeNest.context)
                     .load(product.imageUrl)
                     .into(binding.imgHomeNest)
-                Log.d("HomeFragment", "✅ Nest Image 업데이트 완료: ${product.imageUrl}")
+                Log.d("HomeFragment", "Nest Image 업데이트 완료: ${product.imageUrl}")
             }
-            else -> Log.e("HomeFragment", "❌ 알 수 없는 area: ${product.area}, imageUrl: ${product.imageUrl}")
+            else -> Log.e("HomeFragment", "알 수 없는 area: ${product.itemType}, imageUrl: ${product.imageUrl}")
         }
     }
 
@@ -339,7 +349,7 @@ class HomeFragment : Fragment() {
         }
 
         btnReward.setOnClickListener {
-            navController.navigate(R.id.navigation_reward) // ✅ 클릭 시 fragment_reward로 이동
+            navController.navigate(R.id.navigation_reward) // 클릭 시 fragment_reward로 이동
             dialog.dismiss()
         }
         dialog.show()
@@ -365,46 +375,36 @@ class HomeFragment : Fragment() {
      */
     private fun renderMyProductsForHome() {
         val myProducts = StoreFragment.myProducts
-        Log.d("HomeFragment", "🛒 MY 탭에서 가져온 상품 리스트: ${myProducts.size}개")
+        val mySkins = homeViewModel.homeResult.value?.mySkin ?: emptyList()
 
-        if (myProducts.isEmpty()) {
-            Log.e("HomeFragment", "❌ MY 탭에 저장된 상품이 없습니다!")
-        }
+        Log.d("HomeFragment", " MY 탭에서 가져온 상품 리스트: ${myProducts.size}개")
+//
+//        if (myProducts.isEmpty()) {
+//            Log.e("HomeFragment", "MY 탭에 저장된 상품이 없습니다!")
+//        }
 
         myProducts.forEach { product ->
-            // ✅ `area` 값이 null이면 `itemType`을 기반으로 기본값 설정
-            val area = product.area ?: when (product.itemType) {
-                "SWING" -> "Swing Area"
-                "TOY" -> "Toy Area"
-                "BOWL" -> "Bowl Area"
-                "NEST" -> "Nest Area"
-                else -> "Unknown Area"
-            }
-
-            Log.d("HomeFragment", "🛠 ${area}에 적용할 상품: ${product.name}, imageUrl: ${product.imageUrl}")
-
-            when (area) {
-                "Swing Area" -> Glide.with(binding.imgHomeSwing.context)
-                    .load(product.imageUrl)
+            val skin = mySkins.find { it.itemName == product.name } ?: MySkin(
+                itemName  = product.name,
+                imgUrl = product.imageUrl,
+                itemType = product.itemType ?: "MY"
+            )
+            when (skin.itemType) {
+                "SWING" -> Glide.with(binding.imgHomeSwing.context)
+                    .load(skin.imgUrl)
                     .into(binding.imgHomeSwing)
-                    .also { Log.d("HomeFragment", "✅ Swing Image Updated: ${product.imageUrl}") }
 
-                "Toy Area" -> Glide.with(binding.imgHomeToy.context)
-                    .load(product.imageUrl)
+                "TOY" -> Glide.with(binding.imgHomeToy.context)
+                    .load(skin.imgUrl)
                     .into(binding.imgHomeToy)
-                    .also { Log.d("HomeFragment", "✅ Toy Image Updated: ${product.imageUrl}") }
 
-                "Bowl Area" -> Glide.with(binding.imgHomeBowl.context)
-                    .load(product.imageUrl)
+                "BOWL" -> Glide.with(binding.imgHomeBowl.context)
+                    .load(skin.imgUrl)
                     .into(binding.imgHomeBowl)
-                    .also { Log.d("HomeFragment", "✅ Bowl Image Updated: ${product.imageUrl}") }
 
-                "Nest Area" -> Glide.with(binding.imgHomeNest.context)
-                    .load(product.imageUrl)
+                "NEST" -> Glide.with(binding.imgHomeNest.context)
+                    .load(skin.imgUrl)
                     .into(binding.imgHomeNest)
-                    .also { Log.d("HomeFragment", "✅ Nest Image Updated: ${product.imageUrl}") }
-
-                else -> Log.e("HomeFragment", "❌ 올바르지 않은 area 값: $area")
             }
         }
     }
@@ -413,7 +413,7 @@ class HomeFragment : Fragment() {
         val sharedPreferences = requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val todayDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
 
-        Log.d("HomeFragment", "🔹 saveHiddenDate() 실행됨, 저장 날짜: $todayDate") // ✅ 로그 추가
+        Log.d("HomeFragment", " saveHiddenDate() 실행됨, 저장 날짜: $todayDate") // 로그 추가
 
         sharedPreferences.edit()
             .putString(KEY_LAST_HIDDEN_DATE, todayDate)
