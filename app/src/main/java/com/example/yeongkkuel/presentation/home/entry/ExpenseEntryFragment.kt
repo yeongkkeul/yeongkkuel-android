@@ -459,15 +459,15 @@ class ExpenseEntryFragment : Fragment() {
 
                 Glide.with(this)
                     .load(uri)
-                    .override(500, 500) // ✅ 크기 조정 (236x236)
+                    .override(500, 500) // ✅ 크기 조정
                     .centerCrop() // ✅ 중앙 정렬하여 크기 맞춤
-                    .transform(RoundedCorners(50)) // ✅ 모서리를 둥글게 (50px)
-                    .into(imgPhotoFrame!!)
+                    .into(imgPhotoFrame!!) // ✅ 둥근 모서리는 XML에서 처리
 
                 ivPhotoIcon?.visibility = View.GONE // 아이콘 숨김
             }
         }
     }
+
 //
 //    override fun onDestroyView() {
 //        super.onDestroyView()

@@ -99,10 +99,9 @@ class ExpenseViewFragment : Fragment() {
         if (imageUrl.isNotEmpty()) {
             Glide.with(binding.imgPhotoFrame.context)
                 .load(imageUrl)
-                .override(1000, 1000) // ✅ 크기 조정 (너비 1000px, 높이 600px)
+                .override(500, 500) // ✅ 크기 조정
                 .centerCrop() // ✅ 꽉 차게 표시
-                .transform(RoundedCorners(50)) // ✅ 모서리를 둥글게
-                .into(binding.imgPhotoFrame)
+                .into(binding.imgPhotoFrame) // ✅ 둥근 모서리는 XML에서 처리
 
             binding.ivPhotoIcon.visibility = View.GONE // ✅ 아이콘 숨김
         } else {
