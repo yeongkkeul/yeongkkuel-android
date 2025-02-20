@@ -7,5 +7,6 @@ data class ChatRoom(
     val recentMessage: String,
     val messageTime: String,
     val participantCount: Int,
-    val chatRoomRule: String
+    val chatRoomRule: String,
+    val unreadCount: Int = 0
 )

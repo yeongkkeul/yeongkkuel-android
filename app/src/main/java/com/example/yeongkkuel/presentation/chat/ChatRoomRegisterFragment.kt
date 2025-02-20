@@ -12,13 +12,17 @@ import com.bumptech.glide.Glide
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentChatRoomRegisterBinding
 import com.example.yeongkkuel.network.response.chat.ChatDetailResult
+import com.example.yeongkkuel.presentation.auth.TokenManager
 import com.example.yeongkkuel.presentation.base.MainActivity
 import com.example.yeongkkuel.presentation.chat.data.Age
 import com.example.yeongkkuel.presentation.chat.data.Job
 import com.example.yeongkkuel.presentation.chat.dialog.ChatRoomExpelDialog
 import com.example.yeongkkuel.presentation.chat.dialog.ChatRoomExpenseAutoSendDialog
 import com.example.yeongkkuel.presentation.chat.dialog.ChatRoomPwDialog
+import com.example.yeongkkuel.presentation.chat.room.ChatDatabase
 import com.example.yeongkkuel.presentation.chat.room.ChatGroupViewModel
+import com.example.yeongkkuel.presentation.chat.room.ChatRepository
+import com.example.yeongkkuel.presentation.chat.room.ChatRoomViewModelFactory
 import com.example.yeongkkuel.presentation.chat.search.ChatSearchViewModel
 import java.text.NumberFormat
 import java.util.Locale
@@ -33,8 +37,13 @@ class ChatRoomRegisterFragment : Fragment() {
     private val expel = false
 
     private val viewModel: ChatSearchViewModel by activityViewModels()
-    private val chatGroupViewModel: ChatGroupViewModel by activityViewModels()
-
+    private val chatGroupViewModel: ChatGroupViewModel by activityViewModels {
+        ChatRoomViewModelFactory(
+            ChatRepository(
+                ChatDatabase.getInstance(requireContext()).chatMessageCountDao()
+            )
+        )
+    }
     private var chatDetail: ChatDetailResult? = null
 
     override fun onCreateView(
@@ -74,6 +83,7 @@ class ChatRoomRegisterFragment : Fragment() {
                 val dialog = ChatRoomPwDialog(
                     context = requireContext(),
                     chatRoomId = chatGroupViewModel.selectedChatRoomId.value ?: 0,
+                    chatGroupViewModel = chatGroupViewModel,
                     onCancelClick = { /* 취소 처리 */ },
                     onConfirmClick = { expenseAutoSendDialogShow() }
                 )
@@ -134,21 +144,28 @@ class ChatRoomRegisterFragment : Fragment() {
         val dialog = ChatRoomExpenseAutoSendDialog(
             context = requireContext(),
             onCancelClick = {  },
-            onConfirmClick = { checkExpel() }
+            onConfirmClick = { checkRegister() }
         )
         dialog.show()
     }
 
-    private fun checkExpel() {
+    private fun checkRegister() {
         if (expel) {
             val dialog = ChatRoomExpelDialog(
                 context = requireContext(),
-                onConfirmClick = { }
+                onConfirmClick = {  }
             )
             dialog.show()
         } else {
+            chatRoomRegister()
             navController.navigate(R.id.action_navigation_chat_room_register_to_chat_group)
         }
+    }
+
+    private fun chatRoomRegister() {
+        chatGroupViewModel.setupStompClient()
+        val senderId = TokenManager.getUserId(requireContext())
+        chatGroupViewModel.enterChatRoom(senderId)
     }
 
     override fun onDestroyView() {

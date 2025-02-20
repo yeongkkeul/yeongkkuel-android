@@ -7,8 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.yeongkkuel.network.RetrofitClient
 import com.example.yeongkkuel.network.response.chat.ChatDetailResult
 import com.example.yeongkkuel.network.response.chat.ChatRoomDetailDto
-import com.example.yeongkkuel.presentation.chat.data.Age
-import com.example.yeongkkuel.presentation.chat.data.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
 

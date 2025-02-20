@@ -246,6 +246,15 @@
             app:exitAnim="@anim/slide_out_up_chat"
             app:popEnterAnim="@anim/slide_in_down_chat"
             app:popExitAnim="@anim/slide_out_down_chat"/>
+        <action
+            android:id="@+id/action_navigation_chat_room_register_to_chat"
+            app:destination="@id/navigation_chat"
+            app:popUpTo="@id/navigation_chat_room_register"
+            app:popUpToInclusive="true"
+            app:enterAnim="@anim/slide_in_up_chat"
+            app:exitAnim="@anim/slide_out_up_chat"
+            app:popEnterAnim="@anim/slide_in_down_chat"
+            app:popExitAnim="@anim/slide_out_down_chat"/>
     </fragment>
 
     <fragment

@@ -1,6 +1,7 @@
 package com.example.yeongkkuel.presentation.chat.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import androidx.recyclerview.widget.RecyclerView
@@ -54,30 +55,58 @@ class ChatGroupAdapter(
 
     override fun getItemCount(): Int = messages.size
 
-    val currentTime: String = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-
     inner class ChatViewHolder(private val binding: ViewBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(chatMessage: ChatItemModel, otherProfileImageUrl: String?) {
             when (binding) {
                 is ItemChatUserBinding -> {
                     binding.tvChatMessage.text = chatMessage.content
-                    binding.tvTimeMessage.text = currentTime
+                    binding.tvTimeMessage.text = chatMessage.sendTime
                     binding.tvAmountPeopleRead.text = chatMessage.amountPeopleRead.toString()
+                    if (chatMessage.profileImageUrl?.isNotEmpty() == true) {
+                        binding.cl.visibility = View.VISIBLE
+                        binding.tvChatMessage.visibility = View.GONE
+                        binding.tvTimeMessage.visibility = View.GONE
+                        binding.tvAmountPeopleRead.visibility = View.GONE
+                        binding.tvCategoryData.text = chatMessage.receiptCategory
+                        binding.tvContentData.text = chatMessage.receiptContent
+                        binding.tvAmount.text = "${chatMessage.receiptAmount}원"
+                        Glide.with(binding.image.context)
+                            .load(chatMessage.profileImageUrl)
+                            .error(R.drawable.ic_splash_logo) // 에러 이미지
+                            .into(binding.image)
+                    } else {
+                        binding.cl.visibility = View.GONE
+                    }
                 }
                 is ItemChatOtherBinding -> {
                     binding.tvNicknameSender.text = chatMessage.sender
-                    binding.tvTimeMessage.text = currentTime
+                    binding.tvTimeMessage.text = chatMessage.sendTime
                     binding.tvAmountPeopleRead.text = chatMessage.amountPeopleRead.toString()
                     binding.tvChatMessage.text = chatMessage.content
                     binding.ivProfileSender.setOnClickListener {
                         chatMessageClickListener.onMessageClicked()
                     }
+                    if (chatMessage.profileImageUrl?.isNotEmpty() == true) {
+                        binding.cl.visibility = View.VISIBLE
+                        binding.tvChatMessage.visibility = View.GONE
+                        binding.tvTimeMessage.visibility = View.GONE
+                        binding.tvAmountPeopleRead.visibility = View.GONE
+                        binding.tvCategoryData.text = chatMessage.receiptCategory
+                        binding.tvContentData.text = chatMessage.receiptContent
+                        binding.tvAmount.text = "${chatMessage.receiptAmount}원"
+                        Glide.with(binding.image.context)
+                            .load(chatMessage.profileImageUrl)
+                            .error(R.drawable.ic_splash_logo) // 에러 이미지
+                            .into(binding.image)
+                    } else {
+                        binding.cl.visibility = View.GONE
+                    }
                     otherProfileImageUrl?.let {
                         Glide.with(binding.ivProfileSender.context)
                             .load(it)
                             .circleCrop()
-                            .placeholder(R.drawable.ic_logo) // 기본 이미지
-                            .error(R.drawable.ic_logo) // 에러 이미지
+                            .placeholder(R.drawable.ic_splash_logo) // 기본 이미지
+                            .error(R.drawable.ic_splash_logo) // 에러 이미지
                             .into(binding.ivProfileSender)
                     }
                 }

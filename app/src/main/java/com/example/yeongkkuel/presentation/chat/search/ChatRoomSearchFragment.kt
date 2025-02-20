@@ -20,6 +20,9 @@ import com.example.yeongkkuel.network.response.chat.ChatRoomDetailDto
 import com.example.yeongkkuel.presentation.base.MainActivity
 import com.example.yeongkkuel.presentation.chat.room.ChatGroupViewModel
 import com.example.yeongkkuel.presentation.chat.adapter.ChatRoomSearchAdapter
+import com.example.yeongkkuel.presentation.chat.room.ChatDatabase
+import com.example.yeongkkuel.presentation.chat.room.ChatRepository
+import com.example.yeongkkuel.presentation.chat.room.ChatRoomViewModelFactory
 import timber.log.Timber
 
 class ChatRoomSearchFragment : Fragment(), ChatRoomSearchClickListener {
@@ -31,8 +34,13 @@ class ChatRoomSearchFragment : Fragment(), ChatRoomSearchClickListener {
     private lateinit var chatRoomSearchAdapter: ChatRoomSearchAdapter
 
     private val viewModel: ChatSearchViewModel by activityViewModels()
-    private val chatGroupViewModel: ChatGroupViewModel by activityViewModels()
-
+    private val chatGroupViewModel: ChatGroupViewModel by activityViewModels {
+        ChatRoomViewModelFactory(
+            ChatRepository(
+                ChatDatabase.getInstance(requireContext()).chatMessageCountDao()
+            )
+        )
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
