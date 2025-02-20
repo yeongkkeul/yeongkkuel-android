@@ -83,7 +83,7 @@ class NotificationFragment : Fragment() {
         // 서버로부터 알림 목록을 가져오는 API 호출
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val response = notificationService.getNotificationList(page = 1)
+                val response = notificationService.getNotificationList(page = 0)
                 if (response.isSuccess) {
                     val body = response.result
                     if (body != null) {

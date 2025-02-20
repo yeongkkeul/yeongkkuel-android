@@ -59,13 +59,18 @@ class RewardFragment : Fragment() {
             try {
                 val response = RetrofitClient.myPageService.getRewards()
                 if (response.isSuccess) {
-                    val body = response.result
-                    if (body != null) {
+                    // body 는 list 여야 함.
+                    if (response.result != null) {
                         // 서버에서 받아온 result -> RewardItem 변환
-                        val detailList = body
+
+                        // 리스트 형태의 response.result 를 RewardItem 리스트로 변환
+                        val detailList = response.result
+
                         val itemList = detailList.map {
                             RewardMapper.mapToRewardItem(it)
                         }
+                        //itemlist 데이터 확인
+
                         val dummyData : List<RewardItem> = getDummyRewardItem()
 
                         if(itemList.isEmpty()){
@@ -93,18 +98,32 @@ class RewardFragment : Fragment() {
         val groupedMap = originalItems.groupBy { it.section }
 
         // 2) 원하는 섹션 표시 순서 정의
-        val sectionOrder = listOf("오늘", "어제", "최근 7일")
+        val sectionOrder = listOf("오늘", "어제", "최근")
 
         // 3) 최종 표시 리스트 구성
         val result = mutableListOf<RewardListItem>()
         sectionOrder.forEach { sectionName ->
-            val itemsInSection = groupedMap[sectionName]
-            if (!itemsInSection.isNullOrEmpty()) {
-                // -- 헤더 추가 --
-                result.add(RewardListItem.HeaderItem(sectionName))
-                // -- 섹션 내 아이템들 추가 --
-                for (reward in itemsInSection) {
-                    result.add(RewardListItem.NormalItem(reward))
+            //sectionname이 최근이라면 최근 7일로 변경
+            if(sectionName == "최근"){
+                val itemsInSection = groupedMap[sectionName]
+                if (!itemsInSection.isNullOrEmpty()) {
+                    // -- 헤더 추가 --
+                    result.add(RewardListItem.HeaderItem("최근 7일"))
+                    // -- 섹션 내 아이템들 추가 --
+                    for (reward in itemsInSection) {
+                        result.add(RewardListItem.NormalItem(reward))
+                    }
+                }
+            } else {
+
+                val itemsInSection = groupedMap[sectionName]
+                if (!itemsInSection.isNullOrEmpty()) {
+                    // -- 헤더 추가 --
+                    result.add(RewardListItem.HeaderItem(sectionName))
+                    // -- 섹션 내 아이템들 추가 --
+                    for (reward in itemsInSection) {
+                        result.add(RewardListItem.NormalItem(reward))
+                    }
                 }
             }
         }
@@ -114,6 +133,7 @@ class RewardFragment : Fragment() {
     private fun getDummyRewardItem(): List<RewardItem> {
 
         val dummyRewardItem = mutableListOf<RewardItem>()
+
         dummyRewardItem.add(RewardItem(RewardType.GOAL, "식비에서 5일 연속 무지출 달성", "20", "오늘"))
         dummyRewardItem.add(RewardItem(RewardType.GOAL, "간식/음료에서 5일 연속 무지출 달성", "20", "어제"))
         dummyRewardItem.add(RewardItem(RewardType.TEAM_GOAL, "무지출이 대세다 방 20대 전체 상위 5% 달성", "20", "최근 7일"))
