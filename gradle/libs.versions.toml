@@ -35,6 +35,7 @@ firebaseCrashlyticsBuildtools = "3.0.2"
 jwtdecode = "2.0.1"
 roomCommon = "2.6.1"
 roomKtx = "2.6.1"
+dots-indicator = "4.3"
 
 [libraries]
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCommon" }
@@ -95,6 +96,8 @@ firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "fireb
 androidx-room-common = { group = "androidx.room", name = "room-common", version.ref = "roomCommon" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
 
+# Dots Indicator
+dots-indicator = { module = "com.tbuonomo:dotsindicator", version.ref = "dots-indicator" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

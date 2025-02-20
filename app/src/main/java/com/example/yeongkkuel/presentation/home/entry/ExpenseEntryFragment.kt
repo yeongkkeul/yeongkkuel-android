@@ -18,24 +18,21 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.network.RetrofitClient
 import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
 import com.example.yeongkkuel.presentation.botsheet.BotSheetUiState
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
 import com.example.yeongkkuel.presentation.home.entry.data.*
+import com.example.yeongkkuel.presentation.stat.StatFragment
 import com.example.yeongkkuel.presentation.util.SpendingCategory
 import com.example.yeongkkuel.presentation.util.dpToPx
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.text.SimpleDateFormat
@@ -300,7 +297,26 @@ class ExpenseEntryFragment : Fragment() {
             expenseViewModel.createExpense(expenseRequest, imagePart) { response ->
                 if (response?.isSuccess == true) {
                     Toast.makeText(requireContext(), "지출 내역이 저장되었습니다.", Toast.LENGTH_SHORT).show()
-                    handleNavigationAfterSave(view)
+                    val dateText = tvDateInput.text.toString() // 예: "2025년 2월 19일"
+
+                    // 정규식으로 연, 월, 일을 추출
+                    val regex = "(\\d{4})년 (\\d{1,2})월 (\\d{1,2})일".toRegex()
+                    val matchResult = regex.find(dateText)
+
+                    if (matchResult != null) {
+                        val (year, month, day) = matchResult.destructured
+                        val yearInt = year.toInt()
+                        val monthInt = month.toInt()
+                        val dayInt = day.toInt()
+
+                        botSheetViewModel.getSpendingList(
+                            year = yearInt,
+                            month = monthInt,
+                            day = dayInt
+                        )
+                    } else botSheetViewModel.getSpendingList()
+
+                    navigateAfterSavingExpense()
                 } else {
                     Toast.makeText(requireContext(), "지출 내역 저장 실패.", Toast.LENGTH_SHORT).show()
                 }
@@ -359,7 +375,7 @@ class ExpenseEntryFragment : Fragment() {
             id = 1,
             name = detail,
             price = if (isNoExpenseChecked) 0 else amount,
-            imgExist = false
+            imgExist = selectedImageUri?.toString() ?: ""
         )
 
         botSheetViewModel.addExpenseHistory(expenseHistory)
@@ -377,36 +393,47 @@ class ExpenseEntryFragment : Fragment() {
 
     }
 
-    private fun handleNavigationAfterSave(view: View) {
-        val tvDateInput = view.findViewById<TextView>(R.id.tv_date_input)
+    private fun navigateAfterSavingExpense() {
+        val fromTab = arguments?.getString("fromTab") ?: "home" // 기본값은 홈 탭
+        val tvDateInput = view?.findViewById<TextView>(R.id.tv_date_input)
 
-        val selectedDateText = tvDateInput.text.toString()
+        val selectedDateText = tvDateInput?.text.toString()
         val today = Calendar.getInstance()
-        val dateFormat = SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREAN)
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.KOREAN)
 
         val selectedDate = try {
-            dateFormat.parse(selectedDateText.substring(0, 13))
+            dateFormat.parse(formatDateForServer(selectedDateText))
         } catch (e: Exception) {
             null
         }
 
-        if (selectedDate != null && dateFormat.format(selectedDate) != dateFormat.format(today.time)) {
-            // Bundle 생성 및 데이터 추가
+        if (dateFormat.format(selectedDate) != dateFormat.format(today.time)) {
+            // 날짜가 다르면 지출 탭의 월간 탭으로 이동
+
             val bundle = Bundle().apply {
-                putInt("selected_tab_index", 2) // 월간 탭(인덱스 2) 지정
+                putInt("selected_tab_index", 2) // ✅ 월간 탭의 인덱스 2
             }
+            navController.navigate(R.id.navigation_stat, bundle) // ✅ 지출 탭 이동
 
-            // StatFragment로 이동하며 Bundle 전달
-            navController.navigate(R.id.action_expenseEntryFragment_to_navigation_stat, bundle)
+            val statFragment =
+                parentFragmentManager.findFragmentById(R.id.fragment_container) as? StatFragment
+            statFragment?.moveToMonthlyTab()
 
-            val displayHeight = resources.displayMetrics.heightPixels
-            val peekHeight =
-                (displayHeight - 528.dpToPx(requireContext()))
-            botSheetListener?.setPeekHeight(peekHeight)
         } else {
-            navController.navigate(R.id.navigation_home)
+            // 기존 로직 유지 (홈 or 지출 탭으로 이동)
+            when (fromTab) {
+                "home" -> navController.navigate(R.id.navigation_home)
+                "stat" -> navController.navigate(R.id.navigation_stat)
+                else -> navController.navigate(R.id.navigation_home)
+            }
         }
+
+        // 바텀시트 높이를 원래대로 복귀
+        val displayHeight = resources.displayMetrics.heightPixels
+        val peekHeight = (displayHeight - 528.dpToPx(requireContext()))
+        botSheetListener?.setPeekHeight(peekHeight)
     }
+
 
     private fun getDayOfWeek(year: Int, month: Int, day: Int): String {
         val calendar = Calendar.getInstance()
@@ -454,15 +481,14 @@ class ExpenseEntryFragment : Fragment() {
             data?.data?.let { uri ->
                 selectedImageUri = uri // ✅ 선택한 이미지 URI 저장
 
-                // 🔹 Glide를 사용하여 미리보기 적용 가능
                 val imgPhotoFrame = view?.findViewById<ImageView>(R.id.img_photo_frame)
                 val ivPhotoIcon = view?.findViewById<ImageView>(R.id.iv_photo_icon)
+
                 Glide.with(this)
                     .load(uri)
-                    .override(500, 500) // ✅ 크기 조정 (236x236)
+                    .override(500, 500) // ✅ 크기 조정
                     .centerCrop() // ✅ 중앙 정렬하여 크기 맞춤
-                    .transform(RoundedCorners(50)) // ✅ 모서리를 둥글게 (50px)
-                    .into(imgPhotoFrame!!)
+                    .into(imgPhotoFrame!!) // ✅ 둥근 모서리는 XML에서 처리
 
                 ivPhotoIcon?.visibility = View.GONE // 아이콘 숨김
             }

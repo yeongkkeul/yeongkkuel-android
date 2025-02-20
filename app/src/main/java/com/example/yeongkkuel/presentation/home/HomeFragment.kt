@@ -42,6 +42,7 @@ import java.util.Date
 import java.util.Locale
 import com.bumptech.glide.Glide
 import com.example.yeongkkuel.presentation.base.MainActivity
+import com.example.yeongkkuel.presentation.my.NotificationViewModel
 import com.example.yeongkkuel.presentation.util.dpToPx
 import java.util.Calendar
 
@@ -54,6 +55,8 @@ class HomeFragment : Fragment() {
     private val KEY_LAST_HIDDEN_DATE = "lastHiddenDate"
     private lateinit var repository: HomeRepository
 
+    private val notificationViewModel: NotificationViewModel by viewModels()
+
     private val homeViewModel: HomeViewModel by viewModels {
         HomeViewModel.Factory(HomeRepository())
     }
@@ -64,6 +67,7 @@ class HomeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 //        botSheetViewModel.getSpendingList()
+
     }
 
     override fun onCreateView(
@@ -169,6 +173,9 @@ class HomeFragment : Fragment() {
             }
         }
 
+        // 읽지 않은 알림 확인
+
+
         initAppBar()
     }
 
@@ -179,9 +186,16 @@ class HomeFragment : Fragment() {
                 findNavController().navigate(R.id.navigation_notification)
             }
 
+
             val layoutParams = ivNoti.layoutParams as ViewGroup.MarginLayoutParams
-            layoutParams.marginEnd = 0
+            layoutParams.marginEnd = 12
             ivNoti.layoutParams = layoutParams
+        }
+
+        notificationViewModel.checkUnreadNotifications()
+        notificationViewModel.unreadNotification.observe(viewLifecycleOwner) { hasUnread ->
+            binding.includeTopbar.ivNotiDot.visibility =
+                if (hasUnread) View.VISIBLE else View.INVISIBLE
         }
 
     }

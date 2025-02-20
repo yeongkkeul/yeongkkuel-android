@@ -27,12 +27,13 @@
         app:layout_constraintHorizontal_bias="0.048"
         app:layout_constraintLeft_toRightOf="@id/ivNotificationIcon"
         app:layout_constraintRight_toLeftOf="@id/ivArrow"
+        android:layout_marginLeft="8dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0">
         <!-- 알림 제목/메시지 -->
         <TextView
             android:id="@+id/tvNotificationMessage"
-            android:layout_width="wrap_content"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
@@ -56,8 +57,8 @@
 
     <ImageView
         android:id="@+id/ivArrow"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
         android:src="@drawable/ic_my_look_foward"
         android:contentDescription="이동 아이콘"
         app:layout_constraintRight_toRightOf="parent"

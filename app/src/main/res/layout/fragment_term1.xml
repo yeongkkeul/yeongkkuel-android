@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_median"
             style="@style/humm_medium"
-            android:text="서비스 이용 약간"
+            android:text="서비스 이용 약관"
             android:textColor="@color/black"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"

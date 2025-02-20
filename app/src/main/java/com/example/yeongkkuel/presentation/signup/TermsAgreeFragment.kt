@@ -213,6 +213,7 @@ class TermsAgreeFragment : Fragment() {
         val bundle = Bundle().apply {
             putBoolean("showRewardModal", showRewardModal)
         }
-        findNavController().navigate(R.id.action_termsAgreeFragment_to_navigation_home, bundle)
+//        findNavController().navigate(R.id.action_termsAgreeFragment_to_navigation_home, bundle)
+        findNavController().navigate(R.id.action_termsAgreeFragment_to_navigation_tutorial, bundle)
     }
 }
