@@ -22,11 +22,6 @@ class ExpenseViewModel() : ViewModel() {
     private val _updateResponse = MutableLiveData<ExpenseUpdateResponse?>()
     val updateResponse: LiveData<ExpenseUpdateResponse?> get() = _updateResponse
 
-
-    private val botSheetViewModel: BotSheetViewModel by lazy {
-        BotSheetViewModel()
-    }
-
     fun createExpense(
         expenseRequest: ExpenseRequest,
         imageFile: MultipartBody.Part?,
@@ -36,8 +31,6 @@ class ExpenseViewModel() : ViewModel() {
             val response = repository.createExpense(expenseRequest, imageFile)
             if (response != null && response.isSuccess) {
                 Log.d("ExpenseViewModel", "✅ 지출 내역 저장 성공: $response")
-
-                botSheetViewModel.getSpendingList()
             } else {
                 Log.e("ExpenseViewModel", "🚨 지출 내역 저장 실패 또는 응답 없음")
             }
