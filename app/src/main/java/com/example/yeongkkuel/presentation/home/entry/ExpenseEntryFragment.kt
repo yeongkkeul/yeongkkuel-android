@@ -18,12 +18,9 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.network.RetrofitClient
 import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
@@ -36,7 +33,6 @@ import com.example.yeongkkuel.presentation.util.dpToPx
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.text.SimpleDateFormat
@@ -301,20 +297,24 @@ class ExpenseEntryFragment : Fragment() {
             expenseViewModel.createExpense(expenseRequest, imagePart) { response ->
                 if (response?.isSuccess == true) {
                     Toast.makeText(requireContext(), "지출 내역이 저장되었습니다.", Toast.LENGTH_SHORT).show()
+                    val dateText = tvDateInput.text.toString() // 예: "2025년 2월 19일"
 
-                    // ✅ 기존 날짜에서 삭제 (바로 사라지게!)
-                    botSheetViewModel.removeExpenseFromCategory(response.result.id)
+                    // 정규식으로 연, 월, 일을 추출
+                    val regex = "(\\d{4})년 (\\d{1,2})월 (\\d{1,2})일".toRegex()
+                    val matchResult = regex.find(dateText)
 
-                    // ✅ 새로운 날짜에 추가
-                    botSheetViewModel.moveExpenseToNewDate(
-                        BotSheetUiState.Spending.History(
-                            id = response.result.id,
-                            name = detail,
-                            price = if (isNoExpenseChecked) 0 else amount,
-                            imgExist = selectedImageUri?.toString() ?: ""
-                        ),
-                        formattedDate
-                    )
+                    if (matchResult != null) {
+                        val (year, month, day) = matchResult.destructured
+                        val yearInt = year.toInt()
+                        val monthInt = month.toInt()
+                        val dayInt = day.toInt()
+
+                        botSheetViewModel.getSpendingList(
+                            year = yearInt,
+                            month = monthInt,
+                            day = dayInt
+                        )
+                    } else botSheetViewModel.getSpendingList()
 
                     navigateAfterSavingExpense()
                 } else {
@@ -415,7 +415,8 @@ class ExpenseEntryFragment : Fragment() {
             }
             navController.navigate(R.id.navigation_stat, bundle) // ✅ 지출 탭 이동
 
-            val statFragment = parentFragmentManager.findFragmentById(R.id.fragment_container) as? StatFragment
+            val statFragment =
+                parentFragmentManager.findFragmentById(R.id.fragment_container) as? StatFragment
             statFragment?.moveToMonthlyTab()
 
         } else {
