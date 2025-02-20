@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/navigation_login">
+    app:startDestination="@id/navigation_splash">
 
     <fragment
         android:id="@+id/navigation_splash"
@@ -19,6 +19,11 @@
         <action
             android:id="@+id/action_splashFragment_to_homeFragment"
             app:destination="@id/navigation_home"
+            app:popUpTo="@id/navigation_splash"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_splashFragment_to_navigation_tutorial"
+            app:destination="@id/navigation_tutorial"
             app:popUpTo="@id/navigation_splash"
             app:popUpToInclusive="true" />
     </fragment>
@@ -36,6 +41,12 @@
         <action
             android:id="@+id/action_loginFragment_to_signupFragment"
             app:destination="@id/navigation_signup" />
+        <action
+            android:id="@+id/action_loginFragment_to_navigation_tutorial"
+            app:destination="@id/navigation_tutorial"
+            app:popUpTo="@id/navigation_login"
+            app:popUpToInclusive="true"/>
+
     </fragment>
 
     <fragment
@@ -123,6 +134,11 @@
             app:destination="@id/navigation_home"
             app:popUpTo="@id/navigation_login"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_termsAgreeFragment_to_navigation_tutorial"
+            app:destination="@id/navigation_tutorial"
+            app:popUpTo="@id/navigation_login"
+            app:popUpToInclusive="true"/>
         <action
             android:id="@+id/action_termsAgreeFragment_to_navigation_term_1"
             app:destination="@id/navigation_term_1" />
@@ -400,4 +416,18 @@
         android:label="fragment_term_4"
         tools:layout="@layout/fragment_term4">
     </fragment>
+<!--    tutorial-->
+
+    <fragment
+        android:id="@+id/navigation_tutorial"
+        android:name="com.example.yeongkkuel.presentation.login.tutorial.TutorialFragment"
+        android:label="fragment_tutorial"
+        tools:layout="@layout/fragment_tutorial">
+        <action
+            android:id="@+id/action_tutorialFragment_to_navigation_home"
+            app:destination="@id/navigation_home"
+            app:popUpTo="@id/navigation_tutorial"
+            app:popUpToInclusive="true" />
+    </fragment>
+
 </navigation>

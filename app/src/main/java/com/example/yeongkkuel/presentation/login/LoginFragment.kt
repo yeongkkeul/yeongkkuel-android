@@ -144,7 +144,9 @@ class LoginFragment : Fragment() {
                                 when (result.redirectUrl) {
                                     "/api/home" -> {
                                         // 이미 회원 -> 홈으로 이동
-                                        findNavController().navigate(R.id.action_loginFragment_to_navigation_home)
+//                                        findNavController().navigate(R.id.action_loginFragment_to_navigation_home)
+                                        findNavController().navigate(R.id.action_loginFragment_to_navigation_tutorial)
+
                                     }
                                     "/api/auth/user-info" -> {
                                         // 회원 기입 필요 -> 회원가입 flow로 이동
@@ -200,7 +202,8 @@ class LoginFragment : Fragment() {
                                 when (result.redirectUrl) {
                                     "/api/home" -> {
                                         // 이미 회원 -> 홈으로 이동
-                                        findNavController().navigate(R.id.action_loginFragment_to_navigation_home)
+//                                        findNavController().navigate(R.id.action_loginFragment_to_navigation_home)
+                                        findNavController().navigate(R.id.action_loginFragment_to_navigation_tutorial)
                                     }
                                     "/api/auth/user-info" -> {
                                         // 회원 기입 필요 -> 회원가입 flow로 이동

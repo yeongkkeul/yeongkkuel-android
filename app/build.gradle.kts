@@ -122,4 +122,7 @@ dependencies {
 
     implementation(libs.rxjava)
     implementation(libs.rxandroid)
+
+    // DotsIndicator
+    implementation(libs.dots.indicator)
 }
