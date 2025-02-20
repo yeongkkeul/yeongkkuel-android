@@ -1,6 +1,8 @@
 package com.example.yeongkkuel.presentation.chat
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -59,72 +61,134 @@ class ChatFragment : Fragment(), ChatRoomClickListener {
 
     private fun createOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
-            .readTimeout(0, TimeUnit.MILLISECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
             .build()
     }
 
-//    private fun setupStompClient() {
-//        val okHttpClient = createOkHttpClient()
-//        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "wss://dev.yeongkkeul.store/ws")
-//
-//        // STOMP 클라이언트의 생명주기 이벤트 구독 (RxJava 사용)
-//        val lifecycleDisposable = stompClient.lifecycle()
-//            .subscribeOn(Schedulers.io())
-//            .observeOn(AndroidSchedulers.mainThread())
-//            .subscribe { lifecycleEvent ->
-//                when (lifecycleEvent.type) {
-//                    LifecycleEvent.Type.OPENED -> {
-//                        Timber.tag("STOMP").d("연결 성공: %s", lifecycleEvent)
-//                        // 연결 성공 후 채팅방 가입 요청 실행 (예시: chatRoomId = 123, senderId = 456)
-//                        joinChatRoom(chatRoomId = 2L, senderId = 8L, password = "1234")
-//                        // 필요 시 채팅방 수신 메시지 구독 (예: subscribeToChatRoom(chatRoomId))
-//                    }
-//                    LifecycleEvent.Type.ERROR -> {
-//                        Timber.tag("STOMP").e(lifecycleEvent.exception, "연결 에러: ")
-//                    }
-//                    LifecycleEvent.Type.CLOSED -> {
-//                        Timber.tag("STOMP").d("연결 종료됨")
-//                    }
-//                    else -> {}
-//                }
-//            }
-//        compositeDisposable.add(lifecycleDisposable)
-//
-//        // 웹소켓 연결 시작
-//        stompClient.connect()
-//    }
-//
-//    private fun joinChatRoom(chatRoomId: Long, senderId: Long, password: String?) {
-//        // 채팅방 가입 URL 구성 (roomId 자리에 chatRoomId 값 삽입)
-//        val destination = "/pub/chat.enter.$chatRoomId"
-//
-//        // JSON 메시지 구성 (content는 빈 문자열로 설정)
-//        val jsonMessage = JSONObject().apply {
-//            put("chatRoomId", chatRoomId)
-//            put("senderId", senderId)
-//            put(
-//                "messageType",
-//                "ENTER"
-//            )
-//            put("content", "twosome")
-//            // password가 null인 경우 JSON_NULL로 명시
-//            put("password", password ?: JSONObject.NULL)
-//        }
-//
-//        Timber.d("$jsonMessage")
-//
-//        // 메시지 publish (RxJava Observable 구독)
-//        val sendDisposable = stompClient.send(destination, jsonMessage.toString())
-//            .subscribeOn(Schedulers.io())
-//            .observeOn(AndroidSchedulers.mainThread())
-//            .subscribe({
-//                Timber.d("STOMP", "채팅방 가입 메시지 전송 성공")
-//            }, { error ->
-//                Timber.e("STOMP", "채팅방 가입 메시지 전송 실패: ${error.message}")
-//            })
-//
-//        compositeDisposable.add(sendDisposable)
-//    }
+    private fun setupStompClient() {
+        val okHttpClient = createOkHttpClient()
+        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "wss://dev.yeongkkeul.store/ws")
+
+        // STOMP 클라이언트의 생명주기 이벤트 구독 (RxJava 사용)
+        val lifecycleDisposable = stompClient.lifecycle()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { lifecycleEvent ->
+                when (lifecycleEvent.type) {
+                    LifecycleEvent.Type.OPENED -> {
+                        Timber.tag("STOMP").d("연결 성공: %s", lifecycleEvent)
+                        // 연결 성공 후 채팅방 가입 요청 실행 (예시: chatRoomId = 123, senderId = 456)
+                        joinChatRoom(chatRoomId = 13L, senderId = 30L, password = "1234")
+//                        sendMessageToChatRoom(chatRoomId = 13L, senderId = 5L, content = "1234")
+//                        setupMessageReceiver(chatRoomId = 13L)
+                        // 필요 시 채팅방 수신 메시지 구독 (예: subscribeToChatRoom(chatRoomId))
+                    }
+                    LifecycleEvent.Type.ERROR -> {
+                        Timber.tag("STOMP").e(lifecycleEvent.exception, "연결 에러: ")
+                    }
+                    LifecycleEvent.Type.CLOSED -> {
+                        Timber.tag("STOMP").d("연결 종료됨. 3초 후 재연결 시도...")
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            stompClient.connect()
+                        }, 3000)  // 3초 후 재연결 시도
+                    }
+                    else -> {}
+                }
+            }
+        compositeDisposable.add(lifecycleDisposable)
+
+        // 웹소켓 연결 시작
+        stompClient.connect()
+    }
+
+    private fun joinChatRoom(chatRoomId: Long, senderId: Long, password: String?) {
+        // 채팅방 가입 URL 구성 (roomId 자리에 chatRoomId 값 삽입)
+        val destination = "/pub/chat.enter.$chatRoomId"
+
+        // JSON 메시지 구성 (content는 빈 문자열로 설정)
+        val jsonMessage = JSONObject().apply {
+            put("chatRoomId", chatRoomId)
+            put("senderId", senderId)
+            put("messageType", "ENTER")
+            put("content", "ENTER")
+            // password가 null인 경우 JSON_NULL로 명시
+            put("password", password ?: JSONObject.NULL)
+        }
+
+        Timber.d("$jsonMessage")
+
+        // 메시지 publish (RxJava Observable 구독)
+        val sendDisposable = stompClient.send(destination, jsonMessage.toString())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                Timber.d("STOMP", "채팅방 가입 메시지 전송 성공")
+            }, { error ->
+                Timber.e("STOMP", "채팅방 가입 메시지 전송 실패: ${error.message}")
+            })
+
+        compositeDisposable.add(sendDisposable)
+    }
+
+    private fun sendMessageToChatRoom(chatRoomId: Long, senderId: Long, content: String) {
+        // 메시지 송신을 위한 URL (roomId 자리에 chatRoomId 값 삽입)
+        val destination = "/pub/chat.message.$chatRoomId"
+
+        // JSON 메시지 구성
+        val jsonMessage = JSONObject().apply {
+            put("chatRoomId", chatRoomId)
+            put("senderId", senderId)
+            put("messageType", "TEXT")  // 메시지 유형을 TEXT로 설정
+            put("content", content)     // 실제 메시지 내용
+        }
+
+        Timber.d("전송할 메시지: $jsonMessage")
+
+        // 메시지 publish (RxJava Observable 구독)
+        val sendDisposable = stompClient.send(destination, jsonMessage.toString())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                Timber.d("STOMP", "채팅방 메시지 전송 성공")
+            }, { error ->
+                Timber.e("STOMP", "채팅방 메시지 전송 실패: ${error.message}")
+            })
+
+        compositeDisposable.add(sendDisposable)
+    }
+
+    private fun setupMessageReceiver(chatRoomId: Long) {
+        // 수신할 채팅방 메시지 구독
+        val destination = "/exchange/chat.exchange/chat.room.$chatRoomId"
+
+        val messageDisposable = stompClient.topic(destination)
+            .map { it.payload as String } // 메시지 payload를 String 형식으로 변환
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ payload ->
+                try {
+                    // 수신된 메시지 JSON 파싱
+                    val jsonMessage = JSONObject(payload)
+                    val messageId = jsonMessage.getLong("id")
+                    val roomId = jsonMessage.getLong("chatRoomId")
+                    val senderId = jsonMessage.getLong("senderId")
+                    val messageType = jsonMessage.getString("messageType")
+                    val content = jsonMessage.getString("content")
+                    val timestamp = jsonMessage.getString("timestamp")
+
+                    // 수신된 메시지 로깅
+                    Timber.tag("STOMP").d("메시지 수신: id=%d, chatRoomId=%d, senderId=%d, messageType=%s, content=%s, timestamp=%s",
+                        messageId, roomId, senderId, messageType, content, timestamp)
+
+                } catch (e: Exception) {
+                    Timber.e("STOMP", "수신 메시지 파싱 오류: ${e.message}")
+                }
+            }, { error ->
+                Timber.e("STOMP", "채팅 메시지 수신 실패: ${error.message}")
+            })
+
+        compositeDisposable.add(messageDisposable)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -135,7 +199,7 @@ class ChatFragment : Fragment(), ChatRoomClickListener {
 
         viewModel.fetchChatRooms()
 
-//        setupStompClient()
+        setupStompClient()
 
         // 기존 FAB 클릭 리스너
         binding.floatingActionButton.setOnClickListener {
