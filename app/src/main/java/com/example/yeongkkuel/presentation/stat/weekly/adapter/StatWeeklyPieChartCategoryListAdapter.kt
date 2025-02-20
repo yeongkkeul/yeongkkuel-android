@@ -20,6 +20,10 @@ class StatWeeklyPieChartCategoryListAdapter(
         private val binding: ItemStatWeeklyPiechartcategoryBinding
     ) : RecyclerView.ViewHolder(binding.root) {
         fun onBind(item: StatWeeklyUiState.PieChartData) = with(binding) {
+            if(item.expenditure == 0) {
+                binding.root.visibility = View.GONE
+                return@with
+            }
             if (item.category.name == "") binding.root.visibility = View.GONE
             else {
                 tvSpendingCategory.text = item.category.name
