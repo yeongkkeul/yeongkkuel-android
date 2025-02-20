@@ -1,7 +1,6 @@
 package com.example.yeongkkuel.network.service
 
 import com.example.yeongkkuel.network.request.chat.ChatPwValidateRequest
-import com.example.yeongkkuel.network.request.chat.ChatsRequest
 import com.example.yeongkkuel.network.response.Response
 import com.example.yeongkkuel.network.response.chat.ChatBannerResult
 import com.example.yeongkkuel.network.response.chat.ChatDetailResult
@@ -11,6 +10,7 @@ import com.example.yeongkkuel.network.response.chat.ChatSearchResult
 import com.example.yeongkkuel.network.response.chat.ReceiptResult
 import com.example.yeongkkuel.network.response.chat.ChatRoomRankResponse
 import com.example.yeongkkuel.network.response.chat.ChatRoomUserResult
+import com.example.yeongkkuel.network.response.chat.ChatRoomUsersResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body
@@ -54,6 +54,11 @@ interface ChatService {
     suspend fun postChatroomImages(
         @Path("chatRoomId") chatRoomId:Int
     ): Response<String>
+
+    @GET("/api/chats/{chatRoomId}/users")
+    suspend fun getChatroomUsers(
+        @Path("chatRoomId") chatRoomId:Int
+    ): Response<ChatRoomUsersResponse>
 
 
     // 클라이언트와 서버의 메세지 조회

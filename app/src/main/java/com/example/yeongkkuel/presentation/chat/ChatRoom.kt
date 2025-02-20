@@ -6,5 +6,7 @@ data class ChatRoom(
     val thumbnailUrl: String,
     val recentMessage: String,
     val messageTime: String,
-    val participantCount: Int
+    val participantCount: Int,
+    val chatRoomRule: String,
+    val unreadCount: Int = 0
 )

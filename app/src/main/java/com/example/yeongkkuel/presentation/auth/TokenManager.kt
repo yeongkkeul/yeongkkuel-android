@@ -14,6 +14,7 @@ object TokenManager {
     private const val PREFS_NAME = "my_prefs"
     private const val KEY_ACCESS_TOKEN = "access_token"
     private const val KEY_REFRESH_TOKEN = "refresh_token"
+    private const val KEY_USER_ID = "user_id"
 
     private const val KEY_SOCIAL_TYPE = "social_type"
     private const val KEY_KAKAO_TOKEN = "kakao_token"
@@ -25,12 +26,24 @@ object TokenManager {
         KAKAO, GOOGLE, NONE
     }
 
+    fun saveUserId(context: Context, userId: Int) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit()
+            .putInt(KEY_USER_ID, userId)
+            .apply()
+    }
+
     fun saveTokens(context: Context, accessToken: String, refreshToken: String) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit()
             .putString(KEY_ACCESS_TOKEN, accessToken)
             .putString(KEY_REFRESH_TOKEN, refreshToken)
             .apply()
+    }
+
+    fun getUserId(context: Context): Int {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.getInt(KEY_USER_ID, 0)
     }
 
     fun getAccessToken(context: Context): String? {

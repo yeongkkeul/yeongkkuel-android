@@ -195,6 +195,7 @@ class LoginFragment : Fragment() {
                                 TokenManager.saveTokens(requireContext(), result.accessToken, result.refreshToken)
                                 TokenManager.saveSocialType(requireContext(), TokenManager.SocialType.KAKAO)
                                 TokenManager.saveKakaoToken(requireContext(), kakaoAccessToken)
+                                TokenManager.saveUserId(requireContext(), result.userId)
                                 /*tokenManager.saveAccessToken(result.accessToken)
                                 tokenManager.saveRefreshToken(result.refreshToken)
 */

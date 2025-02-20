@@ -7,15 +7,14 @@ import androidx.lifecycle.viewModelScope
 import com.example.yeongkkuel.network.RetrofitClient
 import com.example.yeongkkuel.network.response.chat.ChatDetailResult
 import com.example.yeongkkuel.network.response.chat.ChatRoomDetailDto
-import com.example.yeongkkuel.presentation.chat.data.Age
-import com.example.yeongkkuel.presentation.chat.data.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class ChatSearchViewModel : ViewModel() {
     val selectedAgeOption: MutableLiveData<String?> = MutableLiveData(null)
 
-    val selectedExpenseOption: MutableLiveData<String> = MutableLiveData()
+    val selectedMinExpenseOption: MutableLiveData<Int> = MutableLiveData()
+    val selectedMaxExpenseOption: MutableLiveData<Int> = MutableLiveData()
 
     val selectedJobOption: MutableLiveData<String?> = MutableLiveData(null)
 
@@ -27,8 +26,8 @@ class ChatSearchViewModel : ViewModel() {
             try {
                 val age: String? = selectedAgeOption.value
                 val job: String? = selectedJobOption.value
-                val minAmount = 0
-                val maxAmount = 1000000
+                val minAmount = selectedMinExpenseOption.value
+                val maxAmount = selectedMaxExpenseOption.value
                 val page = 0
 
                 val response = RetrofitClient.chatService.getChatroomExplore(age, minAmount, maxAmount, job, page)

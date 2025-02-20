@@ -10,6 +10,8 @@ import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.DialogChatRoomPwBinding
 import com.example.yeongkkuel.network.RetrofitClient
 import com.example.yeongkkuel.network.request.chat.ChatPwValidateRequest
+import com.example.yeongkkuel.presentation.chat.room.ChatGroupViewModel
+import com.example.yeongkkuel.presentation.chat.search.ChatSearchViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,6 +19,7 @@ import kotlinx.coroutines.launch
 class ChatRoomPwDialog(
     context: Context,
     private val chatRoomId: Int,
+    private val chatGroupViewModel: ChatGroupViewModel,
     private val onCancelClick: () -> Unit,
     private val onConfirmClick: () -> Unit
 ) : Dialog(context, R.style.CustomDialogDimmed) {
@@ -49,6 +52,7 @@ class ChatRoomPwDialog(
 
         binding.btnConfirm.setOnClickListener {
             val password = binding.etPassword.text.toString()
+            chatGroupViewModel.setSelectedChatRoomPassword(password)
             val request = ChatPwValidateRequest(password)
             // API 호출을 위해 코루틴 사용
             CoroutineScope(Dispatchers.Main).launch {

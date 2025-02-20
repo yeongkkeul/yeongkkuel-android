@@ -41,11 +41,20 @@ class ChatRoomAdapter(
 
         fun bind(chatRoom: ChatRoom) {
             binding.apply {
-                Glide.with(ivThumbnail.context)
-                    .load(chatRoom.thumbnailUrl)
-                    .into(ivThumbnail)
+                if (chatRoom.thumbnailUrl.isEmpty()) {
+                    Glide.with(ivThumbnail.context)
+                        .load(R.drawable.ic_splash_logo) // 대체 이미지 resource
+                        .into(ivThumbnail)
+                } else {
+                    Glide.with(ivThumbnail.context)
+                        .load(chatRoom.thumbnailUrl)
+                        .placeholder(R.drawable.ic_splash_logo) // 로딩 중 대체 이미지
+                        .error(R.drawable.ic_splash_logo)       // 오류 발생 시 대체 이미지
+                        .into(ivThumbnail)
+                }
                 tvTitleChatRoom.text = chatRoom.title
                 tvThumbnailMessage.text = chatRoom.recentMessage
+                tvAmountMessage.text = chatRoom.unreadCount.toString()
                 tvTimeMessage.text = chatRoom.messageTime
                 tvAmountPeople.text = chatRoom.participantCount.toString()
                 root.setOnClickListener {

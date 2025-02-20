@@ -5,5 +5,9 @@ data class ChatItemModel(
     val content: String,
     val isUser: Boolean,
     val sendTime: String,
-    val amountPeopleRead: Int
+    val amountPeopleRead: Int,
+    val profileImageUrl: String?,
+    val receiptCategory: String? = null,
+    val receiptContent: String? = null,
+    val receiptAmount: Int? = null
 )

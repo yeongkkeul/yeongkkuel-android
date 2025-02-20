@@ -13,11 +13,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentChatBinding
+import com.example.yeongkkuel.presentation.auth.TokenManager
 import com.example.yeongkkuel.presentation.base.MainActivity
 import com.example.yeongkkuel.presentation.chat.adapter.ChatRoomAdapter
 import com.example.yeongkkuel.presentation.chat.dialog.FabMenuDialog
+import com.example.yeongkkuel.presentation.chat.room.ChatDatabase
 import com.example.yeongkkuel.presentation.chat.room.ChatGroupViewModel
+import com.example.yeongkkuel.presentation.chat.room.ChatRepository
 import com.example.yeongkkuel.presentation.chat.room.ChatRoomClickListener
+import com.example.yeongkkuel.presentation.chat.room.ChatRoomViewModelFactory
 import com.example.yeongkkuel.utils.SwipeToDelete
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import timber.log.Timber
@@ -30,13 +34,21 @@ class ChatFragment : Fragment(), ChatRoomClickListener {
 
     private lateinit var chatRoomAdapter: ChatRoomAdapter
 
-//    private lateinit var stompClient: StompClient
-//
-//    private val compositeDisposable = CompositeDisposable()
+    private val viewModel: ChatRoomViewModel by activityViewModels {
+        ChatRoomViewModelFactory(
+            ChatRepository(
+                ChatDatabase.getInstance(requireContext()).chatMessageCountDao()
+            )
+        )
+    }
 
-    private val viewModel: ChatRoomViewModel by activityViewModels()
-    private val chatGroupViewModel: ChatGroupViewModel by activityViewModels()
-
+    private val chatGroupViewModel: ChatGroupViewModel by activityViewModels {
+        ChatRoomViewModelFactory(
+            ChatRepository(
+                ChatDatabase.getInstance(requireContext()).chatMessageCountDao()
+            )
+        )
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -48,74 +60,11 @@ class ChatFragment : Fragment(), ChatRoomClickListener {
         return binding.root
     }
 
-//    private fun createOkHttpClient(): OkHttpClient {
-//        return OkHttpClient.Builder()
-//            .readTimeout(0, TimeUnit.MILLISECONDS)
-//            .build()
-//    }
-
-//    private fun setupStompClient() {
-//        val okHttpClient = createOkHttpClient()
-//        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "wss://dev.yeongkkeul.store/ws")
-//
-//        // STOMP 클라이언트의 생명주기 이벤트 구독 (RxJava 사용)
-//        val lifecycleDisposable = stompClient.lifecycle()
-//            .subscribeOn(Schedulers.io())
-//            .observeOn(AndroidSchedulers.mainThread())
-//            .subscribe { lifecycleEvent ->
-//                when (lifecycleEvent.type) {
-//                    LifecycleEvent.Type.OPENED -> {
-//                        Timber.tag("STOMP").d("연결 성공: %s", lifecycleEvent)
-//                        // 연결 성공 후 채팅방 가입 요청 실행 (예시: chatRoomId = 123, senderId = 456)
-//                        joinChatRoom(chatRoomId = 2L, senderId = 8L, password = "1234")
-//                        // 필요 시 채팅방 수신 메시지 구독 (예: subscribeToChatRoom(chatRoomId))
-//                    }
-//                    LifecycleEvent.Type.ERROR -> {
-//                        Timber.tag("STOMP").e(lifecycleEvent.exception, "연결 에러: ")
-//                    }
-//                    LifecycleEvent.Type.CLOSED -> {
-//                        Timber.tag("STOMP").d("연결 종료됨")
-//                    }
-//                    else -> {}
-//                }
-//            }
-//        compositeDisposable.add(lifecycleDisposable)
-//
-//        // 웹소켓 연결 시작
-//        stompClient.connect()
-//    }
-
-//    private fun joinChatRoom(chatRoomId: Long, senderId: Long, password: String?) {
-//        // 채팅방 가입 URL 구성 (roomId 자리에 chatRoomId 값 삽입)
-//        val destination = "/pub/chat.enter.$chatRoomId"
-//
-//        // JSON 메시지 구성 (content는 빈 문자열로 설정)
-//        val jsonMessage = JSONObject().apply {
-//            put("chatRoomId", chatRoomId)
-//            put("senderId", senderId)
-//            put(
-//                "messageType",
-//                "ENTER"
-//            )
-//            put("content", "twosome")
-//            // password가 null인 경우 JSON_NULL로 명시
-//            put("password", password ?: JSONObject.NULL)
-//        }
-//
-//        Timber.d("$jsonMessage")
-//
-//        // 메시지 publish (RxJava Observable 구독)
-//        val sendDisposable = stompClient.send(destination, jsonMessage.toString())
-//            .subscribeOn(Schedulers.io())
-//            .observeOn(AndroidSchedulers.mainThread())
-//            .subscribe({
-//                Log.d("STOMP", "채팅방 가입 메시지 전송 성공")
-//            }, { error ->
-//                Log.e("STOMP", "채팅방 가입 메시지 전송 실패: ${error.message}")
-//            })
-//
-//        compositeDisposable.add(sendDisposable)
-//    }
+    override fun onStop() {
+        super.onStop()
+        // 화면을 벗어나면 polling 중단
+        viewModel.stopPollingChatRooms()
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -124,7 +73,10 @@ class ChatFragment : Fragment(), ChatRoomClickListener {
 
         (requireActivity() as MainActivity).hideBottomNavigation(false)
 
-//        setupStompClient()
+        viewModel.fetchChatRooms()
+
+        val senderId = TokenManager.getUserId(requireContext())
+        chatGroupViewModel.setSenderId(senderId)
 
         // 기존 FAB 클릭 리스너
         binding.floatingActionButton.setOnClickListener {
@@ -142,7 +94,7 @@ class ChatFragment : Fragment(), ChatRoomClickListener {
         setupRecyclerView()
 
         viewModel.chatRooms.observe(viewLifecycleOwner) { chatRooms ->
-            chatRoomAdapter.updateData(ArrayList(chatRooms))
+            chatRoomAdapter.updateData(ArrayList(chatRooms.reversed()))
         }
     }
 
@@ -255,7 +207,6 @@ class ChatFragment : Fragment(), ChatRoomClickListener {
 
     override fun onItemClicked(chatRoom: ChatRoom) {
         // 아이템 클릭 시 실행할 로직
-        showToast("Clicked: ${chatRoom.title}")
         chatGroupViewModel.setSelectedChatRoomId(chatRoom.id)
         navController.navigate(R.id.action_navigation_chat_to_navigation_chat_group)
     }
@@ -268,12 +219,6 @@ class ChatFragment : Fragment(), ChatRoomClickListener {
         } else {
             binding.layoutEmpty.visibility = View.INVISIBLE
             binding.rvChatRoom.visibility = View.VISIBLE
-        }
-    }
-
-    private fun showToast(message: String) {
-        context?.let {
-            android.widget.Toast.makeText(it, message, android.widget.Toast.LENGTH_SHORT).show()
         }
     }
 

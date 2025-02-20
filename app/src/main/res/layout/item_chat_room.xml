@@ -40,7 +40,7 @@
             android:id="@+id/notice_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white">
+            android:background="@drawable/selector_chat_room">
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guideline_iv_start__v"

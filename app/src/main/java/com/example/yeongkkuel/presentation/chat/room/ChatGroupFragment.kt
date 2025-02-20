@@ -19,8 +19,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentChatGroupBinding
+import com.example.yeongkkuel.presentation.auth.TokenManager
 import com.example.yeongkkuel.presentation.base.MainActivity
 import com.example.yeongkkuel.presentation.chat.ChatMessageClickListener
+import com.example.yeongkkuel.presentation.chat.ChatRoomViewModel
 import com.example.yeongkkuel.presentation.chat.adapter.ChatGroupAdapter
 import com.example.yeongkkuel.presentation.chat.adapter.ChatRoomDrawerAdapter
 import com.example.yeongkkuel.presentation.chat.dialog.ChatRoomGroupExitDialog
@@ -38,8 +40,20 @@ class ChatGroupFragment : Fragment(), ChatMessageClickListener {
         get() = requireNotNull(_binding){"FragmentChatGroupBinding -> null"}
 
     private val viewModel: ChatSearchViewModel by activityViewModels()
-    private val chatGroupViewModel: ChatGroupViewModel by activityViewModels()
-
+    private val chatGroupViewModel: ChatGroupViewModel by activityViewModels {
+        ChatRoomViewModelFactory(
+            ChatRepository(
+                ChatDatabase.getInstance(requireContext()).chatMessageCountDao()
+            )
+        )
+    }
+    private val chatRoomViewModel: ChatRoomViewModel by activityViewModels {
+        ChatRoomViewModelFactory(
+            ChatRepository(
+                ChatDatabase.getInstance(requireContext()).chatMessageCountDao()
+            )
+        )
+    }
     private var bannerOpen = false
 
     private lateinit var chatRoomDrawerAdapter: ChatRoomDrawerAdapter
@@ -55,6 +69,12 @@ class ChatGroupFragment : Fragment(), ChatMessageClickListener {
         return binding.root
     }
 
+    override fun onStop() {
+        super.onStop()
+        // 화면을 벗어나면 polling 중단
+        chatGroupViewModel.stopPollingChatRooms()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -67,7 +87,12 @@ class ChatGroupFragment : Fragment(), ChatMessageClickListener {
 
         navController = Navigation.findNavController(view)
 
+        val senderId = TokenManager.getUserId(requireContext())
+
         chatGroupViewModel.selectedChatRoomId.value?.let { chatRoomId ->
+            chatGroupViewModel.fetchLatestTextMessageForChatRoom(chatRoomId, senderId)
+            chatGroupViewModel.setupStompClient()
+            chatGroupViewModel.enterChatRoomRegistered()
             viewModel.fetchChatDetail(chatRoomId) { detail ->
                 detail ?.let {
                     binding.tvDataGoalSuccessChallenger.text = detail.chatRoomChallenger
@@ -93,6 +118,18 @@ class ChatGroupFragment : Fragment(), ChatMessageClickListener {
         chatGroupViewModel.selectedChatRoomId.observe(viewLifecycleOwner) { chatRoomId ->
             if (chatRoomId != null) {
                 chatGroupViewModel.fetchBanner(chatRoomId)
+
+                chatRoomViewModel.chatRooms.observe(viewLifecycleOwner) { chatRooms ->
+                    val targetChatRoom = chatRooms.find { it.id == chatRoomId }
+                    val chatRoomRule = targetChatRoom?.chatRoomRule
+
+                    chatRoomRule?.let {
+                        binding.tvDataGroupRule.text = it
+                        println("Chat Room Rule: $it")
+                    } ?: run {
+                        println("Chat Room with id 1 not found or rule is null")
+                    }
+                }
             }
         }
 
@@ -123,7 +160,7 @@ class ChatGroupFragment : Fragment(), ChatMessageClickListener {
 
         chatGroupViewModel.messages.observe(viewLifecycleOwner) { messages ->
             Timber.tag("ChatFragment").d("글자 업데이트 완료: %s", messages)
-            chatGroupAdapter = ChatGroupAdapter(messages, otherProfileImageUrl, this)
+            chatGroupAdapter = ChatGroupAdapter(messages.reversed(), otherProfileImageUrl, this)
             binding.rvChatGroup.adapter = chatGroupAdapter
             binding.rvChatGroup.scrollToPosition(messages.size - 1)
         }
@@ -131,8 +168,11 @@ class ChatGroupFragment : Fragment(), ChatMessageClickListener {
         binding.btnSend.setOnClickListener {
             Timber.tag("chatGroupViewModel").d(chatGroupViewModel.message.value.toString())
 
-            // GPT 답변을 얻기 위한 openAI 서버에 질문 전송
-            chatGroupViewModel.sendMessage()
+            chatGroupViewModel.selectedChatRoomId.value?.let { chatRoomId ->
+                chatGroupViewModel.sendMessageToChatRoom(chatRoomId.toLong(), senderId.toLong(), chatGroupViewModel.message.value.toString())
+                chatGroupViewModel.enterChatRoomRegistered()
+                chatGroupViewModel.fetchLatestTextMessageForChatRoom(chatRoomId, senderId)
+            }
 
             binding.chatMessageInput.setText("")
         }

@@ -8,6 +8,95 @@
     android:orientation="vertical"
     android:padding="8dp">
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_chat_message_user"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tv_category"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="카테고리"
+            android:textColor="#9F9F9F"
+            android:textSize="15sp"
+            style="@style/body_regula"
+            android:padding="8dp"
+            android:layout_marginEnd="12dp"
+            android:lineSpacingExtra="5dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <TextView
+            android:id="@+id/tv_category_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="카테고리"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            style="@style/body_regula"
+            android:padding="8dp"
+            android:layout_marginStart="12dp"
+            android:lineSpacingExtra="5dp"
+            app:layout_constraintStart_toEndOf="@+id/tv_category"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <TextView
+            android:id="@+id/tv_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="내용"
+            android:textColor="#9F9F9F"
+            android:textSize="15sp"
+            style="@style/body_regula"
+            android:padding="8dp"
+            android:layout_marginEnd="12dp"
+            android:lineSpacingExtra="5dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_category"/>
+
+        <TextView
+            android:id="@+id/tv_content_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="내용"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            style="@style/body_regula"
+            android:padding="8dp"
+            android:layout_marginEnd="12dp"
+            android:lineSpacingExtra="5dp"
+            app:layout_constraintStart_toStartOf="@+id/tv_category_data"
+            app:layout_constraintTop_toBottomOf="@+id/tv_category_data"/>
+
+        <TextView
+            android:id="@+id/tv_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="내용"
+            android:textColor="@color/main1"
+            android:textSize="15sp"
+            style="@style/body_medium"
+            android:padding="8dp"
+            android:layout_marginEnd="12dp"
+            android:lineSpacingExtra="5dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_content"/>
+
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="184dp"
+            android:layout_height="184dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_amount"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <TextView
         android:id="@+id/tv_chat_message"
         android:layout_width="wrap_content"

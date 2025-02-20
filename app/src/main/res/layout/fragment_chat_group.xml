@@ -29,10 +29,11 @@
 
             <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:orientation="vertical"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/app_bar">
+                app:layout_constraintTop_toBottomOf="@+id/app_bar"
+                app:layout_constraintBottom_toTopOf="@+id/layout_chat_input">
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_chat_group"
@@ -387,6 +388,48 @@
                 app:layout_constraintTop_toBottomOf="@+id/iv_photo_1" />
 
             <TextView
+                android:id="@+id/tv_title_group_rule"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="그룹 규칙"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                style="@style/body_semibo"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/seperate_line" />
+
+            <TextView
+                android:id="@+id/tv_data_group_rule"
+                android:layout_width="264dp"
+                android:layout_height="104dp"
+                android:text=""
+                android:textColor="@color/black"
+                style="@style/small_regul"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:background="@drawable/bg_chat_room_group_rule"
+                android:layout_marginTop="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_group_rule" />
+
+            <View
+                android:id="@+id/seperate_line_2"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/main4"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:layout_marginTop="20dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_data_group_rule" />
+
+            <TextView
                 android:id="@+id/tv_title_challenger"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -397,7 +440,7 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginStart="16dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/seperate_line" />
+                app:layout_constraintTop_toBottomOf="@+id/seperate_line_2" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_group_challenger"
@@ -425,6 +468,15 @@
                     android:layout_height="16dp"
                     android:src="@drawable/ic_bell"
                     app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/btn_setting"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_setting"
+                    android:layout_marginStart="12dp"
+                    app:layout_constraintStart_toEndOf="@+id/btn_alarm"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView

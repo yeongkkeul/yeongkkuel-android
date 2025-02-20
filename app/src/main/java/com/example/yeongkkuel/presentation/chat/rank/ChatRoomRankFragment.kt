@@ -17,6 +17,9 @@ import com.example.yeongkkuel.network.response.chat.ChatRoomRank
 import com.example.yeongkkuel.presentation.chat.room.ChatGroupViewModel
 import com.example.yeongkkuel.presentation.chat.dialog.ChatRoomProfilePartyDialog
 import com.example.yeongkkuel.presentation.chat.dialog.ChatRoomRankPopup
+import com.example.yeongkkuel.presentation.chat.room.ChatDatabase
+import com.example.yeongkkuel.presentation.chat.room.ChatRepository
+import com.example.yeongkkuel.presentation.chat.room.ChatRoomViewModelFactory
 import com.example.yeongkkuel.utils.ChatItemDecoration
 
 class ChatRoomRankFragment : Fragment(), ChatRoomRankClickListener {
@@ -28,7 +31,13 @@ class ChatRoomRankFragment : Fragment(), ChatRoomRankClickListener {
 
     private lateinit var chatRoomRankAdapter: ChatRoomRankAdapter
 
-    private val chatGroupViewModel: ChatGroupViewModel by activityViewModels()
+    private val chatGroupViewModel: ChatGroupViewModel by activityViewModels {
+        ChatRoomViewModelFactory(
+            ChatRepository(
+                ChatDatabase.getInstance(requireContext()).chatMessageCountDao()
+            )
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

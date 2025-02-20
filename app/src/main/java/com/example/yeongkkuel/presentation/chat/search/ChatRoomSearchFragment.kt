@@ -20,6 +20,9 @@ import com.example.yeongkkuel.network.response.chat.ChatRoomDetailDto
 import com.example.yeongkkuel.presentation.base.MainActivity
 import com.example.yeongkkuel.presentation.chat.room.ChatGroupViewModel
 import com.example.yeongkkuel.presentation.chat.adapter.ChatRoomSearchAdapter
+import com.example.yeongkkuel.presentation.chat.room.ChatDatabase
+import com.example.yeongkkuel.presentation.chat.room.ChatRepository
+import com.example.yeongkkuel.presentation.chat.room.ChatRoomViewModelFactory
 import timber.log.Timber
 
 class ChatRoomSearchFragment : Fragment(), ChatRoomSearchClickListener {
@@ -31,8 +34,13 @@ class ChatRoomSearchFragment : Fragment(), ChatRoomSearchClickListener {
     private lateinit var chatRoomSearchAdapter: ChatRoomSearchAdapter
 
     private val viewModel: ChatSearchViewModel by activityViewModels()
-    private val chatGroupViewModel: ChatGroupViewModel by activityViewModels()
-
+    private val chatGroupViewModel: ChatGroupViewModel by activityViewModels {
+        ChatRoomViewModelFactory(
+            ChatRepository(
+                ChatDatabase.getInstance(requireContext()).chatMessageCountDao()
+            )
+        )
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -54,6 +62,10 @@ class ChatRoomSearchFragment : Fragment(), ChatRoomSearchClickListener {
         viewModel.fetchChatRooms()
 
         setupRecyclerView()
+
+        binding.btnBack.setOnClickListener {
+            navController.popBackStack()
+        }
 
         binding.etSearch.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -101,8 +113,12 @@ class ChatRoomSearchFragment : Fragment(), ChatRoomSearchClickListener {
             }
         }
 
-        viewModel.selectedExpenseOption.observe(viewLifecycleOwner) { option ->
-            binding.tvSearchTagGoalExpense.text = option
+        viewModel.selectedMinExpenseOption.observe(viewLifecycleOwner) { optionMin ->
+            viewModel.selectedMaxExpenseOption.observe(viewLifecycleOwner) { optionMax ->
+                val displayMax = if (optionMax.toInt() == 100000) "100000+" else optionMax
+                binding.tvSearchTagGoalExpense.text = "$optionMin - $displayMax"
+                viewModel.fetchChatRooms()
+            }
         }
 
         viewModel.selectedJobOption.observe(viewLifecycleOwner) { selectedJob ->
@@ -154,7 +170,6 @@ class ChatRoomSearchFragment : Fragment(), ChatRoomSearchClickListener {
 
     override fun onItemClicked(chatRoomSearch: ChatRoomDetailDto) {
         // 아이템 클릭 시 실행할 로직
-        showToast("Clicked: ${chatRoomSearch.chatRoomTitle}")
         chatGroupViewModel.setSelectedChatRoomId(chatRoomSearch.chatRoomId)
         navController.navigate(R.id.action_navigation_chat_room_search_to_register)
     }
