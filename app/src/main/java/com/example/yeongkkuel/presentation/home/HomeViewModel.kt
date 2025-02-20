@@ -26,7 +26,6 @@ class HomeViewModel(private val repository: HomeRepository) : ViewModel() {
 
                     if (response.mySkin.isNullOrEmpty()) {
                         Log.e("HomeViewModel", "`mySkin`이 비어 있음. 서버 응답 확인 필요!")
-                        fetchShopData("MY")
                     } else {
                         Log.d("HomeViewModel", "`mySkin` 데이터 업데이트 완료: ${response.mySkin}")
                     }
@@ -68,49 +67,23 @@ class HomeViewModel(private val repository: HomeRepository) : ViewModel() {
         Log.d("HomeViewModel", "mySkin 리스트 업데이트 완료: ${updatedList.size}개")
     }
 
-    fun fetchShopData(itemType: String) {
+    fun saveEquippedSkins(purchaseIds: List<Int>) {
         viewModelScope.launch {
             try {
-                Log.d("HomeViewModel", "🛍️ ${itemType} 데이터 요청 중...")
+                Log.d("HomeViewModel", "스킨 착용 저장 요청 - purchaseIds: $purchaseIds")
 
-                val response = repository.getShopData(itemType)
+                val response = repository.saveEquippedSkins(purchaseIds)
 
                 if (response?.isSuccess == true) {
-                    Log.d("HomeViewModel", "✅ ${itemType} 데이터 수신 완료: ${response.result.itemList}")
+                    Log.d("HomeViewModel", "스킨 착용 저장 성공! 홈 데이터 다시 불러오기")
 
-                    if (itemType == "MY") {
-                        Log.d("HomeViewModel", "🟢 MY 탭 데이터 갱신 중...")
-                        val mySkinList = response.result.mySkin.map { mySkin ->
-                            MySkin(
-                                itemName = mySkin.itemName,
-                                itemType = mySkin.itemType,
-                                imgUrl = mySkin.imgUrl ?: ""
-                            )
-                        }
-
-                        val shopItemList = response.result.itemList.map { shopItem ->
-                            MySkin(  // ✅ ShopItem을 MySkin으로 변환
-                                itemName = shopItem.itemName,
-                                itemType = shopItem.itemType,
-                                imgUrl = shopItem.itemImg ?: ""
-                            )
-                        }
-
-                        // ✅ mySkin + shopItem을 합쳐서 관리
-                        _homeResult.postValue(
-                            HomeResult(
-                                myReward = response.result.myReward,
-                                mySkin = mySkinList + shopItemList, // 두 리스트를 합침
-                                today = _homeResult.value?.today ?: "",
-                                categories = _homeResult.value?.categories ?: emptyList()
-                            )
-                        )
-                    }
+                    fetchHomeData()
+                    // `mySkin` 데이터를 포함한 최신 홈 데이터 다시 불러오기
                 } else {
-                    Log.e("HomeViewModel", "❌ ${itemType} 데이터 가져오기 실패: ${response?.message ?: "오류 발생"}")
+                    Log.e("HomeViewModel", "스킨 착용 저장 실패: ${response?.message}")
                 }
             } catch (e: Exception) {
-                Log.e("HomeViewModel", "❌ ${itemType} 데이터 요청 오류: ${e.message}")
+                Log.e("HomeViewModel", "스킨 착용 저장 API 오류: ${e.message}")
             }
         }
     }

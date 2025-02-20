@@ -31,49 +31,16 @@ class StoreViewModel : ViewModel() {
     private val _showFailureDialog = MutableLiveData<Boolean>()
     val showFailureDialog: LiveData<Boolean> = _showFailureDialog
 
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> = _isLoading
+
+    private val _errorMessage = MutableLiveData<String?>()
+    val errorMessage: LiveData<String?> = _errorMessage
+
+    var currentReward: Int = 0 // 보유 리워드 저장 변수 추가
 
     init {
         _productUiState.value = ProductUiState()
-    }
-    fun equipSkin(purchaseId: Int) {
-        val requestBody = mapOf(
-            "userItem" to listOf(mapOf("purchaseId" to purchaseId))
-        )
-
-        viewModelScope.launch {
-            try {
-                val response = repository.saveEquippedSkins(listOf(purchaseId)) // ✅ API 호출
-                _equipResponse.postValue(response)
-
-                if (response?.isSuccess == true) {
-                    Log.d("StoreViewModel", "스킨 착용 성공: ${response.message}")
-                } else {
-                    Log.e("StoreViewModel", "스킨 착용 실패: ${response?.message ?: "서버 응답 없음"}")
-                }
-            } catch (e: Exception) {
-                Log.e("StoreViewModel", "스킨 착용 요청 중 오류 발생: ${e.message}")
-            }
-        }
-    }
-
-    fun saveEquippedSkins(purchaseIds: List<Int>, homeViewModel: HomeViewModel) {
-        viewModelScope.launch {
-            try {
-                Log.d("StoreViewModel", "saveEquippedSkins() 호출 - purchaseIds: $purchaseIds")
-
-                val response = repository.saveEquippedSkins(purchaseIds)
-                _equipResponse.postValue(response)
-
-                if (response?.isSuccess == true) {
-                    Log.d("StoreViewModel", "스킨 착용 저장 성공 - HomeViewModel 업데이트 호출")
-                    homeViewModel.fetchHomeData()
-                } else {
-                    Log.e("StoreViewModel", "스킨 착용 저장 실패")
-                }
-            } catch (e: Exception) {
-                Log.e("StoreViewModel", "스킨 착용 저장 오류: ${e.message}")
-            }
-        }
     }
 
     fun purchaseSkin(itemId: Int, itemType: String, itemName: String, reward: Int, homeViewModel: HomeViewModel) {
@@ -98,6 +65,28 @@ class StoreViewModel : ViewModel() {
             } catch (e: Exception) {
                 Log.e("StoreViewModel", " 스킨 구매 오류: ${e.message}")
                 _purchaseResponse.postValue(null)
+            }
+        }
+    }
+    fun saveEquippedSkins(purchaseIds: List<Int>) {
+        viewModelScope.launch {
+            try {
+                Log.d("StoreViewModel", "스킨 착용 저장 요청 - purchaseIds: $purchaseIds")
+
+                val requestBody = mapOf("userItem" to purchaseIds.map { mapOf("purchaseId" to it) })
+
+                val response = repository.saveEquippedSkins(purchaseIds)
+
+                _equipResponse.postValue(response)
+
+                if (response?.isSuccess == true) {
+                    Log.d("StoreViewModel", "✅ 스킨 착용 저장 성공: ${response.message}")
+                    fetchShopData("MY") // MY 데이터 갱신
+                } else {
+                    Log.e("StoreViewModel", "❌ 스킨 착용 저장 실패: ${response?.message ?: "서버 응답 없음"}")
+                }
+            } catch (e: Exception) {
+                Log.e("StoreViewModel", "❌ 스킨 착용 저장 오류: ${e.message}")
             }
         }
     }
@@ -130,7 +119,7 @@ class StoreViewModel : ViewModel() {
                                         name = shopItem.itemName,
                                         price = shopItem.price ?: 0,
                                         category = ProductCategory.MY,
-                                        imageUrl = shopItem.itemImg ?:"",
+                                        imageUrl = shopItem.itemImg,
                                         itemType = "MY"
                                     )
                                 }
@@ -143,9 +132,9 @@ class StoreViewModel : ViewModel() {
             } catch (e: Exception) {
                 Log.e("StoreViewModel", " ${itemType} 데이터 요청 오류: ${e.message}")
             }
+
         }
     }
 
 
 }
-

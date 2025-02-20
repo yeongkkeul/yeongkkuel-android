@@ -26,7 +26,7 @@ data class CategoryResponse(
 data class MySkin(
     val itemName: String,
     val itemType: String,
-    val imgUrl: String?
+    val imgUrl: String
 )
 
 data class Category(
@@ -40,7 +40,7 @@ data class Expense(
     val content: String,
     val amount: Int,
     val imgExist: Boolean,
-    val imgUrl: String?
+    val imgUrl: String
 )
 
 fun CategoryResponse.toCategory(categoryViewModel: CategoryViewModel): Category {
@@ -51,5 +51,4 @@ fun CategoryResponse.toCategory(categoryViewModel: CategoryViewModel): Category 
         color = existingCategory?.color ?: Colors.RED1 //  기존 카테고리 색상 활용, 없으면 RED1
     )
 }
-
 

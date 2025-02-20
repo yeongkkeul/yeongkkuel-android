@@ -29,7 +29,6 @@ import com.example.yeongkkuel.databinding.FragmentStoreBinding
 import com.example.yeongkkuel.presentation.home.HomeRepository
 import com.example.yeongkkuel.presentation.home.HomeViewModel
 import com.example.yeongkkuel.presentation.home.MySkin
-import com.example.yeongkkuel.presentation.home.store.data.ShopItem
 import com.google.android.material.tabs.TabLayout
 
 
@@ -109,13 +108,16 @@ class StoreFragment : Fragment() {
             selectedProductInMyTab?.let { product ->
                 Log.d("StoreFragment", "${product.name} 선택됨, 홈 화면 업데이트 시작")
 
-                // ✅ 스킨 착용 API 호출 (뷰모델을 통해 실행)
-                viewModel.equipSkin(product.id)
+                // 스킨 착용 API 호출
+                homeViewModel.saveEquippedSkins(listOf(product.id))
+
+                // MY 데이터 갱신 (변경된 정보 반영)
+                viewModel.fetchShopData("MY")
 
                 // UI 반영
                 Toast.makeText(requireContext(), "${product.name}이 착용되었습니다!", Toast.LENGTH_SHORT).show()
                 Log.d("StoreFragment", "${product.name} 착용 완료")
-            } ?: Log.d("StoreFragment", "선택된 상품 없음")
+            } ?: Log.d("StoreFragment", " 선택된 상품 없음")
         }
 
         viewModel.productUiState.observe(viewLifecycleOwner) { uiState ->
@@ -148,14 +150,19 @@ class StoreFragment : Fragment() {
                 ).show()
             }
         }
+
         viewModel.purchaseResponse.observe(viewLifecycleOwner) { response ->
             Log.d("StoreFragment", "스킨 구매 API 응답: $response")
 
             if (response?.isSuccess == true) {
-                Log.d("StoreFragment", "✅ 스킨 구매 성공 - 최신 데이터 갱신 요청")
+                selectedProduct?.let { product ->
+                    saveProductToMyTab(product) // MY 탭에 추가하는 별도 함수 호출
 
+                    // 전체 상품을 다시 불러오지 않고, MY 데이터만 갱신
+                    viewModel.fetchShopData("MY")
+                }
             } else {
-                Log.e("StoreFragment", "❌ 스킨 구매 실패: ${response?.message ?: "서버 응답 없음"}")
+                Log.e("StoreFragment", "스킨 구매 실패: ${response?.message ?: "서버 응답 없음"}")
 
                 if (response?.code == "REWARD_NOT_ENOUGH") {
                     showPurchaseFailureDialog()
@@ -169,40 +176,75 @@ class StoreFragment : Fragment() {
             }
         }
 
+
         viewModel.fetchShopData("SWING")
         Log.d("StoreFragment", "Fetching shop data for category: SWING")
-
-
         viewModel.shopResponse.observe(viewLifecycleOwner) { response ->
-            Log.d("StoreFragment", "🟢 API Response: $response") // 전체 응답 출력
+            Log.d("StoreFragment", " API Response: $response") // 응답 확인 로그 추가
 
             if (response?.isSuccess == true) {
-                val mySkinList = response.result.itemList
-                Log.d("StoreFragment", "✅ MY 탭 최신 데이터 - ${mySkinList.size}개 아이템")
+                binding.tvCoin.text = response.result.myReward.toString() // 숫자만 표시
 
-                if (mySkinList.isEmpty()) {
-                    Log.e("StoreFragment", "❌ MY 스킨 목록이 비어 있음! 서버 응답 확인 필요")
-                }
+                val shopItems = response.result.itemList.map { shopItem ->
+                    val fixedItemType =
+                        shopItem.itemType ?: response.result.itemType ?: "UNKNOWN" // 기본값 추가
+                    Log.d(
+                        "StoreFragment",
+                        "itemType 확인 - id: ${shopItem.id}, name: ${shopItem.itemName}, itemType: ${shopItem.itemType}, fixedItemType: $fixedItemType"
+                    )
 
-                mySkinList.forEach { shopItem ->
-                    Log.d("StoreFragment", "📌 MY 탭 아이템 - id: ${shopItem.id}, name: ${shopItem.itemName}, itemType: ${shopItem.itemType ?: "UNKNOWN"}")
-                }
+//                    if (shopItem.itemType == null) {
+//                        Log.e("StoreViewModel", "itemType이 null이므로 result.itemType(${response.result.itemType}) 사용")
+//                    }
+                    val category = when (fixedItemType) { // ProductCategory 변환
+                        "SWING" -> ProductCategory.SWING
+                        "TOY" -> ProductCategory.TOY
+                        "BOWL" -> ProductCategory.BOWL
+                        "NEST" -> ProductCategory.NEST
+                        else -> ProductCategory.SWING // 예외 방지
+                    }
 
-                updateProductList(mySkinList.map { shopItem ->
                     Product(
                         id = shopItem.id,
                         name = shopItem.itemName,
-                        price = shopItem.price ?: 0,
-                        category = ProductCategory.MY,
-                        imageUrl = shopItem.itemImg ?: "",
-                        itemType = shopItem.itemType ?: "MY"
+                        price = shopItem.price ?: 0, // null 방지
+                        imageUrl = shopItem.itemImg, //서버에서 받은 이미지 URL 사용
+                        category = category, // 변환된 category 사용
+                        itemType = fixedItemType // 수정된 코드 (클래스를 참조하지 않고 객체 참조)
                     )
-                }, isMyTab = true)
+                }
+
+                val selectedCategory = when (binding.tabLayout.selectedTabPosition) {
+                    0 -> ProductCategory.SWING
+                    1 -> ProductCategory.TOY
+                    2 -> ProductCategory.BOWL
+                    3 -> ProductCategory.NEST
+                    4 -> ProductCategory.MY
+                    else -> null
+                }
+
+                if (selectedCategory != null) {
+                    val filteredItems = shopItems.filter { it.category == selectedCategory }
+                    if (filteredItems.isEmpty()) {
+                        Log.d("StoreFragment", "${selectedCategory.name} 카테고리의 상품이 없습니다.")
+                        updateProductList(emptyList()) // 빈 리스트 전달
+                    } else {
+                        updateProductList(filteredItems)
+                    }
+                } else {
+                    Log.d("StoreFragment", "MY 탭 선택됨 - 상품 리스트 업데이트")
+                    myProducts.forEach {
+                        Log.d(
+                            "StoreFragment",
+                            "MY 탭 상품 - id: ${it.id}, name: ${it.name}, itemType: ${it.itemType}, imageUrl: ${it.imageUrl}"
+                        )
+                    }
+                    updateProductList(myProducts, isMyTab = true)
+                }
             }
         }
 
-        viewModel.fetchShopData("SWING") //  초기 데이터 로드
-
+        viewModel.fetchShopData("SWING")
         setupRecyclerView()
         setupTabLayout()
     }
@@ -215,6 +257,8 @@ class StoreFragment : Fragment() {
                 Log.d("StoreFragment", "MY 탭에서 선택된 상품: ${product.name}")
             } else {
                 selectedProduct = product
+                applySelectedProductToStore(product)
+
             }
         }
 
@@ -241,12 +285,42 @@ class StoreFragment : Fragment() {
             }
         )
     }
+    private fun applySelectedProductToStore(product: Product) {
+        Log.d("StoreFragment", "applySelectedProductToStore 호출 - 상품: ${product.name}, itemType: ${product.itemType}")
 
+        when (product.itemType) {
+            "SWING" -> binding.imgStoreSwingArea.post {
+                Glide.with(binding.imgStoreSwingArea.context)
+                    .load(product.imageUrl)
+                    .into(binding.imgStoreSwing)
+                Log.d("StoreFragment", "Swing 이미지 업데이트 완료")
+            }
 
+            "TOY" -> binding.imgStoreToyArea.post {
+                Glide.with(binding.imgStoreToyArea.context)
+                    .load(product.imageUrl)
+                    .into(binding.imgStoreToy)
+                Log.d("StoreFragment", "Toy 이미지 업데이트 완료")
+            }
 
-    private fun updateImage(imageView: ImageView, imageResId: Int) {
-        imageView.setImageResource(imageResId)
+            "BOWL" -> binding.imgStoreBowlArea.post {
+                Glide.with(binding.imgStoreBowlArea.context)
+                    .load(product.imageUrl)
+                    .into(binding.imgStoreBowl)
+                Log.d("StoreFragment", "Bowl 이미지 업데이트 완료")
+            }
+
+            "NEST" -> binding.imgStoreNestArea.post {
+                Glide.with(binding.imgStoreNestArea.context)
+                    .load(product.imageUrl)
+                    .into(binding.imgStoreNest)
+                Log.d("StoreFragment", "Nest 이미지 업데이트 완료")
+            }
+
+            else -> Log.e("StoreFragment", "알 수 없는 itemType: ${product.itemType}")
+        }
     }
+
 
     private fun setupTabLayout() {
         val tabTitles = listOf("그네", "장난감", "밥그릇", "둥지", "MY")
@@ -497,43 +571,13 @@ class StoreFragment : Fragment() {
         dialog.show()
     }
     private fun saveProductToMyTab(product: Product) {
-        val existingProduct = myProducts.find { it.id == product.id }
-
-        if (existingProduct == null) {  // ✅ 중복 방지
+        if (!myProducts.contains(product)) {
             myProducts.add(product)
-            Log.d("StoreFragment", "✅ ${product.name} (ID: ${product.id})이 MY 탭에 추가됨")
+            Log.d("StoreFragment", "${product.name}이 MY 탭에 추가됨")
 
             if (binding.tabLayout.selectedTabPosition == 4) {
                 viewModel.fetchShopData("MY")
             }
-        } else {
-            Log.d("StoreFragment", "⚠️ ${product.name} (ID: ${product.id}) 이미 MY 탭에 존재함")
         }
     }
-    /**
-     * ✅ 스킨 착용 API 호출 함수 (MY 탭에서 스킨을 착용할 때 사용)
-     */
-//    private fun equipSkin(purchaseId: Int) {
-//        val requestBody = mapOf(
-//            "userItem" to listOf(mapOf("purchaseId" to purchaseId))
-//        )
-//
-//        viewModel.equipSkin(requestBody) // ✅ API 호출 (observe 사용 X)
-//
-//        // ✅ 응답을 ViewModel의 LiveData에서 감지
-//        viewModel.equipResponse.observe(viewLifecycleOwner) { response ->
-//            if (response?.isSuccess == true) {
-//                Log.d("StoreFragment", "스킨 착용 성공: ${response.message}")
-//
-//                Toast.makeText(requireContext(), "스킨이 착용되었습니다!", Toast.LENGTH_SHORT).show()
-//
-//                // ✅ 착용 후 MY 탭 데이터 갱신
-//                viewModel.fetchShopData("MY")
-//            } else {
-//                Log.e("StoreFragment", "스킨 착용 실패: ${response?.message ?: "서버 응답 없음"}")
-//                Toast.makeText(requireContext(), "스킨 착용 실패!", Toast.LENGTH_SHORT).show()
-//            }
-//        }
-//    }
-
 }
