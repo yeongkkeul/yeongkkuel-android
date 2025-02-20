@@ -264,11 +264,6 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                 }
             }
 
-            categoryViewModel.categories.observe(this@MainActivity) { categories ->
-                val isCategoryEmpty = categories.isNullOrEmpty() // ✅ 카테고리가 비어 있는지 확인
-                binding.tvAddCategory.visibility = if (isCategoryEmpty) View.VISIBLE else View.GONE
-            }
-
 
             navController.addOnDestinationChangedListener { _, destination, _ ->
                 when (destination.id) {
@@ -388,6 +383,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         botSheetCategoryListAdapter.submitList(uiState.spendingList)
 
         val isEmpty = uiState.spendingList.isEmpty()
+        binding.tvAddCategory.visibility = if (isEmpty) View.VISIBLE else View.GONE
 
         // 데이터 존재 여부에 따라 RecyclerView visibility 변경
         rvBotSheetCategory.visibility = if (isEmpty) View.GONE else View.VISIBLE
