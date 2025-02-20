@@ -1,5 +1,6 @@
 package com.example.yeongkkuel.presentation.my.reward
 
+import android.util.Log
 import com.example.yeongkkuel.network.response.mypage.RewardsResult
 import com.example.yeongkkuel.presentation.my.reward.data.RewardItem
 import com.example.yeongkkuel.presentation.my.reward.data.RewardType
@@ -12,17 +13,23 @@ import java.time.temporal.ChronoUnit
 object RewardMapper {
 
     fun mapToRewardItem(rewardsResult: RewardsResult): RewardItem {
+
         val rewardType = convertStringToRewardType(rewardsResult.record)
         val message = rewardsResult.type
         val rewardText = rewardsResult.reward.toString()
 
         val section = convertDatetimeToSection(rewardsResult.datetime)
 
+
+        Log.d("RewardMapper", "RewardItem: $rewardType, $message, $rewardText, $section")
+
         return RewardItem(
         type = rewardType,
         message = message,
         rewardText = rewardText,
         section = section)
+        //로깅
+
     }
 
 

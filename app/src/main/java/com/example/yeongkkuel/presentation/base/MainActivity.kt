@@ -270,9 +270,11 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     R.id.categoryAddFragment -> {
                         binding.tvAddCategory.visibility = View.GONE // ✅ 카테고리 추가 화면에서는 숨김
                     }
+
                     R.id.navigation_home -> {
                         // ✅ 홈 화면 복귀 시 LiveData가 자동으로 감지됨 → 별도로 체크할 필요 없음
                     }
+
                     else -> {
                         binding.tvAddCategory.visibility = View.GONE // ✅ 다른 화면에서는 숨기기
                     }
@@ -294,7 +296,8 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     R.id.navigation_term_3,
                     R.id.navigation_term_4,
                     R.id.navigation_store,
-                    R.id.navigation_notification -> hideBottomNavigation(
+                    R.id.navigation_notification,
+                    R.id.navigation_tutorial -> hideBottomNavigation(
                         true
                     )
 
@@ -421,7 +424,11 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
 
-    override fun navigateToExpenseEntryWithTab(fromTab: String, selectedCategory: String, categoryColor: Int) {
+    override fun navigateToExpenseEntryWithTab(
+        fromTab: String,
+        selectedCategory: String,
+        categoryColor: Int
+    ) {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         val navController = navHostFragment.navController

@@ -48,7 +48,8 @@ class SplashFragment : Fragment() {
                 val isLoggedIn = autoLogin(requireContext(), TokenManager)
                 if (isLoggedIn) {
                     // 자동 로그인 성공: Splash → HomeFragment로 이동
-                    findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
+//                    findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
+                    findNavController().navigate(R.id.action_splashFragment_to_navigation_tutorial)
                 } else {
                     // 자동 로그인 실패: Splash → LoginFragment로 이동 (이후 LoginFragment에서 정상 로그인 시 Home으로 이동)
                     findNavController().navigate(R.id.action_splashFragment_to_loginFragment)
