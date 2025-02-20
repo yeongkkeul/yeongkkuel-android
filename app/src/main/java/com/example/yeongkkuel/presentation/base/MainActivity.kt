@@ -48,6 +48,8 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
 
     private var rvBottomSheetCollapseStateHeight: Int = 0
 
+    private var currentTab: String = "home" // 기본값을 홈으로 설정
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // 스플래시 화면 설정
         val splashScreen = this.installSplashScreen()
@@ -74,6 +76,11 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             botSheetViewModel.getSpendingList()
         }
 
+        // 스플래시 화면 종료 조건: 데이터가 로드되지 않았다면 계속 유지
+//        splashScreen.setKeepOnScreenCondition {
+//            !isDataLoaded()  // 데이터가 아직 로드되지 않았다면 true를 반환해서 스플래시 유지
+//        }
+
         setupHamburgerClickListener() // 카테고리 더보기 기능 추가
 
         val navHostFragment =
@@ -86,12 +93,6 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
-        }
-
-        categoryViewModel.categories.observe(this) { categories ->
-            val visibleCategories = categories.filter { it.name.lowercase() != "trash" }
-            val categoryCount = visibleCategories.size
-            binding.tvAddCategory.visibility = if (categoryCount >= 1) View.GONE else View.VISIBLE
         }
 
         initView()
@@ -117,6 +118,14 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
     fun resetBottomSheetState() {
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.clItemBotSheet)
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+
+    fun setCurrentTab(tab: String) {
+        currentTab = tab
+    }
+
+    fun getCurrentTab(): String {
+        return currentTab
     }
 
     private fun initView() = with(binding) {
@@ -219,6 +228,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             binding.bottomNavi.setOnItemSelectedListener { item ->
                 when (item.itemId) {
                     R.id.navigation_home -> {
+                        setCurrentTab("home")
                         navController.navigate(R.id.navigation_home)
                         true
                     }
@@ -229,6 +239,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                     }
 
                     R.id.navigation_stat -> {
+                        setCurrentTab("stat")
                         navController.navigate(R.id.navigation_stat)
                         true
                     }
@@ -246,48 +257,27 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                 when (destination.id) {
                     R.id.navigation_home,
                     R.id.navigation_stat,
-                        -> setBotSheetVisible()
+                    -> setBotSheetVisible()
 
 
                     else -> setBotSheetGone()
                 }
             }
-            navController.addOnDestinationChangedListener { _, destination, _ ->
-                val visibleCategories = categoryViewModel.categories.value.orEmpty()
-                    .filter { it.name.lowercase() != "trash" } // trash 제외
-                val categoryCount = visibleCategories.size
 
+
+            navController.addOnDestinationChangedListener { _, destination, _ ->
                 when (destination.id) {
                     R.id.categoryAddFragment -> {
-                        binding.tvAddCategory.visibility = View.GONE // 카테고리 추가 화면에서는 숨기기
-                        binding.tvEmptyMessage1.visibility = View.GONE
-                        binding.tvEmptyMessage2.visibility = View.GONE
-                        binding.imgAddCategory.visibility = View.GONE
+                        binding.tvAddCategory.visibility = View.GONE // ✅ 카테고리 추가 화면에서는 숨김
                     }
-                    R.id.navigation_home, R.id.navigation_stat -> {
-                        if (categoryCount == 0) {
-                            // 카테고리가 없을 때 메시지 & 버튼 표시
-                            binding.tvEmptyMessage1.visibility = View.VISIBLE
-                            binding.tvEmptyMessage2.visibility = View.VISIBLE
-                            binding.imgAddCategory.visibility = View.VISIBLE
-                            binding.tvAddCategory.visibility = View.VISIBLE
-                        } else {
-                            // 카테고리가 있으면 메시지 & 버튼 숨기기
-                            binding.tvEmptyMessage1.visibility = View.GONE
-                            binding.tvEmptyMessage2.visibility = View.GONE
-                            binding.imgAddCategory.visibility = View.GONE
-                            binding.tvAddCategory.visibility = View.GONE
-                        }
+                    R.id.navigation_home -> {
+                        // ✅ 홈 화면 복귀 시 LiveData가 자동으로 감지됨 → 별도로 체크할 필요 없음
                     }
                     else -> {
-                        binding.tvAddCategory.visibility = View.GONE // 다른 화면에서는 숨기기
-                        binding.tvEmptyMessage1.visibility = View.GONE
-                        binding.tvEmptyMessage2.visibility = View.GONE
-                        binding.imgAddCategory.visibility = View.GONE
+                        binding.tvAddCategory.visibility = View.GONE // ✅ 다른 화면에서는 숨기기
                     }
                 }
             }
-
 
 
             // 바텀네비게이션 뷰 숨김 처리 - 스플래시, 로그인
@@ -393,6 +383,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         botSheetCategoryListAdapter.submitList(uiState.spendingList)
 
         val isEmpty = uiState.spendingList.isEmpty()
+        binding.tvAddCategory.visibility = if (isEmpty) View.VISIBLE else View.GONE
 
         // 데이터 존재 여부에 따라 RecyclerView visibility 변경
         rvBotSheetCategory.visibility = if (isEmpty) View.GONE else View.VISIBLE
@@ -430,22 +421,19 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
 
-    override fun navigateToExpenseEntry(selectedCategory: String, categoryColor: Int) {
-        // NavController를 이용해 지출 기입 페이지로 이동
+    override fun navigateToExpenseEntryWithTab(fromTab: String, selectedCategory: String, categoryColor: Int) {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         val navController = navHostFragment.navController
 
-        // 번들에 데이터를 담아 지출 기입 페이지로 전달
         val bundle = Bundle().apply {
+            putString("fromTab", fromTab)
             putString("selectedCategory", selectedCategory)
             putInt("categoryColor", categoryColor)
         }
 
-        // 지출 기입 페이지로 이동하면서 데이터 전달
         navController.navigate(R.id.expenseEntryFragment, bundle)
     }
-
 
     override fun navigateToExpenseView(
         expenseId: Int,
@@ -470,14 +458,11 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
             putInt("expensePrice", expensePrice)
             putInt("categoryColor", categoryColor)
             putString("categoryName", categoryName)
-            if (!imageUrl.isNullOrEmpty()) {
-                putString("imageUrl", imageUrl) // ✅ imageUrl이 null이 아닐 때만 저장
-            }
+            putString("imageUrl", imageUrl)
         }
 
         navController.navigate(R.id.navigation_expense_view, bundle)
     }
-
 
 
     override fun onNoExpenseChanged(isNoExpense: Boolean) {

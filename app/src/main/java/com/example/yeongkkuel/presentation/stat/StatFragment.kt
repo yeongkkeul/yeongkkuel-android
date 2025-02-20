@@ -19,6 +19,7 @@ import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentStatBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
+import com.example.yeongkkuel.presentation.my.NotificationViewModel
 import com.example.yeongkkuel.presentation.stat.monthly.StatMonthlyViewModel
 import com.example.yeongkkuel.presentation.stat.weekly.StatWeeklyViewModel
 import com.example.yeongkkuel.presentation.util.dpToPx
@@ -33,6 +34,8 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
     private val weeklyViewModel: StatWeeklyViewModel by viewModels()
     private val monthlyViewModel: StatMonthlyViewModel by viewModels()
     private val botSheetViewModel : BotSheetViewModel by activityViewModels()
+    val notificationViewModel: NotificationViewModel by viewModels()
+
 
     private val viewPagerAdapter: StatViewPagerAdapter by lazy {
         StatViewPagerAdapter(
@@ -91,9 +94,11 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
             }.attach()
 
 
+
             // ViewPager2의 페이지가 변경될 때마다 호출되는 콜백
             botSheetListener?.let { listner ->
                 registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                    var isFirst = true
                     override fun onPageSelected(position: Int) {
                         super.onPageSelected(position)
 
@@ -108,7 +113,8 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
                                     (displayHeight - 430.dpToPx(requireContext()))
                                 listner.setPeekHeight(peekHeight)
 
-                                botSheetViewModel.getSpendingList()
+                                if(!isFirst) botSheetViewModel.getSpendingList()
+                                else isFirst = false
                             }
 
                             1 -> { // 두 번째 페이지 (StatWeeklyFragment)
@@ -147,9 +153,18 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
             }
         }
 
+        fun initCheckNoti(){
+            notificationViewModel.checkUnreadNotifications()
+            notificationViewModel.unreadNotification.observe(viewLifecycleOwner) { hasUnread ->
+                binding.includeTopbar.ivNotiDot.visibility =
+                    if (hasUnread) View.VISIBLE else View.INVISIBLE
+            }
+        }
+
         initVp()
         initMore()
         initNoti()
+        initCheckNoti()
     }
 
     // ViewPager의 터치 이벤트를 비활성화하는 함수
@@ -160,6 +175,10 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
     // ViewPager의 터치 이벤트를 활성화하는 함수
     override fun enableViewPagerTouch() {
         binding.vpStat.isUserInputEnabled = true // 터치 활성화
+    }
+
+    override fun moveToMonthlyTab() {
+        binding.vpStat.setCurrentItem(2, false) // 월간 탭(인덱스 2)으로 이동
     }
 
     override fun onDestroyView() {

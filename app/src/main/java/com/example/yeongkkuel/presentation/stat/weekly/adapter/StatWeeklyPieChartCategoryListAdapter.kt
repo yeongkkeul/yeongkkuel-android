@@ -19,14 +19,21 @@ class StatWeeklyPieChartCategoryListAdapter(
     inner class ViewHolder(
         private val binding: ItemStatWeeklyPiechartcategoryBinding
     ) : RecyclerView.ViewHolder(binding.root) {
-        fun onBind(item: StatWeeklyUiState.PieChartData) = with(binding){
-            if(item.category.name == "") binding.root.visibility = View.GONE
+        fun onBind(item: StatWeeklyUiState.PieChartData) = with(binding) {
+            if(item.expenditure == 0) {
+                binding.root.visibility = View.GONE
+                return@with
+            }
+            if (item.category.name == "") binding.root.visibility = View.GONE
             else {
                 tvSpendingCategory.text = item.category.name
                 tvSpendingMoney.text = item.expenditure.toMoneyString() + "원"
 
                 tvSpendingMoney.setTextColor(item.color.rgb)
                 ivStartPoint.setColorFilter(item.color.rgb)
+                if (item.color == Colors.TRASH) {
+                    tvSpendingCategory.visibility = View.GONE
+                }
             }
         }
     }
@@ -34,10 +41,11 @@ class StatWeeklyPieChartCategoryListAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
         ViewHolder(
             binding = ItemStatWeeklyPiechartcategoryBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        ))
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
+        )
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.onBind(getItem(position))

@@ -59,38 +59,6 @@
                 android:text="@string/terms_of_service"
                 android:lineSpacingExtra="4dp" />
 
-
-            <!-- 약관 동의 체크박스 및 버튼 -->
-            <LinearLayout
-                android:id="@+id/checkServiceArea"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@drawable/bg_terms_agree"
-                android:gravity="center_vertical"
-                android:paddingEnd="4dp">
-
-                <!-- 라벨 텍스트 -->
-                <TextView
-                    android:id="@+id/tvCheckService"
-                    style="@style/humm_medium"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="약간 동의하기"
-                    android:layout_marginLeft="16dp"
-                    android:textColor="@color/black3" />
-
-                <!-- 체크 아이콘 (Big) -->
-                <ImageView
-                    android:id="@+id/ivCheckService"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="4dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:src="@drawable/selector_big_checkbox" />
-            </LinearLayout>
-
         </LinearLayout>
     </ScrollView>
 

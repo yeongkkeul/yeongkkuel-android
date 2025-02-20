@@ -2,11 +2,11 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- 상단 툴바 -->
-    <!-- 상단 앱바 (기존 코드 유지) -->
+    <!-- 상단 앱바-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cl_appBar"
         android:layout_width="match_parent"
@@ -37,18 +37,33 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/iv_back" />
 
-        <TextView
-            android:id="@+id/tv_notification"
+<!--        -->
+
+
+        <ImageView
+            android:id="@+id/iv_noti"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:textColor="@color/main1"
-            style="@style/body_medium"
-            android:text="알림"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_bell"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <ImageView
+            android:id="@+id/iv_noti_dot"
+            android:layout_width="4dp"
+            android:layout_height="4dp"
+            android:layout_gravity="end|top"
+            android:layout_marginEnd="4dp"
+            android:src="@drawable/ic_noti_dot"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <!-- RecyclerView로 알림 리스트 구성 -->
     <androidx.recyclerview.widget.RecyclerView

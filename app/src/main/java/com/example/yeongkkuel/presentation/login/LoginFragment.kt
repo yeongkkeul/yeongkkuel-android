@@ -64,11 +64,8 @@ class LoginFragment : Fragment() {
             }
         }
 
-        // TODO: 구글 로그인 구현
         binding.btnGoogleLogin.setOnClickListener {
             signInWithGoogle()
-//            findNavController().navigate(R.id.action_loginFragment_to_navigation_home)
-
         }
     }
 
@@ -79,8 +76,8 @@ class LoginFragment : Fragment() {
         val googleClientID: String = BuildConfig.google_CLIENT_ID
         val googleIdOption = GetGoogleIdOption.Builder()
             .setFilterByAuthorizedAccounts(false)   // 구글 계정 유무 체크
-            .setServerClientId(googleClientID)  // 웹 클라이언트 키값
-            .setAutoSelectEnabled(true)            // 자동 로그인 활성화
+            .setServerClientId(googleClientID)  //   웹 클라이언트 키값
+            .setAutoSelectEnabled(false)            // 자동 로그인 활성화
             .build()
 
         val request = GetCredentialRequest.Builder()
@@ -118,88 +115,63 @@ class LoginFragment : Fragment() {
         }
 
         // 백엔드로 ID 토큰 전송
-        CoroutineScope(Dispatchers.IO).launch {
-            val success = postIdTokenToBackend(idToken) // ID 토큰을 서버로 전송하고 성공 여부 반환
-            withContext(Dispatchers.Main) {
-                if (success) {
-                    // 성공 시 회원가입 페이지로 이동 - redirect Url 에 따라 분기
-                    findNavController().navigate(R.id.action_loginFragment_to_signupFragment)
-                } else {
-                    // 실패 처리
-                    Timber.e("Failed to verify ID Token with backend")
+        postIdTokenToBackend(idToken)
+    }
+
+
+    private fun postIdTokenToBackend(idToken: String) {
+        Timber.tag("GoogleLogin").i("구글 로그인 성공. ID 토큰 정보: $idToken")
+
+        RetrofitClient.loginApiService.googleLogin(idToken)
+            .enqueue(object : Callback<KakaoLoginResponse> {
+                override fun onResponse(
+                    call: Call<KakaoLoginResponse>,
+                    response: Response<KakaoLoginResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        val body = response.body()
+                        if (body?.isSuccess == true) {
+                            val result = body.result
+                            if (result != null) {
+                                // JWT 저장
+                                TokenManager.saveTokens(requireContext(), result.accessToken, result.refreshToken)
+                                TokenManager.saveSocialType(requireContext(), TokenManager.SocialType.GOOGLE)
+                                TokenManager.saveGoogleIdToken(requireContext(), idToken)
+                                /*tokenManager.saveAccessToken(result.accessToken)
+                                tokenManager.saveRefreshToken(result.refreshToken)
+*/
+                                // redirectUrl에 따라 분기
+                                when (result.redirectUrl) {
+                                    "/api/home" -> {
+                                        // 이미 회원 -> 홈으로 이동
+                                        findNavController().navigate(R.id.action_loginFragment_to_navigation_home)
+                                    }
+                                    "/api/auth/user-info" -> {
+                                        // 회원 기입 필요 -> 회원가입 flow로 이동
+                                        findNavController().navigate(R.id.action_loginFragment_to_signupFragment)
+                                    }
+                                    else -> {
+                                        // 기타 URL인 경우? 필요 시 처리
+                                        Toast.makeText(requireContext(), "알 수 없는 리디렉션", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            } else {
+                                Toast.makeText(requireContext(), "로그인 응답에 result가 없습니다.", Toast.LENGTH_SHORT).show()
+                            }
+                        } else {
+                            // isSuccess=false or 응답 코드가 다른 경우 => 실패 처리
+                            Toast.makeText(requireContext(), "구글 로그인 실패", Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        // HTTP 4xx/5xx
+                        Toast.makeText(requireContext(), "구글 로그인 API 실패: ${response.code()}", Toast.LENGTH_SHORT).show()
+                    }
                 }
-            }
-        }
-    }
-
-    // TODO: 서버와 통신하여 ID 토큰 검증 (Retrofit 구현)
-    private suspend fun postIdTokenToBackend(idToken: String): Boolean {
-        return true
-
-        /*try {
-            // 서버 API 호출 (예: Retrofit)
-            val response = apiService.verifyGoogleIdToken(idToken) // 서버 검증 엔드포인트 호출
-            response.isSuccessful
-        } catch (e: Exception) {
-            Timber.e("Error while verifying ID Token: $e")
-            false
-        }*/
-    }
-
-    private fun logoutAndReLogin() {
-        UserApiClient.instance.logout { error ->
-            if (error != null) {
-                Timber.e("카카오 로그아웃 실패: $error")
-                // 그래도 로그인은 시도해볼 수 있음
-                handleKakaoLogin()
-            } else {
-                Timber.d("카카오 로그아웃 성공. 이제 다시 로그인 시도.")
-                handleKakaoLogin()
-            }
-        }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
-
-    private fun handleKakaoLogin() {
-        // 카카오톡 앱 설치 여부 확인
-        if (UserApiClient.instance.isKakaoTalkLoginAvailable(requireContext())) {
-            // 카카오톡으로 로그인
-            loginWithKakaoTalk()
-
-        } else {
-            // 카카오 계정으로 로그인
-            loginWithKakaoAccount()
-        }
-    }
-
-
-    private fun loginWithKakaoTalk() {
-        UserApiClient.instance.loginWithKakaoTalk(requireContext()) { token, error ->
-            if (error != null) {
-                handleLoginError(error)
-            } else if (token != null) {
-                Timber.tag("KakaoLogin").i("카카오톡 로그인 성공. 토큰 정보: ${token.accessToken}")
-                postKakaoTokenToBackend(token.accessToken)
-            }
-        }
-    }
-
-
-    private fun loginWithKakaoAccount() {
-        UserApiClient.instance.loginWithKakaoAccount(requireContext()) { token, error ->
-            if (error != null) {
-                handleLoginError(error)
-            } else if (token != null) {
-                Timber.tag("KakaoLogin").i("카카오 계정 로그인 성공. 토큰 정보: ${token.accessToken}")
-                postKakaoTokenToBackend(token.accessToken)
-            }
-        }
-
+                override fun onFailure(call: Call<KakaoLoginResponse>, t: Throwable) {
+                    Timber.e("카카오 로그인 API 호출 실패: $t")
+                    Toast.makeText(requireContext(), "카카오 로그인 API 호출 실패: ${t.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
     }
 
     private fun postKakaoTokenToBackend(kakaoAccessToken: String) {
@@ -258,6 +230,64 @@ class LoginFragment : Fragment() {
                 }
             })
     }
+
+    private fun logoutAndReLogin() {
+        UserApiClient.instance.logout { error ->
+            if (error != null) {
+                Timber.e("카카오 로그아웃 실패: $error")
+                // 그래도 로그인은 시도해볼 수 있음
+                handleKakaoLogin()
+            } else {
+                Timber.d("카카오 로그아웃 성공. 이제 다시 로그인 시도.")
+                handleKakaoLogin()
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+
+    private fun handleKakaoLogin() {
+        // 카카오톡 앱 설치 여부 확인
+        if (UserApiClient.instance.isKakaoTalkLoginAvailable(requireContext())) {
+            // 카카오톡으로 로그인
+            loginWithKakaoTalk()
+
+        } else {
+            // 카카오 계정으로 로그인
+            loginWithKakaoAccount()
+        }
+    }
+
+
+    private fun loginWithKakaoTalk() {
+        UserApiClient.instance.loginWithKakaoTalk(requireContext()) { token, error ->
+            if (error != null) {
+                handleLoginError(error)
+            } else if (token != null) {
+                Timber.tag("KakaoLogin").i("카카오톡 로그인 성공. 토큰 정보: ${token.accessToken}")
+                postKakaoTokenToBackend(token.accessToken)
+            }
+        }
+    }
+
+
+    private fun loginWithKakaoAccount() {
+        UserApiClient.instance.loginWithKakaoAccount(requireContext()) { token, error ->
+            if (error != null) {
+                handleLoginError(error)
+            } else if (token != null) {
+                Timber.tag("KakaoLogin").i("카카오 계정 로그인 성공. 토큰 정보: ${token.accessToken}")
+                postKakaoTokenToBackend(token.accessToken)
+            }
+        }
+
+    }
+
+
 
     // 로그인 실패 시 에러 처리 - 로그인 실패 시 로그만 띄우기? - TODO: 실패 시 처리 방법 고민
     private fun handleLoginError(error: Throwable) {

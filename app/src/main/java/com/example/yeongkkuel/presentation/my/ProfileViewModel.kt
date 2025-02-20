@@ -1,10 +1,13 @@
 package com.example.yeongkkuel.presentation.my
 
+import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yeongkkuel.network.RetrofitClient
+import com.example.yeongkkuel.network.RetrofitClient.myPageService
 import com.example.yeongkkuel.network.request.my.UserProfileRequest
 import com.example.yeongkkuel.network.request.mypage.PatchMyPageRequest
 import com.example.yeongkkuel.network.response.Response
@@ -13,29 +16,37 @@ import com.example.yeongkkuel.network.response.my.UserProfileResponse
 import com.example.yeongkkuel.network.response.my.UserProfileResult
 import com.example.yeongkkuel.network.response.mypage.MyPageResult
 import com.example.yeongkkuel.network.service.MyPageService
-import com.example.yeongkkuel.presentation.my.repository.ProfileRepository
+import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
+import java.net.HttpURLConnection
+import java.net.URL
 
 class ProfileViewModel : ViewModel() {
 
-    private val repository: ProfileRepository
+    private val apiService = RetrofitClient.myPageService
 
     init {
-        repository = ProfileRepository(RetrofitClient.myPageService)
+
         fetchUserProfile()
         getReferralCode()
+        // 읽지 않은 알림 여부
+        getUnreadNotificationCount()
     }
 
     private val _profileResponse = MutableLiveData<Response<MyPageResult>>()
     val profileResponse: LiveData<Response<MyPageResult>> get() = _profileResponse
 
 
+    private val _updateStatusEvent = MutableLiveData<Event<Boolean>>()
+    val updateStatusEvent: LiveData<Event<Boolean>> get() = _updateStatusEvent
 
-
-
-    private val _updateStatus = MutableLiveData<Result<Unit>>()
-    val updateStatus: LiveData<Result<Unit>> get() = _updateStatus
 
 
     private val _nickname = MutableLiveData<String>()
@@ -57,50 +68,89 @@ class ProfileViewModel : ViewModel() {
     private val _referralCode = MutableLiveData<String>()
     val referralCode: LiveData<String> get() = _referralCode
 
+    // 읽지 않은 알림 여부
+    private val _unreadNotificationCount = MutableLiveData<Boolean>()
+    val unreadNotificationCount: LiveData<Boolean> get() = _unreadNotificationCount
+
 
 
     // setter
-    fun updateNickname(newNickname: String) { _nickname.value = newNickname }
-    fun updateGender(newGender: String) { _gender.value = newGender }
-    fun updateAgeGroup(newAgeGroup: String) { _ageGroup.value = newAgeGroup }
-    fun updateJob(newJob: String) { _job.value = newJob }
-    fun updateProfileImageUrl(newUrl: String) { _profileImageUrl.value = newUrl }
-    fun updateReferralCode(newCode: String) { _referralCode.value = newCode }
+    fun updateNickname(newNickname: String) {
+        _nickname.value = newNickname
+    }
 
+    fun updateGender(newGender: String) {
+        _gender.value = newGender
+    }
+
+    fun updateAgeGroup(newAgeGroup: String) {
+        _ageGroup.value = newAgeGroup
+    }
+
+    fun updateJob(newJob: String) {
+        _job.value = newJob
+    }
+
+    fun updateProfileImageUrl(newUrl: String) {
+        _profileImageUrl.value = newUrl
+    }
+
+    fun updateReferralCode(newCode: String) {
+        _referralCode.value = newCode
+    }
 
     // 프로필 조회
     fun fetchUserProfile() {
         viewModelScope.launch {
-            val response = repository.getProfile()
-            response?.let {
-                if (it.isSuccess) {
-                    val result = it.result
+            try {
+                val response = apiService.getMyPage()
+                if (response != null && response.isSuccess) {
+                    val result = response.result
+                    _nickname.value = result.nickname
                     _nickname.value = result.nickname
                     _gender.value = result.gender
                     _ageGroup.value = result.ageGroup
                     _job.value = result.job
                     _profileImageUrl.value = result.profileImageUrl
 
-                    _profileResponse.value = it
+                    _profileResponse.value = response
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }
 
+
+    fun getUnreadNotificationCount() {
+        viewModelScope.launch {
+            try{
+                val response = RetrofitClient.notificationService.getUnreadNotificationCount()
+                if (response != null && response.isSuccess) {
+                    _unreadNotificationCount.value = response.result
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+
+            }
+        }
+    }
     // 추천인 코드 조회
     fun getReferralCode() {
         viewModelScope.launch {
-            val response = repository.getReferralCode()
-            response?.let {
-                if (it.isSuccess) {
-                    val result = it.result
+            try {
+                val response = apiService.getUserReferralCode()
+                if (response != null && response.isSuccess) {
+                    val result = response.result
                     _referralCode.value = result.userReferralCode
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }
 
-    fun saveUserProfile(selectedImageFile: File? = null) {
+    fun saveUserProfile(context: Context, selectedImageFile: File? = null) {
         val patchRequest = PatchMyPageRequest(
             nickname = nickname.value ?: "",
             gender = gender.value ?: "",
@@ -108,11 +158,95 @@ class ProfileViewModel : ViewModel() {
             job = job.value ?: ""
         )
 
-        updateProfile(patchRequest, selectedImageFile)
+        viewModelScope.launch {
+            try {
+                // 1) 만약 사용자가 새 이미지를 선택했으면 그걸 사용
+                val finalImageFile = if (selectedImageFile != null) {
+                    selectedImageFile
+                } else {
+                    // 2) 새 이미지를 선택하지 않았으니, 기존 URL을 파일로 만들어야 함
+                    val url = profileImageUrl.value
+                    if (!url.isNullOrEmpty()) {
+                        downloadImageFile(context, url)
+                    } else {
+                        null
+                    }
+                }
+
+                updateProfile(patchRequest, finalImageFile)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+    }
+
+    private suspend fun downloadImageFile(context: Context, urlString: String): File? = withContext(
+        Dispatchers.IO) {
+        try {
+            val url = URL(urlString)
+            val connection = url.openConnection() as HttpURLConnection
+            connection.connect()
+
+            // 정상 응답인지 체크
+            if (connection.responseCode != HttpURLConnection.HTTP_OK) {
+                connection.disconnect()
+                return@withContext null
+            }
+
+            val inputStream = connection.inputStream
+            // 캐시 디렉토리에 임시 파일 생성
+            val tempFile = File.createTempFile("profile_", ".jpg", context.cacheDir)
+            tempFile.outputStream().use { output ->
+                inputStream.copyTo(output)
+            }
+            connection.disconnect()
+            tempFile
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+
+    fun updateProfile(info: PatchMyPageRequest, profileImageFile: File? = null) {
+        viewModelScope.launch {
+            try{
+            val gson = Gson()
+            val json = gson.toJson(info)
+            val infoBody = json.toRequestBody("application/json".toMediaTypeOrNull())
+
+            // 2. 프로필 이미지 파트 생성
+            val imagePart: MultipartBody.Part = if (profileImageFile != null && profileImageFile.exists()) {
+                // 파일이 있을 경우, 파일 데이터를 RequestBody로 변환
+                val reqFile = profileImageFile.asRequestBody("image/*".toMediaTypeOrNull())
+                MultipartBody.Part.createFormData("profileImage", profileImageFile.name, reqFile)
+            } else {
+                // 파일이 없으면 빈 값을 전송 (Swagger 명세: Send empty value)
+                val emptyRequestBody = "".toRequestBody("text/plain".toMediaTypeOrNull())
+                MultipartBody.Part.createFormData("profileImage", "", emptyRequestBody)
+            }
+
+            // 3. API 호출
+            val response = apiService.patchMyPage(infoBody, imagePart)
+
+            if (response.isSuccess && response.result != null) {
+                _profileResponse.value = response as Response<MyPageResult>
+                _updateStatusEvent.value = Event(true)
+            } else {
+                // 에러 상황 처리 (로그 출력 등)
+                Log.e("ProfileRepository", "updateProfile: ${response.message}")
+                _updateStatusEvent.value = Event(false)
+            }
+        } catch (e: Exception)   {
+            e.printStackTrace()
+        }
+
+        }
     }
 
     private fun convertAgeGroup(apiAge: String): String {
-        return when(apiAge.uppercase()) {
+        return when (apiAge.uppercase()) {
             "TEENAGER" -> "10대"
             "TWENTIES" -> "20대"
             "THIRTIES" -> "30대"
@@ -124,31 +258,13 @@ class ProfileViewModel : ViewModel() {
     }
 
     private fun convertJob(apiJob: String): String {
-        return when(apiJob.uppercase()) {
+        return when (apiJob.uppercase()) {
             "STUDENT" -> "학생"
             "EMPLOYEE" -> "직장인"
             "SELF_EMPLOYED" -> "자영업자"
             "HOMEMAKER" -> "주부"
             "UNDECIDED" -> "무직"
             else -> "무직"  // 알 수 없는 경우 원본 문자열 그대로 사용
-        }
-    }
-
-
-
-
-    fun updateProfile(info: PatchMyPageRequest, profileImageFile: File? = null ) {
-        viewModelScope.launch {
-            val patchResult = repository.updateProfile(info, profileImageFile)
-            if (patchResult != null && patchResult.isSuccess) {
-                // 수정 성공
-                // profileResponse도 갱신할 수 있음
-                _profileResponse.value = patchResult as Response<MyPageResult>
-                _updateStatus.value = Result.success(Unit)
-            } else {
-                // 수정 실패
-                _updateStatus.value = Result.failure(Exception("프로필 수정 실패"))
-            }
         }
     }
 

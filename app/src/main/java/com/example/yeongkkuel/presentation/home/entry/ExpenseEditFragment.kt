@@ -34,7 +34,6 @@ import java.io.File
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.math.min
 
 class ExpenseEditFragment : Fragment() {
 
@@ -127,18 +126,23 @@ class ExpenseEditFragment : Fragment() {
     }
 
 
-    // 이미지 불러오기
+    // 기존 이미지를 불러오는 함수 수정
     private fun loadExistingImage(imageUrl: String?) {
         if (!imageUrl.isNullOrEmpty()) {
             Glide.with(this)
                 .load(imageUrl)
-                .into(binding.imgPhotoFrame)
-            binding.ivPhotoIcon.visibility = View.GONE
+                .override(500, 500) // ✅ 크기 조정
+                .centerCrop() // ✅ 중앙 정렬하여 꽉 차게 표시
+                .into(binding.imgPhotoFrame) // ✅ 둥근 모서리는 XML에서 처리
+
+            binding.ivPhotoIcon.visibility = View.GONE // ✅ 아이콘 숨김
         } else {
             binding.imgPhotoFrame.setImageResource(R.drawable.bg_photo_input) // 기본 이미지 설정
             binding.ivPhotoIcon.visibility = View.VISIBLE
         }
     }
+
+
 
     // 갤러리 열기
     private fun openGallery() {
@@ -153,24 +157,20 @@ class ExpenseEditFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == AppCompatActivity.RESULT_OK) {
             data?.data?.let { uri ->
-                selectedImageUri = uri // 선택한 이미지 URI 저장
+                selectedImageUri = uri // ✅ 선택한 이미지 저장
 
-                // 🔹 핸드폰 화면 크기 가져오기
-                val displayMetrics = requireContext().resources.displayMetrics
-                val screenWidth = displayMetrics.widthPixels // 화면 너비
-                val imageSize = min(screenWidth - 100, 650) // 화면보다 크지 않도록 조정 (최대 650px)
-
+                // 🔹 Glide를 사용하여 이미지 미리보기 업데이트
                 Glide.with(this)
                     .load(uri)
-                    .override(imageSize, imageSize) // 🔹 크기를 화면보다 크지 않게 설정
-                    .fitCenter() // 🔹 이미지가 너무 커지지 않도록 자동 조정
-                    .transform(RoundedCorners(50)) // 🔹 모서리를 둥글게 (50px)
-                    .into(binding.imgPhotoFrame)
+                    .override(500, 500) // ✅ 크기 조정
+                    .centerCrop() // ✅ 중앙 정렬하여 꽉 차게 표시
+                    .into(binding.imgPhotoFrame) // ✅ 둥근 모서리는 XML에서 처리
 
-                binding.ivPhotoIcon.visibility = View.GONE // 아이콘 숨김
+                binding.ivPhotoIcon.visibility = View.GONE // ✅ 아이콘 숨김
             }
         }
     }
+
 
 
     private fun enableEditing() {
@@ -198,6 +198,9 @@ class ExpenseEditFragment : Fragment() {
         val etDetailInput = binding.etDetailInput
         val tvCharacterCount = binding.tvCharacterCount
 
+        val initialTextLength = etDetailInput.text?.length ?: 0
+        tvCharacterCount.text = "$initialTextLength/24"
+
         etDetailInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -215,13 +218,22 @@ class ExpenseEditFragment : Fragment() {
 
     // 쉼표 처리
     private fun setupAmountInput() {
-        binding.etAmountInput.addTextChangedListener(object : TextWatcher {
+        val etAmountInput = binding.etAmountInput
+
+        // 초기 값이 있을 경우 쉼표 추가
+        val initialText = etAmountInput.text.toString().trim().replace(",", "")
+        if (initialText.isNotEmpty()) {
+            val formatted = NumberFormat.getInstance(Locale.KOREAN).format(initialText.toLongOrNull() ?: 0)
+            etAmountInput.setText(formatted)
+        }
+
+        etAmountInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
             override fun afterTextChanged(s: Editable?) {
-                binding.etAmountInput.removeTextChangedListener(this)
+                etAmountInput.removeTextChangedListener(this)
 
                 val rawInput = s?.toString()?.replace(",", "") ?: ""
                 val input = rawInput.toLongOrNull() ?: 0
@@ -234,14 +246,15 @@ class ExpenseEditFragment : Fragment() {
                 val formatted = NumberFormat.getInstance(Locale.KOREAN).format(limitedValue)
 
                 if (formatted != s.toString()) {
-                    binding.etAmountInput.setText(formatted)
-                    binding.etAmountInput.setSelection(formatted.length)
+                    etAmountInput.setText(formatted)
+                    etAmountInput.setSelection(formatted.length)
                 }
 
-                binding.etAmountInput.addTextChangedListener(this)
+                etAmountInput.addTextChangedListener(this)
             }
         })
     }
+
 
     // 수정 API 호출
     private fun saveExpense() {
@@ -306,8 +319,6 @@ class ExpenseEditFragment : Fragment() {
             }
         }
     }
-
-
 
     private fun showDatePickerDialog() {
         val calendar = Calendar.getInstance()
