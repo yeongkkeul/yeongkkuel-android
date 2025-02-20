@@ -19,6 +19,7 @@ import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentStatBinding
 import com.example.yeongkkuel.presentation.botsheet.BotSheetListener
 import com.example.yeongkkuel.presentation.botsheet.BotSheetViewModel
+import com.example.yeongkkuel.presentation.my.NotificationViewModel
 import com.example.yeongkkuel.presentation.stat.monthly.StatMonthlyViewModel
 import com.example.yeongkkuel.presentation.stat.weekly.StatWeeklyViewModel
 import com.example.yeongkkuel.presentation.util.dpToPx
@@ -33,6 +34,8 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
     private val weeklyViewModel: StatWeeklyViewModel by viewModels()
     private val monthlyViewModel: StatMonthlyViewModel by viewModels()
     private val botSheetViewModel : BotSheetViewModel by activityViewModels()
+    val notificationViewModel: NotificationViewModel by viewModels()
+
 
     private val viewPagerAdapter: StatViewPagerAdapter by lazy {
         StatViewPagerAdapter(
@@ -150,9 +153,18 @@ class StatFragment : Fragment(), ViewPagerTouchListener {
             }
         }
 
+        fun initCheckNoti(){
+            notificationViewModel.checkUnreadNotifications()
+            notificationViewModel.unreadNotification.observe(viewLifecycleOwner) { hasUnread ->
+                binding.includeTopbar.ivNotiDot.visibility =
+                    if (hasUnread) View.VISIBLE else View.INVISIBLE
+            }
+        }
+
         initVp()
         initMore()
         initNoti()
+        initCheckNoti()
     }
 
     // ViewPager의 터치 이벤트를 비활성화하는 함수

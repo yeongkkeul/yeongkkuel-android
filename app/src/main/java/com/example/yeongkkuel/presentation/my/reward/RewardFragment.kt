@@ -1,6 +1,7 @@
 package com.example.yeongkkuel.presentation.my.reward
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -8,11 +9,10 @@ import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentRewardBinding
 import com.example.yeongkkuel.network.RetrofitClient
-import com.example.yeongkkuel.presentation.my.notification.data.NotificationType
 import com.example.yeongkkuel.presentation.my.reward.data.RewardItem
+import com.example.yeongkkuel.presentation.my.reward.data.RewardListItem
 import com.example.yeongkkuel.presentation.my.reward.data.RewardType
 import kotlinx.coroutines.launch
 
@@ -36,10 +36,9 @@ class RewardFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // RecyclerView 설정
-        rewardAdapter = RewardAdapter(emptyList()) { clickedItem ->
-            // 아이템 클릭 시 이동 로직
-//            navigateToFragment(clickedItem.type)
-        }
+
+
+        rewardAdapter = RewardAdapter(emptyList())
 
         binding.apply {
             rvReward.adapter = rewardAdapter
@@ -63,36 +62,66 @@ class RewardFragment : Fragment() {
                     val body = response.result
                     if (body != null) {
                         // 서버에서 받아온 result -> RewardItem 변환
-                        val rewardItems: List<RewardItem> = body.map {
+                        val detailList = body
+                        val itemList = detailList.map {
                             RewardMapper.mapToRewardItem(it)
                         }
+                        val dummyData : List<RewardItem> = getDummyRewardItem()
 
-                        // 새로 받은 리스트로 갱신
-                        // 더미데이터
-                        val dummyData = listOf(
-                            RewardItem(RewardType.CHALLENGE_JOIN, "챌린지 참여", "100 포인트", "오늘"),
-                            RewardItem(RewardType.RANKING_REWARD, "랭킹 리워드", "200 포인트", "어제"),
-                            RewardItem(RewardType.DAILY_EXCEED, "하루 지출 초과", "50 포인트", "최근 7일"),
-                            RewardItem(RewardType.CHALLENGE_RANKING_UPDATE, "챌린지 랭킹 업데이트", "150 포인트", "최근 7일")
-                        )
-
-                        val combinedItems =  dummyData
-
-                        updateRewardList(combinedItems)
-                    } else {
-                        // isSuccess가 false거나 body가 null인 경우 처리
+                        if(itemList.isEmpty()){
+                            val finalDisplayList = toDisplayList(dummyData)
+                            rewardAdapter = RewardAdapter(finalDisplayList)
+                            binding.rvReward.adapter = rewardAdapter
+                        } else {
+                            val finalDisplayList = toDisplayList(itemList)
+                            rewardAdapter = RewardAdapter(finalDisplayList)
+                            binding.rvReward.adapter = rewardAdapter
+                        }
                     }
                 } else {
-                    // response.isSuccessful이 아닌 경우(4xx, 5xx 에러 등)
+                    Log.d("NotificationFragment", "알림 목록 가져오기 실패")
                 }
             } catch (e: Exception) {
                 // 네트워크 오류, JSON 파싱 오류 등
+                e.printStackTrace()
             }
         }
     }
 
-    private fun updateRewardList(newItems: List<RewardItem>) {
-        // RewardAdapter를 다시 생성하는 대신,
-        rewardAdapter.updateItems(newItems)
+    private fun toDisplayList(originalItems: List<RewardItem>): List<RewardListItem> {
+        // 1) 섹션별 그룹화
+        val groupedMap = originalItems.groupBy { it.section }
+
+        // 2) 원하는 섹션 표시 순서 정의
+        val sectionOrder = listOf("오늘", "어제", "최근 7일")
+
+        // 3) 최종 표시 리스트 구성
+        val result = mutableListOf<RewardListItem>()
+        sectionOrder.forEach { sectionName ->
+            val itemsInSection = groupedMap[sectionName]
+            if (!itemsInSection.isNullOrEmpty()) {
+                // -- 헤더 추가 --
+                result.add(RewardListItem.HeaderItem(sectionName))
+                // -- 섹션 내 아이템들 추가 --
+                for (reward in itemsInSection) {
+                    result.add(RewardListItem.NormalItem(reward))
+                }
+            }
+        }
+        return result
     }
+
+    private fun getDummyRewardItem(): List<RewardItem> {
+
+        val dummyRewardItem = mutableListOf<RewardItem>()
+        dummyRewardItem.add(RewardItem(RewardType.GOAL, "식비에서 5일 연속 무지출 달성", "20", "오늘"))
+        dummyRewardItem.add(RewardItem(RewardType.GOAL, "간식/음료에서 5일 연속 무지출 달성", "20", "어제"))
+        dummyRewardItem.add(RewardItem(RewardType.TEAM_GOAL, "무지출이 대세다 방 20대 전체 상위 5% 달성", "20", "최근 7일"))
+        return dummyRewardItem
+    }
+
+
+
+
+
 }

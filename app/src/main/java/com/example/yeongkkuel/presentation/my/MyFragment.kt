@@ -22,11 +22,14 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CustomCredential
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentMyBinding
 import com.example.yeongkkuel.network.RetrofitClient
@@ -41,7 +44,9 @@ class MyFragment : Fragment() {
 
     private var _binding: FragmentMyBinding? = null
     private val binding get() = _binding!!
+    private var pressedTime = 0L
 
+    private val notificationViewModel: NotificationViewModel by viewModels()
     private val viewModel: ProfileViewModel by viewModels({ requireActivity() })
 
     override fun onCreateView(
@@ -54,6 +59,17 @@ class MyFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (System.currentTimeMillis() > pressedTime + 2000) {
+                    pressedTime = System.currentTimeMillis()
+                    Toast.makeText(requireContext(), "한번 더 누르면 종료", Toast.LENGTH_SHORT).show()
+                } else {
+                    requireActivity().finish()
+                }
+            }
+        })
+
 
 
         observeViewModel()
@@ -70,14 +86,29 @@ class MyFragment : Fragment() {
             }
 
             val layoutParams = ivNoti.layoutParams as ViewGroup.MarginLayoutParams
-            layoutParams.marginEnd = 0
+            layoutParams.marginEnd = 12
             ivNoti.layoutParams = layoutParams
+
+            notificationViewModel.checkUnreadNotifications()
+            notificationViewModel.unreadNotification.observe(viewLifecycleOwner) { hasUnread ->
+                binding.includeTopbar.ivNotiDot.visibility =
+                    if (hasUnread) View.VISIBLE else View.INVISIBLE
+            }
         }
+
+
 
     }
     private fun observeViewModel() {
         viewModel.profileResponse.observe(viewLifecycleOwner) { response ->
             response.result?.let { result ->
+
+                if(result.ageGroup == "UNDECIDED" || result.job == "UNDECIDED"){
+                    binding.tvDot.visibility = View.GONE
+                } else {
+                    binding.tvDot.visibility = View.VISIBLE
+                }
+
                 binding.tvNickname.text = result.nickname
                 binding.tvAge.text = convertAgeGroup(result.ageGroup)
 
@@ -89,18 +120,33 @@ class MyFragment : Fragment() {
                     val imageUrl = result.profileImageUrl
                     Glide.with(this)
                         .load(imageUrl)
-                        .placeholder(R.drawable.ic_my_profile)  // 로딩 중 표시
-                        .error(R.drawable.ic_my_profile)        // 에러 시 표시
+                        .diskCacheStrategy(DiskCacheStrategy.NONE) // 캐시 끔
+                        .skipMemoryCache(true)
+                        .placeholder(null)
+                        .circleCrop()
+                        .error(R.drawable.bg_box_white)
                         .into(binding.ivProfile)
                 } ?: run {
                     // 기본 이미지 설정 또는 아무 작업도 하지 않음
                     binding.ivProfile.setImageResource(R.drawable.ic_my_profile)
                 }
                 binding.tvEmail.text = result.email
-                binding.tvDailyLimit.text = result.dayTargetExpenditure.toString() + " 원"
-                binding.tvDailyPercent.text = result.weeklyAchievementRate.toString() + " %"
+                binding.tvDailyLimit.text = if (result.dayTargetExpenditure == 0) {
+                    "- 원"
+                } else {
+                    val dayTarget = String.format("%,d", result.dayTargetExpenditure)
+                    "${dayTarget} 원"
+                }
+
+                binding.tvDailyPercent.text = if (result.weeklyAchievementRate == 0.0) {
+                    "- %"
+                } else {
+                    "${result.weeklyAchievementRate} %"
+                }
             }
         }
+
+
     }
 
 
@@ -122,7 +168,6 @@ class MyFragment : Fragment() {
             findNavController().navigate(R.id.action_myFragment_to_navigation_daily_expense_goal)
         }
 
-
         binding.ivRewardMore.setOnClickListener{
             // 이동: MyPage -> RewardFragment
             findNavController().navigate(R.id.action_myPageFragment_to_rewardFragment)
@@ -143,8 +188,22 @@ class MyFragment : Fragment() {
             showWithdrawModal()
         }
 
+        binding.tvFaq.setOnClickListener() {
+            val url = "https://sugared-college-51e.notion.site/0-FAQ-190624a0a41b8097b9cbc4141527da8c?pvs=74"
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            startActivity(intent)
+
+        }
+        binding.tvSupport.setOnClickListener() {
+            val url = "https://sugared-college-51e.notion.site/0-190624a0a41b80d0ba16fa178c3acc40?pvs=73"
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            startActivity(intent)
+
+        }
+
 
     }
+
 
     // 모달
     private fun showInviteCodeModal() {
@@ -422,9 +481,9 @@ class MyFragment : Fragment() {
                 // 일반 로그인 or 미로그인 상태
             }
 
-        }
+            }
 
-    }
+        }
 
 
     /**
@@ -448,7 +507,6 @@ class MyFragment : Fragment() {
                     }
                 }
             }
-
             "google" -> {
 
                 lifecycleScope.launch {

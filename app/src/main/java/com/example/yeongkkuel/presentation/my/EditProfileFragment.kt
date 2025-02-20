@@ -25,8 +25,10 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModel
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.databinding.FragmentEditProfileBinding
 import com.example.yeongkkuel.presentation.my.util.UriUtil
@@ -41,7 +43,10 @@ class EditProfileFragment : Fragment() {
     // ViewModel
     private val viewModel: ProfileViewModel by viewModels()
 
-    // 실제 서버에 보낼 프로필 이미지 파일
+//    private lateinit var imagePickerLauncher: ActivityResultLauncher<Intent>
+
+//    private var selectedImageFile: File? = null
+// 실제 서버 전송용 파일
     private var selectedFile: File? = null
 
     // 선택된 뷰 (없으면 null)
@@ -54,14 +59,20 @@ class EditProfileFragment : Fragment() {
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            val uri = result.data?.data ?: return@registerForActivityResult
-            val compressedFile = UriUtil.toFile(requireContext(), uri)
-            selectedFile = compressedFile
-            // 미리보기
-            val bitmap = BitmapFactory.decodeFile(compressedFile.absolutePath)
-            binding.ivProfile.setImageBitmap(bitmap)
-            // ViewModel에 경로 업데이트 (필요하다면)
-            viewModel.updateProfileImageUrl(compressedFile.absolutePath)
+            val uri = result.data?.data
+            uri?.let {
+                // Uri -> File
+                val compressedFile = UriUtil.toFile(requireContext(), it)
+                selectedFile = compressedFile
+
+                // 미리보기  - imagepicker로 고른 이미지 미리보기로 보역주
+                Glide.with(this)
+                    .load(compressedFile)  // File 객체도 load 가능
+                    .circleCrop()          // 원형 크롭
+                    .into(binding.ivProfile)
+                // 기존 로직대로, ViewModel에도 파일 경로 업데이트 (원하면 추가)
+                viewModel.updateProfileImageUrl(compressedFile.absolutePath)
+            }
         }
     }
 
@@ -79,11 +90,10 @@ class EditProfileFragment : Fragment() {
         setupSelectableViews()
         setupListeners()
         observeViewModel()
+
+
     }
 
-    /**
-     * 성별/나이/직업 각 그룹에 대해 '단일 선택 + 토글 해제'가 가능하도록 설정
-     */
     private fun setupSelectableViews() {
         setupSingleSelection(binding.glGenderGroup) { view, isSelected ->
             if (isSelected && view is TextView) {
@@ -170,7 +180,7 @@ class EditProfileFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-        // 프로필 이미지 변경 버튼
+        // 이미지 편집 버튼
         binding.tvProfileImageEdit.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             imagePickerLauncher.launch(intent)
@@ -185,7 +195,10 @@ class EditProfileFragment : Fragment() {
             // if (!validateSelection()) return@setOnClickListener
 
             // ViewModel 메서드 호출 (PATCH)
-            viewModel.saveUserProfile(selectedFile)
+//            viewModel.saveUserProfile(selectedFile)
+
+                viewModel.saveUserProfile(requireContext(),selectedFile)
+
         }
 
         // 뒤로가기
@@ -224,11 +237,13 @@ class EditProfileFragment : Fragment() {
     }
 
     private fun observeViewModel() {
+
+        // (A) 기존 profileResponse 관찰 - 프로필 조회 / 수정 직후 결과
         // 프로필 조회 결과
         viewModel.profileResponse.observe(viewLifecycleOwner) { response ->
             if (response.isSuccess) {
                 response.result?.let { result ->
-                    // UI에 기존 값 세팅
+                    // 조회 시: UI에 기존 값들 반영
                     binding.etNickname.setText(result.nickname)
                     binding.tvNicknameCount.text = "${result.nickname.length}/10"
 
@@ -236,8 +251,11 @@ class EditProfileFragment : Fragment() {
                     if (!result.profileImageUrl.isNullOrEmpty()) {
                         Glide.with(this)
                             .load(result.profileImageUrl)
-                            .placeholder(R.drawable.ic_my_profile)
-                            .error(R.drawable.ic_my_profile)
+                            .diskCacheStrategy(DiskCacheStrategy.NONE) // 캐시 끔
+                            .skipMemoryCache(true)
+                            .placeholder(R.drawable.bg_box_white)
+                            .error(R.drawable.bg_box_white)
+                            .circleCrop()
                             .into(binding.ivProfile)
                     } else {
                         binding.ivProfile.setImageResource(R.drawable.ic_my_profile)
@@ -254,23 +272,43 @@ class EditProfileFragment : Fragment() {
                     updateInitialSelection(binding.glJobGroup, displayJob)
                 }
             } else {
-                Toast.makeText(requireContext(),
+                Toast.makeText(
+                    requireContext(),
                     "실패: ${response.message ?: "오류가 발생했습니다."}",
                     Toast.LENGTH_SHORT
                 ).show()
             }
         }
 
+        // (B) 이벤트 관찰 - 수정 성공/실패
+        viewModel.updateStatusEvent.observe(viewLifecycleOwner) { event ->
+            // 이벤트가 이미 처리되었는지 확인
+            event.getContentIfNotHandled()?.let { isSuccess ->
+                if (isSuccess) {
+                    // 성공
+                    Toast.makeText(requireContext(), "프로필이 저장되었습니다.", Toast.LENGTH_SHORT).show()
+                    findNavController().navigateUp()
+                } else {
+                    // 실패
+                    Toast.makeText(requireContext(), "프로필 수정 실패", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
         // 프로필 수정(PATCH) 결과
-        viewModel.updateStatus.observe(viewLifecycleOwner) { result ->
+        /*viewModel.updateStatus.observe(viewLifecycleOwner) { result ->
             result.onSuccess {
                 Toast.makeText(requireContext(), "프로필이 저장되었습니다.", Toast.LENGTH_SHORT).show()
                 findNavController().navigateUp()
             }.onFailure { e ->
                 Toast.makeText(requireContext(), "수정 실패: ${e.message}", Toast.LENGTH_SHORT).show()
             }
-        }
-    }
+        }*/
+
+
+    // --------------------------------------------------------------------------------
+    // 이하 변환 함수(기존 로직 유지)
+    // --------------------------------------------------------------------------------
 
     /**
      * 조회된 값에 따라 초기 선택 상태를 업데이트

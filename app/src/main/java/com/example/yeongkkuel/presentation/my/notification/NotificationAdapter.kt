@@ -8,10 +8,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yeongkkuel.R
 import com.example.yeongkkuel.presentation.my.notification.data.NotificationItem
+import com.example.yeongkkuel.presentation.my.notification.data.NotificationListItem
 import com.example.yeongkkuel.presentation.my.notification.data.NotificationType
 
 class NotificationAdapter(
-    private val items: List<NotificationItem>,
+    private val displayItems: List<NotificationListItem>,
     private val onItemClick: (NotificationItem) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -20,17 +21,11 @@ class NotificationAdapter(
         private const val VIEW_TYPE_ITEM = 1
     }
 
-    // 실제로는 섹션을 grouping 하여 items를 구성하거나,
-    // items 안에 섹션 아이템을 추가하여 뷰타입을 구별할 수도 있음
-    // 여기서는 간단히 item.section != null 이면 헤더라고 가정
-
     override fun getItemViewType(position: Int): Int {
-        // 이전 아이템과 section이 다르면 헤더로 표시하는 식으로 로직 처리
-        if (position == 0 ||
-            (position > 0 && items[position].section != items[position-1].section)) {
-            return VIEW_TYPE_HEADER
+        return when (displayItems[position]) {
+            is NotificationListItem.HeaderItem -> VIEW_TYPE_HEADER
+            is NotificationListItem.NormalItem -> VIEW_TYPE_ITEM
         }
-        return VIEW_TYPE_ITEM
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -49,40 +44,38 @@ class NotificationAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val item = items[position]
-        when (holder) {
-            is HeaderViewHolder -> {
-                // '내가 리스트의 첫 헤더인지
-                val isFirstHeader = (position == 0)
-                holder.bind(item, isFirstHeader)
+        when (val item = displayItems[position]) {
+            is NotificationListItem.HeaderItem -> {
+                (holder as HeaderViewHolder).bind(item)
             }
-            is NotificationViewHolder -> {
-                holder.bind(item, onItemClick)
+            is NotificationListItem.NormalItem -> {
+                (holder as NotificationViewHolder).bind(item.notification, onItemClick)
             }
         }
     }
 
-    override fun getItemCount(): Int = items.size
+    override fun getItemCount(): Int = displayItems.size
 
     class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val tvHeader = itemView.findViewById<TextView>(R.id.tvHeader)
-        private val viewHeaderDivider = itemView.findViewById<View>(R.id.viewHeaderDivider)
+        private val tvHeader: TextView = itemView.findViewById(R.id.tvHeader)
+        private val viewHeaderDivider: View? = itemView.findViewById(R.id.viewHeaderDivider)
 
-        fun bind(item: NotificationItem, isFirstHeader: Boolean) {
-            tvHeader.text = item.section
+        fun bind(headerItem: NotificationListItem.HeaderItem) {
+            tvHeader.text = headerItem.sectionName
 
-            // 첫 헤더에는 구분선을 숨기고, 두 번째 이후 헤더에는 보여주기
-            viewHeaderDivider.visibility = if (isFirstHeader) View.GONE else View.VISIBLE
+            // "첫 헤더만 구분선을 안 보이게" 등등의 조건을 주고 싶으면,
+            // adapterPosition == 0 인지 검사할 수도 있습니다.
+            viewHeaderDivider?.visibility = if (adapterPosition == 0) View.GONE else View.VISIBLE
         }
     }
 
     class NotificationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val ivIcon = itemView.findViewById<ImageView>(R.id.ivNotificationIcon)
-        private val tvMessage = itemView.findViewById<TextView>(R.id.tvNotificationMessage)
-        private val tvTime = itemView.findViewById<TextView>(R.id.tvTime)
+        private val ivIcon: ImageView = itemView.findViewById(R.id.ivNotificationIcon)
+        private val tvMessage: TextView = itemView.findViewById(R.id.tvNotificationMessage)
+        private val tvTime: TextView = itemView.findViewById(R.id.tvTime)
 
         fun bind(item: NotificationItem, onClick: (NotificationItem) -> Unit) {
-            // 아이콘은 NotificationType에 따라 다른 drawable을 설정
+            // 아이콘은 NotificationType에 따라 결정
             val iconRes = when (item.type) {
                 NotificationType.CHALLENGE_JOIN -> R.drawable.ic_challenge_join
                 NotificationType.RANKING_REWARD -> R.drawable.ic_ranking_reward
