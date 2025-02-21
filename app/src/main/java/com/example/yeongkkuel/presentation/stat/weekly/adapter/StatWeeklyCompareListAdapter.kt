@@ -57,8 +57,8 @@ class StatWeeklyCompareListAdapter(
                 }
 
                 is StatWeeklyUiState.CompareData.PastCompare -> {
-                    tvComparedUnit.text = item.spendingUnit.kor
-                    tvMyUnit.text = item.spendingUnit.kor
+                    tvComparedUnit.text = SpendingUnit.DAY.kor
+                    tvMyUnit.text = SpendingUnit.DAY.kor
 
                     val spendingDiff = item.currentSpending - item.pastSpending
 

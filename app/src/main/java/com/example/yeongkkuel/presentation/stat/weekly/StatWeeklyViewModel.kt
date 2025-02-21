@@ -9,12 +9,14 @@ import com.example.yeongkkuel.presentation.util.Colors
 import com.example.yeongkkuel.presentation.util.Job
 import com.example.yeongkkuel.presentation.util.SpendingCategory
 import com.example.yeongkkuel.presentation.util.Week
+import com.example.yeongkkuel.presentation.util.getDayOfWeekNum
 import com.github.mikephil.charting.data.Entry
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalDate
 
 class StatWeeklyViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<StatWeeklyUiState>(StatWeeklyUiState.init())
@@ -91,10 +93,11 @@ class StatWeeklyViewModel : ViewModel() {
                                     }
 
                                     // PastCompare는 항상 추가
+                                    val todayWeekNum = getDayOfWeekNum(LocalDate.now())
                                     add(
                                         StatWeeklyUiState.CompareData.PastCompare(
-                                            pastSpending = lastWeekExpenditure ?: 0,
-                                            currentSpending = thisWeekExpenditure,
+                                            pastSpending = lastWeekExpenditure?.div(7) ?: 0,
+                                            currentSpending = thisWeekExpenditure/todayWeekNum,
                                             spendingUnit = SpendingUnit.WEEK
                                         )
                                     )
