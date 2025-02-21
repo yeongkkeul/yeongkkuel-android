@@ -19,6 +19,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
@@ -51,6 +52,10 @@ object RetrofitClient {
 
         if (authRetrofit == null) {
             val client = OkHttpClient.Builder()
+                .connectTimeout(10, TimeUnit.SECONDS)  // 서버 연결 타임아웃 (기본: 10초)
+                .readTimeout(10, TimeUnit.SECONDS)     // 데이터 읽기 타임아웃 (기본: 10초)
+                .writeTimeout(10, TimeUnit.SECONDS)    // 데이터 쓰기 타임아웃 (기본: 10초)
+                .retryOnConnectionFailure(false)        // 네트워크 연결 실패 시 자동 재시도
                 .addInterceptor(AuthInterceptor(context))  // JWT 헤더 자동 추가
                 .addInterceptor(loggingInterceptor) // 📌 HttpLoggingInterceptor 추가!
                 .build()

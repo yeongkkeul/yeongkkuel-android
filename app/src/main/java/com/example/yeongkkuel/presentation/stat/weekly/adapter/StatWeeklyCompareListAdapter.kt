@@ -57,32 +57,19 @@ class StatWeeklyCompareListAdapter(
                 }
 
                 is StatWeeklyUiState.CompareData.PastCompare -> {
-                    tvComparedUnit.text = item.spendingUnit.kor
-                    tvMyUnit.text = item.spendingUnit.kor
+                    tvComparedUnit.text = SpendingUnit.DAY.kor
+                    tvMyUnit.text = SpendingUnit.DAY.kor
 
                     val spendingDiff = item.currentSpending - item.pastSpending
 
-                    when (item.spendingUnit) {
-                        SpendingUnit.DAY -> {
-                            tvComparedTarget.text = "어제"
-                            tvMyTarget.text = "오늘"
-                        }
 
-                        SpendingUnit.WEEK -> {
-                            tvComparedTarget.text = "저번 주"
-                            tvMyTarget.text = "이번 주"
-                        }
-
-                        SpendingUnit.MONTH -> {
-                            tvComparedTarget.text = "저번 달"
-                            tvMyTarget.text = "이번 달"
-                        }
-                    }
+                    tvComparedTarget.text = "저번 주"
+                    tvMyTarget.text = "이번 주"
 
                     val descriptionText = if (spendingDiff >= 0) {
-                        "${tvComparedTarget.text}보다 ${spendingDiff.toMoneyString()} 원 더 썼어요"
+                        "저번 주보다 ${spendingDiff.toMoneyString()} 원 더 썼어요"
                     } else {
-                        "${tvComparedTarget.text}보다 ${(-spendingDiff).toMoneyString()} 원 덜 썼어요"
+                        "저번 주보다 ${(-spendingDiff).toMoneyString()} 원 덜 썼어요"
                     }
 
                     val boldText = if (spendingDiff >= 0) "${spendingDiff.toMoneyString()} 원"

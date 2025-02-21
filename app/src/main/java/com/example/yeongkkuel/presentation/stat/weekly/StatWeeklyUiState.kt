@@ -22,14 +22,14 @@ data class StatWeeklyUiState(
             val target: String,
             val targetSpending: Int,
             val mySpending: Int, // 주간 지출에서 평균 구해서 넣기
-            val spendingUnit: SpendingUnit = SpendingUnit.WEEK,
+            val spendingUnit: SpendingUnit = SpendingUnit.DAY,
             val percentile: Int,
         ) : CompareData
 
         data class PastCompare(
             val pastSpending: Int,
             val currentSpending: Int,
-            val spendingUnit: SpendingUnit = SpendingUnit.WEEK
+            val spendingUnit: SpendingUnit = SpendingUnit.DAY
         ) : CompareData
     }
 
@@ -57,13 +57,13 @@ data class StatWeeklyUiState(
                     target = "20대 직장인",
                     targetSpending = 15700,
                     mySpending = 8100,
-                    spendingUnit = SpendingUnit.WEEK,
+                    spendingUnit = SpendingUnit.DAY,
                     percentile = 10
                 ),
                 CompareData.PastCompare(
                     pastSpending = 122038,
                     currentSpending = 100383,
-                    spendingUnit = SpendingUnit.WEEK
+                    spendingUnit = SpendingUnit.DAY
                 )
             ),
             pieChartList = listOf(

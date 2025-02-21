@@ -22,6 +22,7 @@ import com.example.yeongkkuel.presentation.stat.StatAnimationListener
 import com.example.yeongkkuel.presentation.stat.weekly.adapter.StatWeeklyCompareListAdapter
 import com.example.yeongkkuel.presentation.stat.weekly.adapter.StatWeeklyPieChartCategoryListAdapter
 import com.example.yeongkkuel.presentation.stat.weekly.adapter.StatWeeklyWeekListAdapter
+import com.example.yeongkkuel.presentation.util.getDayOfWeekNum
 import com.example.yeongkkuel.presentation.util.toMoneyString
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.data.LineData
@@ -331,19 +332,6 @@ class StatWeeklyFragment(
         initPieChartDescription()
     }
 
-    private fun getDayOfWeekNum(date: LocalDate): Int {
-        val dayString = date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.KOREAN) // 예: "월요일"
-        return when (dayString) {
-            "월요일" -> 1
-            "화요일" -> 2
-            "수요일" -> 3
-            "목요일" -> 4
-            "금요일" -> 5
-            "토요일" -> 6
-            "일요일" -> 7
-            else -> 0
-        }
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()
