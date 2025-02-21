@@ -93,9 +93,9 @@
                 app:layout_constraintTop_toBottomOf="@id/tv_empty_message1" />
 
             <ImageView
+                android:id="@+id/img_add_category"
                 android:layout_width="127dp"
                 android:layout_height="36dp"
-                android:id="@+id/img_add_category"
                 android:src="@drawable/bg_box_purple"
                 android:layout_marginTop="10dp"
                 android:visibility="visible"

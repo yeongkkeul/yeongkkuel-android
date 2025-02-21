@@ -257,7 +257,7 @@ class MainActivity : AppCompatActivity(), BotSheetListener {
                 when (destination.id) {
                     R.id.navigation_home,
                     R.id.navigation_stat,
-                        -> setBotSheetVisible()
+                    -> setBotSheetVisible()
 
 
                     else -> setBotSheetGone()

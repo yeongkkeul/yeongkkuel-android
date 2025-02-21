@@ -1,6 +1,7 @@
 package com.example.yeongkkuel.presentation.home.store
 
 import android.os.Parcelable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,13 +12,12 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class Product(
-    val id: Int, // ✅ id 추가
+    val id: Int,
     val name: String,
     val price: Int,
-    val imageUrl: String, // ✅ 변경
+    val imageUrl: String,
     val category: ProductCategory,
-    val itemType: String, // ✅ 추가: itemType 필드
-    var area: String? = null
+    val itemType: String ?
 ) : Parcelable
 
 class StoreAdapter(
@@ -38,6 +38,7 @@ class StoreAdapter(
     override fun onBindViewHolder(holder: StoreViewHolder, position: Int) {
         val product = products[position]
         holder.bind(product, position == selectedPosition)
+        Log.d("StoreAdapter", "어댑터에 전달된 Product - id: ${product.id}, name: ${product.name}, itemType: ${product.itemType}")
 
 
         // 아이템 클릭 이벤트 처리
@@ -64,10 +65,9 @@ class StoreAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(product: Product, isSelected: Boolean) {
-            // ✅ 서버에서 받은 이미지 URL을 Glide로 로드
             Glide.with(binding.root.context)
-                .load(product.imageUrl) // ✅ 서버 이미지 URL 사용
-                .into(binding.imgStoreProduct) // ✅ 이미지 로드
+                .load(product.imageUrl) // 서버 이미지 URL 사용
+                .into(binding.imgStoreProduct) //  이미지 로드
 
             binding.tvStoreProductName.text = product.name
             binding.tvProductPrice.text = product.price.toString()

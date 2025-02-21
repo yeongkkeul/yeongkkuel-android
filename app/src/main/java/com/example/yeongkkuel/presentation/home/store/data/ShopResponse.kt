@@ -24,6 +24,6 @@ data class ShopItem(
     val id: Int,
     val itemName: String,
     val price: Int,
-    val itemType: String,
+    val itemType: String?,
     val itemImg: String
 )

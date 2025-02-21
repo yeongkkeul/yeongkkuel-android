@@ -384,7 +384,7 @@ class BotSheetViewModel : ViewModel() {
                 }
             }
         } catch (e: Exception) {
-            Log.e("BotSheetViewModel", "🚨 getSpendingList() 오류: ${e.message}")
+            Log.e("BotSheetViewModel", "getSpendingList() 오류: ${e.message}")
         }
     }
 
